@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Капітал">
+<meta name="theme-color" content="#0a0a0f">
+<title>Капітал</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--card:#16161f;
+  --border:#ffffff0f;--border2:#ffffff1a;
+  --text:#f0f0f8;--muted:#6b6b80;--muted2:#9090a8;
+  --gold:#e8c97a;--gold2:#f5dfa0;
+  --blue:#5b9cf6;--blue2:#7ab3ff;
+  --green:#4ecb8d;--green2:#6edba0;
+  --purple:#a78bfa;--purple2:#c4b0ff;
+  --teal:#2dd4bf;--teal2:#5eead4;
+  --orange:#fb923c;--orange2:#fdb07a;
+  --red:#f87171;
+}
+html,body{height:100%;width:100%;overflow-x:hidden;background:var(--bg);}
+body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
+
+/* HEADER */
+.header{padding:56px 20px 20px;background:linear-gradient(180deg,#0a0a1a 0%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.header-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+.total-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+.total-amount{font-size:clamp(34px,9vw,52px);font-weight:800;letter-spacing:-2px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.total-currency{font-size:20px;font-weight:600;color:var(--gold);opacity:0.7;}
+.total-subs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.badge{font-family:'DM Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px;display:inline-block;}
+.badge-green{background:#4ecb8d18;color:var(--green2);}
+.badge-red{background:#f8717118;color:var(--red);}
+.badge-purple{background:#a78bfa18;color:var(--purple2);}
+
+/* SECTION LABEL */
+.section-label{padding:16px 20px 8px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase;}
+
+/* CARDS */
+.cards{padding:0 16px;display:flex;flex-direction:column;gap:14px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:border-color .2s,opacity .2s,transform .15s;position:relative;}
+.card.dragging{opacity:0.45;transform:scale(0.97);z-index:50;}
+.card.drag-over{border-color:var(--gold)!important;transform:scale(1.01);}
+.card.expanded{border-color:var(--border2);}
+.card-header{padding:16px 18px 14px;display:flex;align-items:center;gap:12px;user-select:none;}
+.drag-handle{font-size:18px;color:var(--muted);cursor:grab;padding:4px 2px;touch-action:none;flex-shrink:0;line-height:1;}
+.card-icon{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.card-info{flex:1;min-width:0;cursor:pointer;}
+.card-name{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:2px;}
+.card-value{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;letter-spacing:-0.5px;}
+.card-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;}
+.card-toggle{color:var(--muted);font-size:14px;transition:transform .25s;flex-shrink:0;padding:4px;cursor:pointer;}
+.card.expanded .card-toggle{transform:rotate(180deg);}
+.card-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.4,0,0.2,1);}
+.card.expanded .card-body{max-height:1400px;}
+.card-inner{padding:0 20px 20px;}
+.divider{height:1px;background:var(--border);margin-bottom:18px;}
+
+/* CARD THEMES */
+.card-deposit{border-top:2px solid var(--blue);}
+.card-deposit .card-icon{background:#5b9cf614;}
+.card-deposit .card-value{color:var(--blue2);}
+.card-crypto{border-top:2px solid var(--purple);}
+.card-crypto .card-icon{background:#a78bfa14;}
+.card-crypto .card-value{color:var(--purple2);}
+.card-usd{border-top:2px solid var(--teal);}
+.card-usd .card-icon{background:#2dd4bf14;}
+.card-usd .card-value{color:var(--teal2);}
+.card-forex{border-top:2px solid var(--orange);}
+.card-forex .card-icon{background:#fb923c14;}
+.card-forex .card-value{color:var(--orange2);}
+.card-cash{border-top:2px solid var(--gold);}
+.card-cash .card-icon{background:#e8c97a14;}
+.card-cash .card-value{color:var(--gold2);}
+.card-other{border-top:2px solid var(--green);}
+.card-other .card-icon{background:#4ecb8d14;}
+.card-other .card-value{color:var(--green2);}
+
+/* INPUTS */
+.field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.field-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;}
+.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;transition:border-color .15s;}
+.field-input:focus{border-color:var(--border2);}
+.field-input::placeholder{color:var(--muted);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+select.field-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;appearance:none;-webkit-appearance:none;}
+select.field-input option{background:var(--bg3);color:var(--text);}
+
+/* RESULT BOX */
+.result-box{background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-top:12px;}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.result-row:last-child{border-bottom:none;}
+.result-key{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);}
+.result-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text);}
+.result-val.green{color:var(--green2);}
+.result-val.red{color:var(--red);}
+.result-val.blue{color:var(--blue2);}
+.result-val.orange{color:var(--orange2);}
+
+/* CALC */
+.calc-section{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:6px;}
+.calc-title{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:14px;}
+.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 7px;border-radius:20px;text-transform:uppercase;}
+.tag-tax{background:#f8717118;color:var(--red);}
+.tag-net{background:#4ecb8d18;color:var(--green2);}
+
+/* LIST ROWS */
+.list-row{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);gap:8px;}
+.list-row:last-child{border-bottom:none;}
+.list-sym{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;min-width:50px;}
+.list-info{font-size:11px;color:var(--muted2);flex:1;}
+.list-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);}
+.rm-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 0 0 8px;flex-shrink:0;}
+.add-btn{width:100%;margin-top:12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:12px;padding:11px;font-family:'Syne',sans-serif;font-size:13px;color:var(--muted2);cursor:pointer;transition:background .15s;}
+.add-btn:active{background:var(--bg2);}
+
+/* LIVE TICKER */
+.live-wrap{margin:0 16px 14px;background:linear-gradient(135deg,#0d1a2e,#0a1220);border:1px solid #5b9cf630;border-radius:20px;padding:18px 20px;position:relative;overflow:hidden;}
+.live-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,#5b9cf60a 0%,transparent 60%);pointer-events:none;}
+.live-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--blue);text-transform:uppercase;margin-bottom:10px;}
+.live-dot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:6px;vertical-align:middle;animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.6);}}
+.live-num{font-family:'DM Mono',monospace;font-size:clamp(22px,6vw,32px);font-weight:500;color:#7ab3ff;letter-spacing:-1px;line-height:1;margin-bottom:4px;}
+.live-kopeck{font-size:0.55em;opacity:0.7;}
+.live-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:10px;}
+.live-rows{display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.live-row{display:flex;justify-content:space-between;align-items:center;}
+.live-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.live-val{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;}
+.live-val.g{color:var(--green2);}
+.live-val.r{color:var(--red);}
+.live-val.b{color:var(--blue2);}
+.live-val.o{color:var(--orange2);}
+.live-bar-wrap{margin-top:10px;height:4px;background:#ffffff0a;border-radius:4px;overflow:hidden;}
+.live-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#3b6fd4,#5b9cf6);transition:width .5s linear;}
+.live-dates{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;}
+.live-setup{background:var(--bg3);border:1px dashed var(--border2);border-radius:14px;padding:16px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+
+/* DAILY LOG */
+.daily-section{margin-top:14px;}
+.daily-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.daily-scroll{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;}
+.daily-row{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;}
+.daily-row:last-child{border-bottom:none;}
+.daily-date{color:var(--muted2);}
+.daily-income{color:var(--green2);}
+.daily-total{color:var(--blue2);font-size:9px;}
+
+.footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-label">Загальний капітал</div>
+  <div class="total-wrap">
+    <div class="total-amount" id="totalAmount">0</div>
+    <div class="total-currency">₴</div>
+  </div>
+  <div class="total-subs">
+    <div class="badge badge-green" id="totalChange">введіть дані</div>
+    <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
+  </div>
+</div>
+
+<div class="section-label">Активи · утримай та перетягни для сортування</div>
+
+<!-- LIVE TICKER -->
+<div class="live-wrap">
+  <div class="live-label"><span class="live-dot"></span>Живий лічильник депозиту</div>
+  <div id="liveSetup" class="live-setup">Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює</div>
+  <div id="liveMain" style="display:none">
+    <div class="live-num" id="liveAmount">0<span class="live-kopeck">.00 ₴</span></div>
+    <div class="live-sub" id="liveSub">поточний баланс з відсотками</div>
+    <div class="live-rows">
+      <div class="live-row"><span class="live-key">📈 Нараховано %</span><span class="live-val g" id="liveInterest">—</span></div>
+      <div class="live-row"><span class="live-key">🏛 Податок</span><span class="live-val r" id="liveTaxLive">—</span></div>
+      <div class="live-row"><span class="live-key">✅ Чистий прибуток</span><span class="live-val g" id="liveNet">—</span></div>
+      <div class="live-row"><span class="live-key">⚡ В секунду</span><span class="live-val b" id="livePerSec">—</span></div>
+      <div class="live-row"><span class="live-key">📅 В день (сьогодні)</span><span class="live-val o" id="livePerDay">—</span></div>
+    </div>
+    <div class="live-bar-wrap"><div class="live-bar" id="liveBar" style="width:0%"></div></div>
+    <div class="live-dates"><span id="liveDateStart">—</span><span id="liveDatePct">0%</span><span id="liveDateEnd">—</span></div>
+    <div class="daily-section">
+      <div class="daily-title">📊 Дохід по днях (перші 30 днів)</div>
+      <div class="daily-scroll" id="dailyLog"><div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Немає даних</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CARDS -->
+<div class="cards" id="cardsContainer">
+
+  <!-- DEPOSIT -->
+  <div class="card card-deposit" id="card-deposit" draggable="true" data-card="deposit">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">🏦</div>
+      <div class="card-info" onclick="toggleCard('deposit')">
+        <div class="card-name">Депозит</div>
+        <div class="card-value" id="depositDisplay">0 ₴</div>
+        <div class="card-pct" id="depositPct">0% від капіталу</div>
+      </div>
+      <div class="card-toggle" onclick="toggleCard('deposit')">▼</div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      <div class="field-group">
+        <div class="field-label">Сума депозиту (₴)</div>
+        <input class="field-input" type="number" id="depPrincipal" placeholder="100 000" inputmode="decimal" oninput="updateAll()">
+      </div>
+      <div class="row2">
+        <div class="field-group">
+          <div class="field-label">Дата відкриття</div>
+          <input class="field-input" type="date" id="depStartDate" oninput="updateAll()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Дата закінчення</div>
+          <input class="field-input" type="date" id="depEndDate" oninput="updateAll()">
+        </div>
+      </div>
+      <div class="calc-section">
+        <div class="calc-title">⚡ Калькулятор складних відсотків</div>
+        <div class="field-group">
+          <div class="field-label">Річна ставка (%)</div>
+          <input class="field-input" type="number" id="depRate" placeholder="16" value="16" inputmode="decimal" oninput="calcDeposit();startLiveTicker()">
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">Строк (місяців)</div>
+            <input class="field-input" type="number" id="depMonths" placeholder="12" value="12" inputmode="numeric" oninput="calcDeposit()">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Капіталізація</div>
+            <select class="field-input" id="depFreq" onchange="calcDeposit();startLiveTicker()">
+              <option value="12">Щомісяця</option>
+              <option value="4">Щокварталу</option>
+              <option value="2">Кожні 6 міс</option>
+              <option value="1">Щорічно</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">Податок на прибуток (%)</div>
+            <input class="field-input" type="number" id="depTax" placeholder="0" value="0" inputmode="decimal" oninput="calcDeposit();startLiveTicker()">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Неоподатк. мінімум</div>
+            <input class="field-input" type="number" id="depTaxFree" placeholder="0" value="0" inputmode="numeric" oninput="calcDeposit();startLiveTicker()">
+          </div>
+        </div>
+        <div class="result-box">
+          <div class="result-row"><span class="result-key">Підсумкова сума</span><span class="result-val blue" id="r-total">—</span></div>
+          <div class="result-row"><span class="result-key">Нараховано %</span><span class="result-val green" id="r-interest">—</span></div>
+          <div class="result-row"><span class="result-key">Оподатк. база</span><span class="result-val" id="r-taxbase">—</span></div>
+          <div class="result-row"><span class="result-key">Податок <span class="tag tag-tax">ПДФО</span></span><span class="result-val red" id="r-tax">—</span></div>
+          <div class="result-row"><span class="result-key">Чистий прибуток <span class="tag tag-net">після податку</span></span><span class="result-val green" id="r-net">—</span></div>
+          <div class="result-row"><span class="result-key">Ефективна ставка</span><span class="result-val" id="r-eff">—</span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- CRYPTO -->
+  <div class="card card-crypto" id="card-crypto" draggable="true" data-card="crypto">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">₮</div>
+      <div class="card-info" onclick="toggleCard('crypto')">
+        <div class="card-name">Крипто · USDT</div>
+        <div class="card-value" id="cryptoDisplay">0 ₴</div>
+        <div class="card-pct" id="cryptoPct">0% від капіталу</div>
+      </div>
+      <div class="card-toggle" onclick="toggleCard('crypto')">▼</div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      <div class="field-group">
+        <div class="field-label">Загальна сума вкладень в USDT</div>
+        <input class="field-input" type="number" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
+      </div>
+      <div class="row2">
+        <div class="field-group">
+          <div class="field-label">Курс USDT / ₴</div>
+          <input class="field-input" type="number" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Собівартість (₴)</div>
+          <input class="field-input" type="number" id="cryptoCost" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        </div>
+      </div>
+      <div class="result-box">
+        <div class="result-row"><span class="result-key">Еквівалент у ₴</span><span class="result-val blue" id="cryptoUahVal">0 ₴</span></div>
+        <div class="result-row"><span class="result-key">P&amp;L</span><span class="result-val" id="cryptoPnl">—</span></div>
+        <div class="result-row"><span class="result-key">ROI</span><span class="result-val" id="cryptoRoi">—</span></div>
+      </div>
+      <div id="cryptoRows" style="margin-top:12px"></div>
+      <div class="row2" style="margin-top:12px">
+        <div class="field-group">
+          <div class="field-label">Монета</div>
+          <input class="field-input" type="text" id="newCoinName" placeholder="BTC" style="text-transform:uppercase">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Сума USDT</div>
+          <input class="field-input" type="number" id="newCoinUsdt" placeholder="0" inputmode="decimal">
+        </div>
+      </div>
+      <button class="add-btn" onclick="addCoin()">+ Додати монету</button>
+    </div></div>
+  </div>
+
+  <!-- USD -->
+  <div class="card card-usd" id="card-usd" draggable="true" data-card="usd">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">💵</div>
+      <div class="card-info" onclick="toggleCard('usd')">
+        <div class="card-name">USD · Доларові заощадження</div>
+        <div class="card-value" id="usdDisplay">0 ₴</div>
+        <div class="card-pct" id="usdPct">0% від капіталу</div>
+      </div>
+      <div class="card-toggle" onclick="toggleCard('usd')">▼</div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      <div class="field-group">
+        <div class="field-label">Сума в доларах ($)</div>
+        <input class="field-input" type="number" id="usdAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+      </div>
+      <div class="row2">
+        <div class="field-group">
+          <div class="field-label">Курс USD / ₴</div>
+          <input class="field-input" type="number" id="usdUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Нотатка</div>
+          <input class="field-input" type="text" id="usdNote" placeholder="Готівка..." oninput="saveData()">
+        </div>
+      </div>
+      <div class="result-box">
+        <div class="result-row"><span class="result-key">💱 Конвертація → ₴</span><span class="result-val blue" id="usdToUah">0 ₴</span></div>
+        <div class="result-row"><span class="result-key">Входить у загальний рахунок</span><span class="result-val green">✓ Так</span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- FOREX -->
+  <div class="card card-forex" id="card-forex" draggable="true" data-card="forex">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">🌐</div>
+      <div class="card-info" onclick="toggleCard('forex')">
+        <div class="card-name">Валютні накопичення</div>
+        <div class="card-value" id="forexDisplay">0 ₴</div>
+        <div class="card-pct" id="forexPct">0% від капіталу</div>
+      </div>
+      <div class="card-toggle" onclick="toggleCard('forex')">▼</div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      <div id="forexRows"></div>
+      <div class="row3">
+        <div class="field-group">
+          <div class="field-label">Валюта</div>
+          <select class="field-input" id="newForexCur">
+            <option value="EUR">€ EUR</option>
+            <option value="GBP">£ GBP</option>
+            <option value="PLN">zł PLN</option>
+            <option value="CHF">Fr CHF</option>
+            <option value="CZK">Kč CZK</option>
+            <option value="RUB">₽ RUB</option>
+            <option value="KZT">₸ KZT</option>
+            <option value="OTHER">Інша</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Сума</div>
+          <input class="field-input" type="number" id="newForexAmt" placeholder="0" inputmode="decimal">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Курс / ₴</div>
+          <input class="field-input" type="number" id="newForexRate" placeholder="43" inputmode="decimal">
+        </div>
+      </div>
+      <button class="add-btn" onclick="addForex()">+ Додати валюту</button>
+      <div class="result-box">
+        <div class="result-row"><span class="result-key">Усього у ₴</span><span class="result-val orange" id="forexTotal">0 ₴</span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- CASH -->
+  <div class="card card-cash" id="card-cash" draggable="true" data-card="cash">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">💴</div>
+      <div class="card-info" onclick="toggleCard('cash')">
+        <div class="card-name">Готівка (₴)</div>
+        <div class="card-value" id="cashDisplay">0 ₴</div>
+        <div class="card-pct" id="cashPct">0% від капіталу</div>
+      </div>
+      <div class="card-toggle" onclick="toggleCard('cash')">▼</div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      <div class="field-group">
+        <div class="field-label">Сума (₴)</div>
+        <input class="field-input" type="number" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Де зберігається</div>
+        <input class="field-input" type="text" id="cashNote" placeholder="Вдома, сейф..." oninput="saveData()">
+      </div>
+    </div></div>
+  </div>
+
+  <!-- CURRENT ACCOUNT -->
+  <div class="card card-other" id="card-other" draggable="true" data-card="other">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">💳</div>
+      <div class="card-info" onclick="toggleCard('other')">
+        <div class="card-name">Поточний рахунок</div>
+        <div class="card-value" id="otherDisplay">0 ₴</div>
+        <div class="card-pct" id="otherPct">0% від капіталу</div>
+      </div>
+      <div class="card-toggle" onclick="toggleCard('other')">▼</div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      <div class="field-group">
+        <div class="field-label">Баланс (₴)</div>
+        <input class="field-input" type="number" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Банк</div>
+        <input class="field-input" type="text" id="otherName" placeholder="Monobank..." oninput="saveData()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Нотатка</div>
+        <input class="field-input" type="text" id="otherNote" placeholder="Зарплатний рахунок..." oninput="saveData()">
+      </div>
+    </div></div>
+  </div>
+
+</div>
+<div class="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────
+let coins=[], forexItems=[], cardOrder=[];
+
+// ── UTILS ────────────────────────────────────
+const $=(id)=>document.getElementById(id);
+function val(id){return parseFloat($(id)?.value)||0;}
+function sval(id){return $(id)?.value||'';}
+function fmtN(n){return n.toLocaleString('uk-UA',{maximumFractionDigits:0});}
+function fmtD(n,d=2){return n.toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function pct(a,t){return t?((a/t)*100).toFixed(1)+'%':'0%';}
+function setText(id,v){const e=$(id);if(e)e.textContent=v;}
+
+// ── GETTERS ──────────────────────────────────
+const getDepVal   =()=>val('depPrincipal');
+const getCryptoVal=()=>val('cryptoUsdt')*(val('usdtUah')||41);
+const getUsdVal   =()=>val('usdAmount')*(val('usdUah')||41);
+const getForexVal =()=>forexItems.reduce((s,f)=>s+f.amt*f.rate,0);
+const getCashVal  =()=>val('cashAmount');
+const getOtherVal =()=>val('otherAmount');
+
+// ── UPDATE ALL ───────────────────────────────
+function updateAll(){
+  const dep=getDepVal(), crypto=getCryptoVal(), usd=getUsdVal();
+  const forex=getForexVal(), cash=getCashVal(), other=getOtherVal();
+  const total=dep+crypto+usd+forex+cash+other;
+  const nonZero=[dep,crypto,usd,forex,cash,other].filter(v=>v>0).length;
+
+  setText('totalAmount', fmtN(total));
+  setText('totalBreakdown', nonZero+' активів · '+fmtN(total)+' ₴');
+
+  const chEl=$('totalChange');
+  if(dep&&total){
+    const ch=(total-dep)/dep*100;
+    chEl.textContent=(ch>=0?'+':'')+ch.toFixed(1)+'% від депозиту';
+    chEl.className='badge '+(ch>=0?'badge-green':'badge-red');
+  } else {
+    chEl.textContent='введіть дані';
+    chEl.className='badge badge-green';
+  }
+
+  const cards=[
+    ['deposit',dep],['crypto',crypto],['usd',usd],
+    ['forex',forex],['cash',cash],['other',other]
+  ];
+  cards.forEach(([k,v])=>{
+    setText(k+'Display', fmtN(v)+' ₴');
+    setText(k+'Pct',     pct(v,total)+' від капіталу');
+  });
+
+  setText('usdToUah',   fmtN(usd)+' ₴');
+  setText('cryptoUahVal',fmtN(crypto)+' ₴');
+
+  calcDeposit();
+  updateCryptoPnl();
+  renderCoins();
+  renderForex();
+  saveData();
+}
+
+// ── DEPOSIT CALC ─────────────────────────────
+function calcDeposit(){
+  const P=val('depPrincipal'); if(!P){clearDep();return;}
+  const r=val('depRate')/100, n=val('depFreq')||12, t=val('depMonths')/12;
+  const tax=val('depTax')/100, tf=val('depTaxFree')||0;
+  const A=P*Math.pow(1+r/n,n*t);
+  const interest=A-P, taxBase=Math.max(0,interest-tf);
+  const taxAmt=taxBase*tax, net=interest-taxAmt;
+  const eff=P&&t?(net/P/t*100):0;
+  setText('r-total',   fmtN(Math.round(A))+' ₴');
+  setText('r-interest','+'+fmtN(Math.round(interest))+' ₴');
+  setText('r-taxbase', fmtN(Math.round(taxBase))+' ₴');
+  setText('r-tax',     '−'+fmtN(Math.round(taxAmt))+' ₴');
+  setText('r-net',     '+'+fmtN(Math.round(net))+' ₴');
+  setText('r-eff',     eff.toFixed(2)+'% річних');
+}
+function clearDep(){['r-total','r-interest','r-taxbase','r-tax','r-net','r-eff'].forEach(id=>setText(id,'—'));}
+
+// ── CRYPTO ───────────────────────────────────
+function updateCryptoPnl(){
+  const cur=getCryptoVal(), cost=val('cryptoCost');
+  if(!cur||!cost){setText('cryptoPnl','—');setText('cryptoRoi','—');return;}
+  const pnl=cur-cost,roi=pnl/cost*100;
+  const pe=$('cryptoPnl'),re=$('cryptoRoi');
+  pe.textContent=(pnl>=0?'+':'')+fmtN(Math.round(pnl))+' ₴';
+  pe.className='result-val '+(pnl>=0?'green':'red');
+  re.textContent=(roi>=0?'+':'')+roi.toFixed(2)+'%';
+  re.className='result-val '+(roi>=0?'green':'red');
+}
+function addCoin(){
+  const name=(document.getElementById('newCoinName').value||'').trim().toUpperCase();
+  const usdt=parseFloat(document.getElementById('newCoinUsdt').value)||0;
+  if(!name)return;
+  coins.push({name,usdt});
+  document.getElementById('newCoinName').value='';
+  document.getElementById('newCoinUsdt').value='';
+  renderCoins();saveData();
+}
+function removeCoin(i){coins.splice(i,1);renderCoins();saveData();}
+function renderCoins(){
+  const rate=val('usdtUah')||41;
+  const el=$('cryptoRows'); if(!coins.length){el.innerHTML='';return;}
+  el.innerHTML='<div class="divider" style="margin:0 0 10px"></div>'+
+    coins.map((c,i)=>`<div class="list-row">
+      <div class="list-sym" style="color:var(--purple2)">${c.name}</div>
+      <div class="list-info">${fmtD(c.usdt)} USDT</div>
+      <div class="list-val">${fmtN(Math.round(c.usdt*rate))} ₴</div>
+      <button class="rm-btn" onclick="removeCoin(${i})">×</button>
+    </div>`).join('');
+}
+
+// ── FOREX ────────────────────────────────────
+const FFLAGS={EUR:'🇪🇺',GBP:'🇬🇧',PLN:'🇵🇱',CHF:'🇨🇭',CZK:'🇨🇿',RUB:'🇷🇺',KZT:'🇰🇿',OTHER:'🌐'};
+const FSYM  ={EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',OTHER:'?'};
+function addForex(){
+  const cur=sval('newForexCur');
+  const amt=parseFloat($('newForexAmt').value)||0;
+  const rate=parseFloat($('newForexRate').value)||0;
+  if(!amt||!rate)return;
+  forexItems.push({cur,amt,rate});
+  $('newForexAmt').value='';$('newForexRate').value='';
+  renderForex();updateAll();saveData();
+}
+function removeForex(i){forexItems.splice(i,1);renderForex();updateAll();saveData();}
+function renderForex(){
+  const el=$('forexRows');
+  const total=forexItems.reduce((s,f)=>s+f.amt*f.rate,0);
+  setText('forexTotal',fmtN(Math.round(total))+' ₴');
+  setText('forexDisplay',fmtN(Math.round(total))+' ₴');
+  if(!forexItems.length){el.innerHTML='';return;}
+  el.innerHTML=forexItems.map((f,i)=>`<div class="list-row">
+    <span style="font-size:16px;flex-shrink:0">${FFLAGS[f.cur]||'🌐'}</span>
+    <div class="list-sym" style="color:var(--orange2)">${FSYM[f.cur]||''} ${f.cur}</div>
+    <div class="list-info">${fmtD(f.amt)} × ${f.rate} ₴</div>
+    <div class="list-val">${fmtN(Math.round(f.amt*f.rate))} ₴</div>
+    <button class="rm-btn" onclick="removeForex(${i})">×</button>
+  </div>`).join('')+'<div class="divider" style="margin:8px 0 4px"></div>';
+}
+
+// ── TOGGLE CARD ──────────────────────────────
+function toggleCard(name){$('card-'+name).classList.toggle('expanded');}
+
+// ── LIVE TICKER ──────────────────────────────
+let liveInterval=null;
+function fmtLive(n){
+  const a=Math.abs(n);
+  if(a>=1e6)return (n/1e6).toFixed(4)+'M ₴';
+  if(a>=1e3)return fmtD(n,2)+' ₴';
+  return n.toFixed(2)+' ₴';
+}
+function calcLive(){
+  const P=val('depPrincipal'), rAnn=val('depRate')/100;
+  const n=val('depFreq')||12, tax=val('depTax')/100, tf=val('depTaxFree')||0;
+  const sStr=$('depStartDate').value, eStr=$('depEndDate').value;
+  if(!P||!rAnn||!sStr||!eStr){
+    $('liveSetup').style.display='block';$('liveMain').style.display='none';return;
+  }
+  const start=new Date(sStr),end=new Date(eStr),now=new Date();
+  if(now<start||end<=start){
+    $('liveSetup').style.display='block';$('liveMain').style.display='none';return;
+  }
+  $('liveSetup').style.display='none';$('liveMain').style.display='block';
+
+  const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
+  const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
+  const A=P*Math.pow(1+rAnn/n,n*yEl);
+  const interest=A-P, taxBase=Math.max(0,interest-tf);
+  const taxAmt=taxBase*tax, net=interest-taxAmt;
+  const rPerSec=rAnn/(365.25*24*3600);
+  const perSec=A*rPerSec*(1-(interest>tf?tax:0));
+  const perDay=perSec*86400;
+
+  const intPart=Math.floor(A).toLocaleString('uk-UA');
+  const decPart=(A%1).toFixed(2).slice(1);
+  $('liveAmount').innerHTML=intPart+'<span class="live-kopeck">'+decPart+' ₴</span>';
+  const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
+  const dGone=Math.round(yEl*365.25);
+  setText('liveSub','минуло '+dGone+' дн · залишилось '+dLeft+' дн');
+  setText('liveInterest','+'+fmtLive(interest));
+  setText('liveTaxLive','−'+fmtLive(taxAmt));
+  setText('liveNet','+'+fmtLive(net));
+  setText('livePerSec','+'+perSec.toFixed(5)+' ₴/с');
+  setText('livePerDay','+'+fmtLive(perDay));
+  $('liveBar').style.width=Math.round(progress*100)+'%';
+  const fmt2=d=>d.toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'});
+  setText('liveDateStart',fmt2(start));
+  setText('liveDatePct',Math.round(progress*100)+'%');
+  setText('liveDateEnd',fmt2(end));
+  renderDailyLog(P,rAnn,n,tax,tf,start,now);
+}
+
+function renderDailyLog(P,rAnn,n,tax,tf,start,now){
+  const el=$('dailyLog');
+  const daysGone=Math.round((now-start)/(1000*60*60*24));
+  const count=Math.min(daysGone,30);
+  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Перший день ще попереду</div>';return;}
+  let rows='';
+  for(let d=0;d<count;d++){
+    const t0=d/365.25, t1=(d+1)/365.25;
+    const A0=P*Math.pow(1+rAnn/n,n*t0);
+    const A1=P*Math.pow(1+rAnn/n,n*t1);
+    const gi=A1-A0;
+    const tb0=Math.max(0,A0-P-tf)*tax;
+    const tb1=Math.max(0,A1-P-tf)*tax;
+    const dayTax=Math.max(0,tb1-tb0);
+    const dayNet=gi-dayTax;
+    const date=new Date(start);date.setDate(date.getDate()+d);
+    rows+=`<div class="daily-row">
+      <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>
+      <span class="daily-income">+${dayNet.toFixed(2)} ₴/день</span>
+      <span class="daily-total">${fmtN(Math.round(A1))} ₴</span>
+    </div>`;
+  }
+  el.innerHTML=rows;
+  el.scrollTop=el.scrollHeight;
+}
+
+function startLiveTicker(){
+  if(liveInterval)clearInterval(liveInterval);
+  calcLive();
+  liveInterval=setInterval(calcLive,100);
+}
+['depPrincipal','depRate','depFreq','depTax','depTaxFree','depStartDate','depEndDate'].forEach(id=>{
+  $(id)?.addEventListener('input',startLiveTicker);
+});
+
+// ── DRAG & DROP ──────────────────────────────
+function initDrag(){
+  const container=$('cardsContainer');
+  let dragged=null;
+
+  container.querySelectorAll('.card').forEach(card=>{
+    // Desktop
+    card.addEventListener('dragstart',e=>{
+      dragged=card;
+      setTimeout(()=>card.classList.add('dragging'),0);
+      e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend',()=>{
+      card.classList.remove('dragging');
+      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      saveOrder();
+    });
+    card.addEventListener('dragover',e=>{e.preventDefault();if(card!==dragged)card.classList.add('drag-over');});
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if(dragged&&card!==dragged){
+        const all=[...container.querySelectorAll('.card')];
+        if(all.indexOf(dragged)<all.indexOf(card)) card.after(dragged);
+        else card.before(dragged);
+      }
+    });
+
+    // Touch (long press)
+    let timer,clone,isDrag=false,startY=0,startX=0;
+    const handle=card.querySelector('.drag-handle');
+
+    const onTouchStart=e=>{
+      startY=e.touches[0].clientY; startX=e.touches[0].clientX;
+      timer=setTimeout(()=>{
+        isDrag=true; dragged=card;
+        card.classList.add('dragging');
+        const rect=card.getBoundingClientRect();
+        clone=card.cloneNode(true);
+        Object.assign(clone.style,{position:'fixed',zIndex:999,width:rect.width+'px',left:rect.left+'px',top:rect.top+'px',opacity:'0.85',pointerEvents:'none',borderRadius:'20px'});
+        document.body.appendChild(clone);
+      },450);
+    };
+    const onTouchMove=e=>{
+      if(!isDrag){
+        if(Math.abs(e.touches[0].clientY-startY)>10||Math.abs(e.touches[0].clientX-startX)>10) clearTimeout(timer);
+        return;
+      }
+      e.preventDefault();
+      const t=e.touches[0];
+      if(clone) clone.style.top=(t.clientY-60)+'px';
+      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
+      if(target&&target!==card) target.classList.add('drag-over');
+    };
+    const onTouchEnd=e=>{
+      clearTimeout(timer);
+      if(!isDrag){isDrag=false;return;}
+      isDrag=false;
+      if(clone){clone.remove();clone=null;}
+      card.classList.remove('dragging');
+      const t=e.changedTouches[0];
+      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
+      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      if(target&&target!==card){
+        const all=[...container.querySelectorAll('.card')];
+        if(all.indexOf(card)<all.indexOf(target)) target.after(card);
+        else target.before(card);
+      }
+      saveOrder();
+    };
+
+    (handle||card).addEventListener('touchstart',onTouchStart,{passive:true});
+    document.addEventListener('touchmove',onTouchMove,{passive:false});
+    (handle||card).addEventListener('touchend',onTouchEnd);
+  });
+}
+
+function saveOrder(){
+  cardOrder=[...document.querySelectorAll('.card')].map(c=>c.dataset.card);
+  saveData();
+}
+function applyOrder(order){
+  if(!order?.length)return;
+  const c=$('cardsContainer');
+  order.forEach(id=>{const e=$('card-'+id);if(e)c.appendChild(e);});
+}
+
+// ── PERSIST ──────────────────────────────────
+function saveData(){
+  try{
+    localStorage.setItem('kapital_v4',JSON.stringify({
+      depPrincipal:sval('depPrincipal'),depRate:sval('depRate'),
+      depMonths:sval('depMonths'),depFreq:sval('depFreq'),
+      depTax:sval('depTax'),depTaxFree:sval('depTaxFree'),
+      depStartDate:sval('depStartDate'),depEndDate:sval('depEndDate'),
+      cryptoUsdt:sval('cryptoUsdt'),usdtUah:sval('usdtUah'),cryptoCost:sval('cryptoCost'),
+      usdAmount:sval('usdAmount'),usdUah:sval('usdUah'),usdNote:sval('usdNote'),
+      cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),
+      otherAmount:sval('otherAmount'),otherName:sval('otherName'),otherNote:sval('otherNote'),
+      coins,forexItems,cardOrder
+    }));
+  }catch(e){}
+}
+function loadData(){
+  try{
+    const d=JSON.parse(localStorage.getItem('kapital_v4')||'null');
+    if(!d)return;
+    const sv=(id,v)=>{if(v!==undefined&&$(id))$(id).value=v;};
+    sv('depPrincipal',d.depPrincipal);sv('depRate',d.depRate);
+    sv('depMonths',d.depMonths);sv('depFreq',d.depFreq);
+    sv('depTax',d.depTax);sv('depTaxFree',d.depTaxFree);
+    sv('depStartDate',d.depStartDate);sv('depEndDate',d.depEndDate);
+    sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('cryptoCost',d.cryptoCost);
+    sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
+    sv('cashAmount',d.cashAmount);sv('cashNote',d.cashNote);
+    sv('otherAmount',d.otherAmount);sv('otherName',d.otherName);sv('otherNote',d.otherNote);
+    if(Array.isArray(d.coins))coins=d.coins;
+    if(Array.isArray(d.forexItems))forexItems=d.forexItems;
+    if(Array.isArray(d.cardOrder))applyOrder(d.cardOrder);
+  }catch(e){}
+}
+
+// ── INIT ─────────────────────────────────────
+loadData();
+updateAll();
+startLiveTicker();
+initDrag();
+</script>
+</body>
+</html>
