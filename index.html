@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="Капітал">
 <meta name="theme-color" content="#0a0a0f">
 <title>Капітал</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -28,12 +28,23 @@ body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:anti
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
 
-/* HEADER */
+/* HEADER — ділова типографіка */
 .header{padding:56px 20px 20px;background:linear-gradient(180deg,#0a0a1a 0%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
 .header-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
 .total-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
-.total-amount{font-size:clamp(34px,9vw,52px);font-weight:800;letter-spacing:-2px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
-.total-currency{font-size:20px;font-weight:600;color:var(--gold);opacity:0.7;}
+/* ЗМІНА 1: Діловий шрифт для головної суми */
+.total-amount{
+  font-family:'Inter',sans-serif;
+  font-size:clamp(36px,9vw,54px);
+  font-weight:900;
+  letter-spacing:-2px;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum";
+}
+.total-currency{font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--gold);opacity:0.7;letter-spacing:-0.5px;}
 .total-subs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
 .badge{font-family:'DM Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px;display:inline-block;}
 .badge-green{background:#4ecb8d18;color:var(--green2);}
@@ -59,7 +70,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .card-toggle{color:var(--muted);font-size:14px;transition:transform .25s;flex-shrink:0;padding:4px;cursor:pointer;}
 .card.expanded .card-toggle{transform:rotate(180deg);}
 .card-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.4,0,0.2,1);}
-.card.expanded .card-body{max-height:1400px;}
+.card.expanded .card-body{max-height:2000px;}
 .card-inner{padding:0 20px 20px;}
 .divider{height:1px;background:var(--border);margin-bottom:18px;}
 
@@ -82,6 +93,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .card-other{border-top:2px solid var(--green);}
 .card-other .card-icon{background:#4ecb8d14;}
 .card-other .card-value{color:var(--green2);}
+.card-custom{border-top:2px solid var(--purple);}
+.card-custom .card-icon{background:#a78bfa14;}
+.card-custom .card-value{color:var(--purple2);}
 
 /* INPUTS */
 .field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
@@ -122,11 +136,29 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .add-btn{width:100%;margin-top:12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:12px;padding:11px;font-family:'Syne',sans-serif;font-size:13px;color:var(--muted2);cursor:pointer;transition:background .15s;}
 .add-btn:active{background:var(--bg2);}
 
-/* LIVE TICKER */
-.live-wrap{margin:0 16px 14px;background:linear-gradient(135deg,#0d1a2e,#0a1220);border:1px solid #5b9cf630;border-radius:20px;padding:18px 20px;position:relative;overflow:hidden;}
+/* ЗМІНА 3: СВАЙП ДЕПОЗИТІВ */
+.deposits-swipe-wrap{margin:0 16px 14px;position:relative;}
+.deposits-swipe-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px;}
+.deposits-swipe-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--blue);text-transform:uppercase;}
+.deposits-dots{display:flex;gap:6px;align-items:center;}
+.dep-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .2s;cursor:pointer;}
+.dep-dot.active{background:var(--blue);width:18px;border-radius:3px;}
+.deposits-nav{display:flex;gap:8px;}
+.dep-nav-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--muted2);transition:all .15s;}
+.dep-nav-btn:active{background:var(--bg2);color:var(--blue);}
+.dep-add-btn{background:var(--bg3);border:1px dashed var(--border2);border-radius:8px;height:28px;padding:0 10px;display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--blue);font-family:'DM Mono',monospace;white-space:nowrap;}
+.dep-add-btn:active{background:var(--bg2);}
+.deposits-slider{overflow:hidden;border-radius:20px;}
+.deposits-track{display:flex;transition:transform .35s cubic-bezier(0.4,0,0.2,1);}
+.deposit-slide{min-width:100%;width:100%;}
+.live-wrap{background:linear-gradient(135deg,#0d1a2e,#0a1220);border:1px solid #5b9cf630;border-radius:20px;padding:18px 20px;position:relative;overflow:hidden;}
 .live-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,#5b9cf60a 0%,transparent 60%);pointer-events:none;}
-.live-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--blue);text-transform:uppercase;margin-bottom:10px;}
-.live-dot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:6px;vertical-align:middle;animation:blink 1.5s infinite;}
+.live-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--blue);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.live-label-left{display:flex;align-items:center;gap:6px;}
+.dep-name-badge{font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);background:#5b9cf615;padding:2px 8px;border-radius:10px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dep-delete-btn{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 4px;opacity:0.6;}
+.dep-delete-btn:hover{color:var(--red);opacity:1;}
+.live-dot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;vertical-align:middle;animation:blink 1.5s infinite;}
 @keyframes blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.6);}}
 .live-num{font-family:'DM Mono',monospace;font-size:clamp(22px,6vw,32px);font-weight:500;color:#7ab3ff;letter-spacing:-1px;line-height:1;margin-bottom:4px;}
 .live-kopeck{font-size:0.55em;opacity:0.7;}
@@ -143,6 +175,10 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .live-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#3b6fd4,#5b9cf6);transition:width .5s linear;}
 .live-dates{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;}
 .live-setup{background:var(--bg3);border:1px dashed var(--border2);border-radius:14px;padding:16px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+.dep-name-input-row{margin-bottom:12px;}
+.dep-name-input{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:13px;color:var(--blue2);outline:none;width:100%;transition:border-color .15s;}
+.dep-name-input:focus{border-color:var(--blue);}
+.dep-name-input::placeholder{color:var(--muted);}
 
 /* DAILY LOG */
 .daily-section{margin-top:14px;}
@@ -153,6 +189,31 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .daily-date{color:var(--muted2);}
 .daily-income{color:var(--green2);}
 .daily-total{color:var(--blue2);font-size:9px;}
+
+/* ЗМІНА 2: КНОПКА ДОДАТИ РОЗДІЛ */
+.add-section-wrap{padding:0 16px;margin-bottom:14px;}
+.add-section-btn{width:100%;background:var(--bg2);border:1px dashed var(--border2);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .15s;}
+.add-section-btn:active{background:var(--bg3);}
+.add-section-btn span{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);}
+.add-section-btn .plus{font-size:18px;color:var(--purple);font-weight:300;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#000000a0;z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;transform:translateY(100%);transition:transform .3s cubic-bezier(0.4,0,0.2,1);}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text);}
+.modal-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:20px;}
+.modal-field{margin-bottom:14px;}
+.modal-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.modal-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:15px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;}
+.modal-input:focus{border-color:var(--border2);}
+.emoji-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;}
+.emoji-btn{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px;font-size:20px;cursor:pointer;text-align:center;transition:border-color .15s;}
+.emoji-btn.sel{border-color:var(--purple);background:#a78bfa15;}
+.modal-confirm{width:100%;margin-top:18px;background:var(--purple);border:none;border-radius:14px;padding:14px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;}
+.modal-confirm:active{opacity:0.85;}
+.modal-cancel{width:100%;margin-top:8px;background:transparent;border:1px solid var(--border2);border-radius:14px;padding:12px;font-family:'Syne',sans-serif;font-size:14px;color:var(--muted2);cursor:pointer;}
 
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
@@ -175,39 +236,34 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 <div class="section-label">Активи · утримай та перетягни для сортування</div>
 
-<!-- LIVE TICKER -->
-<div class="live-wrap">
-  <div class="live-label"><span class="live-dot"></span>Живий лічильник депозиту</div>
-  <div id="liveSetup" class="live-setup">Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює</div>
-  <div id="liveMain" style="display:none">
-    <div class="live-num" id="liveAmount">0<span class="live-kopeck">.00 ₴</span></div>
-    <div class="live-sub" id="liveSub">поточний баланс з відсотками</div>
-    <div class="live-rows">
-      <div class="live-row"><span class="live-key">📈 Нараховано %</span><span class="live-val g" id="liveInterest">—</span></div>
-      <div class="live-row"><span class="live-key">🏛 Податок</span><span class="live-val r" id="liveTaxLive">—</span></div>
-      <div class="live-row"><span class="live-key">✅ Чистий прибуток</span><span class="live-val g" id="liveNet">—</span></div>
-      <div class="live-row"><span class="live-key">⚡ В секунду</span><span class="live-val b" id="livePerSec">—</span></div>
-      <div class="live-row"><span class="live-key">📅 В день (сьогодні)</span><span class="live-val o" id="livePerDay">—</span></div>
+<!-- ЗМІНА 3: СВАЙП ДЕПОЗИТІВ -->
+<div class="deposits-swipe-wrap">
+  <div class="deposits-swipe-header">
+    <div class="deposits-swipe-title"><span class="live-dot" style="margin-right:6px"></span>Живий лічильник</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="deposits-dots" id="depDots"></div>
+      <div class="deposits-nav">
+        <button class="dep-nav-btn" onclick="slideDeposit(-1)">‹</button>
+        <button class="dep-nav-btn" onclick="slideDeposit(1)">›</button>
+        <button class="dep-add-btn" onclick="addDepositSlide()">+ Депозит</button>
+      </div>
     </div>
-    <div class="live-bar-wrap"><div class="live-bar" id="liveBar" style="width:0%"></div></div>
-    <div class="live-dates"><span id="liveDateStart">—</span><span id="liveDatePct">0%</span><span id="liveDateEnd">—</span></div>
-    <div class="daily-section">
-      <div class="daily-title">📊 Дохід по днях (перші 30 днів)</div>
-      <div class="daily-scroll" id="dailyLog"><div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Немає даних</div></div>
-    </div>
+  </div>
+  <div class="deposits-slider">
+    <div class="deposits-track" id="depositsTrack"></div>
   </div>
 </div>
 
 <!-- CARDS -->
 <div class="cards" id="cardsContainer">
 
-  <!-- DEPOSIT -->
+  <!-- DEPOSIT CARD -->
   <div class="card card-deposit" id="card-deposit" draggable="true" data-card="deposit">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
       <div class="card-icon">🏦</div>
       <div class="card-info" onclick="toggleCard('deposit')">
-        <div class="card-name">Депозит</div>
+        <div class="card-name">Депозит (всього)</div>
         <div class="card-value" id="depositDisplay">0 ₴</div>
         <div class="card-pct" id="depositPct">0% від капіталу</div>
       </div>
@@ -215,60 +271,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
-      <div class="field-group">
-        <div class="field-label">Сума депозиту (₴)</div>
-        <input class="field-input" type="number" id="depPrincipal" placeholder="100 000" inputmode="decimal" oninput="updateAll()">
-      </div>
-      <div class="row2">
-        <div class="field-group">
-          <div class="field-label">Дата відкриття</div>
-          <input class="field-input" type="date" id="depStartDate" oninput="updateAll()">
-        </div>
-        <div class="field-group">
-          <div class="field-label">Дата закінчення</div>
-          <input class="field-input" type="date" id="depEndDate" oninput="updateAll()">
-        </div>
-      </div>
-      <div class="calc-section">
-        <div class="calc-title">⚡ Калькулятор складних відсотків</div>
-        <div class="field-group">
-          <div class="field-label">Річна ставка (%)</div>
-          <input class="field-input" type="number" id="depRate" placeholder="16" value="16" inputmode="decimal" oninput="calcDeposit();startLiveTicker()">
-        </div>
-        <div class="row2">
-          <div class="field-group">
-            <div class="field-label">Строк (місяців)</div>
-            <input class="field-input" type="number" id="depMonths" placeholder="12" value="12" inputmode="numeric" oninput="calcDeposit()">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Капіталізація</div>
-            <select class="field-input" id="depFreq" onchange="calcDeposit();startLiveTicker()">
-              <option value="12">Щомісяця</option>
-              <option value="4">Щокварталу</option>
-              <option value="2">Кожні 6 міс</option>
-              <option value="1">Щорічно</option>
-            </select>
-          </div>
-        </div>
-        <div class="row2">
-          <div class="field-group">
-            <div class="field-label">Податок на прибуток (%)</div>
-            <input class="field-input" type="number" id="depTax" placeholder="0" value="0" inputmode="decimal" oninput="calcDeposit();startLiveTicker()">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Неоподатк. мінімум</div>
-            <input class="field-input" type="number" id="depTaxFree" placeholder="0" value="0" inputmode="numeric" oninput="calcDeposit();startLiveTicker()">
-          </div>
-        </div>
-        <div class="result-box">
-          <div class="result-row"><span class="result-key">Підсумкова сума</span><span class="result-val blue" id="r-total">—</span></div>
-          <div class="result-row"><span class="result-key">Нараховано %</span><span class="result-val green" id="r-interest">—</span></div>
-          <div class="result-row"><span class="result-key">Оподатк. база</span><span class="result-val" id="r-taxbase">—</span></div>
-          <div class="result-row"><span class="result-key">Податок <span class="tag tag-tax">ПДФО</span></span><span class="result-val red" id="r-tax">—</span></div>
-          <div class="result-row"><span class="result-key">Чистий прибуток <span class="tag tag-net">після податку</span></span><span class="result-val green" id="r-net">—</span></div>
-          <div class="result-row"><span class="result-key">Ефективна ставка</span><span class="result-val" id="r-eff">—</span></div>
-        </div>
-      </div>
+      <div id="depositSummaryList"></div>
     </div></div>
   </div>
 
@@ -443,48 +446,501 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div class="field-label">Баланс (₴)</div>
         <input class="field-input" type="number" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
-      <div class="field-group">
-        <div class="field-label">Банк</div>
-        <input class="field-input" type="text" id="otherName" placeholder="Monobank..." oninput="saveData()">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Нотатка</div>
-        <input class="field-input" type="text" id="otherNote" placeholder="Зарплатний рахунок..." oninput="saveData()">
+      <div class="row2">
+        <div class="field-group">
+          <div class="field-label">Банк</div>
+          <input class="field-input" type="text" id="otherName" placeholder="Monobank..." oninput="saveData()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Нотатка</div>
+          <input class="field-input" type="text" id="otherNote" placeholder="..." oninput="saveData()">
+        </div>
       </div>
     </div></div>
   </div>
 
+  <!-- CUSTOM CARDS CONTAINER -->
+  <div id="customCardsContainer"></div>
+
 </div>
+
+<!-- ЗМІНА 2: КНОПКА ДОДАТИ РОЗДІЛ -->
+<div class="add-section-wrap">
+  <button class="add-section-btn" onclick="openAddSection()">
+    <span class="plus">+</span>
+    <span>Додати власний розділ</span>
+  </button>
+</div>
+
+<!-- MODAL ДОДАТИ РОЗДІЛ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalIfOutside(event)">
+  <div class="modal-box">
+    <div class="modal-title">Новий розділ</div>
+    <div class="modal-sub">Як депозит — з відсотками та датами</div>
+    <div class="modal-field">
+      <div class="modal-label">Назва розділу</div>
+      <input class="modal-input" type="text" id="modalName" placeholder="Наприклад: ОВДП, Інвест-фонд...">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Іконка</div>
+      <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+    <button class="modal-confirm" onclick="confirmAddSection()">Створити розділ</button>
+    <button class="modal-cancel" onclick="closeModal()">Скасувати</button>
+  </div>
+</div>
+
 <div class="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 </div>
 
 <script>
-// ── STATE ────────────────────────────────────
-let coins=[], forexItems=[], cardOrder=[];
+const $=id=>document.getElementById(id);
+const setText=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+const val=id=>{const e=$(id);return e?parseFloat(e.value)||0:0;};
+const sval=id=>{const e=$(id);return e?e.value:'';};
+const fmtN=n=>Math.round(n).toLocaleString('uk-UA');
+const fmtD=(n,d=2)=>n.toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct=(v,t)=>t?((v/t*100).toFixed(1)+'%'):'0%';
 
-// ── UTILS ────────────────────────────────────
-const $=(id)=>document.getElementById(id);
-function val(id){return parseFloat($(id)?.value)||0;}
-function sval(id){return $(id)?.value||'';}
-function fmtN(n){return n.toLocaleString('uk-UA',{maximumFractionDigits:0});}
-function fmtD(n,d=2){return n.toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});}
-function pct(a,t){return t?((a/t)*100).toFixed(1)+'%':'0%';}
-function setText(id,v){const e=$(id);if(e)e.textContent=v;}
+// ── STATE ─────────────────────────────────────
+let coins=[], forexItems=[], cardOrder=[], customSections=[];
 
-// ── GETTERS ──────────────────────────────────
-const getDepVal   =()=>val('depPrincipal');
-const getCryptoVal=()=>val('cryptoUsdt')*(val('usdtUah')||41);
-const getUsdVal   =()=>val('usdAmount')*(val('usdUah')||41);
-const getForexVal =()=>forexItems.reduce((s,f)=>s+f.amt*f.rate,0);
-const getCashVal  =()=>val('cashAmount');
-const getOtherVal =()=>val('otherAmount');
+// ── DEPOSIT SLIDES ────────────────────────────
+let deposits=[{id:'dep0',name:'Депозит 1',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''}];
+let currentDepSlide=0;
+let liveIntervals={};
 
-// ── UPDATE ALL ───────────────────────────────
+function getDepositHtml(dep,idx){
+  return `<div class="deposit-slide">
+    <div class="live-wrap">
+      <div class="live-label">
+        <div class="live-label-left">
+          <span class="live-dot"></span>
+          <input class="dep-name-input" style="background:transparent;border:none;padding:0;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;width:130px;" 
+            value="${dep.name}" placeholder="Назва депозиту"
+            oninput="deposits[${idx}].name=this.value;renderDepDots();saveData()" />
+        </div>
+        ${deposits.length>1?`<button class="dep-delete-btn" onclick="removeDeposit(${idx})">✕</button>`:''}
+      </div>
+      <div id="liveSetup_${dep.id}" class="live-setup">Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює</div>
+      <div id="liveMain_${dep.id}" style="display:none">
+        <div class="live-num" id="liveAmount_${dep.id}">0<span class="live-kopeck">.00 ₴</span></div>
+        <div class="live-sub" id="liveSub_${dep.id}">поточний баланс з відсотками</div>
+        <div class="live-rows">
+          <div class="live-row"><span class="live-key">📈 Нараховано %</span><span class="live-val g" id="liveInterest_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">🏛 Податок</span><span class="live-val r" id="liveTaxLive_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">✅ Чистий прибуток</span><span class="live-val g" id="liveNet_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">⚡ В секунду</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">📅 В день (сьогодні)</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
+        </div>
+        <div class="live-bar-wrap"><div class="live-bar" id="liveBar_${dep.id}" style="width:0%"></div></div>
+        <div class="live-dates"><span id="liveDateStart_${dep.id}">—</span><span id="liveDatePct_${dep.id}">0%</span><span id="liveDateEnd_${dep.id}">—</span></div>
+        <div class="daily-section">
+          <div class="daily-title">📊 Дохід по днях (перші 30 днів)</div>
+          <div class="daily-scroll" id="dailyLog_${dep.id}"><div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Немає даних</div></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+        <div class="field-group">
+          <div class="field-label">Сума депозиту (₴)</div>
+          <input class="field-input" type="number" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
+            oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">Дата відкриття</div>
+            <input class="field-input" type="date" id="depStartDate_${dep.id}" value="${dep.startDate}"
+              oninput="deposits[${idx}].startDate=this.value;updateAll();startLiveTicker('${dep.id}')">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Дата закінчення</div>
+            <input class="field-input" type="date" id="depEndDate_${dep.id}" value="${dep.endDate}"
+              oninput="deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')">
+          </div>
+        </div>
+        <div class="calc-section">
+          <div class="calc-title">⚡ Калькулятор складних відсотків</div>
+          <div class="field-group">
+            <div class="field-label">Річна ставка (%)</div>
+            <input class="field-input" type="number" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
+              oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+          </div>
+          <div class="row2">
+            <div class="field-group">
+              <div class="field-label">Строк (місяців)</div>
+              <input class="field-input" type="number" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
+                oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}')">
+            </div>
+            <div class="field-group">
+              <div class="field-label">Капіталізація</div>
+              <select class="field-input" id="depFreq_${dep.id}"
+                onchange="deposits[${idx}].freq=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+                <option value="12" ${dep.freq=='12'?'selected':''}>Щомісяця</option>
+                <option value="4" ${dep.freq=='4'?'selected':''}>Щокварталу</option>
+                <option value="2" ${dep.freq=='2'?'selected':''}>Кожні 6 міс</option>
+                <option value="1" ${dep.freq=='1'?'selected':''}>Щорічно</option>
+              </select>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field-group">
+              <div class="field-label">Податок на прибуток (%)</div>
+              <input class="field-input" type="number" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
+                oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+            </div>
+            <div class="field-group">
+              <div class="field-label">Неоподатк. мінімум</div>
+              <input class="field-input" type="number" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
+                oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+            </div>
+          </div>
+          <div class="result-box">
+            <div class="result-row"><span class="result-key">Підсумкова сума</span><span class="result-val blue" id="r-total_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">Нараховано %</span><span class="result-val green" id="r-interest_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">Оподатк. база</span><span class="result-val" id="r-taxbase_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">Податок <span class="tag tag-tax">ПДФО</span></span><span class="result-val red" id="r-tax_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">Чистий прибуток <span class="tag tag-net">після податку</span></span><span class="result-val green" id="r-net_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">Ефективна ставка</span><span class="result-val" id="r-eff_${dep.id}">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDeposits(){
+  const track=$('depositsTrack');
+  track.innerHTML=deposits.map((d,i)=>getDepositHtml(d,i)).join('');
+  renderDepDots();
+  updateSlidePosition();
+  deposits.forEach(d=>{ startLiveTicker(d.id); calcDeposit(d.id); });
+}
+
+function renderDepDots(){
+  const dots=$('depDots');
+  dots.innerHTML=deposits.map((d,i)=>`<div class="dep-dot${i===currentDepSlide?' active':''}" onclick="goToSlide(${i})"></div>`).join('');
+}
+
+function goToSlide(idx){
+  currentDepSlide=Math.max(0,Math.min(idx,deposits.length-1));
+  updateSlidePosition();
+  renderDepDots();
+}
+function slideDeposit(dir){goToSlide(currentDepSlide+dir);}
+function updateSlidePosition(){
+  $('depositsTrack').style.transform=`translateX(-${currentDepSlide*100}%)`;
+}
+
+function addDepositSlide(){
+  if(deposits.length>=3){alert('Максимум 3 депозити');return;}
+  const id='dep'+Date.now();
+  deposits.push({id,name:'Депозит '+(deposits.length+1),principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''});
+  renderDeposits();
+  goToSlide(deposits.length-1);
+  saveData();
+}
+
+function removeDeposit(idx){
+  if(!confirm('Видалити цей депозит?'))return;
+  if(liveIntervals[deposits[idx].id])clearInterval(liveIntervals[deposits[idx].id]);
+  deposits.splice(idx,1);
+  if(currentDepSlide>=deposits.length)currentDepSlide=deposits.length-1;
+  renderDeposits();
+  updateAll();
+  saveData();
+}
+
+// Swipe підтримка
+let touchStartX=0;
+document.addEventListener('touchstart',e=>{
+  if(e.target.closest('.deposits-slider'))touchStartX=e.touches[0].clientX;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!e.target.closest('.deposits-slider'))return;
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>50)slideDeposit(dx<0?1:-1);
+},{passive:true});
+
+// ── DEPOSIT CALC ──────────────────────────────
+function getDepVal(id){
+  const P=parseFloat(document.getElementById('depPrincipal_'+id)?.value)||0;
+  return P;
+}
+function getAllDepositsTotal(){
+  return deposits.reduce((sum,d)=>sum+(parseFloat(d.principal)||0),0);
+}
+
+function calcDeposit(depId){
+  const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
+  if(!P){['r-total','r-interest','r-taxbase','r-tax','r-net','r-eff'].forEach(k=>setText(k+'_'+depId,'—'));return;}
+  const r=parseFloat($('depRate_'+depId)?.value||16)/100;
+  const n=parseFloat($('depFreq_'+depId)?.value||12);
+  const t=(parseFloat($('depMonths_'+depId)?.value||12))/12;
+  const tax=parseFloat($('depTax_'+depId)?.value||0)/100;
+  const tf=parseFloat($('depTaxFree_'+depId)?.value||0);
+  const A=P*Math.pow(1+r/n,n*t);
+  const interest=A-P, taxBase=Math.max(0,interest-tf);
+  const taxAmt=taxBase*tax, net=interest-taxAmt;
+  const eff=P&&t?(net/P/t*100):0;
+  setText('r-total_'+depId,   fmtN(Math.round(A))+' ₴');
+  setText('r-interest_'+depId,'+'+fmtN(Math.round(interest))+' ₴');
+  setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' ₴');
+  setText('r-tax_'+depId,     '−'+fmtN(Math.round(taxAmt))+' ₴');
+  setText('r-net_'+depId,     '+'+fmtN(Math.round(net))+' ₴');
+  setText('r-eff_'+depId,     eff.toFixed(2)+'% річних');
+}
+
+// ── LIVE TICKER ───────────────────────────────
+function fmtLive(n){
+  const a=Math.abs(n);
+  if(a>=1e6)return (n/1e6).toFixed(4)+'M ₴';
+  if(a>=1e3)return fmtD(n,2)+' ₴';
+  return n.toFixed(2)+' ₴';
+}
+
+function calcLive(depId){
+  const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
+  const rAnn=parseFloat($('depRate_'+depId)?.value||16)/100;
+  const n=parseFloat($('depFreq_'+depId)?.value||12);
+  const tax=parseFloat($('depTax_'+depId)?.value||0)/100;
+  const tf=parseFloat($('depTaxFree_'+depId)?.value||0);
+  const sStr=$('depStartDate_'+depId)?.value;
+  const eStr=$('depEndDate_'+depId)?.value;
+  if(!P||!rAnn||!sStr||!eStr){
+    const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
+    if(s)s.style.display='block'; if(m)m.style.display='none'; return;
+  }
+  const start=new Date(sStr),end=new Date(eStr),now=new Date();
+  if(now<start||end<=start){
+    const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
+    if(s)s.style.display='block'; if(m)m.style.display='none'; return;
+  }
+  const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
+  if(s)s.style.display='none'; if(m)m.style.display='block';
+
+  const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
+  const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
+  const A=P*Math.pow(1+rAnn/n,n*yEl);
+  const interest=A-P, taxBase=Math.max(0,interest-tf);
+  const taxAmt=taxBase*tax, net=interest-taxAmt;
+  const rPerSec=rAnn/(365.25*24*3600);
+  const perSec=A*rPerSec*(1-(interest>tf?tax:0));
+  const perDay=perSec*86400;
+
+  const intPart=Math.floor(A).toLocaleString('uk-UA');
+  const decPart=(A%1).toFixed(2).slice(1);
+  const la=$('liveAmount_'+depId);
+  if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' ₴</span>';
+  const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
+  const dGone=Math.round(yEl*365.25);
+  setText('liveSub_'+depId,'минуло '+dGone+' дн · залишилось '+dLeft+' дн');
+  setText('liveInterest_'+depId,'+'+fmtLive(interest));
+  setText('liveTaxLive_'+depId,'−'+fmtLive(taxAmt));
+  setText('liveNet_'+depId,'+'+fmtLive(net));
+  setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' ₴/с');
+  setText('livePerDay_'+depId,'+'+fmtLive(perDay));
+  const lb=$('liveBar_'+depId);
+  if(lb)lb.style.width=Math.round(progress*100)+'%';
+  const fmt2=d=>d.toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'});
+  setText('liveDateStart_'+depId,fmt2(start));
+  setText('liveDatePct_'+depId,Math.round(progress*100)+'%');
+  setText('liveDateEnd_'+depId,fmt2(end));
+  renderDailyLog(depId,P,rAnn,n,tax,tf,start,now);
+}
+
+function renderDailyLog(depId,P,rAnn,n,tax,tf,start,now){
+  const el=$('dailyLog_'+depId); if(!el)return;
+  const daysGone=Math.round((now-start)/(1000*60*60*24));
+  const count=Math.min(daysGone,30);
+  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Перший день ще попереду</div>';return;}
+  let rows='';
+  for(let d=0;d<count;d++){
+    const t0=d/365.25, t1=(d+1)/365.25;
+    const A0=P*Math.pow(1+rAnn/n,n*t0), A1=P*Math.pow(1+rAnn/n,n*t1);
+    const gi=A1-A0;
+    const tb0=Math.max(0,A0-P-tf)*tax, tb1=Math.max(0,A1-P-tf)*tax;
+    const dayTax=Math.max(0,tb1-tb0), dayNet=gi-dayTax;
+    const date=new Date(start); date.setDate(date.getDate()+d);
+    rows+=`<div class="daily-row">
+      <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>
+      <span class="daily-income">+${dayNet.toFixed(2)} ₴/день</span>
+      <span class="daily-total">${fmtN(Math.round(A1))} ₴</span>
+    </div>`;
+  }
+  el.innerHTML=rows;
+  el.scrollTop=el.scrollHeight;
+}
+
+function startLiveTicker(depId){
+  if(liveIntervals[depId])clearInterval(liveIntervals[depId]);
+  calcLive(depId);
+  liveIntervals[depId]=setInterval(()=>calcLive(depId),100);
+}
+
+// ── CUSTOM SECTIONS ───────────────────────────
+const EMOJIS=['💰','📈','🏠','🚗','💎','🎯','🏆','💡','🔑','🌟','💼','📊','🏗','⚡','🌱','🛡','🎪','💫','🏅','🎁'];
+let selectedEmoji='💰';
+
+function openAddSection(){
+  selectedEmoji='💰';
+  $('modalName').value='';
+  renderEmojiGrid();
+  $('modalOverlay').classList.add('open');
+  setTimeout(()=>$('modalName').focus(),300);
+}
+function closeModal(){$('modalOverlay').classList.remove('open');}
+function closeModalIfOutside(e){if(e.target===$('modalOverlay'))closeModal();}
+function renderEmojiGrid(){
+  $('emojiGrid').innerHTML=EMOJIS.map(e=>`<button class="emoji-btn${e===selectedEmoji?' sel':''}" onclick="selectEmoji('${e}')">${e}</button>`).join('');
+}
+function selectEmoji(e){selectedEmoji=e;renderEmojiGrid();}
+
+function confirmAddSection(){
+  const name=$('modalName').value.trim();
+  if(!name){$('modalName').style.borderColor='var(--red)';return;}
+  const id='custom_'+Date.now();
+  const section={id,name,icon:selectedEmoji,principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''};
+  customSections.push(section);
+  closeModal();
+  renderCustomCards();
+  saveData();
+  updateAll();
+}
+
+function renderCustomCards(){
+  const container=$('customCardsContainer');
+  container.innerHTML=customSections.map((s,i)=>getCustomCardHtml(s,i)).join('');
+  customSections.forEach(s=>{ calcCustomSection(s.id); });
+}
+
+function getCustomCardHtml(s,idx){
+  return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">${s.icon}</div>
+      <div class="card-info" onclick="toggleCard('${s.id}')">
+        <div class="card-name">${s.name}</div>
+        <div class="card-value" id="customDisplay_${s.id}">0 ₴</div>
+        <div class="card-pct" id="customPct_${s.id}">0% від капіталу</div>
+      </div>
+      <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      <div class="field-group">
+        <div class="field-label">Сума (₴)</div>
+        <input class="field-input" type="number" id="customPrincipal_${s.id}" placeholder="100 000" inputmode="decimal" value="${s.principal}"
+          oninput="customSections[${idx}].principal=this.value;updateAll()">
+      </div>
+      <div class="row2">
+        <div class="field-group">
+          <div class="field-label">Дата відкриття</div>
+          <input class="field-input" type="date" id="customStart_${s.id}" value="${s.startDate}"
+            oninput="customSections[${idx}].startDate=this.value;calcCustomSection('${s.id}')">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Дата закінчення</div>
+          <input class="field-input" type="date" id="customEnd_${s.id}" value="${s.endDate}"
+            oninput="customSections[${idx}].endDate=this.value;calcCustomSection('${s.id}')">
+        </div>
+      </div>
+      <div class="calc-section">
+        <div class="calc-title">⚡ Дохідність</div>
+        <div class="field-group">
+          <div class="field-label">Річна ставка (%)</div>
+          <input class="field-input" type="number" id="customRate_${s.id}" placeholder="16" value="${s.rate}" inputmode="decimal"
+            oninput="customSections[${idx}].rate=this.value;calcCustomSection('${s.id}')">
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">Строк (місяців)</div>
+            <input class="field-input" type="number" id="customMonths_${s.id}" placeholder="12" value="${s.months}" inputmode="numeric"
+              oninput="customSections[${idx}].months=this.value;calcCustomSection('${s.id}')">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Капіталізація</div>
+            <select class="field-input" id="customFreq_${s.id}"
+              onchange="customSections[${idx}].freq=this.value;calcCustomSection('${s.id}')">
+              <option value="12" ${s.freq=='12'?'selected':''}>Щомісяця</option>
+              <option value="4" ${s.freq=='4'?'selected':''}>Щокварталу</option>
+              <option value="2" ${s.freq=='2'?'selected':''}>Кожні 6 міс</option>
+              <option value="1" ${s.freq=='1'?'selected':''}>Щорічно</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">Податок (%)</div>
+            <input class="field-input" type="number" id="customTax_${s.id}" placeholder="0" value="${s.tax}" inputmode="decimal"
+              oninput="customSections[${idx}].tax=this.value;calcCustomSection('${s.id}')">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Неоподатк. мінімум</div>
+            <input class="field-input" type="number" id="customTaxFree_${s.id}" placeholder="0" value="${s.taxFree}" inputmode="decimal"
+              oninput="customSections[${idx}].taxFree=this.value;calcCustomSection('${s.id}')">
+          </div>
+        </div>
+        <div class="result-box">
+          <div class="result-row"><span class="result-key">Підсумкова сума</span><span class="result-val blue" id="cust-total_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">Нараховано %</span><span class="result-val green" id="cust-interest_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">Податок ПДФО</span><span class="result-val red" id="cust-tax_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">Чистий прибуток</span><span class="result-val green" id="cust-net_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">Ефективна ставка</span><span class="result-val" id="cust-eff_${s.id}">—</span></div>
+        </div>
+      </div>
+      <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">✕ Видалити розділ</button>
+    </div></div>
+  </div>`;
+}
+
+function calcCustomSection(id){
+  const P=parseFloat($('customPrincipal_'+id)?.value)||0;
+  if(!P){['cust-total','cust-interest','cust-tax','cust-net','cust-eff'].forEach(k=>setText(k+'_'+id,'—'));return;}
+  const r=parseFloat($('customRate_'+id)?.value||16)/100;
+  const n=parseFloat($('customFreq_'+id)?.value||12);
+  const t=(parseFloat($('customMonths_'+id)?.value||12))/12;
+  const tax=parseFloat($('customTax_'+id)?.value||0)/100;
+  const tf=parseFloat($('customTaxFree_'+id)?.value||0);
+  const A=P*Math.pow(1+r/n,n*t);
+  const interest=A-P, taxBase=Math.max(0,interest-tf);
+  const taxAmt=taxBase*tax, net=interest-taxAmt;
+  const eff=P&&t?(net/P/t*100):0;
+  setText('cust-total_'+id,    fmtN(Math.round(A))+' ₴');
+  setText('cust-interest_'+id, '+'+fmtN(Math.round(interest))+' ₴');
+  setText('cust-tax_'+id,      '−'+fmtN(Math.round(taxAmt))+' ₴');
+  setText('cust-net_'+id,      '+'+fmtN(Math.round(net))+' ₴');
+  setText('cust-eff_'+id,      eff.toFixed(2)+'% річних');
+}
+
+function removeCustomSection(id){
+  if(!confirm('Видалити цей розділ?'))return;
+  customSections=customSections.filter(s=>s.id!==id);
+  renderCustomCards();
+  updateAll();
+  saveData();
+}
+
+function getCustomTotal(){
+  return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
+}
+
+// ── TOTALS ────────────────────────────────────
+function getCryptoVal(){
+  const u=val('cryptoUsdt'),r=val('usdtUah')||41;
+  return u*r;
+}
+function getUsdVal(){return val('usdAmount')*(val('usdUah')||41);}
+function getForexVal(){return forexItems.reduce((s,f)=>s+f.amt*f.rate,0);}
+function getCashVal(){return val('cashAmount');}
+function getOtherVal(){return val('otherAmount');}
+
 function updateAll(){
-  const dep=getDepVal(), crypto=getCryptoVal(), usd=getUsdVal();
+  const dep=getAllDepositsTotal();
+  const crypto=getCryptoVal(), usd=getUsdVal();
   const forex=getForexVal(), cash=getCashVal(), other=getOtherVal();
-  const total=dep+crypto+usd+forex+cash+other;
-  const nonZero=[dep,crypto,usd,forex,cash,other].filter(v=>v>0).length;
+  const custom=getCustomTotal();
+  const total=dep+crypto+usd+forex+cash+other+custom;
+  const nonZero=[dep,crypto,usd,forex,cash,other,custom].filter(v=>v>0).length;
 
   setText('totalAmount', fmtN(total));
   setText('totalBreakdown', nonZero+' активів · '+fmtN(total)+' ₴');
@@ -499,44 +955,48 @@ function updateAll(){
     chEl.className='badge badge-green';
   }
 
-  const cards=[
-    ['deposit',dep],['crypto',crypto],['usd',usd],
-    ['forex',forex],['cash',cash],['other',other]
-  ];
-  cards.forEach(([k,v])=>{
-    setText(k+'Display', fmtN(v)+' ₴');
-    setText(k+'Pct',     pct(v,total)+' від капіталу');
+  // Депозит — сума всіх
+  setText('depositDisplay', fmtN(dep)+' ₴');
+  setText('depositPct', pct(dep,total)+' від капіталу');
+
+  // Депозит summary
+  const sl=$('depositSummaryList');
+  if(sl){
+    sl.innerHTML=deposits.map(d=>`<div class="result-row">
+      <span class="result-key">${d.name}</span>
+      <span class="result-val blue">${fmtN(parseFloat(d.principal)||0)} ₴</span>
+    </div>`).join('');
+  }
+
+  setText('cryptoDisplay', fmtN(crypto)+' ₴');
+  setText('cryptoPct', pct(crypto,total)+' від капіталу');
+  setText('usdDisplay', fmtN(usd)+' ₴');
+  setText('usdPct', pct(usd,total)+' від капіталу');
+  setText('forexDisplay', fmtN(forex)+' ₴');
+  setText('forexPct', pct(forex,total)+' від капіталу');
+  setText('cashDisplay', fmtN(cash)+' ₴');
+  setText('cashPct', pct(cash,total)+' від капіталу');
+  setText('otherDisplay', fmtN(other)+' ₴');
+  setText('otherPct', pct(other,total)+' від капіталу');
+
+  // Custom sections
+  customSections.forEach(s=>{
+    const v=parseFloat(s.principal)||0;
+    setText('customDisplay_'+s.id, fmtN(v)+' ₴');
+    setText('customPct_'+s.id, pct(v,total)+' від капіталу');
+    calcCustomSection(s.id);
   });
 
-  setText('usdToUah',   fmtN(usd)+' ₴');
-  setText('cryptoUahVal',fmtN(crypto)+' ₴');
+  setText('usdToUah', fmtN(usd)+' ₴');
+  setText('cryptoUahVal', fmtN(crypto)+' ₴');
 
-  calcDeposit();
   updateCryptoPnl();
   renderCoins();
   renderForex();
   saveData();
 }
 
-// ── DEPOSIT CALC ─────────────────────────────
-function calcDeposit(){
-  const P=val('depPrincipal'); if(!P){clearDep();return;}
-  const r=val('depRate')/100, n=val('depFreq')||12, t=val('depMonths')/12;
-  const tax=val('depTax')/100, tf=val('depTaxFree')||0;
-  const A=P*Math.pow(1+r/n,n*t);
-  const interest=A-P, taxBase=Math.max(0,interest-tf);
-  const taxAmt=taxBase*tax, net=interest-taxAmt;
-  const eff=P&&t?(net/P/t*100):0;
-  setText('r-total',   fmtN(Math.round(A))+' ₴');
-  setText('r-interest','+'+fmtN(Math.round(interest))+' ₴');
-  setText('r-taxbase', fmtN(Math.round(taxBase))+' ₴');
-  setText('r-tax',     '−'+fmtN(Math.round(taxAmt))+' ₴');
-  setText('r-net',     '+'+fmtN(Math.round(net))+' ₴');
-  setText('r-eff',     eff.toFixed(2)+'% річних');
-}
-function clearDep(){['r-total','r-interest','r-taxbase','r-tax','r-net','r-eff'].forEach(id=>setText(id,'—'));}
-
-// ── CRYPTO ───────────────────────────────────
+// ── CRYPTO ────────────────────────────────────
 function updateCryptoPnl(){
   const cur=getCryptoVal(), cost=val('cryptoCost');
   if(!cur||!cost){setText('cryptoPnl','—');setText('cryptoRoi','—');return;}
@@ -569,7 +1029,7 @@ function renderCoins(){
     </div>`).join('');
 }
 
-// ── FOREX ────────────────────────────────────
+// ── FOREX ─────────────────────────────────────
 const FFLAGS={EUR:'🇪🇺',GBP:'🇬🇧',PLN:'🇵🇱',CHF:'🇨🇭',CZK:'🇨🇿',RUB:'🇷🇺',KZT:'🇰🇿',OTHER:'🌐'};
 const FSYM  ={EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',OTHER:'?'};
 function addForex(){
@@ -586,7 +1046,6 @@ function renderForex(){
   const el=$('forexRows');
   const total=forexItems.reduce((s,f)=>s+f.amt*f.rate,0);
   setText('forexTotal',fmtN(Math.round(total))+' ₴');
-  setText('forexDisplay',fmtN(Math.round(total))+' ₴');
   if(!forexItems.length){el.innerHTML='';return;}
   el.innerHTML=forexItems.map((f,i)=>`<div class="list-row">
     <span style="font-size:16px;flex-shrink:0">${FFLAGS[f.cur]||'🌐'}</span>
@@ -597,100 +1056,17 @@ function renderForex(){
   </div>`).join('')+'<div class="divider" style="margin:8px 0 4px"></div>';
 }
 
-// ── TOGGLE CARD ──────────────────────────────
-function toggleCard(name){$('card-'+name).classList.toggle('expanded');}
-
-// ── LIVE TICKER ──────────────────────────────
-let liveInterval=null;
-function fmtLive(n){
-  const a=Math.abs(n);
-  if(a>=1e6)return (n/1e6).toFixed(4)+'M ₴';
-  if(a>=1e3)return fmtD(n,2)+' ₴';
-  return n.toFixed(2)+' ₴';
-}
-function calcLive(){
-  const P=val('depPrincipal'), rAnn=val('depRate')/100;
-  const n=val('depFreq')||12, tax=val('depTax')/100, tf=val('depTaxFree')||0;
-  const sStr=$('depStartDate').value, eStr=$('depEndDate').value;
-  if(!P||!rAnn||!sStr||!eStr){
-    $('liveSetup').style.display='block';$('liveMain').style.display='none';return;
-  }
-  const start=new Date(sStr),end=new Date(eStr),now=new Date();
-  if(now<start||end<=start){
-    $('liveSetup').style.display='block';$('liveMain').style.display='none';return;
-  }
-  $('liveSetup').style.display='none';$('liveMain').style.display='block';
-
-  const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
-  const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
-  const A=P*Math.pow(1+rAnn/n,n*yEl);
-  const interest=A-P, taxBase=Math.max(0,interest-tf);
-  const taxAmt=taxBase*tax, net=interest-taxAmt;
-  const rPerSec=rAnn/(365.25*24*3600);
-  const perSec=A*rPerSec*(1-(interest>tf?tax:0));
-  const perDay=perSec*86400;
-
-  const intPart=Math.floor(A).toLocaleString('uk-UA');
-  const decPart=(A%1).toFixed(2).slice(1);
-  $('liveAmount').innerHTML=intPart+'<span class="live-kopeck">'+decPart+' ₴</span>';
-  const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
-  const dGone=Math.round(yEl*365.25);
-  setText('liveSub','минуло '+dGone+' дн · залишилось '+dLeft+' дн');
-  setText('liveInterest','+'+fmtLive(interest));
-  setText('liveTaxLive','−'+fmtLive(taxAmt));
-  setText('liveNet','+'+fmtLive(net));
-  setText('livePerSec','+'+perSec.toFixed(5)+' ₴/с');
-  setText('livePerDay','+'+fmtLive(perDay));
-  $('liveBar').style.width=Math.round(progress*100)+'%';
-  const fmt2=d=>d.toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'});
-  setText('liveDateStart',fmt2(start));
-  setText('liveDatePct',Math.round(progress*100)+'%');
-  setText('liveDateEnd',fmt2(end));
-  renderDailyLog(P,rAnn,n,tax,tf,start,now);
+// ── TOGGLE CARD ───────────────────────────────
+function toggleCard(name){
+  const el=$('card-'+name);
+  if(el)el.classList.toggle('expanded');
 }
 
-function renderDailyLog(P,rAnn,n,tax,tf,start,now){
-  const el=$('dailyLog');
-  const daysGone=Math.round((now-start)/(1000*60*60*24));
-  const count=Math.min(daysGone,30);
-  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Перший день ще попереду</div>';return;}
-  let rows='';
-  for(let d=0;d<count;d++){
-    const t0=d/365.25, t1=(d+1)/365.25;
-    const A0=P*Math.pow(1+rAnn/n,n*t0);
-    const A1=P*Math.pow(1+rAnn/n,n*t1);
-    const gi=A1-A0;
-    const tb0=Math.max(0,A0-P-tf)*tax;
-    const tb1=Math.max(0,A1-P-tf)*tax;
-    const dayTax=Math.max(0,tb1-tb0);
-    const dayNet=gi-dayTax;
-    const date=new Date(start);date.setDate(date.getDate()+d);
-    rows+=`<div class="daily-row">
-      <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>
-      <span class="daily-income">+${dayNet.toFixed(2)} ₴/день</span>
-      <span class="daily-total">${fmtN(Math.round(A1))} ₴</span>
-    </div>`;
-  }
-  el.innerHTML=rows;
-  el.scrollTop=el.scrollHeight;
-}
-
-function startLiveTicker(){
-  if(liveInterval)clearInterval(liveInterval);
-  calcLive();
-  liveInterval=setInterval(calcLive,100);
-}
-['depPrincipal','depRate','depFreq','depTax','depTaxFree','depStartDate','depEndDate'].forEach(id=>{
-  $(id)?.addEventListener('input',startLiveTicker);
-});
-
-// ── DRAG & DROP ──────────────────────────────
+// ── DRAG & DROP ───────────────────────────────
 function initDrag(){
   const container=$('cardsContainer');
   let dragged=null;
-
   container.querySelectorAll('.card').forEach(card=>{
-    // Desktop
     card.addEventListener('dragstart',e=>{
       dragged=card;
       setTimeout(()=>card.classList.add('dragging'),0);
@@ -712,106 +1088,47 @@ function initDrag(){
         else card.before(dragged);
       }
     });
-
-    // Touch (long press)
-    let timer,clone,isDrag=false,startY=0,startX=0;
-    const handle=card.querySelector('.drag-handle');
-
-    const onTouchStart=e=>{
-      startY=e.touches[0].clientY; startX=e.touches[0].clientX;
-      timer=setTimeout(()=>{
-        isDrag=true; dragged=card;
-        card.classList.add('dragging');
-        const rect=card.getBoundingClientRect();
-        clone=card.cloneNode(true);
-        Object.assign(clone.style,{position:'fixed',zIndex:999,width:rect.width+'px',left:rect.left+'px',top:rect.top+'px',opacity:'0.85',pointerEvents:'none',borderRadius:'20px'});
-        document.body.appendChild(clone);
-      },450);
-    };
-    const onTouchMove=e=>{
-      if(!isDrag){
-        if(Math.abs(e.touches[0].clientY-startY)>10||Math.abs(e.touches[0].clientX-startX)>10) clearTimeout(timer);
-        return;
-      }
-      e.preventDefault();
-      const t=e.touches[0];
-      if(clone) clone.style.top=(t.clientY-60)+'px';
-      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
-      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
-      if(target&&target!==card) target.classList.add('drag-over');
-    };
-    const onTouchEnd=e=>{
-      clearTimeout(timer);
-      if(!isDrag){isDrag=false;return;}
-      isDrag=false;
-      if(clone){clone.remove();clone=null;}
-      card.classList.remove('dragging');
-      const t=e.changedTouches[0];
-      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
-      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
-      if(target&&target!==card){
-        const all=[...container.querySelectorAll('.card')];
-        if(all.indexOf(card)<all.indexOf(target)) target.after(card);
-        else target.before(card);
-      }
-      saveOrder();
-    };
-
-    (handle||card).addEventListener('touchstart',onTouchStart,{passive:true});
-    document.addEventListener('touchmove',onTouchMove,{passive:false});
-    (handle||card).addEventListener('touchend',onTouchEnd);
   });
 }
-
 function saveOrder(){
   cardOrder=[...document.querySelectorAll('.card')].map(c=>c.dataset.card);
   saveData();
 }
-function applyOrder(order){
-  if(!order?.length)return;
-  const c=$('cardsContainer');
-  order.forEach(id=>{const e=$('card-'+id);if(e)c.appendChild(e);});
-}
 
-// ── PERSIST ──────────────────────────────────
+// ── PERSIST ───────────────────────────────────
 function saveData(){
   try{
-    localStorage.setItem('kapital_v4',JSON.stringify({
-      depPrincipal:sval('depPrincipal'),depRate:sval('depRate'),
-      depMonths:sval('depMonths'),depFreq:sval('depFreq'),
-      depTax:sval('depTax'),depTaxFree:sval('depTaxFree'),
-      depStartDate:sval('depStartDate'),depEndDate:sval('depEndDate'),
+    localStorage.setItem('kapital_v5',JSON.stringify({
+      deposits,
       cryptoUsdt:sval('cryptoUsdt'),usdtUah:sval('usdtUah'),cryptoCost:sval('cryptoCost'),
       usdAmount:sval('usdAmount'),usdUah:sval('usdUah'),usdNote:sval('usdNote'),
       cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),
       otherAmount:sval('otherAmount'),otherName:sval('otherName'),otherNote:sval('otherNote'),
-      coins,forexItems,cardOrder
+      coins,forexItems,cardOrder,customSections
     }));
   }catch(e){}
 }
 function loadData(){
   try{
-    const d=JSON.parse(localStorage.getItem('kapital_v4')||'null');
+    const d=JSON.parse(localStorage.getItem('kapital_v5')||'null');
     if(!d)return;
     const sv=(id,v)=>{if(v!==undefined&&$(id))$(id).value=v;};
-    sv('depPrincipal',d.depPrincipal);sv('depRate',d.depRate);
-    sv('depMonths',d.depMonths);sv('depFreq',d.depFreq);
-    sv('depTax',d.depTax);sv('depTaxFree',d.depTaxFree);
-    sv('depStartDate',d.depStartDate);sv('depEndDate',d.depEndDate);
+    if(Array.isArray(d.deposits)&&d.deposits.length)deposits=d.deposits;
     sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('cryptoCost',d.cryptoCost);
     sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
     sv('cashAmount',d.cashAmount);sv('cashNote',d.cashNote);
     sv('otherAmount',d.otherAmount);sv('otherName',d.otherName);sv('otherNote',d.otherNote);
     if(Array.isArray(d.coins))coins=d.coins;
     if(Array.isArray(d.forexItems))forexItems=d.forexItems;
-    if(Array.isArray(d.cardOrder))applyOrder(d.cardOrder);
+    if(Array.isArray(d.customSections))customSections=d.customSections;
   }catch(e){}
 }
 
-// ── INIT ─────────────────────────────────────
+// ── INIT ──────────────────────────────────────
 loadData();
+renderDeposits();
+renderCustomCards();
 updateAll();
-startLiveTicker();
 initDrag();
 </script>
 </body>
