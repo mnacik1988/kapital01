@@ -216,6 +216,18 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .modal-cancel{width:100%;margin-top:8px;background:transparent;border:1px solid var(--border2);border-radius:14px;padding:12px;font-family:'Syne',sans-serif;font-size:14px;color:var(--muted2);cursor:pointer;}
 
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
+
+/* СВОРАЧИВАЕМЫЙ КАЛЬКУЛЯТОР В ДЕПОЗИТЕ */
+.dep-calc-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 0 4px;border-top:1px solid var(--border);margin-top:12px;user-select:none;}
+.dep-calc-toggle-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted2);text-transform:uppercase;}
+.dep-calc-toggle-icon{font-size:13px;color:var(--muted);transition:transform .25s;}
+.dep-calc-toggle.open .dep-calc-toggle-icon{transform:rotate(180deg);}
+.dep-calc-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.4,0,0.2,1);}
+.dep-calc-body.open{max-height:1200px;}
+
+/* DRAG для кастомних карток */
+.card-custom.dragging{opacity:0.45;transform:scale(0.97);}
+.card-custom.drag-over{border-color:var(--gold)!important;transform:scale(1.01);}
 </style>
 </head>
 <body>
@@ -540,7 +552,12 @@ function getDepositHtml(dep,idx){
           <div class="daily-scroll" id="dailyLog_${dep.id}"><div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Немає даних</div></div>
         </div>
       </div>
-      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+      <div class="dep-calc-toggle" id="depCalcToggle_${dep.id}" onclick="toggleDepCalc('${dep.id}')">
+        <span class="dep-calc-toggle-label">⚙ Налаштування депозиту</span>
+        <span class="dep-calc-toggle-icon">▼</span>
+      </div>
+      <div class="dep-calc-body" id="depCalcBody_${dep.id}">
+        <div style="padding-top:14px;">
         <div class="field-group">
           <div class="field-label">Сума депозиту (₴)</div>
           <input class="field-input" type="number" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
@@ -602,6 +619,7 @@ function getDepositHtml(dep,idx){
             <div class="result-row"><span class="result-key">Чистий прибуток <span class="tag tag-net">після податку</span></span><span class="result-val green" id="r-net_${dep.id}">—</span></div>
             <div class="result-row"><span class="result-key">Ефективна ставка</span><span class="result-val" id="r-eff_${dep.id}">—</span></div>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -777,6 +795,15 @@ function startLiveTicker(depId){
   liveIntervals[depId]=setInterval(()=>calcLive(depId),100);
 }
 
+// ── TOGGLE DEP CALC ───────────────────────────
+function toggleDepCalc(depId){
+  const toggle=$('depCalcToggle_'+depId);
+  const body=$('depCalcBody_'+depId);
+  if(!toggle||!body)return;
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
 // ── CUSTOM SECTIONS ───────────────────────────
 const EMOJIS=['💰','📈','🏠','🚗','💎','🎯','🏆','💡','🔑','🌟','💼','📊','🏗','⚡','🌱','🛡','🎪','💫','🏅','🎁'];
 let selectedEmoji='💰';
@@ -811,6 +838,9 @@ function renderCustomCards(){
   const container=$('customCardsContainer');
   container.innerHTML=customSections.map((s,i)=>getCustomCardHtml(s,i)).join('');
   customSections.forEach(s=>{ calcCustomSection(s.id); });
+  // Make custom cards draggable
+  container.querySelectorAll('.card').forEach(c=>c.setAttribute('draggable','true'));
+  refreshDrag();
 }
 
 function getCustomCardHtml(s,idx){
@@ -1064,9 +1094,20 @@ function toggleCard(name){
 
 // ── DRAG & DROP ───────────────────────────────
 function initDrag(){
+  refreshDrag();
+}
+
+function refreshDrag(){
   const container=$('cardsContainer');
   let dragged=null;
+
+  // Re-bind all cards including custom
   container.querySelectorAll('.card').forEach(card=>{
+    // Remove old listeners by cloning (except inputs)
+    const newCard=card.cloneNode(false);
+    // Just rebind on the existing card to avoid losing inner HTML
+    card._dragBound=true;
+
     card.addEventListener('dragstart',e=>{
       dragged=card;
       setTimeout(()=>card.classList.add('dragging'),0);
@@ -1086,8 +1127,64 @@ function initDrag(){
         const all=[...container.querySelectorAll('.card')];
         if(all.indexOf(dragged)<all.indexOf(card)) card.after(dragged);
         else card.before(dragged);
+        saveOrder();
       }
     });
+
+    // Touch drag (long press on handle)
+    let timer,clone,isDrag=false,startY=0,startX=0;
+    const handle=card.querySelector('.drag-handle');
+    if(!handle)return;
+
+    const onTouchStart=e=>{
+      startY=e.touches[0].clientY; startX=e.touches[0].clientX;
+      timer=setTimeout(()=>{
+        isDrag=true; dragged=card;
+        card.classList.add('dragging');
+        const rect=card.getBoundingClientRect();
+        clone=card.cloneNode(true);
+        Object.assign(clone.style,{
+          position:'fixed',zIndex:999,width:rect.width+'px',
+          left:rect.left+'px',top:rect.top+'px',
+          opacity:'0.85',pointerEvents:'none',borderRadius:'20px',
+          boxShadow:'0 8px 32px #0008'
+        });
+        document.body.appendChild(clone);
+        if(navigator.vibrate)navigator.vibrate(30);
+      },450);
+    };
+    const onTouchMove=e=>{
+      if(!isDrag){
+        if(Math.abs(e.touches[0].clientY-startY)>10||Math.abs(e.touches[0].clientX-startX)>10)clearTimeout(timer);
+        return;
+      }
+      e.preventDefault();
+      const t=e.touches[0];
+      if(clone)clone.style.top=(t.clientY-60)+'px';
+      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
+      if(target&&target!==card)target.classList.add('drag-over');
+    };
+    const onTouchEnd=e=>{
+      clearTimeout(timer);
+      if(!isDrag){isDrag=false;return;}
+      isDrag=false;
+      if(clone){clone.remove();clone=null;}
+      card.classList.remove('dragging');
+      const t=e.changedTouches[0];
+      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
+      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      if(target&&target!==card){
+        const all=[...container.querySelectorAll('.card')];
+        if(all.indexOf(card)<all.indexOf(target))target.after(card);
+        else target.before(card);
+        saveOrder();
+      }
+    };
+
+    handle.addEventListener('touchstart',onTouchStart,{passive:true});
+    document.addEventListener('touchmove',onTouchMove,{passive:false});
+    handle.addEventListener('touchend',onTouchEnd);
   });
 }
 function saveOrder(){
