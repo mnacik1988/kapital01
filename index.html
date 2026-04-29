@@ -241,6 +241,45 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .sec-table .td-name{color:var(--green2);font-weight:500;}
 .sec-table .td-div{color:var(--orange2);}
 
+/* LIVE PRICE BADGE */
+.live-price-badge{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:#4ecb8d18;color:var(--green2);margin-left:4px;vertical-align:middle;}
+.live-price-badge.loading{background:#5b9cf618;color:var(--blue2);}
+.live-price-badge.error{background:#f8717118;color:var(--red);}
+.live-price-dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
+.price-up{color:var(--green2)!important;}
+.price-down{color:var(--red)!important;}
+.price-neutral{color:var(--muted2)!important;}
+.pnl-positive{color:var(--green2);font-weight:500;}
+.pnl-negative{color:var(--red);font-weight:500;}
+
+/* TICKER SEARCH */
+.ticker-search-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+.ticker-search-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);outline:none;text-transform:uppercase;}
+.ticker-search-input:focus{border-color:var(--green);}
+.ticker-search-input::placeholder{text-transform:none;color:var(--muted);}
+.ticker-fetch-btn{background:#4ecb8d20;border:1px solid #4ecb8d40;border-radius:10px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.ticker-fetch-btn:active{background:#4ecb8d35;}
+.ticker-fetch-btn.loading{color:var(--blue2);background:#5b9cf618;border-color:#5b9cf640;pointer-events:none;}
+.stock-price-info{background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none;}
+.stock-price-info.visible{display:block;}
+.stock-price-info .spi-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.stock-price-info .spi-price{font-family:'DM Mono',monospace;font-size:18px;color:var(--green2);font-weight:500;}
+.stock-price-info .spi-change{font-family:'DM Mono',monospace;font-size:11px;margin-left:8px;}
+.stock-price-info .spi-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:4px;}
+.stock-price-info .spi-div{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange2);margin-top:2px;}
+.auto-refresh-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border);margin-top:8px;}
+.auto-refresh-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+.refresh-status{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);}
+.refresh-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);cursor:pointer;transition:all .15s;}
+.refresh-btn:active{color:var(--green2);border-color:var(--green);}
+.sec-table .td-live-price{color:var(--text);min-width:70px;}
+.sec-table .td-pnl{min-width:60px;font-size:10px;}
+.sec-summary-divs{background:linear-gradient(135deg,#fb923c08,transparent);border:1px solid #fb923c20;border-radius:10px;padding:10px 12px;margin-top:8px;}
+.sec-summary-divs .sd-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--orange2);text-transform:uppercase;margin-bottom:6px;}
+.sec-summary-divs .sd-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+.sec-summary-divs .sd-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.sec-summary-divs .sd-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--orange2);font-weight:500;}
+
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
@@ -1112,12 +1151,154 @@ function getCustomTotal(){
   return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
 }
 
+// ── LIVE STOCK PRICES via Anthropic API ──────
+let stockPriceCache={};
+let usdUahRate=41;
+
+async function claudeGetStockData(tickers){
+  const tickerList=tickers.join(', ');
+  const prompt=`Get current stock prices and dividend info for these tickers: ${tickerList}
+Also provide current USD to UAH exchange rate.
+Respond ONLY with valid JSON (no markdown, no backticks, no explanation):
+{"usdUah":number,"stocks":{"TICKER":{"price":number,"change":number,"changePct":number,"divYield":number,"divAbs":number,"name":"string","currency":"USD"}}}`;
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  if(!resp.ok)throw new Error('API '+resp.status);
+  const data=await resp.json();
+  const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+  const m=text.match(/\{[\s\S]*\}/);
+  if(!m)throw new Error('No JSON');
+  return JSON.parse(m[0]);
+}
+
+async function fetchUsdUahRate(){
+  // Updated as part of stock fetch; this is a no-op standalone
+}
+
+async function fetchStockPrice(ticker){
+  ticker=ticker.toUpperCase().trim();
+  if(!ticker)return null;
+  const cached=stockPriceCache[ticker];
+  if(cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
+  try{
+    const result=await claudeGetStockData([ticker]);
+    if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
+    const s=result.stocks&&result.stocks[ticker];
+    if(!s)throw new Error('No data for '+ticker);
+    const entry={...s,updated:Date.now()};
+    stockPriceCache[ticker]=entry;
+    return entry;
+  }catch(e){
+    console.warn('fetchStockPrice error for',ticker,e.message);
+    return null;
+  }
+}
+
+async function fetchMultipleStocks(tickers){
+  if(!tickers.length)return{};
+  try{
+    const result=await claudeGetStockData(tickers);
+    if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
+    const now=Date.now();
+    Object.entries(result.stocks||{}).forEach(([t,s])=>{stockPriceCache[t]={...s,updated:now};});
+    return result.stocks||{};
+  }catch(e){
+    console.warn('fetchMultipleStocks error',e.message);
+    return{};
+  }
+}
+
+async function fetchTickerForInput(secId){
+  const tickerInput=$('secName_'+secId);
+  const ticker=(tickerInput?.value||'').trim().toUpperCase();
+  if(!ticker)return;
+  const btn=$('fetchBtn_'+secId);
+  const info=$('stockInfo_'+secId);
+  if(btn){btn.className='ticker-fetch-btn loading';btn.textContent='⏳ Запит...';}
+  if(info)info.className='stock-price-info';
+  const data=await fetchStockPrice(ticker);
+  if(btn){btn.className='ticker-fetch-btn';btn.textContent='🔍 Отримати ціну';}
+  if(!data){
+    if(info){info.className='stock-price-info visible';info.innerHTML=`<div class="spi-name" style="color:var(--red)">⚠ Тікер "${ticker}" не знайдено</div><div class="spi-meta">Перевірте символ (напр: AAPL, MSFT, AMZN)</div>`;}
+    return;
+  }
+  const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
+  const divYieldAbs=(data.divAbs||0)*(data.currency==='USD'?usdUahRate:1);
+  const priceField=$('secPrice_'+secId);
+  if(priceField)priceField.value=priceUah.toFixed(2);
+  const divField=$('secDiv_'+secId);
+  if(divField&&data.divYield>0)divField.value=data.divYield.toFixed(2);
+  if(info){
+    const changeClass=(data.change||0)>=0?'price-up':'price-down';
+    const changeSign=(data.change||0)>=0?'+':'';
+    const ch=data.change||0, chp=data.changePct||0;
+    info.className='stock-price-info visible';
+    info.innerHTML=`
+      <div class="spi-name">${data.name} <span style="color:var(--muted);font-size:10px">${ticker} · ${data.currency}</span></div>
+      <div>
+        <span class="spi-price">${data.currency==='USD'?'$'+data.price.toFixed(2):fmtN(Math.round(priceUah))+' ₴'}</span>
+        ${data.currency==='USD'?`<span style="color:var(--muted);font-size:10px"> ≈ ${fmtN(Math.round(priceUah))} ₴</span>`:''}
+        <span class="spi-change ${changeClass}">${changeSign}${ch.toFixed(2)} (${changeSign}${chp.toFixed(2)}%)</span>
+      </div>
+      <div class="spi-meta">Курс USD/₴: ${usdUahRate.toFixed(2)} · Оновлено: ${new Date().toLocaleTimeString('uk-UA')}</div>
+      ${data.divYield>0?`<div class="spi-div">💰 Дивіденди: ${data.divYield.toFixed(2)}% річних · ≈${fmtD(divYieldAbs,2)} ₴/акція/рік</div>`:'<div class="spi-div" style="color:var(--muted)">— Дивіденди не виплачуються</div>'}
+    `;
+  }
+}
+
+async function refreshAllStockPrices(secId){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  if(!sec||!sec.items.length)return;
+  const btn=$('refreshAllBtn_'+secId);
+  const status=$('refreshStatus_'+secId);
+  if(btn)btn.textContent='⏳ ...';
+  if(status)status.textContent='Запит до Claude...';
+  const tickers=[...new Set(sec.items.filter(it=>it.ticker).map(it=>it.ticker))];
+  if(!tickers.length){if(btn)btn.textContent='⟳ Оновити';return;}
+  const stocks=await fetchMultipleStocks(tickers);
+  let updated=0;
+  for(let it of sec.items){
+    if(!it.ticker)continue;
+    const data=stocks[it.ticker]||stockPriceCache[it.ticker];
+    if(data){
+      const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
+      it.price=priceUah;it.livePrice=priceUah;
+      it.divYield=data.divYield>0?data.divYield:it.divYield||0;
+      it.liveName=data.name;it.liveChange=data.changePct;
+      it.liveCurrency=data.currency;it.liveOrigPrice=data.price;
+      it.divAbs=data.divAbs||0;
+      updated++;
+    }
+  }
+  sec.lastRefresh=new Date().toLocaleTimeString('uk-UA');
+  renderSecuritiesCards();updateAll();saveData();
+  if(btn)btn.textContent='⟳ Оновити';
+  const st=$('refreshStatus_'+secId);
+  if(st)st.textContent=updated?`Оновл. ${sec.lastRefresh}`:'Помилка оновлення';
+}
+
+let autoRefreshInterval=null;
+function startAutoRefresh(){
+  if(autoRefreshInterval)clearInterval(autoRefreshInterval);
+  autoRefreshInterval=setInterval(()=>{
+    securitiesSections.forEach(s=>{if(s.items.some(it=>it.ticker))refreshAllStockPrices(s.id);});
+  },5*60*1000);
+}
+
 // ── SECURITIES (Stocks / Bonds / OVDP) ───────
 function addSecuritiesCard(type){
   const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
   const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
   const id='sec_'+type+'_'+Date.now();
-  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[]});
+  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[],lastRefresh:null});
   renderSecuritiesCards();
   saveData(); updateAll();
 }
@@ -1134,25 +1315,55 @@ function getSecCardHtml(s,idx){
   const lang=LANGS[currentLang];
   const total=s.items.reduce((sum,it)=>sum+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0);
   const totalDiv=s.items.reduce((sum,it)=>{
-    const val=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
-    return sum+val*(parseFloat(it.div)||0)/100;
+    const v=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
+    return sum+v*(parseFloat(it.divYield)||parseFloat(it.div)||0)/100;
   },0);
+  const totalDivAbs=s.items.reduce((sum,it)=>{
+    return sum+(parseFloat(it.qty)||0)*(parseFloat(it.divAbs)||0)*(parseFloat(it.liveCurrency)==='USD'?usdUahRate:1);
+  },0);
+  const hasTickers=s.items.some(it=>it.ticker);
   const themeClass='card-'+s.type;
+
   const rows=s.items.length>0?(
-    '<table class="sec-table"><tr>'+
-    '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th><th>'+lang.secPrice+'</th><th>'+lang.secDiv+'</th><th>'+lang.secTotal+'</th><th></th></tr>'+
-    s.items.map((it,j)=>
-      '<tr><td class="td-name">'+(it.name||'—')+'</td><td>'+(it.qty||0)+'</td><td>'+fmtN(parseFloat(it.price)||0)+'</td>'+
-      '<td class="td-div">'+(it.div||0)+'%</td>'+
-      '<td>'+fmtN(Math.round((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)))+'</td>'+
-      '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+j+')">×</button></td></tr>'
-    ).join('')+
-    '</table>'+
+    '<div style="overflow-x:auto"><table class="sec-table"><tr>'+
+    '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th>'+
+    '<th>Ціна</th><th>Дивіденди</th><th>'+lang.secTotal+'</th><th>P&L</th><th></th></tr>'+
+    s.items.map((it,j)=>{
+      const qty=parseFloat(it.qty)||0;
+      const price=parseFloat(it.price)||0;
+      const buyPrice=parseFloat(it.buyPrice)||0;
+      const totVal=qty*price;
+      const divPct=parseFloat(it.divYield)||parseFloat(it.div)||0;
+      const pnl=buyPrice>0?totVal-qty*buyPrice:null;
+      const pnlClass=pnl===null?'':pnl>=0?'pnl-positive':'pnl-negative';
+      const changeClass=it.liveChange==null?'':(it.liveChange>=0?'price-up':'price-down');
+      const priceDisplay=it.ticker?
+        `<span class="${changeClass}">${fmtN(Math.round(price))}</span>${it.liveChange!=null?`<span style="font-size:9px;color:${it.liveChange>=0?'var(--green2)':'var(--red)'}">${it.liveChange>=0?'▲':'▼'}${Math.abs(it.liveChange).toFixed(1)}%</span>`:''}`
+        :fmtN(price);
+      return '<tr>'+
+        '<td class="td-name">'+(it.ticker?`<span style="font-family:\'DM Mono\',monospace;font-size:10px;background:#4ecb8d15;padding:1px 5px;border-radius:6px">${it.ticker}</span> `:'')+(it.liveName||it.name||'—')+'</td>'+
+        '<td>'+qty+'</td>'+
+        '<td class="td-live-price">'+priceDisplay+'</td>'+
+        '<td class="td-div">'+divPct.toFixed(1)+'%</td>'+
+        '<td>'+fmtN(Math.round(totVal))+'</td>'+
+        '<td class="td-pnl">'+(pnl!==null?`<span class="${pnlClass}">${pnl>=0?'+':''}${fmtN(Math.round(pnl))}</span>`:'—')+'</td>'+
+        '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+j+')">×</button></td></tr>';
+    }).join('')+
+    '</table></div>'+
+    '<div class="sec-summary-divs"><div class="sd-label">💰 Дивідендний дохід</div>'+
+    '<div class="sd-row"><span class="sd-key">Річний дохід (за ціною)</span><span class="sd-val">+'+fmtN(Math.round(totalDiv))+' ₴/рік</span></div>'+
+    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">Абс. дивіденд ($/акція)</span><span class="sd-val">+'+fmtN(Math.round(totalDivAbs))+' ₴/рік</span></div>':'')+
+    '<div class="sd-row"><span class="sd-key">В місяць</span><span class="sd-val">~'+fmtN(Math.round(totalDiv/12))+' ₴</span></div>'+
+    '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(Math.round(total))+' ₴</span></div>'+
-    '<div class="result-row"><span class="result-key">'+lang.secDiv+'</span><span class="result-val green">+'+fmtN(Math.round(totalDiv))+' ₴/рік</span></div>'+
-    '</div>'
+    '</div>'+
+    (hasTickers?`<div class="auto-refresh-bar">
+      <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
+      <button class="refresh-btn" id="refreshAllBtn_${s.id}" onclick="refreshAllStockPrices('${s.id}')">⟳ Оновити</button>
+    </div>`:'')
   ):'';
+
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
@@ -1172,24 +1383,29 @@ function getSecCardHtml(s,idx){
       ${rows}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
+        <div class="ticker-search-row">
+          <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="Тікер: AAPL, MSFT...">
+          <button class="ticker-fetch-btn" id="fetchBtn_${s.id}" onclick="fetchTickerForInput('${s.id}')">🔍 Отримати ціну</button>
+        </div>
+        <div class="stock-price-info" id="stockInfo_${s.id}"></div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">${lang.secName}</div>
-            <input class="field-input" type="text" id="secName_${s.id}" placeholder="${lang.secNamePh}">
+            <div class="field-label">Кількість акцій</div>
+            <input class="field-input" type="number" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
           </div>
           <div class="field-group">
-            <div class="field-label">${lang.secQty}</div>
-            <input class="field-input" type="number" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
+            <div class="field-label">Ціна купівлі (₴)</div>
+            <input class="field-input" type="number" id="secBuyPrice_${s.id}" placeholder="для P&L" inputmode="decimal">
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">${lang.secPrice}</div>
-            <input class="field-input" type="number" id="secPrice_${s.id}" placeholder="500" inputmode="decimal">
+            <div class="field-label">Поточна ціна (₴) <span style="color:var(--muted);font-size:9px">авто</span></div>
+            <input class="field-input" type="number" id="secPrice_${s.id}" placeholder="автоматично" inputmode="decimal">
           </div>
           <div class="field-group">
-            <div class="field-label">${lang.secDiv}</div>
-            <input class="field-input" type="number" id="secDiv_${s.id}" placeholder="5" inputmode="decimal">
+            <div class="field-label">Дивіденди (% річних) <span style="color:var(--muted);font-size:9px">авто</span></div>
+            <input class="field-input" type="number" id="secDiv_${s.id}" placeholder="авто" inputmode="decimal">
           </div>
         </div>
         <button class="add-btn" onclick="addSecItem('${s.id}')">${lang.addSecItem}</button>
@@ -1201,13 +1417,27 @@ function getSecCardHtml(s,idx){
 
 function addSecItem(secId){
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
-  const name=($('secName_'+secId)?.value||'').trim();
+  const ticker=($('secName_'+secId)?.value||'').trim().toUpperCase();
   const qty=parseFloat($('secQty_'+secId)?.value)||0;
   const price=parseFloat($('secPrice_'+secId)?.value)||0;
-  const div=parseFloat($('secDiv_'+secId)?.value)||0;
-  if(!name&&!qty&&!price)return;
-  securitiesSections[idx].items.push({name,qty,price,div});
+  const divYield=parseFloat($('secDiv_'+secId)?.value)||0;
+  const buyPrice=parseFloat($('secBuyPrice_'+secId)?.value)||0;
+  if(!ticker&&!qty&&!price)return;
+  // Try to use cached data for this ticker
+  const cached=ticker?stockPriceCache[ticker]:null;
+  const name=cached?.name||ticker;
+  securitiesSections[idx].items.push({
+    name, ticker, qty, price, divYield, buyPrice,
+    div:divYield, // backward compat
+    liveChange:cached?.changePct??null,
+    liveName:cached?.name||null,
+    liveCurrency:cached?.currency||null,
+    liveOrigPrice:cached?.price||null,
+    divAbs:cached?.divAbs||0,
+  });
   renderSecuritiesCards(); updateAll(); saveData();
+  // Auto-refresh if ticker provided
+  if(ticker)refreshAllStockPrices(secId);
 }
 function removeSecItem(secId,itemIdx){
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
@@ -1546,6 +1776,14 @@ updateAll();
 restoreOrder();
 initDrag();
 applyTranslations();
+
+// Auto-refresh stock prices on startup if any tickers saved
+setTimeout(()=>{
+  securitiesSections.forEach(s=>{
+    if(s.items.some(it=>it.ticker))refreshAllStockPrices(s.id);
+  });
+},500);
+startAutoRefresh();
 </script>
 </body>
 </html>
