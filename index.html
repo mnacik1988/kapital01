@@ -30,7 +30,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
 
 /* LANG SWITCHER */
-.lang-bar{position:fixed;top:12px;right:16px;z-index:300;display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:3px;}
+.lang-bar{position:fixed;top:12px;right:16px;z-index:600;display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:3px;}
 .lang-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;padding:4px 9px;border-radius:16px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
 .lang-btn.active{background:var(--bg3);color:var(--text);}
 
@@ -287,7 +287,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 /* FREEMIUM */
 .pro-badge{display:inline-flex;align-items:center;gap:3px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 7px;border-radius:20px;background:linear-gradient(135deg,#e8c97a22,#f5dfa022);border:1px solid #e8c97a40;color:var(--gold2);text-transform:uppercase;vertical-align:middle;margin-left:5px;}
-.paywall-overlay{position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
+.paywall-overlay{position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
 .paywall-overlay.open{opacity:1;pointer-events:all;}
 .paywall-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:28px 24px 48px;width:100%;transform:translateY(100%);transition:transform .35s cubic-bezier(0.4,0,0.2,1);}
 .paywall-overlay.open .paywall-box{transform:translateY(0);}
@@ -677,7 +677,11 @@ function openPaywall(reason){
   const sub=document.querySelector('.paywall-sub');
   if(sub&&reason)sub.textContent=reason;
   const el=document.getElementById('paywallOverlay');
-  if(el)el.classList.add('open');
+  if(!el)return;
+  // Full reset before opening
+  el.style.pointerEvents='all';
+  el.style.opacity='';
+  el.classList.add('open');
 }
 
 // ── I18N ─────────────────────────────────────
@@ -1968,9 +1972,18 @@ startAutoRefresh();
 function checkPro(){ return isPro; }
 function closePaywall(){
   const el=document.getElementById('paywallOverlay');
-  if(el){el.classList.remove('open');setTimeout(()=>{el.style.pointerEvents='none';},300);}
+  if(!el)return;
+  el.classList.remove('open');
+  // Force pointer-events off immediately AND after animation
+  el.style.pointerEvents='none';
+  setTimeout(()=>{
+    el.style.pointerEvents='none';
+    el.style.opacity='0';
+  },350);
 }
-function closePaywallIfOutside(e){ if(e.target===document.getElementById('paywallOverlay'))closePaywall(); }
+function closePaywallIfOutside(e){
+  if(e.target===document.getElementById('paywallOverlay'))closePaywall();
+}
 
 function activatePro(){
   // In real app: trigger StoreKit / Google Play purchase flow
