@@ -28,22 +28,16 @@ body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:anti
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
 
-/* HEADER — ділова типографіка */
+/* LANG SWITCHER */
+.lang-bar{position:fixed;top:12px;right:16px;z-index:300;display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:3px;}
+.lang-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;padding:4px 9px;border-radius:16px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.lang-btn.active{background:var(--bg3);color:var(--text);}
+
+/* HEADER */
 .header{padding:56px 20px 20px;background:linear-gradient(180deg,#0a0a1a 0%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
 .header-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
 .total-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
-/* ЗМІНА 1: Діловий шрифт для головної суми */
-.total-amount{
-  font-family:'Inter',sans-serif;
-  font-size:clamp(36px,9vw,54px);
-  font-weight:900;
-  letter-spacing:-2px;
-  background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  line-height:1;
-  font-variant-numeric:tabular-nums;
-  font-feature-settings:"tnum";
-}
+.total-amount{font-family:'Inter',sans-serif;font-size:clamp(36px,9vw,54px);font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
 .total-currency{font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--gold);opacity:0.7;letter-spacing:-0.5px;}
 .total-subs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
 .badge{font-family:'DM Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px;display:inline-block;}
@@ -67,10 +61,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .card-name{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:2px;}
 .card-value{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;letter-spacing:-0.5px;}
 .card-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;}
+.card-actions{display:flex;align-items:center;gap:4px;}
+.card-del-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:color .15s,background .15s;flex-shrink:0;}
+.card-del-btn:hover{color:var(--red);background:#f8717115;}
 .card-toggle{color:var(--muted);font-size:14px;transition:transform .25s;flex-shrink:0;padding:4px;cursor:pointer;}
 .card.expanded .card-toggle{transform:rotate(180deg);}
 .card-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.4,0,0.2,1);}
-.card.expanded .card-body{max-height:2000px;}
+.card.expanded .card-body{max-height:3000px;}
 .card-inner{padding:0 20px 20px;}
 .divider{height:1px;background:var(--border);margin-bottom:18px;}
 
@@ -96,6 +93,15 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .card-custom{border-top:2px solid var(--purple);}
 .card-custom .card-icon{background:#a78bfa14;}
 .card-custom .card-value{color:var(--purple2);}
+.card-stocks{border-top:2px solid var(--green);}
+.card-stocks .card-icon{background:#4ecb8d14;}
+.card-stocks .card-value{color:var(--green2);}
+.card-bonds{border-top:2px solid var(--blue);}
+.card-bonds .card-icon{background:#5b9cf614;}
+.card-bonds .card-value{color:var(--blue2);}
+.card-ovdp{border-top:2px solid var(--gold);}
+.card-ovdp .card-icon{background:#e8c97a14;}
+.card-ovdp .card-value{color:var(--gold2);}
 
 /* INPUTS */
 .field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
@@ -105,6 +111,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .field-input::placeholder{color:var(--muted);}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
 select.field-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;appearance:none;-webkit-appearance:none;}
 select.field-input option{background:var(--bg3);color:var(--text);}
 
@@ -136,7 +143,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .add-btn{width:100%;margin-top:12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:12px;padding:11px;font-family:'Syne',sans-serif;font-size:13px;color:var(--muted2);cursor:pointer;transition:background .15s;}
 .add-btn:active{background:var(--bg2);}
 
-/* ЗМІНА 3: СВАЙП ДЕПОЗИТІВ */
+/* DEPOSIT SWIPE */
 .deposits-swipe-wrap{margin:0 16px 14px;position:relative;}
 .deposits-swipe-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px;}
 .deposits-swipe-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--blue);text-transform:uppercase;}
@@ -190,12 +197,15 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .daily-income{color:var(--green2);}
 .daily-total{color:var(--blue2);font-size:9px;}
 
-/* ЗМІНА 2: КНОПКА ДОДАТИ РОЗДІЛ */
+/* ADD SECTION BTN */
 .add-section-wrap{padding:0 16px;margin-bottom:14px;}
-.add-section-btn{width:100%;background:var(--bg2);border:1px dashed var(--border2);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .15s;}
+.add-section-btn{width:100%;background:var(--bg2);border:1px dashed var(--border2);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .15s;margin-bottom:8px;}
 .add-section-btn:active{background:var(--bg3);}
 .add-section-btn span{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);}
 .add-section-btn .plus{font-size:18px;color:var(--purple);font-weight:300;}
+.section-type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.section-type-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:10px 8px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);transition:all .15s;}
+.section-type-btn:hover{border-color:var(--green);color:var(--green2);}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:#000000a0;z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
@@ -215,9 +225,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .modal-confirm:active{opacity:0.85;}
 .modal-cancel{width:100%;margin-top:8px;background:transparent;border:1px solid var(--border2);border-radius:14px;padding:12px;font-family:'Syne',sans-serif;font-size:14px;color:var(--muted2);cursor:pointer;}
 
-.footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
-
-/* СВОРАЧИВАЕМЫЙ КАЛЬКУЛЯТОР В ДЕПОЗИТЕ */
+/* DEP CALC TOGGLE */
 .dep-calc-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 0 4px;border-top:1px solid var(--border);margin-top:12px;user-select:none;}
 .dep-calc-toggle-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted2);text-transform:uppercase;}
 .dep-calc-toggle-icon{font-size:13px;color:var(--muted);transition:transform .25s;}
@@ -225,39 +233,52 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .dep-calc-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.4,0,0.2,1);}
 .dep-calc-body.open{max-height:1200px;}
 
-/* DRAG для кастомних карток */
-.card-custom.dragging{opacity:0.45;transform:scale(0.97);}
-.card-custom.drag-over{border-color:var(--gold)!important;transform:scale(1.01);}
+/* SECURITIES TABLE */
+.sec-table{width:100%;border-collapse:collapse;margin-top:10px;}
+.sec-table th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);}
+.sec-table td{font-family:'DM Mono',monospace;font-size:11px;padding:8px 8px;border-bottom:1px solid var(--border);color:var(--text);}
+.sec-table tr:last-child td{border-bottom:none;}
+.sec-table .td-name{color:var(--green2);font-weight:500;}
+.sec-table .td-div{color:var(--orange2);}
+
+.footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
 <body>
 <div class="app">
 
+<!-- LANG BAR -->
+<div class="lang-bar">
+  <button class="lang-btn active" id="lang-uk" onclick="setLang('uk')">УКР</button>
+  <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">РУС</button>
+  <button class="lang-btn" id="lang-en" onclick="setLang('en')">ENG</button>
+</div>
+
 <!-- HEADER -->
 <div class="header">
-  <div class="header-label">Загальний капітал</div>
+  <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
   <div class="total-wrap">
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-currency">₴</div>
   </div>
   <div class="total-subs">
-    <div class="badge badge-green" id="totalChange">введіть дані</div>
+    <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
     <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
   </div>
 </div>
 
-<div class="section-label">Активи · утримай та перетягни для сортування</div>
+<div class="section-label" data-i18n="sectionLabel">Активи · утримай та перетягни для сортування</div>
 
-<!-- ЗМІНА 3: СВАЙП ДЕПОЗИТІВ -->
+<!-- DEPOSIT SWIPE -->
 <div class="deposits-swipe-wrap">
   <div class="deposits-swipe-header">
-    <div class="deposits-swipe-title"><span class="live-dot" style="margin-right:6px"></span>Живий лічильник</div>
+    <div class="deposits-swipe-title"><span class="live-dot" style="margin-right:6px"></span><span data-i18n="liveCnt">Живий лічильник</span></div>
     <div style="display:flex;align-items:center;gap:8px;">
       <div class="deposits-dots" id="depDots"></div>
       <div class="deposits-nav">
         <button class="dep-nav-btn" onclick="slideDeposit(-1)">‹</button>
         <button class="dep-nav-btn" onclick="slideDeposit(1)">›</button>
-        <button class="dep-add-btn" onclick="addDepositSlide()">+ Депозит</button>
+        <button class="dep-add-btn" onclick="addDepositSlide()">+ <span data-i18n="deposit">Депозит</span></button>
       </div>
     </div>
   </div>
@@ -275,11 +296,14 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="drag-handle">⠿</div>
       <div class="card-icon">🏦</div>
       <div class="card-info" onclick="toggleCard('deposit')">
-        <div class="card-name">Депозит (всього)</div>
+        <div class="card-name" data-i18n="depositAll">Депозит (всього)</div>
         <div class="card-value" id="depositDisplay">0 ₴</div>
         <div class="card-pct" id="depositPct">0% від капіталу</div>
       </div>
-      <div class="card-toggle" onclick="toggleCard('deposit')">▼</div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="deleteBuiltinCard('deposit')" title="Видалити">✕</button>
+        <div class="card-toggle" onclick="toggleCard('deposit')">▼</div>
+      </div>
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
@@ -293,45 +317,62 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="drag-handle">⠿</div>
       <div class="card-icon">₮</div>
       <div class="card-info" onclick="toggleCard('crypto')">
-        <div class="card-name">Крипто · USDT</div>
+        <div class="card-name" data-i18n="cryptoName">Крипто · USDT</div>
         <div class="card-value" id="cryptoDisplay">0 ₴</div>
         <div class="card-pct" id="cryptoPct">0% від капіталу</div>
       </div>
-      <div class="card-toggle" onclick="toggleCard('crypto')">▼</div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="deleteBuiltinCard('crypto')" title="Видалити">✕</button>
+        <div class="card-toggle" onclick="toggleCard('crypto')">▼</div>
+      </div>
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <div class="field-group">
-        <div class="field-label">Загальна сума вкладень в USDT</div>
+        <div class="field-label" data-i18n="totalUsdtInv">Загальна сума вкладень в USDT</div>
         <input class="field-input" type="number" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
-          <div class="field-label">Курс USDT / ₴</div>
+          <div class="field-label" data-i18n="rateUsdtUah">Курс USDT / ₴</div>
           <input class="field-input" type="number" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
         </div>
         <div class="field-group">
-          <div class="field-label">Собівартість (₴)</div>
+          <div class="field-label" data-i18n="costPrice">Собівартість (₴)</div>
           <input class="field-input" type="number" id="cryptoCost" placeholder="0" inputmode="decimal" oninput="updateAll()">
         </div>
       </div>
       <div class="result-box">
-        <div class="result-row"><span class="result-key">Еквівалент у ₴</span><span class="result-val blue" id="cryptoUahVal">0 ₴</span></div>
+        <div class="result-row"><span class="result-key" data-i18n="uahEquiv">Еквівалент у ₴</span><span class="result-val blue" id="cryptoUahVal">0 ₴</span></div>
         <div class="result-row"><span class="result-key">P&amp;L</span><span class="result-val" id="cryptoPnl">—</span></div>
         <div class="result-row"><span class="result-key">ROI</span><span class="result-val" id="cryptoRoi">—</span></div>
       </div>
+      <!-- COINS LIST -->
       <div id="cryptoRows" style="margin-top:12px"></div>
-      <div class="row2" style="margin-top:12px">
-        <div class="field-group">
-          <div class="field-label">Монета</div>
-          <input class="field-input" type="text" id="newCoinName" placeholder="BTC" style="text-transform:uppercase">
+      <div style="margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
+        <div class="calc-title" data-i18n="addCoinTitle">+ Додати монету</div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label" data-i18n="coinName">Назва монети</div>
+            <input class="field-input" type="text" id="newCoinName" placeholder="BTC" style="text-transform:uppercase">
+          </div>
+          <div class="field-group">
+            <div class="field-label" data-i18n="coinQty">Кількість</div>
+            <input class="field-input" type="number" id="newCoinQty" placeholder="0.5" inputmode="decimal">
+          </div>
         </div>
-        <div class="field-group">
-          <div class="field-label">Сума USDT</div>
-          <input class="field-input" type="number" id="newCoinUsdt" placeholder="0" inputmode="decimal">
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label" data-i18n="coinBuyPrice">Ціна купівлі (USDT)</div>
+            <input class="field-input" type="number" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
+          </div>
+          <div class="field-group">
+            <div class="field-label" data-i18n="coinCurPrice">Поточна ціна (USDT)</div>
+            <input class="field-input" type="number" id="newCoinCurPrice" placeholder="65000" inputmode="decimal">
+          </div>
         </div>
+        <button class="add-btn" onclick="addCoin()" data-i18n="addCoinBtn">+ Додати монету</button>
       </div>
-      <button class="add-btn" onclick="addCoin()">+ Додати монету</button>
     </div></div>
   </div>
 
@@ -341,31 +382,34 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="drag-handle">⠿</div>
       <div class="card-icon">💵</div>
       <div class="card-info" onclick="toggleCard('usd')">
-        <div class="card-name">USD · Доларові заощадження</div>
+        <div class="card-name" data-i18n="usdName">USD · Доларові заощадження</div>
         <div class="card-value" id="usdDisplay">0 ₴</div>
         <div class="card-pct" id="usdPct">0% від капіталу</div>
       </div>
-      <div class="card-toggle" onclick="toggleCard('usd')">▼</div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="deleteBuiltinCard('usd')" title="Видалити">✕</button>
+        <div class="card-toggle" onclick="toggleCard('usd')">▼</div>
+      </div>
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <div class="field-group">
-        <div class="field-label">Сума в доларах ($)</div>
+        <div class="field-label" data-i18n="usdAmount">Сума в доларах ($)</div>
         <input class="field-input" type="number" id="usdAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
-          <div class="field-label">Курс USD / ₴</div>
+          <div class="field-label" data-i18n="rateUsdUah">Курс USD / ₴</div>
           <input class="field-input" type="number" id="usdUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
         </div>
         <div class="field-group">
-          <div class="field-label">Нотатка</div>
+          <div class="field-label" data-i18n="note">Нотатка</div>
           <input class="field-input" type="text" id="usdNote" placeholder="Готівка..." oninput="saveData()">
         </div>
       </div>
       <div class="result-box">
-        <div class="result-row"><span class="result-key">💱 Конвертація → ₴</span><span class="result-val blue" id="usdToUah">0 ₴</span></div>
-        <div class="result-row"><span class="result-key">Входить у загальний рахунок</span><span class="result-val green">✓ Так</span></div>
+        <div class="result-row"><span class="result-key" data-i18n="convUah">💱 Конвертація → ₴</span><span class="result-val blue" id="usdToUah">0 ₴</span></div>
+        <div class="result-row"><span class="result-key" data-i18n="inTotal">Входить у загальний рахунок</span><span class="result-val green">✓ <span data-i18n="yes">Так</span></span></div>
       </div>
     </div></div>
   </div>
@@ -376,18 +420,21 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="drag-handle">⠿</div>
       <div class="card-icon">🌐</div>
       <div class="card-info" onclick="toggleCard('forex')">
-        <div class="card-name">Валютні накопичення</div>
+        <div class="card-name" data-i18n="forexName">Валютні накопичення</div>
         <div class="card-value" id="forexDisplay">0 ₴</div>
         <div class="card-pct" id="forexPct">0% від капіталу</div>
       </div>
-      <div class="card-toggle" onclick="toggleCard('forex')">▼</div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="deleteBuiltinCard('forex')" title="Видалити">✕</button>
+        <div class="card-toggle" onclick="toggleCard('forex')">▼</div>
+      </div>
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <div id="forexRows"></div>
       <div class="row3">
         <div class="field-group">
-          <div class="field-label">Валюта</div>
+          <div class="field-label" data-i18n="currency">Валюта</div>
           <select class="field-input" id="newForexCur">
             <option value="EUR">€ EUR</option>
             <option value="GBP">£ GBP</option>
@@ -396,21 +443,21 @@ select.field-input option{background:var(--bg3);color:var(--text);}
             <option value="CZK">Kč CZK</option>
             <option value="RUB">₽ RUB</option>
             <option value="KZT">₸ KZT</option>
-            <option value="OTHER">Інша</option>
+            <option value="OTHER" data-i18n="other">Інша</option>
           </select>
         </div>
         <div class="field-group">
-          <div class="field-label">Сума</div>
+          <div class="field-label" data-i18n="amount">Сума</div>
           <input class="field-input" type="number" id="newForexAmt" placeholder="0" inputmode="decimal">
         </div>
         <div class="field-group">
-          <div class="field-label">Курс / ₴</div>
+          <div class="field-label" data-i18n="rateUah">Курс / ₴</div>
           <input class="field-input" type="number" id="newForexRate" placeholder="43" inputmode="decimal">
         </div>
       </div>
-      <button class="add-btn" onclick="addForex()">+ Додати валюту</button>
+      <button class="add-btn" onclick="addForex()" data-i18n="addCurrency">+ Додати валюту</button>
       <div class="result-box">
-        <div class="result-row"><span class="result-key">Усього у ₴</span><span class="result-val orange" id="forexTotal">0 ₴</span></div>
+        <div class="result-row"><span class="result-key" data-i18n="totalUah">Усього у ₴</span><span class="result-val orange" id="forexTotal">0 ₴</span></div>
       </div>
     </div></div>
   </div>
@@ -421,20 +468,23 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="drag-handle">⠿</div>
       <div class="card-icon">💴</div>
       <div class="card-info" onclick="toggleCard('cash')">
-        <div class="card-name">Готівка (₴)</div>
+        <div class="card-name" data-i18n="cashName">Готівка (₴)</div>
         <div class="card-value" id="cashDisplay">0 ₴</div>
         <div class="card-pct" id="cashPct">0% від капіталу</div>
       </div>
-      <div class="card-toggle" onclick="toggleCard('cash')">▼</div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="deleteBuiltinCard('cash')" title="Видалити">✕</button>
+        <div class="card-toggle" onclick="toggleCard('cash')">▼</div>
+      </div>
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <div class="field-group">
-        <div class="field-label">Сума (₴)</div>
+        <div class="field-label" data-i18n="amountUah">Сума (₴)</div>
         <input class="field-input" type="number" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="field-group">
-        <div class="field-label">Де зберігається</div>
+        <div class="field-label" data-i18n="whereStored">Де зберігається</div>
         <input class="field-input" type="text" id="cashNote" placeholder="Вдома, сейф..." oninput="saveData()">
       </div>
     </div></div>
@@ -446,25 +496,28 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="drag-handle">⠿</div>
       <div class="card-icon">💳</div>
       <div class="card-info" onclick="toggleCard('other')">
-        <div class="card-name">Поточний рахунок</div>
+        <div class="card-name" data-i18n="currentAcc">Поточний рахунок</div>
         <div class="card-value" id="otherDisplay">0 ₴</div>
         <div class="card-pct" id="otherPct">0% від капіталу</div>
       </div>
-      <div class="card-toggle" onclick="toggleCard('other')">▼</div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="deleteBuiltinCard('other')" title="Видалити">✕</button>
+        <div class="card-toggle" onclick="toggleCard('other')">▼</div>
+      </div>
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <div class="field-group">
-        <div class="field-label">Баланс (₴)</div>
+        <div class="field-label" data-i18n="balanceUah">Баланс (₴)</div>
         <input class="field-input" type="number" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
-          <div class="field-label">Банк</div>
+          <div class="field-label" data-i18n="bank">Банк</div>
           <input class="field-input" type="text" id="otherName" placeholder="Monobank..." oninput="saveData()">
         </div>
         <div class="field-group">
-          <div class="field-label">Нотатка</div>
+          <div class="field-label" data-i18n="note">Нотатка</div>
           <input class="field-input" type="text" id="otherNote" placeholder="..." oninput="saveData()">
         </div>
       </div>
@@ -476,148 +529,274 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 </div>
 
-<!-- ЗМІНА 2: КНОПКА ДОДАТИ РОЗДІЛ -->
-<div class="add-section-wrap">
-  <button class="add-section-btn" onclick="openAddSection()">
-    <span class="plus">+</span>
-    <span>Додати власний розділ</span>
-  </button>
-</div>
-
-<!-- MODAL ДОДАТИ РОЗДІЛ -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalIfOutside(event)">
-  <div class="modal-box">
-    <div class="modal-title">Новий розділ</div>
-    <div class="modal-sub">Як депозит — з відсотками та датами</div>
-    <div class="modal-field">
-      <div class="modal-label">Назва розділу</div>
-      <input class="modal-input" type="text" id="modalName" placeholder="Наприклад: ОВДП, Інвест-фонд...">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Іконка</div>
-      <div class="emoji-grid" id="emojiGrid"></div>
-    </div>
-    <button class="modal-confirm" onclick="confirmAddSection()">Створити розділ</button>
-    <button class="modal-cancel" onclick="closeModal()">Скасувати</button>
+<!-- ADD SECTION BUTTONS -->
+<div class="add-section-wrap" style="margin-top:14px;">
+  <div class="section-type-row">
+    <button class="section-type-btn" onclick="addSecuritiesCard('stocks')">📈 <span data-i18n="stocksBtn">Акції</span></button>
+    <button class="section-type-btn" onclick="addSecuritiesCard('bonds')">📜 <span data-i18n="bondsBtn">Облігації</span></button>
+  </div>
+  <div class="section-type-row">
+    <button class="section-type-btn" onclick="addSecuritiesCard('ovdp')">🏛 <span data-i18n="ovdpBtn">ОВДП</span></button>
+    <button class="add-section-btn" onclick="openAddSection()" style="margin-bottom:0;border:1px solid var(--border2);">
+      <span class="plus">+</span>
+      <span data-i18n="addCustom">Власний розділ</span>
+    </button>
   </div>
 </div>
 
-<div class="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalIfOutside(event)">
+  <div class="modal-box">
+    <div class="modal-title" data-i18n="newSection">Новий розділ</div>
+    <div class="modal-sub" data-i18n="newSectionSub">Як депозит — з відсотками та датами</div>
+    <div class="modal-field">
+      <div class="modal-label" data-i18n="sectionNameLabel">Назва розділу</div>
+      <input class="modal-input" type="text" id="modalName" placeholder="Наприклад: ОВДП, Інвест-фонд...">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label" data-i18n="iconLabel">Іконка</div>
+      <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+    <button class="modal-confirm" onclick="confirmAddSection()" data-i18n="createSection">Створити розділ</button>
+    <button class="modal-cancel" onclick="closeModal()" data-i18n="cancel">Скасувати</button>
+  </div>
+</div>
+
+<div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 </div>
 
 <script>
+// ── I18N ─────────────────────────────────────
+const LANGS={
+  uk:{
+    totalCapital:'Загальний капітал',enterData:'введіть дані',sectionLabel:'Активи · утримай та перетягни для сортування',
+    liveCnt:'Живий лічильник',deposit:'Депозит',depositAll:'Депозит (всього)',
+    cryptoName:'Крипто · USDT',totalUsdtInv:'Загальна сума вкладень в USDT',rateUsdtUah:'Курс USDT / ₴',
+    costPrice:'Собівартість (₴)',uahEquiv:'Еквівалент у ₴',addCoinTitle:'Додати монету',
+    coinName:'Назва монети',coinQty:'Кількість',coinBuyPrice:'Ціна купівлі (USDT)',coinCurPrice:'Поточна ціна (USDT)',addCoinBtn:'+ Додати монету',
+    usdName:'USD · Доларові заощадження',usdAmount:'Сума в доларах ($)',rateUsdUah:'Курс USD / ₴',
+    note:'Нотатка',convUah:'💱 Конвертація → ₴',inTotal:'Входить у загальний рахунок',yes:'Так',
+    forexName:'Валютні накопичення',currency:'Валюта',amount:'Сума',rateUah:'Курс / ₴',other:'Інша',addCurrency:'+ Додати валюту',totalUah:'Усього у ₴',
+    cashName:'Готівка (₴)',amountUah:'Сума (₴)',whereStored:'Де зберігається',
+    currentAcc:'Поточний рахунок',balanceUah:'Баланс (₴)',bank:'Банк',
+    stocksBtn:'Акції',bondsBtn:'Облігації',ovdpBtn:'ОВДП',addCustom:'Власний розділ',
+    newSection:'Новий розділ',newSectionSub:'Як депозит — з відсотками та датами',
+    sectionNameLabel:'Назва розділу',iconLabel:'Іконка',createSection:'Створити розділ',cancel:'Скасувати',
+    footer:'КАПІТАЛ · дані зберігаються локально на пристрої',
+    confirmDelete:'Видалити цей розділ?',confirmDeleteCard:'Видалити цей блок? Дані будуть втрачені.',
+    depSetup:'Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює',
+    depSettings:'⚙ Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depEnd:'Дата закінчення',
+    compCalc:'⚡ Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
+    monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
+    taxPct:'Податок на прибуток (%)',taxFree:'Неоподатк. мінімум',
+    finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',
+    incomeDays:'📊 Дохід по днях (перші 30 днів)',yield:'⚡ Дохідність',
+    secName:'Назва',secQty:'Кількість',secPrice:'Ціна (₴)',secDiv:'Дивіденди (%)',secTotal:'Вартість',secActions:'Дія',
+    addSecItem:'+ Додати позицію',removeSection:'✕ Видалити розділ',
+    secNamePh:'Apple, AAPL...',assets:'активів',pctOfCapital:'% від капіталу',
+    perSec:'⚡ В секунду',perDay:'📅 В день (сьогодні)',taxLabel:'🏛 Податок',accruedPct:'📈 Нараховано %',netProfitLabel:'✅ Чистий прибуток',
+    daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
+    maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
+    deleteDep:'Видалити цей депозит?',
+  },
+  ru:{
+    totalCapital:'Общий капитал',enterData:'введите данные',sectionLabel:'Активы · удерживай и перетаскивай для сортировки',
+    liveCnt:'Живой счётчик',deposit:'Депозит',depositAll:'Депозит (всего)',
+    cryptoName:'Крипто · USDT',totalUsdtInv:'Общая сумма вложений в USDT',rateUsdtUah:'Курс USDT / ₴',
+    costPrice:'Себестоимость (₴)',uahEquiv:'Эквивалент в ₴',addCoinTitle:'Добавить монету',
+    coinName:'Название монеты',coinQty:'Количество',coinBuyPrice:'Цена покупки (USDT)',coinCurPrice:'Текущая цена (USDT)',addCoinBtn:'+ Добавить монету',
+    usdName:'USD · Долларовые сбережения',usdAmount:'Сумма в долларах ($)',rateUsdUah:'Курс USD / ₴',
+    note:'Заметка',convUah:'💱 Конвертация → ₴',inTotal:'Входит в общий счёт',yes:'Да',
+    forexName:'Валютные накопления',currency:'Валюта',amount:'Сумма',rateUah:'Курс / ₴',other:'Другая',addCurrency:'+ Добавить валюту',totalUah:'Итого в ₴',
+    cashName:'Наличные (₴)',amountUah:'Сумма (₴)',whereStored:'Где хранится',
+    currentAcc:'Текущий счёт',balanceUah:'Баланс (₴)',bank:'Банк',
+    stocksBtn:'Акции',bondsBtn:'Облигации',ovdpBtn:'ОВГЗ',addCustom:'Свой раздел',
+    newSection:'Новый раздел',newSectionSub:'Как депозит — с процентами и датами',
+    sectionNameLabel:'Название раздела',iconLabel:'Иконка',createSection:'Создать раздел',cancel:'Отмена',
+    footer:'КАПИТАЛ · данные хранятся локально на устройстве',
+    confirmDelete:'Удалить этот раздел?',confirmDeleteCard:'Удалить этот блок? Данные будут потеряны.',
+    depSetup:'Укажите дату открытия, сумму и ставку депозита — счётчик заработает',
+    depSettings:'⚙ Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depEnd:'Дата окончания',
+    compCalc:'⚡ Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
+    monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
+    taxPct:'Налог на прибыль (%)',taxFree:'Необлаг. минимум',
+    finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',
+    incomeDays:'📊 Доход по дням (первые 30 дней)',yield:'⚡ Доходность',
+    secName:'Название',secQty:'Количество',secPrice:'Цена (₴)',secDiv:'Дивиденды (%)',secTotal:'Стоимость',secActions:'Действие',
+    addSecItem:'+ Добавить позицию',removeSection:'✕ Удалить раздел',
+    secNamePh:'Apple, AAPL...',assets:'активов',pctOfCapital:'% от капитала',
+    perSec:'⚡ В секунду',perDay:'📅 В день (сегодня)',taxLabel:'🏛 Налог',accruedPct:'📈 Начислено %',netProfitLabel:'✅ Чистая прибыль',
+    daysPassed:'прошло',daysLeft:'осталось',days:'дн',
+    maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
+    deleteDep:'Удалить этот депозит?',
+  },
+  en:{
+    totalCapital:'Total Capital',enterData:'enter data',sectionLabel:'Assets · hold and drag to sort',
+    liveCnt:'Live Counter',deposit:'Deposit',depositAll:'Deposit (total)',
+    cryptoName:'Crypto · USDT',totalUsdtInv:'Total USDT investment',rateUsdtUah:'USDT / ₴ Rate',
+    costPrice:'Cost Price (₴)',uahEquiv:'UAH Equivalent',addCoinTitle:'Add Coin',
+    coinName:'Coin Name',coinQty:'Quantity',coinBuyPrice:'Buy Price (USDT)',coinCurPrice:'Current Price (USDT)',addCoinBtn:'+ Add Coin',
+    usdName:'USD · Dollar Savings',usdAmount:'Amount in USD ($)',rateUsdUah:'USD / ₴ Rate',
+    note:'Note',convUah:'💱 Convert → ₴',inTotal:'Included in total',yes:'Yes',
+    forexName:'Forex Savings',currency:'Currency',amount:'Amount',rateUah:'Rate / ₴',other:'Other',addCurrency:'+ Add Currency',totalUah:'Total in ₴',
+    cashName:'Cash (₴)',amountUah:'Amount (₴)',whereStored:'Where stored',
+    currentAcc:'Current Account',balanceUah:'Balance (₴)',bank:'Bank',
+    stocksBtn:'Stocks',bondsBtn:'Bonds',ovdpBtn:'Gov. Bonds',addCustom:'Custom Section',
+    newSection:'New Section',newSectionSub:'Like a deposit — with rates and dates',
+    sectionNameLabel:'Section Name',iconLabel:'Icon',createSection:'Create Section',cancel:'Cancel',
+    footer:'CAPITAL · data is stored locally on device',
+    confirmDelete:'Delete this section?',confirmDeleteCard:'Delete this block? Data will be lost.',
+    depSetup:'Enter start date, amount and rate — the counter will start',
+    depSettings:'⚙ Deposit Settings',depPrincipalLbl:'Deposit Amount (₴)',depStart:'Start Date',depEnd:'End Date',
+    compCalc:'⚡ Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
+    monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
+    taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
+    finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',
+    incomeDays:'📊 Daily Income (first 30 days)',yield:'⚡ Yield',
+    secName:'Name',secQty:'Qty',secPrice:'Price (₴)',secDiv:'Dividends (%)',secTotal:'Value',secActions:'Action',
+    addSecItem:'+ Add Position',removeSection:'✕ Delete Section',
+    secNamePh:'Apple, AAPL...',assets:'assets',pctOfCapital:'% of capital',
+    perSec:'⚡ Per second',perDay:'📅 Per day (today)',taxLabel:'🏛 Tax',accruedPct:'📈 Accrued %',netProfitLabel:'✅ Net profit',
+    daysPassed:'passed',daysLeft:'left',days:'d',
+    maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
+    deleteDep:'Delete this deposit?',
+  }
+};
+let currentLang='uk';
+function t(key){return LANGS[currentLang][key]||LANGS['uk'][key]||key;}
+function setLang(lang){
+  currentLang=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('lang-'+lang).classList.add('active');
+  applyTranslations();
+  saveData();
+}
+function applyTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    el.textContent=t(key);
+  });
+  renderDeposits();
+  renderCustomCards();
+  renderSecuritiesCards();
+  updateAll();
+}
+
+// ── HELPERS ─────────────────────────────────
 const $=id=>document.getElementById(id);
 const setText=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
 const val=id=>{const e=$(id);return e?parseFloat(e.value)||0:0;};
 const sval=id=>{const e=$(id);return e?e.value:'';};
 const fmtN=n=>Math.round(n).toLocaleString('uk-UA');
 const fmtD=(n,d=2)=>n.toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});
-const pct=(v,t)=>t?((v/t*100).toFixed(1)+'%'):'0%';
+const pct=(v,total)=>total?((v/total*100).toFixed(1)+'%'):'0%';
 
-// ── STATE ─────────────────────────────────────
-let coins=[], forexItems=[], cardOrder=[], customSections=[];
+// ── STATE ────────────────────────────────────
+let coins=[], forexItems=[], cardOrder=[], customSections=[], securitiesSections=[];
+let hiddenCards={}; // which builtin cards are hidden
 
-// ── DEPOSIT SLIDES ────────────────────────────
-let deposits=[{id:'dep0',name:'Депозит 1',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''}];
+// ── DEPOSIT SLIDES ───────────────────────────
+let deposits=[{id:'dep0',name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''}];
 let currentDepSlide=0;
 let liveIntervals={};
 
 function getDepositHtml(dep,idx){
+  const lang=LANGS[currentLang];
   return `<div class="deposit-slide">
     <div class="live-wrap">
       <div class="live-label">
         <div class="live-label-left">
           <span class="live-dot"></span>
-          <input class="dep-name-input" style="background:transparent;border:none;padding:0;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;width:130px;" 
-            value="${dep.name}" placeholder="Назва депозиту"
+          <input class="dep-name-input" style="background:transparent;border:none;padding:0;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;width:130px;"
+            value="${dep.name||''}" placeholder="${lang.depPlaceholder} ${idx+1}"
             oninput="deposits[${idx}].name=this.value;renderDepDots();saveData()" />
         </div>
         ${deposits.length>1?`<button class="dep-delete-btn" onclick="removeDeposit(${idx})">✕</button>`:''}
       </div>
-      <div id="liveSetup_${dep.id}" class="live-setup">Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює</div>
+      <div id="liveSetup_${dep.id}" class="live-setup">${lang.depSetup}</div>
       <div id="liveMain_${dep.id}" style="display:none">
         <div class="live-num" id="liveAmount_${dep.id}">0<span class="live-kopeck">.00 ₴</span></div>
-        <div class="live-sub" id="liveSub_${dep.id}">поточний баланс з відсотками</div>
+        <div class="live-sub" id="liveSub_${dep.id}">${lang.daysPassed} 0 ${lang.days}</div>
         <div class="live-rows">
-          <div class="live-row"><span class="live-key">📈 Нараховано %</span><span class="live-val g" id="liveInterest_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">🏛 Податок</span><span class="live-val r" id="liveTaxLive_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">✅ Чистий прибуток</span><span class="live-val g" id="liveNet_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">⚡ В секунду</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">📅 В день (сьогодні)</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${lang.accruedPct}</span><span class="live-val g" id="liveInterest_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${lang.taxLabel}</span><span class="live-val r" id="liveTaxLive_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${lang.netProfitLabel}</span><span class="live-val g" id="liveNet_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${lang.perSec}</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${lang.perDay}</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
         </div>
         <div class="live-bar-wrap"><div class="live-bar" id="liveBar_${dep.id}" style="width:0%"></div></div>
         <div class="live-dates"><span id="liveDateStart_${dep.id}">—</span><span id="liveDatePct_${dep.id}">0%</span><span id="liveDateEnd_${dep.id}">—</span></div>
         <div class="daily-section">
-          <div class="daily-title">📊 Дохід по днях (перші 30 днів)</div>
-          <div class="daily-scroll" id="dailyLog_${dep.id}"><div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Немає даних</div></div>
+          <div class="daily-title">${lang.incomeDays}</div>
+          <div class="daily-scroll" id="dailyLog_${dep.id}"></div>
         </div>
       </div>
       <div class="dep-calc-toggle" id="depCalcToggle_${dep.id}" onclick="toggleDepCalc('${dep.id}')">
-        <span class="dep-calc-toggle-label">⚙ Налаштування депозиту</span>
+        <span class="dep-calc-toggle-label">${lang.depSettings}</span>
         <span class="dep-calc-toggle-icon">▼</span>
       </div>
       <div class="dep-calc-body" id="depCalcBody_${dep.id}">
         <div style="padding-top:14px;">
         <div class="field-group">
-          <div class="field-label">Сума депозиту (₴)</div>
+          <div class="field-label">${lang.depPrincipalLbl}</div>
           <input class="field-input" type="number" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
             oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Дата відкриття</div>
+            <div class="field-label">${lang.depStart}</div>
             <input class="field-input" type="date" id="depStartDate_${dep.id}" value="${dep.startDate}"
               oninput="deposits[${idx}].startDate=this.value;updateAll();startLiveTicker('${dep.id}')">
           </div>
           <div class="field-group">
-            <div class="field-label">Дата закінчення</div>
+            <div class="field-label">${lang.depEnd}</div>
             <input class="field-input" type="date" id="depEndDate_${dep.id}" value="${dep.endDate}"
               oninput="deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')">
           </div>
         </div>
         <div class="calc-section">
-          <div class="calc-title">⚡ Калькулятор складних відсотків</div>
+          <div class="calc-title">${lang.compCalc}</div>
           <div class="field-group">
-            <div class="field-label">Річна ставка (%)</div>
+            <div class="field-label">${lang.annualRate}</div>
             <input class="field-input" type="number" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
               oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
           </div>
           <div class="row2">
             <div class="field-group">
-              <div class="field-label">Строк (місяців)</div>
+              <div class="field-label">${lang.termMon}</div>
               <input class="field-input" type="number" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
                 oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}')">
             </div>
             <div class="field-group">
-              <div class="field-label">Капіталізація</div>
+              <div class="field-label">${lang.capitaliz}</div>
               <select class="field-input" id="depFreq_${dep.id}"
                 onchange="deposits[${idx}].freq=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
-                <option value="12" ${dep.freq=='12'?'selected':''}>Щомісяця</option>
-                <option value="4" ${dep.freq=='4'?'selected':''}>Щокварталу</option>
-                <option value="2" ${dep.freq=='2'?'selected':''}>Кожні 6 міс</option>
-                <option value="1" ${dep.freq=='1'?'selected':''}>Щорічно</option>
+                <option value="12" ${dep.freq=='12'?'selected':''}>${lang.monthly}</option>
+                <option value="4" ${dep.freq=='4'?'selected':''}>${lang.quarterly}</option>
+                <option value="2" ${dep.freq=='2'?'selected':''}>${lang.every6m}</option>
+                <option value="1" ${dep.freq=='1'?'selected':''}>${lang.yearly}</option>
               </select>
             </div>
           </div>
           <div class="row2">
             <div class="field-group">
-              <div class="field-label">Податок на прибуток (%)</div>
+              <div class="field-label">${lang.taxPct}</div>
               <input class="field-input" type="number" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
                 oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
             </div>
             <div class="field-group">
-              <div class="field-label">Неоподатк. мінімум</div>
+              <div class="field-label">${lang.taxFree}</div>
               <input class="field-input" type="number" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
                 oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
             </div>
           </div>
           <div class="result-box">
-            <div class="result-row"><span class="result-key">Підсумкова сума</span><span class="result-val blue" id="r-total_${dep.id}">—</span></div>
-            <div class="result-row"><span class="result-key">Нараховано %</span><span class="result-val green" id="r-interest_${dep.id}">—</span></div>
-            <div class="result-row"><span class="result-key">Оподатк. база</span><span class="result-val" id="r-taxbase_${dep.id}">—</span></div>
-            <div class="result-row"><span class="result-key">Податок <span class="tag tag-tax">ПДФО</span></span><span class="result-val red" id="r-tax_${dep.id}">—</span></div>
-            <div class="result-row"><span class="result-key">Чистий прибуток <span class="tag tag-net">після податку</span></span><span class="result-val green" id="r-net_${dep.id}">—</span></div>
-            <div class="result-row"><span class="result-key">Ефективна ставка</span><span class="result-val" id="r-eff_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">${lang.finalAmt}</span><span class="result-val blue" id="r-total_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">${lang.accrued}</span><span class="result-val green" id="r-interest_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">${lang.taxBase}</span><span class="result-val" id="r-taxbase_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">${lang.taxPDFO} <span class="tag tag-tax">ПДФО</span></span><span class="result-val red" id="r-tax_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">${lang.netProfit} <span class="tag tag-net">${lang.taxPDFO.toLowerCase()}</span></span><span class="result-val green" id="r-net_${dep.id}">—</span></div>
+            <div class="result-row"><span class="result-key">${lang.effRate}</span><span class="result-val" id="r-eff_${dep.id}">—</span></div>
           </div>
         </div>
         </div>
@@ -638,37 +817,29 @@ function renderDepDots(){
   const dots=$('depDots');
   dots.innerHTML=deposits.map((d,i)=>`<div class="dep-dot${i===currentDepSlide?' active':''}" onclick="goToSlide(${i})"></div>`).join('');
 }
-
 function goToSlide(idx){
   currentDepSlide=Math.max(0,Math.min(idx,deposits.length-1));
-  updateSlidePosition();
-  renderDepDots();
+  updateSlidePosition(); renderDepDots();
 }
 function slideDeposit(dir){goToSlide(currentDepSlide+dir);}
 function updateSlidePosition(){
   $('depositsTrack').style.transform=`translateX(-${currentDepSlide*100}%)`;
 }
-
 function addDepositSlide(){
-  if(deposits.length>=3){alert('Максимум 3 депозити');return;}
+  if(deposits.length>=3){alert(t('maxDep'));return;}
   const id='dep'+Date.now();
-  deposits.push({id,name:'Депозит '+(deposits.length+1),principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''});
-  renderDeposits();
-  goToSlide(deposits.length-1);
-  saveData();
+  deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''});
+  renderDeposits(); goToSlide(deposits.length-1); saveData();
 }
-
 function removeDeposit(idx){
-  if(!confirm('Видалити цей депозит?'))return;
+  if(!confirm(t('deleteDep')))return;
   if(liveIntervals[deposits[idx].id])clearInterval(liveIntervals[deposits[idx].id]);
   deposits.splice(idx,1);
   if(currentDepSlide>=deposits.length)currentDepSlide=deposits.length-1;
-  renderDeposits();
-  updateAll();
-  saveData();
+  renderDeposits(); updateAll(); saveData();
 }
 
-// Swipe підтримка
+// Swipe
 let touchStartX=0;
 document.addEventListener('touchstart',e=>{
   if(e.target.closest('.deposits-slider'))touchStartX=e.touches[0].clientX;
@@ -679,43 +850,37 @@ document.addEventListener('touchend',e=>{
   if(Math.abs(dx)>50)slideDeposit(dx<0?1:-1);
 },{passive:true});
 
-// ── DEPOSIT CALC ──────────────────────────────
-function getDepVal(id){
-  const P=parseFloat(document.getElementById('depPrincipal_'+id)?.value)||0;
-  return P;
-}
+// ── DEPOSIT CALC ─────────────────────────────
 function getAllDepositsTotal(){
   return deposits.reduce((sum,d)=>sum+(parseFloat(d.principal)||0),0);
 }
-
 function calcDeposit(depId){
   const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
   if(!P){['r-total','r-interest','r-taxbase','r-tax','r-net','r-eff'].forEach(k=>setText(k+'_'+depId,'—'));return;}
   const r=parseFloat($('depRate_'+depId)?.value||16)/100;
   const n=parseFloat($('depFreq_'+depId)?.value||12);
-  const t=(parseFloat($('depMonths_'+depId)?.value||12))/12;
+  const tt=(parseFloat($('depMonths_'+depId)?.value||12))/12;
   const tax=parseFloat($('depTax_'+depId)?.value||0)/100;
   const tf=parseFloat($('depTaxFree_'+depId)?.value||0);
-  const A=P*Math.pow(1+r/n,n*t);
+  const A=P*Math.pow(1+r/n,n*tt);
   const interest=A-P, taxBase=Math.max(0,interest-tf);
   const taxAmt=taxBase*tax, net=interest-taxAmt;
-  const eff=P&&t?(net/P/t*100):0;
+  const eff=P&&tt?(net/P/tt*100):0;
   setText('r-total_'+depId,   fmtN(Math.round(A))+' ₴');
   setText('r-interest_'+depId,'+'+fmtN(Math.round(interest))+' ₴');
   setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' ₴');
   setText('r-tax_'+depId,     '−'+fmtN(Math.round(taxAmt))+' ₴');
   setText('r-net_'+depId,     '+'+fmtN(Math.round(net))+' ₴');
-  setText('r-eff_'+depId,     eff.toFixed(2)+'% річних');
+  setText('r-eff_'+depId,     eff.toFixed(2)+'% '+t('yearly'));
 }
 
-// ── LIVE TICKER ───────────────────────────────
+// ── LIVE TICKER ──────────────────────────────
 function fmtLive(n){
   const a=Math.abs(n);
   if(a>=1e6)return (n/1e6).toFixed(4)+'M ₴';
   if(a>=1e3)return fmtD(n,2)+' ₴';
   return n.toFixed(2)+' ₴';
 }
-
 function calcLive(depId){
   const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
   const rAnn=parseFloat($('depRate_'+depId)?.value||16)/100;
@@ -735,7 +900,6 @@ function calcLive(depId){
   }
   const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
   if(s)s.style.display='none'; if(m)m.style.display='block';
-
   const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
   const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
   const A=P*Math.pow(1+rAnn/n,n*yEl);
@@ -744,14 +908,13 @@ function calcLive(depId){
   const rPerSec=rAnn/(365.25*24*3600);
   const perSec=A*rPerSec*(1-(interest>tf?tax:0));
   const perDay=perSec*86400;
-
   const intPart=Math.floor(A).toLocaleString('uk-UA');
   const decPart=(A%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
   if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' ₴</span>';
   const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
   const dGone=Math.round(yEl*365.25);
-  setText('liveSub_'+depId,'минуло '+dGone+' дн · залишилось '+dLeft+' дн');
+  setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days'));
   setText('liveInterest_'+depId,'+'+fmtLive(interest));
   setText('liveTaxLive_'+depId,'−'+fmtLive(taxAmt));
   setText('liveNet_'+depId,'+'+fmtLive(net));
@@ -765,12 +928,11 @@ function calcLive(depId){
   setText('liveDateEnd_'+depId,fmt2(end));
   renderDailyLog(depId,P,rAnn,n,tax,tf,start,now);
 }
-
 function renderDailyLog(depId,P,rAnn,n,tax,tf,start,now){
   const el=$('dailyLog_'+depId); if(!el)return;
   const daysGone=Math.round((now-start)/(1000*60*60*24));
   const count=Math.min(daysGone,30);
-  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Перший день ще попереду</div>';return;}
+  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">—</div>';return;}
   let rows='';
   for(let d=0;d<count;d++){
     const t0=d/365.25, t1=(d+1)/365.25;
@@ -781,38 +943,38 @@ function renderDailyLog(depId,P,rAnn,n,tax,tf,start,now){
     const date=new Date(start); date.setDate(date.getDate()+d);
     rows+=`<div class="daily-row">
       <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>
-      <span class="daily-income">+${dayNet.toFixed(2)} ₴/день</span>
+      <span class="daily-income">+${dayNet.toFixed(2)} ₴/${t('days')}</span>
       <span class="daily-total">${fmtN(Math.round(A1))} ₴</span>
     </div>`;
   }
-  el.innerHTML=rows;
-  el.scrollTop=el.scrollHeight;
+  el.innerHTML=rows; el.scrollTop=el.scrollHeight;
 }
-
 function startLiveTicker(depId){
   if(liveIntervals[depId])clearInterval(liveIntervals[depId]);
   calcLive(depId);
   liveIntervals[depId]=setInterval(()=>calcLive(depId),100);
 }
-
-// ── TOGGLE DEP CALC ───────────────────────────
 function toggleDepCalc(depId){
-  const toggle=$('depCalcToggle_'+depId);
-  const body=$('depCalcBody_'+depId);
+  const toggle=$('depCalcToggle_'+depId), body=$('depCalcBody_'+depId);
   if(!toggle||!body)return;
-  toggle.classList.toggle('open');
-  body.classList.toggle('open');
+  toggle.classList.toggle('open'); body.classList.toggle('open');
 }
 
-// ── CUSTOM SECTIONS ───────────────────────────
+// ── DELETE BUILTIN CARDS ─────────────────────
+function deleteBuiltinCard(name){
+  if(!confirm(t('confirmDeleteCard')))return;
+  hiddenCards[name]=true;
+  const card=$('card-'+name);
+  if(card)card.style.display='none';
+  saveData(); updateAll();
+}
+
+// ── CUSTOM SECTIONS ──────────────────────────
 const EMOJIS=['💰','📈','🏠','🚗','💎','🎯','🏆','💡','🔑','🌟','💼','📊','🏗','⚡','🌱','🛡','🎪','💫','🏅','🎁'];
 let selectedEmoji='💰';
-
 function openAddSection(){
-  selectedEmoji='💰';
-  $('modalName').value='';
-  renderEmojiGrid();
-  $('modalOverlay').classList.add('open');
+  selectedEmoji='💰'; $('modalName').value='';
+  renderEmojiGrid(); $('modalOverlay').classList.add('open');
   setTimeout(()=>$('modalName').focus(),300);
 }
 function closeModal(){$('modalOverlay').classList.remove('open');}
@@ -821,29 +983,26 @@ function renderEmojiGrid(){
   $('emojiGrid').innerHTML=EMOJIS.map(e=>`<button class="emoji-btn${e===selectedEmoji?' sel':''}" onclick="selectEmoji('${e}')">${e}</button>`).join('');
 }
 function selectEmoji(e){selectedEmoji=e;renderEmojiGrid();}
-
 function confirmAddSection(){
   const name=$('modalName').value.trim();
   if(!name){$('modalName').style.borderColor='var(--red)';return;}
   const id='custom_'+Date.now();
-  const section={id,name,icon:selectedEmoji,principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''};
-  customSections.push(section);
-  closeModal();
-  renderCustomCards();
-  saveData();
-  updateAll();
+  customSections.push({id,name,icon:selectedEmoji,principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''});
+  closeModal(); renderCustomCards(); saveData(); updateAll();
 }
 
 function renderCustomCards(){
   const container=$('customCardsContainer');
+  // Keep existing securities cards, only replace custom ones
+  // We'll manage this by having two separate containers
   container.innerHTML=customSections.map((s,i)=>getCustomCardHtml(s,i)).join('');
-  customSections.forEach(s=>{ calcCustomSection(s.id); });
-  // Make custom cards draggable
+  customSections.forEach(s=>calcCustomSection(s.id));
   container.querySelectorAll('.card').forEach(c=>c.setAttribute('draggable','true'));
   refreshDrag();
 }
 
 function getCustomCardHtml(s,idx){
+  const lang=LANGS[currentLang];
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
@@ -851,74 +1010,77 @@ function getCustomCardHtml(s,idx){
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
         <div class="card-value" id="customDisplay_${s.id}">0 ₴</div>
-        <div class="card-pct" id="customPct_${s.id}">0% від капіталу</div>
+        <div class="card-pct" id="customPct_${s.id}">0% ${lang.pctOfCapital}</div>
       </div>
-      <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">✕</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+      </div>
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <div class="field-group">
-        <div class="field-label">Сума (₴)</div>
+        <div class="field-label">${lang.amountUah}</div>
         <input class="field-input" type="number" id="customPrincipal_${s.id}" placeholder="100 000" inputmode="decimal" value="${s.principal}"
           oninput="customSections[${idx}].principal=this.value;updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
-          <div class="field-label">Дата відкриття</div>
+          <div class="field-label">${lang.depStart}</div>
           <input class="field-input" type="date" id="customStart_${s.id}" value="${s.startDate}"
             oninput="customSections[${idx}].startDate=this.value;calcCustomSection('${s.id}')">
         </div>
         <div class="field-group">
-          <div class="field-label">Дата закінчення</div>
+          <div class="field-label">${lang.depEnd}</div>
           <input class="field-input" type="date" id="customEnd_${s.id}" value="${s.endDate}"
             oninput="customSections[${idx}].endDate=this.value;calcCustomSection('${s.id}')">
         </div>
       </div>
       <div class="calc-section">
-        <div class="calc-title">⚡ Дохідність</div>
+        <div class="calc-title">${lang.yield}</div>
         <div class="field-group">
-          <div class="field-label">Річна ставка (%)</div>
+          <div class="field-label">${lang.annualRate}</div>
           <input class="field-input" type="number" id="customRate_${s.id}" placeholder="16" value="${s.rate}" inputmode="decimal"
             oninput="customSections[${idx}].rate=this.value;calcCustomSection('${s.id}')">
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Строк (місяців)</div>
+            <div class="field-label">${lang.termMon}</div>
             <input class="field-input" type="number" id="customMonths_${s.id}" placeholder="12" value="${s.months}" inputmode="numeric"
               oninput="customSections[${idx}].months=this.value;calcCustomSection('${s.id}')">
           </div>
           <div class="field-group">
-            <div class="field-label">Капіталізація</div>
+            <div class="field-label">${lang.capitaliz}</div>
             <select class="field-input" id="customFreq_${s.id}"
               onchange="customSections[${idx}].freq=this.value;calcCustomSection('${s.id}')">
-              <option value="12" ${s.freq=='12'?'selected':''}>Щомісяця</option>
-              <option value="4" ${s.freq=='4'?'selected':''}>Щокварталу</option>
-              <option value="2" ${s.freq=='2'?'selected':''}>Кожні 6 міс</option>
-              <option value="1" ${s.freq=='1'?'selected':''}>Щорічно</option>
+              <option value="12" ${s.freq=='12'?'selected':''}>${lang.monthly}</option>
+              <option value="4" ${s.freq=='4'?'selected':''}>${lang.quarterly}</option>
+              <option value="2" ${s.freq=='2'?'selected':''}>${lang.every6m}</option>
+              <option value="1" ${s.freq=='1'?'selected':''}>${lang.yearly}</option>
             </select>
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Податок (%)</div>
+            <div class="field-label">${lang.taxPct}</div>
             <input class="field-input" type="number" id="customTax_${s.id}" placeholder="0" value="${s.tax}" inputmode="decimal"
               oninput="customSections[${idx}].tax=this.value;calcCustomSection('${s.id}')">
           </div>
           <div class="field-group">
-            <div class="field-label">Неоподатк. мінімум</div>
+            <div class="field-label">${lang.taxFree}</div>
             <input class="field-input" type="number" id="customTaxFree_${s.id}" placeholder="0" value="${s.taxFree}" inputmode="decimal"
               oninput="customSections[${idx}].taxFree=this.value;calcCustomSection('${s.id}')">
           </div>
         </div>
         <div class="result-box">
-          <div class="result-row"><span class="result-key">Підсумкова сума</span><span class="result-val blue" id="cust-total_${s.id}">—</span></div>
-          <div class="result-row"><span class="result-key">Нараховано %</span><span class="result-val green" id="cust-interest_${s.id}">—</span></div>
-          <div class="result-row"><span class="result-key">Податок ПДФО</span><span class="result-val red" id="cust-tax_${s.id}">—</span></div>
-          <div class="result-row"><span class="result-key">Чистий прибуток</span><span class="result-val green" id="cust-net_${s.id}">—</span></div>
-          <div class="result-row"><span class="result-key">Ефективна ставка</span><span class="result-val" id="cust-eff_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">${lang.finalAmt}</span><span class="result-val blue" id="cust-total_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">${lang.accrued}</span><span class="result-val green" id="cust-interest_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">${lang.taxPDFO}</span><span class="result-val red" id="cust-tax_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">${lang.netProfit}</span><span class="result-val green" id="cust-net_${s.id}">—</span></div>
+          <div class="result-row"><span class="result-key">${lang.effRate}</span><span class="result-val" id="cust-eff_${s.id}">—</span></div>
         </div>
       </div>
-      <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">✕ Видалити розділ</button>
+      <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">${lang.removeSection}</button>
     </div></div>
   </div>`;
 }
@@ -928,101 +1090,221 @@ function calcCustomSection(id){
   if(!P){['cust-total','cust-interest','cust-tax','cust-net','cust-eff'].forEach(k=>setText(k+'_'+id,'—'));return;}
   const r=parseFloat($('customRate_'+id)?.value||16)/100;
   const n=parseFloat($('customFreq_'+id)?.value||12);
-  const t=(parseFloat($('customMonths_'+id)?.value||12))/12;
+  const tt=(parseFloat($('customMonths_'+id)?.value||12))/12;
   const tax=parseFloat($('customTax_'+id)?.value||0)/100;
   const tf=parseFloat($('customTaxFree_'+id)?.value||0);
-  const A=P*Math.pow(1+r/n,n*t);
+  const A=P*Math.pow(1+r/n,n*tt);
   const interest=A-P, taxBase=Math.max(0,interest-tf);
   const taxAmt=taxBase*tax, net=interest-taxAmt;
-  const eff=P&&t?(net/P/t*100):0;
+  const eff=P&&tt?(net/P/tt*100):0;
   setText('cust-total_'+id,    fmtN(Math.round(A))+' ₴');
   setText('cust-interest_'+id, '+'+fmtN(Math.round(interest))+' ₴');
   setText('cust-tax_'+id,      '−'+fmtN(Math.round(taxAmt))+' ₴');
   setText('cust-net_'+id,      '+'+fmtN(Math.round(net))+' ₴');
-  setText('cust-eff_'+id,      eff.toFixed(2)+'% річних');
+  setText('cust-eff_'+id,      eff.toFixed(2)+'%');
 }
-
 function removeCustomSection(id){
-  if(!confirm('Видалити цей розділ?'))return;
+  if(!confirm(t('confirmDelete')))return;
   customSections=customSections.filter(s=>s.id!==id);
-  renderCustomCards();
-  updateAll();
-  saveData();
+  renderCustomCards(); updateAll(); saveData();
 }
-
 function getCustomTotal(){
   return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
 }
 
-// ── TOTALS ────────────────────────────────────
-function getCryptoVal(){
-  const u=val('cryptoUsdt'),r=val('usdtUah')||41;
-  return u*r;
+// ── SECURITIES (Stocks / Bonds / OVDP) ───────
+function addSecuritiesCard(type){
+  const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
+  const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
+  const id='sec_'+type+'_'+Date.now();
+  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[]});
+  renderSecuritiesCards();
+  saveData(); updateAll();
 }
+
+function renderSecuritiesCards(){
+  const container=$('securitiesContainer');
+  if(!container)return;
+  container.innerHTML=securitiesSections.map((s,i)=>getSecCardHtml(s,i)).join('');
+  container.querySelectorAll('.card').forEach(c=>c.setAttribute('draggable','true'));
+  refreshDrag();
+}
+
+function getSecCardHtml(s,idx){
+  const lang=LANGS[currentLang];
+  const total=s.items.reduce((sum,it)=>sum+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0);
+  const totalDiv=s.items.reduce((sum,it)=>{
+    const val=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
+    return sum+val*(parseFloat(it.div)||0)/100;
+  },0);
+  const themeClass='card-'+s.type;
+  const rows=s.items.length>0?(
+    '<table class="sec-table"><tr>'+
+    '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th><th>'+lang.secPrice+'</th><th>'+lang.secDiv+'</th><th>'+lang.secTotal+'</th><th></th></tr>'+
+    s.items.map((it,j)=>
+      '<tr><td class="td-name">'+(it.name||'—')+'</td><td>'+(it.qty||0)+'</td><td>'+fmtN(parseFloat(it.price)||0)+'</td>'+
+      '<td class="td-div">'+(it.div||0)+'%</td>'+
+      '<td>'+fmtN(Math.round((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)))+'</td>'+
+      '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+j+')">×</button></td></tr>'
+    ).join('')+
+    '</table>'+
+    '<div class="result-box" style="margin-top:10px">'+
+    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(Math.round(total))+' ₴</span></div>'+
+    '<div class="result-row"><span class="result-key">'+lang.secDiv+'</span><span class="result-val green">+'+fmtN(Math.round(totalDiv))+' ₴/рік</span></div>'+
+    '</div>'
+  ):'';
+  return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">${s.icon}</div>
+      <div class="card-info" onclick="toggleCard('${s.id}')">
+        <div class="card-name">${s.name}</div>
+        <div class="card-value" id="secDisplay_${s.id}">${fmtN(Math.round(total))} ₴</div>
+        <div class="card-pct" id="secPct_${s.id}">—</div>
+      </div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="removeSecCard('${s.id}')">✕</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+      </div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      ${rows}
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+        <div class="calc-title">${lang.addSecItem}</div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${lang.secName}</div>
+            <input class="field-input" type="text" id="secName_${s.id}" placeholder="${lang.secNamePh}">
+          </div>
+          <div class="field-group">
+            <div class="field-label">${lang.secQty}</div>
+            <input class="field-input" type="number" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${lang.secPrice}</div>
+            <input class="field-input" type="number" id="secPrice_${s.id}" placeholder="500" inputmode="decimal">
+          </div>
+          <div class="field-group">
+            <div class="field-label">${lang.secDiv}</div>
+            <input class="field-input" type="number" id="secDiv_${s.id}" placeholder="5" inputmode="decimal">
+          </div>
+        </div>
+        <button class="add-btn" onclick="addSecItem('${s.id}')">${lang.addSecItem}</button>
+      </div>
+      <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeSecCard('${s.id}')">${lang.removeSection}</button>
+    </div></div>
+  </div>`;
+}
+
+function addSecItem(secId){
+  const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
+  const name=($('secName_'+secId)?.value||'').trim();
+  const qty=parseFloat($('secQty_'+secId)?.value)||0;
+  const price=parseFloat($('secPrice_'+secId)?.value)||0;
+  const div=parseFloat($('secDiv_'+secId)?.value)||0;
+  if(!name&&!qty&&!price)return;
+  securitiesSections[idx].items.push({name,qty,price,div});
+  renderSecuritiesCards(); updateAll(); saveData();
+}
+function removeSecItem(secId,itemIdx){
+  const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
+  securitiesSections[idx].items.splice(itemIdx,1);
+  renderSecuritiesCards(); updateAll(); saveData();
+}
+function removeSecCard(secId){
+  if(!confirm(t('confirmDelete')))return;
+  securitiesSections=securitiesSections.filter(s=>s.id!==secId);
+  renderSecuritiesCards(); updateAll(); saveData();
+}
+function getSecuritiesTotal(){
+  return securitiesSections.reduce((sum,s)=>
+    sum+s.items.reduce((ss,it)=>ss+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0),0);
+}
+
+// ── TOTALS ────────────────────────────────────
+function getCryptoVal(){const u=val('cryptoUsdt'),r=val('usdtUah')||41;return u*r;}
 function getUsdVal(){return val('usdAmount')*(val('usdUah')||41);}
 function getForexVal(){return forexItems.reduce((s,f)=>s+f.amt*f.rate,0);}
 function getCashVal(){return val('cashAmount');}
 function getOtherVal(){return val('otherAmount');}
 
 function updateAll(){
-  const dep=getAllDepositsTotal();
-  const crypto=getCryptoVal(), usd=getUsdVal();
-  const forex=getForexVal(), cash=getCashVal(), other=getOtherVal();
+  const dep=hiddenCards['deposit']?0:getAllDepositsTotal();
+  const crypto=hiddenCards['crypto']?0:getCryptoVal();
+  const usd=hiddenCards['usd']?0:getUsdVal();
+  const forex=hiddenCards['forex']?0:getForexVal();
+  const cash=hiddenCards['cash']?0:getCashVal();
+  const other=hiddenCards['other']?0:getOtherVal();
   const custom=getCustomTotal();
-  const total=dep+crypto+usd+forex+cash+other+custom;
-  const nonZero=[dep,crypto,usd,forex,cash,other,custom].filter(v=>v>0).length;
+  const securities=getSecuritiesTotal();
+  const total=dep+crypto+usd+forex+cash+other+custom+securities;
+  const nonZero=[dep,crypto,usd,forex,cash,other,custom,securities].filter(v=>v>0).length;
 
   setText('totalAmount', fmtN(total));
-  setText('totalBreakdown', nonZero+' активів · '+fmtN(total)+' ₴');
+  setText('totalBreakdown', nonZero+' '+t('assets')+' · '+fmtN(total)+' ₴');
 
   const chEl=$('totalChange');
   if(dep&&total){
     const ch=(total-dep)/dep*100;
-    chEl.textContent=(ch>=0?'+':'')+ch.toFixed(1)+'% від депозиту';
+    chEl.textContent=(ch>=0?'+':'')+ch.toFixed(1)+'%';
     chEl.className='badge '+(ch>=0?'badge-green':'badge-red');
   } else {
-    chEl.textContent='введіть дані';
+    chEl.textContent=t('enterData');
     chEl.className='badge badge-green';
   }
 
-  // Депозит — сума всіх
-  setText('depositDisplay', fmtN(dep)+' ₴');
-  setText('depositPct', pct(dep,total)+' від капіталу');
-
-  // Депозит summary
-  const sl=$('depositSummaryList');
-  if(sl){
-    sl.innerHTML=deposits.map(d=>`<div class="result-row">
-      <span class="result-key">${d.name}</span>
+  if(!hiddenCards['deposit']){
+    setText('depositDisplay', fmtN(dep)+' ₴');
+    setText('depositPct', pct(dep,total)+' '+t('pctOfCapital'));
+    const sl=$('depositSummaryList');
+    if(sl)sl.innerHTML=deposits.map(d=>`<div class="result-row">
+      <span class="result-key">${d.name||t('deposit')}</span>
       <span class="result-val blue">${fmtN(parseFloat(d.principal)||0)} ₴</span>
     </div>`).join('');
   }
+  if(!hiddenCards['crypto']){
+    setText('cryptoDisplay', fmtN(crypto)+' ₴');
+    setText('cryptoPct', pct(crypto,total)+' '+t('pctOfCapital'));
+    setText('cryptoUahVal', fmtN(crypto)+' ₴');
+    updateCryptoPnl();
+    renderCoins();
+  }
+  if(!hiddenCards['usd']){
+    setText('usdDisplay', fmtN(usd)+' ₴');
+    setText('usdPct', pct(usd,total)+' '+t('pctOfCapital'));
+    setText('usdToUah', fmtN(usd)+' ₴');
+  }
+  if(!hiddenCards['forex']){
+    setText('forexDisplay', fmtN(forex)+' ₴');
+    setText('forexPct', pct(forex,total)+' '+t('pctOfCapital'));
+    renderForex();
+  }
+  if(!hiddenCards['cash']){
+    setText('cashDisplay', fmtN(cash)+' ₴');
+    setText('cashPct', pct(cash,total)+' '+t('pctOfCapital'));
+  }
+  if(!hiddenCards['other']){
+    setText('otherDisplay', fmtN(other)+' ₴');
+    setText('otherPct', pct(other,total)+' '+t('pctOfCapital'));
+  }
 
-  setText('cryptoDisplay', fmtN(crypto)+' ₴');
-  setText('cryptoPct', pct(crypto,total)+' від капіталу');
-  setText('usdDisplay', fmtN(usd)+' ₴');
-  setText('usdPct', pct(usd,total)+' від капіталу');
-  setText('forexDisplay', fmtN(forex)+' ₴');
-  setText('forexPct', pct(forex,total)+' від капіталу');
-  setText('cashDisplay', fmtN(cash)+' ₴');
-  setText('cashPct', pct(cash,total)+' від капіталу');
-  setText('otherDisplay', fmtN(other)+' ₴');
-  setText('otherPct', pct(other,total)+' від капіталу');
-
-  // Custom sections
   customSections.forEach(s=>{
     const v=parseFloat(s.principal)||0;
     setText('customDisplay_'+s.id, fmtN(v)+' ₴');
-    setText('customPct_'+s.id, pct(v,total)+' від капіталу');
+    setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
     calcCustomSection(s.id);
   });
 
-  setText('usdToUah', fmtN(usd)+' ₴');
-  setText('cryptoUahVal', fmtN(crypto)+' ₴');
+  // Update securities display
+  securitiesSections.forEach(s=>{
+    const v=s.items.reduce((sum,it)=>sum+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0);
+    setText('secDisplay_'+s.id, fmtN(Math.round(v))+' ₴');
+    setText('secPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
+  });
 
-  updateCryptoPnl();
-  renderCoins();
-  renderForex();
   saveData();
 }
 
@@ -1032,31 +1314,43 @@ function updateCryptoPnl(){
   if(!cur||!cost){setText('cryptoPnl','—');setText('cryptoRoi','—');return;}
   const pnl=cur-cost,roi=pnl/cost*100;
   const pe=$('cryptoPnl'),re=$('cryptoRoi');
-  pe.textContent=(pnl>=0?'+':'')+fmtN(Math.round(pnl))+' ₴';
-  pe.className='result-val '+(pnl>=0?'green':'red');
-  re.textContent=(roi>=0?'+':'')+roi.toFixed(2)+'%';
-  re.className='result-val '+(roi>=0?'green':'red');
+  if(pe){pe.textContent=(pnl>=0?'+':'')+fmtN(Math.round(pnl))+' ₴';pe.className='result-val '+(pnl>=0?'green':'red');}
+  if(re){re.textContent=(roi>=0?'+':'')+roi.toFixed(2)+'%';re.className='result-val '+(roi>=0?'green':'red');}
 }
 function addCoin(){
-  const name=(document.getElementById('newCoinName').value||'').trim().toUpperCase();
-  const usdt=parseFloat(document.getElementById('newCoinUsdt').value)||0;
+  const name=($('newCoinName')?.value||'').trim().toUpperCase();
+  const qty=parseFloat($('newCoinQty')?.value)||0;
+  const buyPrice=parseFloat($('newCoinBuyPrice')?.value)||0;
+  const curPrice=parseFloat($('newCoinCurPrice')?.value)||0;
   if(!name)return;
-  coins.push({name,usdt});
-  document.getElementById('newCoinName').value='';
-  document.getElementById('newCoinUsdt').value='';
-  renderCoins();saveData();
+  coins.push({name,qty,buyPrice,curPrice});
+  if($('newCoinName'))$('newCoinName').value='';
+  if($('newCoinQty'))$('newCoinQty').value='';
+  if($('newCoinBuyPrice'))$('newCoinBuyPrice').value='';
+  if($('newCoinCurPrice'))$('newCoinCurPrice').value='';
+  renderCoins(); saveData();
 }
 function removeCoin(i){coins.splice(i,1);renderCoins();saveData();}
 function renderCoins(){
   const rate=val('usdtUah')||41;
-  const el=$('cryptoRows'); if(!coins.length){el.innerHTML='';return;}
+  const el=$('cryptoRows'); if(!el)return;
+  if(!coins.length){el.innerHTML='';return;}
   el.innerHTML='<div class="divider" style="margin:0 0 10px"></div>'+
-    coins.map((c,i)=>`<div class="list-row">
-      <div class="list-sym" style="color:var(--purple2)">${c.name}</div>
-      <div class="list-info">${fmtD(c.usdt)} USDT</div>
-      <div class="list-val">${fmtN(Math.round(c.usdt*rate))} ₴</div>
-      <button class="rm-btn" onclick="removeCoin(${i})">×</button>
-    </div>`).join('');
+    '<table class="sec-table"><tr><th>'+t('coinName')+'</th><th>'+t('coinQty')+'</th><th>'+t('coinBuyPrice')+'</th><th>'+t('coinCurPrice')+'</th><th>P&L</th><th></th></tr>'+
+    coins.map((c,i)=>{
+      const qty=c.qty||0, buy=c.buyPrice||0, cur=c.curPrice||0;
+      const pnlUsd=(cur-buy)*qty;
+      const pnlUah=pnlUsd*rate;
+      const pnlClass=pnlUsd>=0?'green':'red';
+      return `<tr>
+        <td class="td-name">${c.name}</td>
+        <td>${qty}</td>
+        <td>${fmtD(buy,0)}</td>
+        <td>${fmtD(cur,0)}</td>
+        <td class="${pnlClass}">${pnlUsd>=0?'+':''}${fmtN(Math.round(pnlUah))} ₴</td>
+        <td><button class="rm-btn" onclick="removeCoin(${i})">×</button></td>
+      </tr>`;
+    }).join('')+'</table>';
 }
 
 // ── FOREX ─────────────────────────────────────
@@ -1064,16 +1358,17 @@ const FFLAGS={EUR:'🇪🇺',GBP:'🇬🇧',PLN:'🇵🇱',CHF:'🇨🇭',CZK:'�
 const FSYM  ={EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',OTHER:'?'};
 function addForex(){
   const cur=sval('newForexCur');
-  const amt=parseFloat($('newForexAmt').value)||0;
-  const rate=parseFloat($('newForexRate').value)||0;
+  const amt=parseFloat($('newForexAmt')?.value)||0;
+  const rate=parseFloat($('newForexRate')?.value)||0;
   if(!amt||!rate)return;
   forexItems.push({cur,amt,rate});
-  $('newForexAmt').value='';$('newForexRate').value='';
+  if($('newForexAmt'))$('newForexAmt').value='';
+  if($('newForexRate'))$('newForexRate').value='';
   renderForex();updateAll();saveData();
 }
 function removeForex(i){forexItems.splice(i,1);renderForex();updateAll();saveData();}
 function renderForex(){
-  const el=$('forexRows');
+  const el=$('forexRows');if(!el)return;
   const total=forexItems.reduce((s,f)=>s+f.amt*f.rate,0);
   setText('forexTotal',fmtN(Math.round(total))+' ₴');
   if(!forexItems.length){el.innerHTML='';return;}
@@ -1083,7 +1378,7 @@ function renderForex(){
     <div class="list-info">${fmtD(f.amt)} × ${f.rate} ₴</div>
     <div class="list-val">${fmtN(Math.round(f.amt*f.rate))} ₴</div>
     <button class="rm-btn" onclick="removeForex(${i})">×</button>
-  </div>`).join('')+'<div class="divider" style="margin:8px 0 4px"></div>';
+  </div>`).join('');
 }
 
 // ── TOGGLE CARD ───────────────────────────────
@@ -1093,121 +1388,120 @@ function toggleCard(name){
 }
 
 // ── DRAG & DROP ───────────────────────────────
-function initDrag(){
-  refreshDrag();
-}
-
+function initDrag(){refreshDrag();}
 function refreshDrag(){
   const container=$('cardsContainer');
+  const secContainer=$('securitiesContainer');
+  const allContainers=[container,secContainer].filter(Boolean);
   let dragged=null;
 
-  // Re-bind all cards including custom
-  container.querySelectorAll('.card').forEach(card=>{
-    // Remove old listeners by cloning (except inputs)
-    const newCard=card.cloneNode(false);
-    // Just rebind on the existing card to avoid losing inner HTML
-    card._dragBound=true;
+  allContainers.forEach(cont=>{
+    cont.querySelectorAll('.card').forEach(card=>{
+      if(card._dragBound)return;
+      card._dragBound=true;
+      card.setAttribute('draggable','true');
 
-    card.addEventListener('dragstart',e=>{
-      dragged=card;
-      setTimeout(()=>card.classList.add('dragging'),0);
-      e.dataTransfer.effectAllowed='move';
-    });
-    card.addEventListener('dragend',()=>{
-      card.classList.remove('dragging');
-      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
-      saveOrder();
-    });
-    card.addEventListener('dragover',e=>{e.preventDefault();if(card!==dragged)card.classList.add('drag-over');});
-    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
-    card.addEventListener('drop',e=>{
-      e.preventDefault();
-      card.classList.remove('drag-over');
-      if(dragged&&card!==dragged){
-        const all=[...container.querySelectorAll('.card')];
-        if(all.indexOf(dragged)<all.indexOf(card)) card.after(dragged);
-        else card.before(dragged);
+      card.addEventListener('dragstart',e=>{
+        dragged=card;
+        setTimeout(()=>card.classList.add('dragging'),0);
+        e.dataTransfer.effectAllowed='move';
+      });
+      card.addEventListener('dragend',()=>{
+        card.classList.remove('dragging');
+        document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
         saveOrder();
-      }
+      });
+      card.addEventListener('dragover',e=>{e.preventDefault();if(card!==dragged)card.classList.add('drag-over');});
+      card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+      card.addEventListener('drop',e=>{
+        e.preventDefault();card.classList.remove('drag-over');
+        if(dragged&&card!==dragged){
+          const all=[...document.querySelectorAll('#cardsContainer .card, #securitiesContainer .card, .card[data-card]')];
+          if(all.indexOf(dragged)<all.indexOf(card))card.after(dragged);
+          else card.before(dragged);
+          saveOrder();
+        }
+      });
+
+      // Touch drag
+      let timer,clone,isDrag=false,startY=0,startX=0;
+      const handle=card.querySelector('.drag-handle');
+      if(!handle)return;
+      const onTouchStart=e=>{
+        startY=e.touches[0].clientY; startX=e.touches[0].clientX;
+        timer=setTimeout(()=>{
+          isDrag=true; dragged=card; card.classList.add('dragging');
+          const rect=card.getBoundingClientRect();
+          clone=card.cloneNode(true);
+          Object.assign(clone.style,{position:'fixed',zIndex:999,width:rect.width+'px',left:rect.left+'px',top:rect.top+'px',opacity:'0.85',pointerEvents:'none',borderRadius:'20px',boxShadow:'0 8px 32px #0008'});
+          document.body.appendChild(clone);
+          if(navigator.vibrate)navigator.vibrate(30);
+        },450);
+      };
+      const onTouchMove=e=>{
+        if(!isDrag){if(Math.abs(e.touches[0].clientY-startY)>10||Math.abs(e.touches[0].clientX-startX)>10)clearTimeout(timer);return;}
+        e.preventDefault();
+        const tc=e.touches[0];
+        if(clone)clone.style.top=(tc.clientY-60)+'px';
+        document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+        const target=document.elementFromPoint(tc.clientX,tc.clientY)?.closest('.card');
+        if(target&&target!==card)target.classList.add('drag-over');
+      };
+      const onTouchEnd=e=>{
+        clearTimeout(timer);
+        if(!isDrag){isDrag=false;return;}
+        isDrag=false;
+        if(clone){clone.remove();clone=null;}
+        card.classList.remove('dragging');
+        const tc=e.changedTouches[0];
+        const target=document.elementFromPoint(tc.clientX,tc.clientY)?.closest('.card');
+        document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+        if(target&&target!==card){
+          const all=[...document.querySelectorAll('.card')];
+          if(all.indexOf(card)<all.indexOf(target))target.after(card);
+          else target.before(card);
+          saveOrder();
+        }
+      };
+      handle.addEventListener('touchstart',onTouchStart,{passive:true});
+      document.addEventListener('touchmove',onTouchMove,{passive:false});
+      handle.addEventListener('touchend',onTouchEnd);
     });
-
-    // Touch drag (long press on handle)
-    let timer,clone,isDrag=false,startY=0,startX=0;
-    const handle=card.querySelector('.drag-handle');
-    if(!handle)return;
-
-    const onTouchStart=e=>{
-      startY=e.touches[0].clientY; startX=e.touches[0].clientX;
-      timer=setTimeout(()=>{
-        isDrag=true; dragged=card;
-        card.classList.add('dragging');
-        const rect=card.getBoundingClientRect();
-        clone=card.cloneNode(true);
-        Object.assign(clone.style,{
-          position:'fixed',zIndex:999,width:rect.width+'px',
-          left:rect.left+'px',top:rect.top+'px',
-          opacity:'0.85',pointerEvents:'none',borderRadius:'20px',
-          boxShadow:'0 8px 32px #0008'
-        });
-        document.body.appendChild(clone);
-        if(navigator.vibrate)navigator.vibrate(30);
-      },450);
-    };
-    const onTouchMove=e=>{
-      if(!isDrag){
-        if(Math.abs(e.touches[0].clientY-startY)>10||Math.abs(e.touches[0].clientX-startX)>10)clearTimeout(timer);
-        return;
-      }
-      e.preventDefault();
-      const t=e.touches[0];
-      if(clone)clone.style.top=(t.clientY-60)+'px';
-      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
-      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
-      if(target&&target!==card)target.classList.add('drag-over');
-    };
-    const onTouchEnd=e=>{
-      clearTimeout(timer);
-      if(!isDrag){isDrag=false;return;}
-      isDrag=false;
-      if(clone){clone.remove();clone=null;}
-      card.classList.remove('dragging');
-      const t=e.changedTouches[0];
-      const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
-      container.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
-      if(target&&target!==card){
-        const all=[...container.querySelectorAll('.card')];
-        if(all.indexOf(card)<all.indexOf(target))target.after(card);
-        else target.before(card);
-        saveOrder();
-      }
-    };
-
-    handle.addEventListener('touchstart',onTouchStart,{passive:true});
-    document.addEventListener('touchmove',onTouchMove,{passive:false});
-    handle.addEventListener('touchend',onTouchEnd);
   });
 }
+
 function saveOrder(){
-  cardOrder=[...document.querySelectorAll('.card')].map(c=>c.dataset.card);
+  cardOrder=[...document.querySelectorAll('.card')].map(c=>c.dataset.card).filter(Boolean);
   saveData();
+}
+
+function restoreOrder(){
+  if(!cardOrder||!cardOrder.length)return;
+  const container=$('cardsContainer');
+  cardOrder.forEach(cardId=>{
+    const el=document.querySelector(`[data-card="${cardId}"]`);
+    if(el&&el.parentNode)container.appendChild(el);
+  });
 }
 
 // ── PERSIST ───────────────────────────────────
 function saveData(){
   try{
-    localStorage.setItem('kapital_v5',JSON.stringify({
+    localStorage.setItem('kapital_v6',JSON.stringify({
       deposits,
       cryptoUsdt:sval('cryptoUsdt'),usdtUah:sval('usdtUah'),cryptoCost:sval('cryptoCost'),
       usdAmount:sval('usdAmount'),usdUah:sval('usdUah'),usdNote:sval('usdNote'),
       cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),
       otherAmount:sval('otherAmount'),otherName:sval('otherName'),otherNote:sval('otherNote'),
-      coins,forexItems,cardOrder,customSections
+      coins,forexItems,cardOrder,customSections,securitiesSections,
+      hiddenCards,currentLang
     }));
   }catch(e){}
 }
+
 function loadData(){
   try{
-    const d=JSON.parse(localStorage.getItem('kapital_v5')||'null');
+    const d=JSON.parse(localStorage.getItem('kapital_v6')||'null');
     if(!d)return;
     const sv=(id,v)=>{if(v!==undefined&&$(id))$(id).value=v;};
     if(Array.isArray(d.deposits)&&d.deposits.length)deposits=d.deposits;
@@ -1218,15 +1512,40 @@ function loadData(){
     if(Array.isArray(d.coins))coins=d.coins;
     if(Array.isArray(d.forexItems))forexItems=d.forexItems;
     if(Array.isArray(d.customSections))customSections=d.customSections;
+    if(Array.isArray(d.securitiesSections))securitiesSections=d.securitiesSections;
+    if(Array.isArray(d.cardOrder))cardOrder=d.cardOrder;
+    if(d.hiddenCards)hiddenCards=d.hiddenCards;
+    if(d.currentLang)currentLang=d.currentLang;
   }catch(e){}
 }
 
+// ── SECURITIES CONTAINER ─────────────────────
+// Insert securities container after customCardsContainer
+const secContainerEl=document.createElement('div');
+secContainerEl.id='securitiesContainer';
+secContainerEl.style.display='contents';
+$('customCardsContainer').after(secContainerEl);
+
 // ── INIT ──────────────────────────────────────
 loadData();
+
+// Apply saved lang to buttons
+document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+const activeLangBtn=$('lang-'+currentLang);
+if(activeLangBtn)activeLangBtn.classList.add('active');
+
+// Apply hidden cards
+Object.keys(hiddenCards).forEach(name=>{
+  if(hiddenCards[name]){const c=$('card-'+name);if(c)c.style.display='none';}
+});
+
 renderDeposits();
 renderCustomCards();
+renderSecuritiesCards();
 updateAll();
+restoreOrder();
 initDrag();
+applyTranslations();
 </script>
 </body>
 </html>
