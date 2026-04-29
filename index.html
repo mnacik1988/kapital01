@@ -30,12 +30,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
 
 /* LANG SWITCHER */
-.lang-bar{position:fixed;top:58px;right:16px;z-index:600;display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:3px;}
+.lang-bar{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:3px;}
 .lang-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;padding:4px 9px;border-radius:16px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
 .lang-btn.active{background:var(--bg3);color:var(--text);}
 
 /* HEADER */
 .header{padding:56px 20px 20px;background:linear-gradient(180deg,#0a0a1a 0%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.header-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
 .header-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
 .total-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
 .total-amount{font-family:'Inter',sans-serif;font-size:clamp(36px,9vw,54px);font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
@@ -316,16 +317,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <body>
 <div class="app">
 
-<!-- LANG BAR -->
-<div class="lang-bar">
-  <button class="lang-btn active" id="lang-uk" onclick="setLang('uk')">УКР</button>
-  <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">РУС</button>
-  <button class="lang-btn" id="lang-en" onclick="setLang('en')">ENG</button>
-</div>
-
 <!-- HEADER -->
 <div class="header">
-  <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
+  <div class="header-top-row">
+    <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
+    <div class="lang-bar">
+      <button class="lang-btn active" id="lang-uk" onclick="setLang('uk')">УКР</button>
+      <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">РУС</button>
+      <button class="lang-btn" id="lang-en" onclick="setLang('en')">ENG</button>
+    </div>
+  </div>
   <div class="total-wrap">
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-currency">₴</div>
