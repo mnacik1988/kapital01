@@ -1606,8 +1606,11 @@ function addSecItem(secId){
     divAbs:cached?.divAbs||0,
   });
   renderSecuritiesCards(); updateAll(); saveData();
-  // Auto-refresh if ticker provided
-  if(ticker)refreshAllStockPrices(secId);
+  // Auto-refresh only for PRO or first ticker (free demo)
+  if(ticker){
+    const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
+    if(isPro || totalLive <= 1) refreshAllStockPrices(secId);
+  }
 }
 function removeSecItem(secId,itemIdx){
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
@@ -1999,17 +2002,17 @@ function updateProUI(){
 const _origFetchTicker = fetchTickerForInput;
 fetchTickerForInput = async function(secId){
   if(!isPro){
-    // Count total items with live prices across ALL sections
-    const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    // Also check current section's items that already have ticker
-    const sec = securitiesSections.find(s=>s.id===secId);
-    const thisHasTicker = sec && sec.items.some(it=>it.ticker);
-    // Allow if total live tickers < 1 (first one is free demo)
-    if(totalLive >= 1 && !thisHasTicker){
-      openPaywall('Живі ціни для 2+ акцій — тільки в PRO. 1-а акція безкоштовно як демо ✨');
-      return;
+    // Count already SAVED items with tickers (not counting current input)
+    const savedLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
+    if(savedLive >= 1){
+      // Check if this section already has a saved ticker (allow refresh of existing)
+      const sec = securitiesSections.find(s=>s.id===secId);
+      const thisAlreadySaved = sec && sec.items.some(it=>it.ticker);
+      if(!thisAlreadySaved){
+        openPaywall('Живі ціни для 2+ акцій — тільки в PRO. 1-а акція безкоштовно як демо ✨');
+        return;
+      }
     }
-    // If this section already has a live ticker, allow refresh of existing
   }
   await _origFetchTicker(secId);
 };
