@@ -106,9 +106,12 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* INPUTS */
 .field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
 .field-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;}
-.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;transition:border-color .15s;}
-.field-input:focus{border-color:var(--border2);}
+.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:text;}
+.field-input:focus{border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d20;}
 .field-input::placeholder{color:var(--muted);}
+/* iOS keyboard fix */
+input[type="number"].field-input{-webkit-appearance:none;appearance:none;}
+input.field-input:focus,select.field-input:focus{-webkit-user-select:text;user-select:text;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
@@ -396,16 +399,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="totalUsdtInv">Загальна сума вкладень в USDT</div>
-        <input class="field-input" type="number" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="text" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
           <div class="field-label" data-i18n="rateUsdtUah">Курс USDT / ₴</div>
-          <input class="field-input" type="number" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+          <input class="field-input" type="text" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="costPrice">Собівартість (₴)</div>
-          <input class="field-input" type="number" id="cryptoCost" placeholder="0" inputmode="decimal" oninput="updateAll()">
+          <input class="field-input" type="text" id="cryptoCost" placeholder="0" inputmode="decimal" oninput="updateAll()">
         </div>
       </div>
       <div class="result-box">
@@ -424,17 +427,17 @@ select.field-input option{background:var(--bg3);color:var(--text);}
           </div>
           <div class="field-group">
             <div class="field-label" data-i18n="coinQty">Кількість</div>
-            <input class="field-input" type="number" id="newCoinQty" placeholder="0.5" inputmode="decimal">
+            <input class="field-input" type="text" id="newCoinQty" placeholder="0.5" inputmode="decimal">
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
             <div class="field-label" data-i18n="coinBuyPrice">Ціна купівлі (USDT)</div>
-            <input class="field-input" type="number" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
+            <input class="field-input" type="text" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
           </div>
           <div class="field-group">
             <div class="field-label" data-i18n="coinCurPrice">Поточна ціна (USDT)</div>
-            <input class="field-input" type="number" id="newCoinCurPrice" placeholder="65000" inputmode="decimal">
+            <input class="field-input" type="text" id="newCoinCurPrice" placeholder="65000" inputmode="decimal">
           </div>
         </div>
         <button class="add-btn" onclick="addCoin()" data-i18n="addCoinBtn">+ Додати монету</button>
@@ -461,12 +464,12 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="usdAmount">Сума в доларах ($)</div>
-        <input class="field-input" type="number" id="usdAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="text" id="usdAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
           <div class="field-label" data-i18n="rateUsdUah">Курс USD / ₴</div>
-          <input class="field-input" type="number" id="usdUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+          <input class="field-input" type="text" id="usdUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="note">Нотатка</div>
@@ -514,11 +517,11 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="amount">Сума</div>
-          <input class="field-input" type="number" id="newForexAmt" placeholder="0" inputmode="decimal">
+          <input class="field-input" type="text" id="newForexAmt" placeholder="0" inputmode="decimal">
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="rateUah">Курс / ₴</div>
-          <input class="field-input" type="number" id="newForexRate" placeholder="43" inputmode="decimal">
+          <input class="field-input" type="text" id="newForexRate" placeholder="43" inputmode="decimal">
         </div>
       </div>
       <button class="add-btn" onclick="addForex()" data-i18n="addCurrency">+ Додати валюту</button>
@@ -547,7 +550,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="amountUah">Сума (₴)</div>
-        <input class="field-input" type="number" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="text" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="field-group">
         <div class="field-label" data-i18n="whereStored">Де зберігається</div>
@@ -575,7 +578,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="balanceUah">Баланс (₴)</div>
-        <input class="field-input" type="number" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="text" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
@@ -664,6 +667,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <script>
+// iOS keyboard fix — ensure inputs get focus on tap
+document.addEventListener('DOMContentLoaded', function(){
+  document.body.addEventListener('touchend', function(e){
+    const el = e.target;
+    if(el.tagName === 'INPUT' && el.type !== 'date'){
+      setTimeout(()=>{ el.focus(); }, 50);
+    }
+  }, {passive:true});
+});
+
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 let isPro = localStorage.getItem('kapital_pro') === 'true';
 const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1 };
@@ -847,7 +860,7 @@ function getDepositHtml(dep,idx){
         <div style="padding-top:14px;">
         <div class="field-group">
           <div class="field-label">${lang.depPrincipalLbl}</div>
-          <input class="field-input" type="number" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
+          <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
             oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
         </div>
         <div class="row2">
@@ -866,13 +879,13 @@ function getDepositHtml(dep,idx){
           <div class="calc-title">${lang.compCalc}</div>
           <div class="field-group">
             <div class="field-label">${lang.annualRate}</div>
-            <input class="field-input" type="number" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
+            <input class="field-input" type="text" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
               oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
           </div>
           <div class="row2">
             <div class="field-group">
               <div class="field-label">${lang.termMon}</div>
-              <input class="field-input" type="number" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
+              <input class="field-input" type="text" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
                 oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}')">
             </div>
             <div class="field-group">
@@ -889,12 +902,12 @@ function getDepositHtml(dep,idx){
           <div class="row2">
             <div class="field-group">
               <div class="field-label">${lang.taxPct}</div>
-              <input class="field-input" type="number" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
+              <input class="field-input" type="text" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
                 oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
             </div>
             <div class="field-group">
               <div class="field-label">${lang.taxFree}</div>
-              <input class="field-input" type="number" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
+              <input class="field-input" type="text" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
                 oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
             </div>
           </div>
@@ -1140,7 +1153,7 @@ function getCustomCardHtml(s,idx){
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label">${lang.amountUah}</div>
-        <input class="field-input" type="number" id="customPrincipal_${s.id}" placeholder="100 000" inputmode="decimal" value="${s.principal}"
+        <input class="field-input" type="text" id="customPrincipal_${s.id}" placeholder="100 000" inputmode="decimal" value="${s.principal}"
           oninput="customSections[${idx}].principal=this.value;updateAll()">
       </div>
       <div class="row2">
@@ -1159,13 +1172,13 @@ function getCustomCardHtml(s,idx){
         <div class="calc-title">${lang.yield}</div>
         <div class="field-group">
           <div class="field-label">${lang.annualRate}</div>
-          <input class="field-input" type="number" id="customRate_${s.id}" placeholder="16" value="${s.rate}" inputmode="decimal"
+          <input class="field-input" type="text" id="customRate_${s.id}" placeholder="16" value="${s.rate}" inputmode="decimal"
             oninput="customSections[${idx}].rate=this.value;calcCustomSection('${s.id}')">
         </div>
         <div class="row2">
           <div class="field-group">
             <div class="field-label">${lang.termMon}</div>
-            <input class="field-input" type="number" id="customMonths_${s.id}" placeholder="12" value="${s.months}" inputmode="numeric"
+            <input class="field-input" type="text" id="customMonths_${s.id}" placeholder="12" value="${s.months}" inputmode="numeric"
               oninput="customSections[${idx}].months=this.value;calcCustomSection('${s.id}')">
           </div>
           <div class="field-group">
@@ -1182,12 +1195,12 @@ function getCustomCardHtml(s,idx){
         <div class="row2">
           <div class="field-group">
             <div class="field-label">${lang.taxPct}</div>
-            <input class="field-input" type="number" id="customTax_${s.id}" placeholder="0" value="${s.tax}" inputmode="decimal"
+            <input class="field-input" type="text" id="customTax_${s.id}" placeholder="0" value="${s.tax}" inputmode="decimal"
               oninput="customSections[${idx}].tax=this.value;calcCustomSection('${s.id}')">
           </div>
           <div class="field-group">
             <div class="field-label">${lang.taxFree}</div>
-            <input class="field-input" type="number" id="customTaxFree_${s.id}" placeholder="0" value="${s.taxFree}" inputmode="decimal"
+            <input class="field-input" type="text" id="customTaxFree_${s.id}" placeholder="0" value="${s.taxFree}" inputmode="decimal"
               oninput="customSections[${idx}].taxFree=this.value;calcCustomSection('${s.id}')">
           </div>
         </div>
@@ -1539,21 +1552,21 @@ function getSecCardHtml(s,idx){
         <div class="row2">
           <div class="field-group">
             <div class="field-label">Кількість акцій</div>
-            <input class="field-input" type="number" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
+            <input class="field-input" type="text" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
           </div>
           <div class="field-group">
             <div class="field-label">Ціна купівлі (₴)</div>
-            <input class="field-input" type="number" id="secBuyPrice_${s.id}" placeholder="для P&L" inputmode="decimal">
+            <input class="field-input" type="text" id="secBuyPrice_${s.id}" placeholder="для P&L" inputmode="decimal">
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
             <div class="field-label">Поточна ціна (₴) <span style="color:var(--muted);font-size:9px">авто</span></div>
-            <input class="field-input" type="number" id="secPrice_${s.id}" placeholder="автоматично" inputmode="decimal">
+            <input class="field-input" type="text" id="secPrice_${s.id}" placeholder="автоматично" inputmode="decimal">
           </div>
           <div class="field-group">
             <div class="field-label">Дивіденди (% річних) <span style="color:var(--muted);font-size:9px">авто</span></div>
-            <input class="field-input" type="number" id="secDiv_${s.id}" placeholder="авто" inputmode="decimal">
+            <input class="field-input" type="text" id="secDiv_${s.id}" placeholder="авто" inputmode="decimal">
           </div>
         </div>
         <button class="add-btn" onclick="addSecItem('${s.id}')">${lang.addSecItem}</button>
