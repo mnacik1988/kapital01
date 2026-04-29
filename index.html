@@ -1210,6 +1210,7 @@ async function fetchUsdUahRate(){
   // no-op — rate is fetched together with stock prices
 }
 
+let stockLastError='';
 async function fetchStockPrice(ticker){
   ticker=ticker.toUpperCase().trim();
   if(!ticker)return null;
@@ -1218,13 +1219,14 @@ async function fetchStockPrice(ticker){
   try{
     const result=await claudeGetStockData([ticker]);
     if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
-    // Try exact match, then case-insensitive
     const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
-    if(!s||!s.price)throw new Error('No price data returned');
+    if(!s||!s.price)throw new Error('Дані отримано, але ціна відсутня. Відповідь: '+JSON.stringify(result).slice(0,150));
     const entry={...s,updated:Date.now()};
     stockPriceCache[ticker]=entry;
+    stockLastError='';
     return entry;
   }catch(e){
+    stockLastError=e.message;
     console.warn('fetchStockPrice error for',ticker,':',e.message);
     return null;
   }
@@ -1251,11 +1253,15 @@ async function fetchTickerForInput(secId){
   const btn=$('fetchBtn_'+secId);
   const info=$('stockInfo_'+secId);
   if(btn){btn.className='ticker-fetch-btn loading';btn.textContent='⏳ Запит...';}
-  if(info)info.className='stock-price-info';
-  const data=await fetchStockPrice(ticker);
+  if(info){info.className='stock-price-info visible';info.innerHTML=`<div class="spi-meta" style="color:var(--blue2)">⏳ Запит до Claude... (~10 сек)</div>`;}
+  let data=null,lastError='';
+  try{ data=await fetchStockPrice(ticker); }catch(e){lastError=e.message;}
   if(btn){btn.className='ticker-fetch-btn';btn.textContent='🔍 Отримати ціну';}
   if(!data){
-    if(info){info.className='stock-price-info visible';info.innerHTML=`<div class="spi-name" style="color:var(--red)">⚠ Тікер "${ticker}" не знайдено</div><div class="spi-meta">Перевірте символ (напр: AAPL, MSFT, AMZN)</div>`;}
+    if(info){info.className='stock-price-info visible';info.innerHTML=
+      `<div class="spi-name" style="color:var(--red)">⚠ Не вдалося отримати дані для "${ticker}"</div>`+
+      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px">${lastError||'Невідома помилка'}</div>`+
+      `<div class="spi-meta" style="margin-top:6px">Введіть ціну вручну або спробуйте ще раз</div>`;}
     return;
   }
   const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
