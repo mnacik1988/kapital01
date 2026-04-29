@@ -1151,99 +1151,114 @@ function getCustomTotal(){
   return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
 }
 
-// ── LIVE STOCK PRICES via Anthropic API ──────
+// ── LIVE STOCK PRICES (dual-mode: Claude.ai + direct) ──────
 let stockPriceCache={};
 let usdUahRate=41;
+let stockLastError='';
 
+// Detect if we're running inside Claude.ai (Anthropic API available without key)
+const isClaudeEnv=(()=>{
+  try{return window.location.hostname.includes('claude.ai')||window.location.hostname.includes('anthropic.com');}
+  catch(e){return false;}
+})();
+
+// ── Source A: Anthropic API with web_search (works in Claude.ai) ──
 async function claudeGetStockData(tickers){
   const tickerList=tickers.map(t=>t.toUpperCase()).join(', ');
-  // Use system prompt to enforce JSON output strictly
   const resp=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       model:'claude-sonnet-4-20250514',
       max_tokens:1500,
-      system:'You are a financial data API. You MUST respond with raw JSON only — no markdown, no backticks, no explanation, no text before or after the JSON object.',
+      system:'You are a financial data API. Respond with raw JSON only — no markdown, no backticks, no text outside JSON.',
       tools:[{type:'web_search_20250305',name:'web_search'}],
       messages:[{role:'user',content:
-        `Search for current stock prices for: ${tickerList}\n`+
-        `Also find current USD to UAH exchange rate.\n`+
-        `Return ONLY this JSON structure (replace TICKER with actual ticker symbols):\n`+
-        `{"usdUah":41.5,"stocks":{"AAPL":{"price":213.5,"change":1.2,"changePct":0.57,"divYield":0.52,"divAbs":1.0,"name":"Apple Inc","currency":"USD"}}}`
+        'Search current stock prices for: '+tickerList+'. Also find current USD to UAH rate. '+
+        'Return ONLY JSON: {"usdUah":44.0,"stocks":{"AAPL":{"price":213.5,"change":1.2,"changePct":0.57,"divYield":0.52,"divAbs":1.0,"name":"Apple Inc","currency":"USD"}}}'
       }]
     })
   });
-  if(!resp.ok){
-    const errText=await resp.text();
-    throw new Error('API '+resp.status+': '+errText.slice(0,100));
-  }
+  if(!resp.ok){const t=await resp.text();throw new Error('API '+resp.status+': '+t.slice(0,80));}
   const data=await resp.json();
   const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-
-  // Extract the outermost JSON object robustly
   let jsonStr=null;
-  // Try to find JSON block in markdown fences first
-  const fenced=text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+  const fenced=text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
   if(fenced)jsonStr=fenced[1];
-  else{
-    // Find outermost { } by tracking depth
-    let depth=0,start=-1,end=-1;
-    for(let i=0;i<text.length;i++){
-      if(text[i]==='{'){if(depth===0)start=i;depth++;}
-      else if(text[i]==='}'){depth--;if(depth===0){end=i;break;}}
-    }
-    if(start>=0&&end>start)jsonStr=text.slice(start,end+1);
-  }
-  if(!jsonStr)throw new Error('No JSON found in response: '+text.slice(0,200));
+  else{let d=0,s=-1,e=-1;for(let i=0;i<text.length;i++){if(text[i]==='{'){if(!d)s=i;d++;}else if(text[i]==='}'){d--;if(!d){e=i;break;}}}if(s>=0&&e>s)jsonStr=text.slice(s,e+1);}
+  if(!jsonStr)throw new Error('No JSON: '+text.slice(0,120));
   const parsed=JSON.parse(jsonStr);
-  // Normalise stock keys to uppercase
-  if(parsed.stocks){
-    const norm={};
-    Object.entries(parsed.stocks).forEach(([k,v])=>norm[k.toUpperCase()]=v);
-    parsed.stocks=norm;
-  }
+  if(parsed.stocks){const n={};Object.entries(parsed.stocks).forEach(([k,v])=>n[k.toUpperCase()]=v);parsed.stocks=n;}
   return parsed;
 }
 
-async function fetchUsdUahRate(){
-  // no-op — rate is fetched together with stock prices
+// ── Source B: Yahoo Finance direct (works on GitHub Pages, local) ──
+async function yahooGetStockData(ticker){
+  // Yahoo Finance v8 — works fine from non-Claude environments
+  const url='https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(ticker)+'?interval=1d&range=2d';
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('Yahoo HTTP '+r.status);
+  const d=await r.json();
+  const meta=d?.chart?.result?.[0]?.meta;
+  if(!meta||!meta.regularMarketPrice)throw new Error('No Yahoo data');
+  const price=meta.regularMarketPrice;
+  const prev=meta.chartPreviousClose||meta.previousClose||price;
+  const change=price-prev, changePct=prev?(change/prev*100):0;
+  // Get dividends + name via quote endpoint
+  let divYield=0,divAbs=0,name=meta.symbol||ticker;
+  try{
+    const qr=await fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+encodeURIComponent(ticker));
+    const qd=await qr.json();
+    const q=qd?.quoteResponse?.result?.[0];
+    if(q){divYield=(q.trailingAnnualDividendYield||0)*100;divAbs=q.trailingAnnualDividendRate||0;name=q.longName||q.shortName||name;}
+  }catch(e2){}
+  // Get USD/UAH rate
+  try{
+    const rr=await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json');
+    const rd=await rr.json();
+    if(rd&&rd[0]&&rd[0].rate)usdUahRate=rd[0].rate;
+  }catch(e3){}
+  return{usdUah:usdUahRate,stocks:{[ticker]:{price,change,changePct,divYield,divAbs,name,currency:meta.currency||'USD'}}};
 }
 
-let stockLastError='';
+async function fetchUsdUahRate(){}
+
 async function fetchStockPrice(ticker){
   ticker=ticker.toUpperCase().trim();
   if(!ticker)return null;
   const cached=stockPriceCache[ticker];
   if(cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
   try{
-    const result=await claudeGetStockData([ticker]);
+    // Try Claude API first (works in Claude.ai), fallback to Yahoo direct
+    let result;
+    try{result=await claudeGetStockData([ticker]);}
+    catch(e1){
+      console.info('Claude API unavailable, trying Yahoo directly...');
+      result=await yahooGetStockData(ticker);
+    }
     if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
     const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
-    if(!s||!s.price)throw new Error('Дані отримано, але ціна відсутня. Відповідь: '+JSON.stringify(result).slice(0,150));
+    if(!s||!s.price)throw new Error('Ціна не знайдена');
     const entry={...s,updated:Date.now()};
     stockPriceCache[ticker]=entry;
     stockLastError='';
     return entry;
   }catch(e){
     stockLastError=e.message;
-    console.warn('fetchStockPrice error for',ticker,':',e.message);
+    console.warn('fetchStockPrice failed for',ticker,':',e.message);
     return null;
   }
 }
 
 async function fetchMultipleStocks(tickers){
   if(!tickers.length)return{};
-  try{
-    const result=await claudeGetStockData(tickers);
-    if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
-    const now=Date.now();
-    Object.entries(result.stocks||{}).forEach(([t,s])=>{stockPriceCache[t]={...s,updated:now};});
-    return result.stocks||{};
-  }catch(e){
-    console.warn('fetchMultipleStocks error',e.message);
-    return{};
-  }
+  const results={};
+  // Fetch all in parallel
+  await Promise.all(tickers.map(async t=>{
+    const d=await fetchStockPrice(t);
+    if(d)results[t]=d;
+  }));
+  return results;
 }
 
 async function fetchTickerForInput(secId){
