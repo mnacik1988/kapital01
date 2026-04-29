@@ -2020,7 +2020,7 @@ refreshAllStockPrices = async function(secId){
   if(!isPro){
     const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
     if(totalLive > 1){
-      openPaywall('Автооновлення всіх акцій — тільки в PRO');
+      // Мовчки зупиняємо — paywall відкриється тільки при натисканні "Отримати ціну"
       return;
     }
   }
