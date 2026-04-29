@@ -1156,31 +1156,58 @@ let stockPriceCache={};
 let usdUahRate=41;
 
 async function claudeGetStockData(tickers){
-  const tickerList=tickers.join(', ');
-  const prompt=`Get current stock prices and dividend info for these tickers: ${tickerList}
-Also provide current USD to UAH exchange rate.
-Respond ONLY with valid JSON (no markdown, no backticks, no explanation):
-{"usdUah":number,"stocks":{"TICKER":{"price":number,"change":number,"changePct":number,"divYield":number,"divAbs":number,"name":"string","currency":"USD"}}}`;
+  const tickerList=tickers.map(t=>t.toUpperCase()).join(', ');
+  // Use system prompt to enforce JSON output strictly
   const resp=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       model:'claude-sonnet-4-20250514',
-      max_tokens:1000,
+      max_tokens:1500,
+      system:'You are a financial data API. You MUST respond with raw JSON only — no markdown, no backticks, no explanation, no text before or after the JSON object.',
       tools:[{type:'web_search_20250305',name:'web_search'}],
-      messages:[{role:'user',content:prompt}]
+      messages:[{role:'user',content:
+        `Search for current stock prices for: ${tickerList}\n`+
+        `Also find current USD to UAH exchange rate.\n`+
+        `Return ONLY this JSON structure (replace TICKER with actual ticker symbols):\n`+
+        `{"usdUah":41.5,"stocks":{"AAPL":{"price":213.5,"change":1.2,"changePct":0.57,"divYield":0.52,"divAbs":1.0,"name":"Apple Inc","currency":"USD"}}}`
+      }]
     })
   });
-  if(!resp.ok)throw new Error('API '+resp.status);
+  if(!resp.ok){
+    const errText=await resp.text();
+    throw new Error('API '+resp.status+': '+errText.slice(0,100));
+  }
   const data=await resp.json();
   const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-  const m=text.match(/\{[\s\S]*\}/);
-  if(!m)throw new Error('No JSON');
-  return JSON.parse(m[0]);
+  console.log('Claude raw response:', text.slice(0,300));
+  // Extract the outermost JSON object robustly
+  let jsonStr=null;
+  // Try to find JSON block in markdown fences first
+  const fenced=text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+  if(fenced)jsonStr=fenced[1];
+  else{
+    // Find outermost { } by tracking depth
+    let depth=0,start=-1,end=-1;
+    for(let i=0;i<text.length;i++){
+      if(text[i]==='{'){if(depth===0)start=i;depth++;}
+      else if(text[i]==='}'){depth--;if(depth===0){end=i;break;}}
+    }
+    if(start>=0&&end>start)jsonStr=text.slice(start,end+1);
+  }
+  if(!jsonStr)throw new Error('No JSON found in response: '+text.slice(0,200));
+  const parsed=JSON.parse(jsonStr);
+  // Normalise stock keys to uppercase
+  if(parsed.stocks){
+    const norm={};
+    Object.entries(parsed.stocks).forEach(([k,v])=>norm[k.toUpperCase()]=v);
+    parsed.stocks=norm;
+  }
+  return parsed;
 }
 
 async function fetchUsdUahRate(){
-  // Updated as part of stock fetch; this is a no-op standalone
+  // no-op — rate is fetched together with stock prices
 }
 
 async function fetchStockPrice(ticker){
@@ -1191,13 +1218,14 @@ async function fetchStockPrice(ticker){
   try{
     const result=await claudeGetStockData([ticker]);
     if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
-    const s=result.stocks&&result.stocks[ticker];
-    if(!s)throw new Error('No data for '+ticker);
+    // Try exact match, then case-insensitive
+    const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
+    if(!s||!s.price)throw new Error('No price data returned');
     const entry={...s,updated:Date.now()};
     stockPriceCache[ticker]=entry;
     return entry;
   }catch(e){
-    console.warn('fetchStockPrice error for',ticker,e.message);
+    console.warn('fetchStockPrice error for',ticker,':',e.message);
     return null;
   }
 }
