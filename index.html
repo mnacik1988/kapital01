@@ -664,6 +664,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <script>
+// ── FREEMIUM STATE (declared first so all functions can access) ──
+let isPro = localStorage.getItem('kapital_pro') === 'true';
+const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1 };
+function openPaywall(reason){
+  const sub=document.querySelector('.paywall-sub');
+  if(sub&&reason)sub.textContent=reason;
+  const el=document.getElementById('paywallOverlay');
+  if(el)el.classList.add('open');
+}
+
 // ── I18N ─────────────────────────────────────
 const LANGS={
   uk:{
@@ -930,7 +940,7 @@ function _addDepositSlideCore(){
   renderDeposits(); goToSlide(deposits.length-1); saveData();
 }
 function addDepositSlide(){
-  if(typeof isPro !== 'undefined' && !isPro && deposits.length >= 1){
+  if(!isPro && deposits.length >= FREE_LIMITS.deposits){
     openPaywall('Більше 1 депозиту — тільки в PRO');
     return;
   }
@@ -1078,7 +1088,7 @@ function deleteBuiltinCard(name){
 const EMOJIS=['💰','📈','🏠','🚗','💎','🎯','🏆','💡','🔑','🌟','💼','📊','🏗','⚡','🌱','🛡','🎪','💫','🏅','🎁'];
 let selectedEmoji='💰';
 function openAddSection(){
-  if(typeof isPro !== 'undefined' && !isPro && customSections.length >= 1){
+  if(!isPro && customSections.length >= FREE_LIMITS.customSections){
     openPaywall('Більше 1 власного розділу — тільки в PRO');
     return;
   }
@@ -1572,7 +1582,7 @@ function getSecCardHtml(s,idx){
 
 function addSecItem(secId){
   const _secFreemium = securitiesSections.find(s=>s.id===secId);
-  if(typeof isPro !== 'undefined' && !isPro && _secFreemium && _secFreemium.items.length >= 3){
+  if(!isPro && _secFreemium && _secFreemium.items.length >= FREE_LIMITS.stockItems){
     openPaywall('Більше 3 акцій — тільки в PRO');
     return;
   }
@@ -1945,23 +1955,8 @@ setTimeout(()=>{
 },500);
 startAutoRefresh();
 // ── FREEMIUM ─────────────────────────────────────────────────
-// In production replace with real in-app purchase validation
-let isPro = localStorage.getItem('kapital_pro') === 'true';
-
-const FREE_LIMITS = {
-  deposits: 1,        // max 1 deposit
-  stockItems: 3,      // max 3 stock positions per section
-  customSections: 1,  // max 1 custom section
-  livePrice: false,   // no live prices
-};
-
+// isPro, FREE_LIMITS and openPaywall declared at top of script
 function checkPro(){ return isPro; }
-
-function openPaywall(reason){
-  const sub = document.querySelector('.paywall-sub');
-  if(sub && reason) sub.textContent = reason;
-  document.getElementById('paywallOverlay').classList.add('open');
-}
 function closePaywall(){ document.getElementById('paywallOverlay').classList.remove('open'); }
 function closePaywallIfOutside(e){ if(e.target===document.getElementById('paywallOverlay'))closePaywall(); }
 
