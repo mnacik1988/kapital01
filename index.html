@@ -26,7 +26,6 @@
 html,body{height:100%;width:100%;overflow-x:hidden;background:var(--bg);}
 body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;}
 /* iOS PWA: allow text selection in inputs */
-input,textarea,select{-webkit-user-select:text!important;user-select:text!important;-webkit-tap-highlight-color:rgba(78,203,141,0.2);}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
 
@@ -113,8 +112,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .field-input::placeholder{color:var(--muted);}
 /* iOS keyboard fix */
 input[type="number"].field-input{-webkit-appearance:none;appearance:none;}
-input.field-input,textarea.field-input{-webkit-user-select:text!important;user-select:text!important;}
-input.field-input:focus,select.field-input:focus{-webkit-user-select:text!important;user-select:text!important;}
+.field-input:focus{border-color:var(--green);}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
@@ -670,20 +668,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <script>
-// iOS PWA keyboard fix — minimal reliable version
-(function(){
-  if(!/iPad|iPhone|iPod/.test(navigator.userAgent)) return;
-  // Only needed in standalone (home screen) mode
-  if(!window.navigator.standalone) return;
-  // For each input: on click, blur then focus to force keyboard
-  document.addEventListener('click', function(e){
-    const el = e.target;
-    if((el.tagName==='INPUT' || el.tagName==='TEXTAREA') && el.type!=='date'){
-      el.blur();
-      setTimeout(function(){ el.focus(); }, 10);
-    }
-  }, true);
-})();
+
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 let isPro = localStorage.getItem('kapital_pro') === 'true';
@@ -1981,7 +1966,10 @@ startAutoRefresh();
 // ── FREEMIUM ─────────────────────────────────────────────────
 // isPro, FREE_LIMITS and openPaywall declared at top of script
 function checkPro(){ return isPro; }
-function closePaywall(){ document.getElementById('paywallOverlay').classList.remove('open'); }
+function closePaywall(){
+  const el=document.getElementById('paywallOverlay');
+  if(el){el.classList.remove('open');setTimeout(()=>{el.style.pointerEvents='none';},300);}
+}
 function closePaywallIfOutside(e){ if(e.target===document.getElementById('paywallOverlay'))closePaywall(); }
 
 function activatePro(){
