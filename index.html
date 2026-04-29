@@ -1228,26 +1228,32 @@ async function fetchStockPrice(ticker){
   if(!ticker)return null;
   const cached=stockPriceCache[ticker];
   if(cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
+  let claudeErr='', yahooErr='';
+  // Try Claude API
+  let result=null;
   try{
-    // Try Claude API first (works in Claude.ai), fallback to Yahoo direct
-    let result;
-    try{result=await claudeGetStockData([ticker]);}
-    catch(e1){
-      console.info('Claude API unavailable, trying Yahoo directly...');
+    result=await claudeGetStockData([ticker]);
+  }catch(e1){claudeErr=e1.message;}
+  // Fallback to Yahoo
+  if(!result){
+    try{
       result=await yahooGetStockData(ticker);
-    }
-    if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
-    const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
-    if(!s||!s.price)throw new Error('Ціна не знайдена');
-    const entry={...s,updated:Date.now()};
-    stockPriceCache[ticker]=entry;
-    stockLastError='';
-    return entry;
-  }catch(e){
-    stockLastError=e.message;
-    console.warn('fetchStockPrice failed for',ticker,':',e.message);
+    }catch(e2){yahooErr=e2.message;}
+  }
+  if(!result){
+    stockLastError='Claude: '+(claudeErr||'—')+' | Yahoo: '+(yahooErr||'—');
     return null;
   }
+  if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
+  const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
+  if(!s||!s.price){
+    stockLastError='Дані отримано але ціна відсутня: '+JSON.stringify(result).slice(0,100);
+    return null;
+  }
+  const entry={...s,updated:Date.now()};
+  stockPriceCache[ticker]=entry;
+  stockLastError='';
+  return entry;
 }
 
 async function fetchMultipleStocks(tickers){
@@ -1269,14 +1275,16 @@ async function fetchTickerForInput(secId){
   const info=$('stockInfo_'+secId);
   if(btn){btn.className='ticker-fetch-btn loading';btn.textContent='⏳ Запит...';}
   if(info){info.className='stock-price-info visible';info.innerHTML=`<div class="spi-meta" style="color:var(--blue2)">⏳ Запит до Claude... (~10 сек)</div>`;}
-  let data=null,lastError='';
-  try{ data=await fetchStockPrice(ticker); }catch(e){lastError=e.message;}
+  stockLastError='';
+  let data=null;
+  try{ data=await fetchStockPrice(ticker); }catch(e){stockLastError=e.message;}
   if(btn){btn.className='ticker-fetch-btn';btn.textContent='🔍 Отримати ціну';}
   if(!data){
+    const errMsg=stockLastError||'Обидва джерела недоступні';
     if(info){info.className='stock-price-info visible';info.innerHTML=
       `<div class="spi-name" style="color:var(--red)">⚠ Не вдалося отримати дані для "${ticker}"</div>`+
-      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px">${lastError||'Невідома помилка'}</div>`+
-      `<div class="spi-meta" style="margin-top:6px">Введіть ціну вручну або спробуйте ще раз</div>`;}
+      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${errMsg}</div>`+
+      `<div class="spi-meta" style="margin-top:6px;color:var(--muted)">Введіть ціну вручну або спробуйте ще раз</div>`;}
     return;
   }
   const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
