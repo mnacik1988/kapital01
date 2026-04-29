@@ -25,6 +25,8 @@
 }
 html,body{height:100%;width:100%;overflow-x:hidden;background:var(--bg);}
 body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;}
+/* iOS PWA: allow text selection in inputs */
+input,textarea,select{-webkit-user-select:text!important;user-select:text!important;-webkit-tap-highlight-color:rgba(78,203,141,0.2);}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
 
@@ -111,7 +113,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .field-input::placeholder{color:var(--muted);}
 /* iOS keyboard fix */
 input[type="number"].field-input{-webkit-appearance:none;appearance:none;}
-input.field-input:focus,select.field-input:focus{-webkit-user-select:text;user-select:text;}
+input.field-input,textarea.field-input{-webkit-user-select:text!important;user-select:text!important;}
+input.field-input:focus,select.field-input:focus{-webkit-user-select:text!important;user-select:text!important;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
@@ -669,41 +672,30 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <script>
 // iOS PWA keyboard fix
 (function(){
-  const isStandalone = window.navigator.standalone === true;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if(!isIOS) return;
+  const isStandalone = window.navigator.standalone === true;
 
-  if(isIOS){
-    // Fix 1: On any touch on an input — force focus + caret placement
-    document.addEventListener('touchstart', function(e){
-      const el = e.target;
-      if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'){
-        // Prevent double-tap zoom which blocks keyboard in PWA
-        e.stopPropagation();
-      }
-    }, {passive:false});
-
-    document.addEventListener('touchend', function(e){
-      const el = e.target;
-      if((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.type !== 'date'){
-        e.preventDefault();
-        el.focus();
-        // Place caret at end
+  function fixInput(el){
+    if(!el || el.type === 'date' || el.tagName === 'SELECT') return;
+    // readonly trick: remove readonly to force keyboard
+    el.setAttribute('readonly', true);
+    setTimeout(function(){
+      el.removeAttribute('readonly');
+      el.focus();
+      try{
         const len = el.value.length;
-        try{ el.setSelectionRange(len, len); } catch(err){}
-      }
-    }, {passive:false});
-
-    // Fix 2: In standalone PWA mode, inputs need explicit readOnly toggle trick
-    if(isStandalone){
-      document.addEventListener('touchstart', function(e){
-        const el = e.target;
-        if((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.type !== 'date'){
-          el.removeAttribute('readonly');
-          el.focus();
-        }
-      }, {passive:true});
-    }
+        el.setSelectionRange(len, len);
+      }catch(e){}
+    }, 100);
   }
+
+  document.addEventListener('touchstart', function(e){
+    const el = e.target;
+    if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'){
+      fixInput(el);
+    }
+  }, {passive:true});
 })();
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
