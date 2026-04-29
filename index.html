@@ -108,7 +108,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* INPUTS */
 .field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
 .field-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;}
-.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:text;}
+.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s;}
 .field-input:focus{border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d20;}
 .field-input::placeholder{color:var(--muted);}
 /* iOS keyboard fix */
@@ -670,32 +670,19 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <script>
-// iOS PWA keyboard fix
+// iOS PWA keyboard fix — minimal reliable version
 (function(){
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  if(!isIOS) return;
-  const isStandalone = window.navigator.standalone === true;
-
-  function fixInput(el){
-    if(!el || el.type === 'date' || el.tagName === 'SELECT') return;
-    // readonly trick: remove readonly to force keyboard
-    el.setAttribute('readonly', true);
-    setTimeout(function(){
-      el.removeAttribute('readonly');
-      el.focus();
-      try{
-        const len = el.value.length;
-        el.setSelectionRange(len, len);
-      }catch(e){}
-    }, 100);
-  }
-
-  document.addEventListener('touchstart', function(e){
+  if(!/iPad|iPhone|iPod/.test(navigator.userAgent)) return;
+  // Only needed in standalone (home screen) mode
+  if(!window.navigator.standalone) return;
+  // For each input: on click, blur then focus to force keyboard
+  document.addEventListener('click', function(e){
     const el = e.target;
-    if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'){
-      fixInput(el);
+    if((el.tagName==='INPUT' || el.tagName==='TEXTAREA') && el.type!=='date'){
+      el.blur();
+      setTimeout(function(){ el.focus(); }, 10);
     }
-  }, {passive:true});
+  }, true);
 })();
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
