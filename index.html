@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Капітал">
@@ -667,15 +667,44 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <script>
-// iOS keyboard fix — ensure inputs get focus on tap
-document.addEventListener('DOMContentLoaded', function(){
-  document.body.addEventListener('touchend', function(e){
-    const el = e.target;
-    if(el.tagName === 'INPUT' && el.type !== 'date'){
-      setTimeout(()=>{ el.focus(); }, 50);
+// iOS PWA keyboard fix
+(function(){
+  const isStandalone = window.navigator.standalone === true;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  if(isIOS){
+    // Fix 1: On any touch on an input — force focus + caret placement
+    document.addEventListener('touchstart', function(e){
+      const el = e.target;
+      if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'){
+        // Prevent double-tap zoom which blocks keyboard in PWA
+        e.stopPropagation();
+      }
+    }, {passive:false});
+
+    document.addEventListener('touchend', function(e){
+      const el = e.target;
+      if((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.type !== 'date'){
+        e.preventDefault();
+        el.focus();
+        // Place caret at end
+        const len = el.value.length;
+        try{ el.setSelectionRange(len, len); } catch(err){}
+      }
+    }, {passive:false});
+
+    // Fix 2: In standalone PWA mode, inputs need explicit readOnly toggle trick
+    if(isStandalone){
+      document.addEventListener('touchstart', function(e){
+        const el = e.target;
+        if((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.type !== 'date'){
+          el.removeAttribute('readonly');
+          el.focus();
+        }
+      }, {passive:true});
     }
-  }, {passive:true});
-});
+  }
+})();
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 let isPro = localStorage.getItem('kapital_pro') === 'true';
