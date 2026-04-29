@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Капітал">
@@ -25,8 +25,6 @@
 }
 html,body{height:100%;width:100%;overflow-x:hidden;background:var(--bg);}
 body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;}
-/* iOS PWA: allow text selection in inputs */
-input,textarea,select{-webkit-user-select:text!important;user-select:text!important;-webkit-tap-highlight-color:rgba(78,203,141,0.2);}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
 
@@ -108,13 +106,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* INPUTS */
 .field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
 .field-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;}
-.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s;}
-.field-input:focus{border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d20;}
+.field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;transition:border-color .15s;}
+.field-input:focus{border-color:var(--border2);}
 .field-input::placeholder{color:var(--muted);}
-/* iOS keyboard fix */
-input[type="number"].field-input{-webkit-appearance:none;appearance:none;}
-input.field-input,textarea.field-input{-webkit-user-select:text!important;user-select:text!important;}
-input.field-input:focus,select.field-input:focus{-webkit-user-select:text!important;user-select:text!important;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
@@ -247,72 +241,6 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .sec-table .td-name{color:var(--green2);font-weight:500;}
 .sec-table .td-div{color:var(--orange2);}
 
-/* LIVE PRICE BADGE */
-.live-price-badge{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:#4ecb8d18;color:var(--green2);margin-left:4px;vertical-align:middle;}
-.live-price-badge.loading{background:#5b9cf618;color:var(--blue2);}
-.live-price-badge.error{background:#f8717118;color:var(--red);}
-.live-price-dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
-.price-up{color:var(--green2)!important;}
-.price-down{color:var(--red)!important;}
-.price-neutral{color:var(--muted2)!important;}
-.pnl-positive{color:var(--green2);font-weight:500;}
-.pnl-negative{color:var(--red);font-weight:500;}
-
-/* TICKER SEARCH */
-.ticker-search-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
-.ticker-search-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);outline:none;text-transform:uppercase;}
-.ticker-search-input:focus{border-color:var(--green);}
-.ticker-search-input::placeholder{text-transform:none;color:var(--muted);}
-.ticker-fetch-btn{background:#4ecb8d20;border:1px solid #4ecb8d40;border-radius:10px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;white-space:nowrap;transition:all .15s;}
-.ticker-fetch-btn:active{background:#4ecb8d35;}
-.ticker-fetch-btn.loading{color:var(--blue2);background:#5b9cf618;border-color:#5b9cf640;pointer-events:none;}
-.stock-price-info{background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none;}
-.stock-price-info.visible{display:block;}
-.stock-price-info .spi-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;}
-.stock-price-info .spi-price{font-family:'DM Mono',monospace;font-size:18px;color:var(--green2);font-weight:500;}
-.stock-price-info .spi-change{font-family:'DM Mono',monospace;font-size:11px;margin-left:8px;}
-.stock-price-info .spi-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:4px;}
-.stock-price-info .spi-div{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange2);margin-top:2px;}
-.auto-refresh-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border);margin-top:8px;}
-.auto-refresh-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
-.refresh-status{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);}
-.refresh-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);cursor:pointer;transition:all .15s;}
-.refresh-btn:active{color:var(--green2);border-color:var(--green);}
-.sec-table .td-live-price{color:var(--text);min-width:70px;}
-.sec-table .td-pnl{min-width:60px;font-size:10px;}
-.sec-summary-divs{background:linear-gradient(135deg,#fb923c08,transparent);border:1px solid #fb923c20;border-radius:10px;padding:10px 12px;margin-top:8px;}
-.sec-summary-divs .sd-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--orange2);text-transform:uppercase;margin-bottom:6px;}
-.sec-summary-divs .sd-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
-.sec-summary-divs .sd-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
-.sec-summary-divs .sd-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--orange2);font-weight:500;}
-
-
-/* FREEMIUM */
-.pro-badge{display:inline-flex;align-items:center;gap:3px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 7px;border-radius:20px;background:linear-gradient(135deg,#e8c97a22,#f5dfa022);border:1px solid #e8c97a40;color:var(--gold2);text-transform:uppercase;vertical-align:middle;margin-left:5px;}
-.paywall-overlay{position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
-.paywall-overlay.open{opacity:1;pointer-events:all;}
-.paywall-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:28px 24px 48px;width:100%;transform:translateY(100%);transition:transform .35s cubic-bezier(0.4,0,0.2,1);}
-.paywall-overlay.open .paywall-box{transform:translateY(0);}
-.paywall-crown{font-size:48px;text-align:center;margin-bottom:12px;}
-.paywall-title{font-size:22px;font-weight:800;text-align:center;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
-.paywall-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);text-align:center;margin-bottom:24px;}
-.paywall-features{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
-.paywall-feature{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:12px;border:1px solid var(--border);}
-.paywall-feature-icon{font-size:20px;flex-shrink:0;}
-.paywall-feature-text{font-size:13px;font-weight:600;}
-.paywall-feature-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
-.paywall-price{text-align:center;font-family:'DM Mono',monospace;font-size:13px;color:var(--muted2);margin-bottom:16px;}
-.paywall-price strong{font-size:28px;font-weight:900;color:var(--gold);font-family:'Inter',sans-serif;}
-.paywall-btn{width:100%;background:linear-gradient(135deg,var(--gold),#c9a84c);border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;margin-bottom:10px;}
-.paywall-restore{width:100%;background:transparent;border:1px solid var(--border2);border-radius:14px;padding:12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);cursor:pointer;}
-.paywall-close{width:100%;background:transparent;border:none;padding:10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;}
-.free-limit-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 0;margin-bottom:8px;}
-.free-limit-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
-.free-limit-dots{display:flex;gap:4px;}
-.free-limit-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);}
-.free-limit-dot.used{background:var(--green);}
-.free-limit-dot.locked{background:var(--gold);opacity:0.5;}
-
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
@@ -333,7 +261,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-currency">₴</div>
   </div>
-  <div class="total-subs" style="align-items:center;">
+  <div class="total-subs">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
     <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
   </div>
@@ -402,16 +330,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="totalUsdtInv">Загальна сума вкладень в USDT</div>
-        <input class="field-input" type="text" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="number" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
           <div class="field-label" data-i18n="rateUsdtUah">Курс USDT / ₴</div>
-          <input class="field-input" type="text" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+          <input class="field-input" type="number" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="costPrice">Собівартість (₴)</div>
-          <input class="field-input" type="text" id="cryptoCost" placeholder="0" inputmode="decimal" oninput="updateAll()">
+          <input class="field-input" type="number" id="cryptoCost" placeholder="0" inputmode="decimal" oninput="updateAll()">
         </div>
       </div>
       <div class="result-box">
@@ -430,17 +358,17 @@ select.field-input option{background:var(--bg3);color:var(--text);}
           </div>
           <div class="field-group">
             <div class="field-label" data-i18n="coinQty">Кількість</div>
-            <input class="field-input" type="text" id="newCoinQty" placeholder="0.5" inputmode="decimal">
+            <input class="field-input" type="number" id="newCoinQty" placeholder="0.5" inputmode="decimal">
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
             <div class="field-label" data-i18n="coinBuyPrice">Ціна купівлі (USDT)</div>
-            <input class="field-input" type="text" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
+            <input class="field-input" type="number" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
           </div>
           <div class="field-group">
             <div class="field-label" data-i18n="coinCurPrice">Поточна ціна (USDT)</div>
-            <input class="field-input" type="text" id="newCoinCurPrice" placeholder="65000" inputmode="decimal">
+            <input class="field-input" type="number" id="newCoinCurPrice" placeholder="65000" inputmode="decimal">
           </div>
         </div>
         <button class="add-btn" onclick="addCoin()" data-i18n="addCoinBtn">+ Додати монету</button>
@@ -467,12 +395,12 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="usdAmount">Сума в доларах ($)</div>
-        <input class="field-input" type="text" id="usdAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="number" id="usdAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
           <div class="field-label" data-i18n="rateUsdUah">Курс USD / ₴</div>
-          <input class="field-input" type="text" id="usdUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+          <input class="field-input" type="number" id="usdUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="note">Нотатка</div>
@@ -520,11 +448,11 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="amount">Сума</div>
-          <input class="field-input" type="text" id="newForexAmt" placeholder="0" inputmode="decimal">
+          <input class="field-input" type="number" id="newForexAmt" placeholder="0" inputmode="decimal">
         </div>
         <div class="field-group">
           <div class="field-label" data-i18n="rateUah">Курс / ₴</div>
-          <input class="field-input" type="text" id="newForexRate" placeholder="43" inputmode="decimal">
+          <input class="field-input" type="number" id="newForexRate" placeholder="43" inputmode="decimal">
         </div>
       </div>
       <button class="add-btn" onclick="addForex()" data-i18n="addCurrency">+ Додати валюту</button>
@@ -553,7 +481,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="amountUah">Сума (₴)</div>
-        <input class="field-input" type="text" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="number" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="field-group">
         <div class="field-label" data-i18n="whereStored">Де зберігається</div>
@@ -581,7 +509,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="balanceUah">Баланс (₴)</div>
-        <input class="field-input" type="text" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <input class="field-input" type="number" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
       </div>
       <div class="row2">
         <div class="field-group">
@@ -634,67 +562,10 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
 </div>
 
-
-<!-- PAYWALL -->
-<div class="paywall-overlay" id="paywallOverlay" onclick="closePaywallIfOutside(event)">
-  <div class="paywall-box">
-    <div class="paywall-crown">👑</div>
-    <div class="paywall-title">Капітал PRO</div>
-    <div class="paywall-sub">Розблокуйте всі можливості</div>
-    <div class="paywall-features">
-      <div class="paywall-feature">
-        <div class="paywall-feature-icon">📈</div>
-        <div><div class="paywall-feature-text">Живі ціни акцій</div><div class="paywall-feature-sub">Необмежено · 1-а акція безкоштовно як демо</div></div>
-      </div>
-      <div class="paywall-feature">
-        <div class="paywall-feature-icon">🏦</div>
-        <div><div class="paywall-feature-text">До 3 депозитів</div><div class="paywall-feature-sub">Відстежуйте всі вклади</div></div>
-      </div>
-      <div class="paywall-feature">
-        <div class="paywall-feature-icon">📊</div>
-        <div><div class="paywall-feature-text">Необмежені розділи</div><div class="paywall-feature-sub">Власні категорії активів</div></div>
-      </div>
-      <div class="paywall-feature">
-        <div class="paywall-feature-icon">📄</div>
-        <div><div class="paywall-feature-text">Експорт PDF</div><div class="paywall-feature-sub">Звіт по всіх активах</div></div>
-      </div>
-    </div>
-    <div class="paywall-price"><strong>$2.99</strong> / місяць</div>
-    <button class="paywall-btn" onclick="activatePro()">✨ Підключити PRO</button>
-    <button class="paywall-restore" onclick="restorePurchase()">Відновити покупку</button>
-    <button class="paywall-close" onclick="closePaywall()">Не зараз</button>
-  </div>
-</div>
-
 <div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 </div>
 
 <script>
-// iOS PWA keyboard fix — minimal reliable version
-(function(){
-  if(!/iPad|iPhone|iPod/.test(navigator.userAgent)) return;
-  // Only needed in standalone (home screen) mode
-  if(!window.navigator.standalone) return;
-  // For each input: on click, blur then focus to force keyboard
-  document.addEventListener('click', function(e){
-    const el = e.target;
-    if((el.tagName==='INPUT' || el.tagName==='TEXTAREA') && el.type!=='date'){
-      el.blur();
-      setTimeout(function(){ el.focus(); }, 10);
-    }
-  }, true);
-})();
-
-// ── FREEMIUM STATE (declared first so all functions can access) ──
-let isPro = localStorage.getItem('kapital_pro') === 'true';
-const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1 };
-function openPaywall(reason){
-  const sub=document.querySelector('.paywall-sub');
-  if(sub&&reason)sub.textContent=reason;
-  const el=document.getElementById('paywallOverlay');
-  if(el)el.classList.add('open');
-}
-
 // ── I18N ─────────────────────────────────────
 const LANGS={
   uk:{
@@ -868,7 +739,7 @@ function getDepositHtml(dep,idx){
         <div style="padding-top:14px;">
         <div class="field-group">
           <div class="field-label">${lang.depPrincipalLbl}</div>
-          <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
+          <input class="field-input" type="number" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
             oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
         </div>
         <div class="row2">
@@ -887,13 +758,13 @@ function getDepositHtml(dep,idx){
           <div class="calc-title">${lang.compCalc}</div>
           <div class="field-group">
             <div class="field-label">${lang.annualRate}</div>
-            <input class="field-input" type="text" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
+            <input class="field-input" type="number" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
               oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
           </div>
           <div class="row2">
             <div class="field-group">
               <div class="field-label">${lang.termMon}</div>
-              <input class="field-input" type="text" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
+              <input class="field-input" type="number" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
                 oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}')">
             </div>
             <div class="field-group">
@@ -910,12 +781,12 @@ function getDepositHtml(dep,idx){
           <div class="row2">
             <div class="field-group">
               <div class="field-label">${lang.taxPct}</div>
-              <input class="field-input" type="text" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
+              <input class="field-input" type="number" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
                 oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
             </div>
             <div class="field-group">
               <div class="field-label">${lang.taxFree}</div>
-              <input class="field-input" type="text" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
+              <input class="field-input" type="number" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
                 oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
             </div>
           </div>
@@ -954,18 +825,11 @@ function slideDeposit(dir){goToSlide(currentDepSlide+dir);}
 function updateSlidePosition(){
   $('depositsTrack').style.transform=`translateX(-${currentDepSlide*100}%)`;
 }
-function _addDepositSlideCore(){
+function addDepositSlide(){
   if(deposits.length>=3){alert(t('maxDep'));return;}
   const id='dep'+Date.now();
   deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''});
   renderDeposits(); goToSlide(deposits.length-1); saveData();
-}
-function addDepositSlide(){
-  if(!isPro && deposits.length >= FREE_LIMITS.deposits){
-    openPaywall('Більше 1 депозиту — тільки в PRO');
-    return;
-  }
-  _addDepositSlideCore();
 }
 function removeDeposit(idx){
   if(!confirm(t('deleteDep')))return;
@@ -1109,10 +973,6 @@ function deleteBuiltinCard(name){
 const EMOJIS=['💰','📈','🏠','🚗','💎','🎯','🏆','💡','🔑','🌟','💼','📊','🏗','⚡','🌱','🛡','🎪','💫','🏅','🎁'];
 let selectedEmoji='💰';
 function openAddSection(){
-  if(!isPro && customSections.length >= FREE_LIMITS.customSections){
-    openPaywall('Більше 1 власного розділу — тільки в PRO');
-    return;
-  }
   selectedEmoji='💰'; $('modalName').value='';
   renderEmojiGrid(); $('modalOverlay').classList.add('open');
   setTimeout(()=>$('modalName').focus(),300);
@@ -1161,7 +1021,7 @@ function getCustomCardHtml(s,idx){
       <div class="divider"></div>
       <div class="field-group">
         <div class="field-label">${lang.amountUah}</div>
-        <input class="field-input" type="text" id="customPrincipal_${s.id}" placeholder="100 000" inputmode="decimal" value="${s.principal}"
+        <input class="field-input" type="number" id="customPrincipal_${s.id}" placeholder="100 000" inputmode="decimal" value="${s.principal}"
           oninput="customSections[${idx}].principal=this.value;updateAll()">
       </div>
       <div class="row2">
@@ -1180,13 +1040,13 @@ function getCustomCardHtml(s,idx){
         <div class="calc-title">${lang.yield}</div>
         <div class="field-group">
           <div class="field-label">${lang.annualRate}</div>
-          <input class="field-input" type="text" id="customRate_${s.id}" placeholder="16" value="${s.rate}" inputmode="decimal"
+          <input class="field-input" type="number" id="customRate_${s.id}" placeholder="16" value="${s.rate}" inputmode="decimal"
             oninput="customSections[${idx}].rate=this.value;calcCustomSection('${s.id}')">
         </div>
         <div class="row2">
           <div class="field-group">
             <div class="field-label">${lang.termMon}</div>
-            <input class="field-input" type="text" id="customMonths_${s.id}" placeholder="12" value="${s.months}" inputmode="numeric"
+            <input class="field-input" type="number" id="customMonths_${s.id}" placeholder="12" value="${s.months}" inputmode="numeric"
               oninput="customSections[${idx}].months=this.value;calcCustomSection('${s.id}')">
           </div>
           <div class="field-group">
@@ -1203,12 +1063,12 @@ function getCustomCardHtml(s,idx){
         <div class="row2">
           <div class="field-group">
             <div class="field-label">${lang.taxPct}</div>
-            <input class="field-input" type="text" id="customTax_${s.id}" placeholder="0" value="${s.tax}" inputmode="decimal"
+            <input class="field-input" type="number" id="customTax_${s.id}" placeholder="0" value="${s.tax}" inputmode="decimal"
               oninput="customSections[${idx}].tax=this.value;calcCustomSection('${s.id}')">
           </div>
           <div class="field-group">
             <div class="field-label">${lang.taxFree}</div>
-            <input class="field-input" type="text" id="customTaxFree_${s.id}" placeholder="0" value="${s.taxFree}" inputmode="decimal"
+            <input class="field-input" type="number" id="customTaxFree_${s.id}" placeholder="0" value="${s.taxFree}" inputmode="decimal"
               oninput="customSections[${idx}].taxFree=this.value;calcCustomSection('${s.id}')">
           </div>
         </div>
@@ -1252,222 +1112,12 @@ function getCustomTotal(){
   return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
 }
 
-// ── LIVE STOCK PRICES ────────────────────────────────────────
-let stockPriceCache={};
-let usdUahRate=41;
-let stockLastError='';
-
-// ── CONFIG ────────────────────────────────────────────────────
-// Ваш Cloudflare Worker URL (після деплою stock-worker.js)
-// Залиште '' щоб використовувати вбудований Claude API (тільки Claude.ai)
-let WORKER_URL = localStorage.getItem('worker_url') || 'https://plain-bread-df6d.mnacik1988.workers.dev';
-
-// ── Source 1: Власний Cloudflare Worker (працює скрізь) ───────
-async function workerGetStock(tickers){
-  if(!WORKER_URL) throw new Error('Worker URL not configured');
-  const url = WORKER_URL.replace(/\/$/,'') + '/multi?tickers=' + tickers.map(encodeURIComponent).join(',');
-  const r = await fetch(url);
-  if(!r.ok) throw new Error('Worker HTTP ' + r.status);
-  const d = await r.json();
-  if(d.error) throw new Error('Worker: ' + d.error);
-  return d; // { usdUah, stocks: { AAPL: {...} } }
-}
-
-// ── Source 2: Anthropic Claude API (працює в Claude.ai) ───────
-async function claudeGetStockData(tickers){
-  const tickerList=tickers.map(t=>t.toUpperCase()).join(', ');
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1500,
-      system:'You are a financial data API. Respond with raw JSON only — no markdown, no backticks, no text outside JSON.',
-      tools:[{type:'web_search_20250305',name:'web_search'}],
-      messages:[{role:'user',content:
-        'Search current stock prices for: '+tickerList+'. Also find current USD to UAH rate. '+
-        'Return ONLY JSON: {"usdUah":44.0,"stocks":{"AAPL":{"price":213.5,"change":1.2,"changePct":0.57,"divYield":0.52,"divAbs":1.0,"name":"Apple Inc","currency":"USD"}}}'
-      }]
-    })
-  });
-  if(!resp.ok){
-    const t=await resp.text();
-    if(resp.status===429) throw new Error('Забагато запитів — зачекайте 30 сек і спробуйте ще раз');
-    throw new Error('Claude API '+resp.status+': '+t.slice(0,80));
-  }
-  const data=await resp.json();
-  const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-  let jsonStr=null;
-  const fenced=text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  if(fenced)jsonStr=fenced[1];
-  else{let d=0,s=-1,e=-1;for(let i=0;i<text.length;i++){if(text[i]==='{'){if(!d)s=i;d++;}else if(text[i]==='}'){d--;if(!d){e=i;break;}}}if(s>=0&&e>s)jsonStr=text.slice(s,e+1);}
-  if(!jsonStr)throw new Error('No JSON: '+text.slice(0,120));
-  const parsed=JSON.parse(jsonStr);
-  if(parsed.stocks){const n={};Object.entries(parsed.stocks).forEach(([k,v])=>n[k.toUpperCase()]=v);parsed.stocks=n;}
-  return parsed;
-}
-
-async function fetchUsdUahRate(){}
-
-async function fetchStockPrice(ticker){
-  ticker=ticker.toUpperCase().trim();
-  if(!ticker)return null;
-  const cached=stockPriceCache[ticker];
-  if(cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
-  let errors=[];
-  let result=null;
-
-  // 1. Worker (працює скрізь — GitHub Pages, App Store WebView, локально)
-  try{
-    result=await workerGetStock([ticker]);
-  }catch(e1){errors.push('Worker: '+e1.message);}
-
-  // 2. Claude API (fallback для Claude.ai без Worker)
-  if(!result){
-    try{result=await claudeGetStockData([ticker]);}
-    catch(e2){errors.push('Claude: '+e2.message);}
-  }
-
-  if(!result){
-    stockLastError=errors.join(' | ');
-    if(!WORKER_URL) stockLastError+=' | 💡 Налаштуйте Cloudflare Worker для роботи поза Claude.ai';
-    return null;
-  }
-  if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
-  const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
-  if(!s||!s.price){
-    stockLastError='Дані отримано але ціна відсутня';
-    return null;
-  }
-  const entry={...s,updated:Date.now()};
-  stockPriceCache[ticker]=entry;
-  stockLastError='';
-  return entry;
-}
-
-async function fetchMultipleStocks(tickers){
-  if(!tickers.length)return{};
-  // Try Worker for all at once (efficient)
-  if(WORKER_URL){
-    try{
-      const result=await workerGetStock(tickers);
-      if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
-      const now=Date.now();
-      Object.entries(result.stocks||{}).forEach(([t,s])=>{stockPriceCache[t]={...s,updated:now};});
-      return result.stocks||{};
-    }catch(e){}
-  }
-  // Fallback: fetch one by one
-  const results={};
-  await Promise.all(tickers.map(async t=>{
-    const d=await fetchStockPrice(t);
-    if(d)results[t]=d;
-  }));
-  return results;
-}
-
-function saveWorkerUrl(secId){
-  const input=document.getElementById('workerUrlInput_'+secId);
-  const url=(input?.value||'').trim().replace(/\/$/,'');
-  WORKER_URL=url;
-  localStorage.setItem('worker_url',url);
-  const status=document.getElementById('workerUrlStatus_'+secId);
-  if(status)status.textContent=url?'✓ Worker URL збережено. Спробуйте отримати ціну.':' URL очищено.';
-  document.querySelectorAll('[id^="workerUrlInput_"]').forEach(el=>el.value=url);
-}
-
-async function fetchTickerForInput(secId){
-  const tickerInput=$('secName_'+secId);
-  const ticker=(tickerInput?.value||'').trim().toUpperCase();
-  if(!ticker)return;
-  const btn=$('fetchBtn_'+secId);
-  const info=$('stockInfo_'+secId);
-  if(btn){btn.className='ticker-fetch-btn loading';btn.textContent='⏳ Запит...';}
-  if(info){info.className='stock-price-info visible';info.innerHTML=`<div class="spi-meta" style="color:var(--blue2)">⏳ Запит до Claude... (~10 сек)</div>`;}
-  stockLastError='';
-  let data=null;
-  try{ data=await fetchStockPrice(ticker); }catch(e){stockLastError=e.message;}
-  if(btn){btn.className='ticker-fetch-btn';btn.textContent='🔍 Отримати ціну';}
-  if(!data){
-    const errMsg=stockLastError||'Обидва джерела недоступні';
-    if(info){info.className='stock-price-info visible';info.innerHTML=
-      `<div class="spi-name" style="color:var(--red)">⚠ Не вдалося отримати дані для "${ticker}"</div>`+
-      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${errMsg}</div>`+
-      `<div style="display:flex;gap:8px;margin-top:8px;">
-        <button onclick="fetchTickerForInput('${secId}')" style="flex:1;background:#4ecb8d20;border:1px solid #4ecb8d40;border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;">↺ Спробувати ще раз</button>
-        <button onclick="document.getElementById('stockInfo_${secId}').className='stock-price-info'" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);cursor:pointer;">Ввести вручну</button>
-      </div>`;}
-    return;
-  }
-  const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
-  const divYieldAbs=(data.divAbs||0)*(data.currency==='USD'?usdUahRate:1);
-  const priceField=$('secPrice_'+secId);
-  if(priceField)priceField.value=priceUah.toFixed(2);
-  const divField=$('secDiv_'+secId);
-  if(divField&&data.divYield>0)divField.value=data.divYield.toFixed(2);
-  if(info){
-    const changeClass=(data.change||0)>=0?'price-up':'price-down';
-    const changeSign=(data.change||0)>=0?'+':'';
-    const ch=data.change||0, chp=data.changePct||0;
-    info.className='stock-price-info visible';
-    info.innerHTML=`
-      <div class="spi-name">${data.name} <span style="color:var(--muted);font-size:10px">${ticker} · ${data.currency}</span></div>
-      <div>
-        <span class="spi-price">${data.currency==='USD'?'$'+data.price.toFixed(2):fmtN(Math.round(priceUah))+' ₴'}</span>
-        ${data.currency==='USD'?`<span style="color:var(--muted);font-size:10px"> ≈ ${fmtN(Math.round(priceUah))} ₴</span>`:''}
-        <span class="spi-change ${changeClass}">${changeSign}${ch.toFixed(2)} (${changeSign}${chp.toFixed(2)}%)</span>
-      </div>
-      <div class="spi-meta">Курс USD/₴: ${usdUahRate.toFixed(2)} · Оновлено: ${new Date().toLocaleTimeString('uk-UA')}</div>
-      ${data.divYield>0?`<div class="spi-div">💰 Дивіденди: ${data.divYield.toFixed(2)}% річних · ≈${fmtD(divYieldAbs,2)} ₴/акція/рік</div>`:'<div class="spi-div" style="color:var(--muted)">— Дивіденди не виплачуються</div>'}
-    `;
-  }
-}
-
-async function refreshAllStockPrices(secId){
-  const sec=securitiesSections.find(s=>s.id===secId);
-  if(!sec||!sec.items.length)return;
-  const btn=$('refreshAllBtn_'+secId);
-  const status=$('refreshStatus_'+secId);
-  if(btn)btn.textContent='⏳ ...';
-  if(status)status.textContent='Запит до Claude...';
-  const tickers=[...new Set(sec.items.filter(it=>it.ticker).map(it=>it.ticker))];
-  if(!tickers.length){if(btn)btn.textContent='⟳ Оновити';return;}
-  const stocks=await fetchMultipleStocks(tickers);
-  let updated=0;
-  for(let it of sec.items){
-    if(!it.ticker)continue;
-    const data=stocks[it.ticker]||stockPriceCache[it.ticker];
-    if(data){
-      const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
-      it.price=priceUah;it.livePrice=priceUah;
-      it.divYield=data.divYield>0?data.divYield:it.divYield||0;
-      it.liveName=data.name;it.liveChange=data.changePct;
-      it.liveCurrency=data.currency;it.liveOrigPrice=data.price;
-      it.divAbs=data.divAbs||0;
-      updated++;
-    }
-  }
-  sec.lastRefresh=new Date().toLocaleTimeString('uk-UA');
-  renderSecuritiesCards();updateAll();saveData();
-  if(btn)btn.textContent='⟳ Оновити';
-  const st=$('refreshStatus_'+secId);
-  if(st)st.textContent=updated?`Оновл. ${sec.lastRefresh}`:'Помилка оновлення';
-}
-
-let autoRefreshInterval=null;
-function startAutoRefresh(){
-  if(autoRefreshInterval)clearInterval(autoRefreshInterval);
-  autoRefreshInterval=setInterval(()=>{
-    securitiesSections.forEach(s=>{if(s.items.some(it=>it.ticker))refreshAllStockPrices(s.id);});
-  },5*60*1000);
-}
-
 // ── SECURITIES (Stocks / Bonds / OVDP) ───────
 function addSecuritiesCard(type){
   const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
   const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
   const id='sec_'+type+'_'+Date.now();
-  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[],lastRefresh:null});
+  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[]});
   renderSecuritiesCards();
   saveData(); updateAll();
 }
@@ -1484,55 +1134,25 @@ function getSecCardHtml(s,idx){
   const lang=LANGS[currentLang];
   const total=s.items.reduce((sum,it)=>sum+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0);
   const totalDiv=s.items.reduce((sum,it)=>{
-    const v=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
-    return sum+v*(parseFloat(it.divYield)||parseFloat(it.div)||0)/100;
+    const val=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
+    return sum+val*(parseFloat(it.div)||0)/100;
   },0);
-  const totalDivAbs=s.items.reduce((sum,it)=>{
-    return sum+(parseFloat(it.qty)||0)*(parseFloat(it.divAbs)||0)*(parseFloat(it.liveCurrency)==='USD'?usdUahRate:1);
-  },0);
-  const hasTickers=s.items.some(it=>it.ticker);
   const themeClass='card-'+s.type;
-
   const rows=s.items.length>0?(
-    '<div style="overflow-x:auto"><table class="sec-table"><tr>'+
-    '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th>'+
-    '<th>Ціна</th><th>Дивіденди</th><th>'+lang.secTotal+'</th><th>P&L</th><th></th></tr>'+
-    s.items.map((it,j)=>{
-      const qty=parseFloat(it.qty)||0;
-      const price=parseFloat(it.price)||0;
-      const buyPrice=parseFloat(it.buyPrice)||0;
-      const totVal=qty*price;
-      const divPct=parseFloat(it.divYield)||parseFloat(it.div)||0;
-      const pnl=buyPrice>0?totVal-qty*buyPrice:null;
-      const pnlClass=pnl===null?'':pnl>=0?'pnl-positive':'pnl-negative';
-      const changeClass=it.liveChange==null?'':(it.liveChange>=0?'price-up':'price-down');
-      const priceDisplay=it.ticker?
-        `<span class="${changeClass}">${fmtN(Math.round(price))}</span>${it.liveChange!=null?`<span style="font-size:9px;color:${it.liveChange>=0?'var(--green2)':'var(--red)'}">${it.liveChange>=0?'▲':'▼'}${Math.abs(it.liveChange).toFixed(1)}%</span>`:''}`
-        :fmtN(price);
-      return '<tr>'+
-        '<td class="td-name">'+(it.ticker?`<span style="font-family:\'DM Mono\',monospace;font-size:10px;background:#4ecb8d15;padding:1px 5px;border-radius:6px">${it.ticker}</span> `:'')+(it.liveName||it.name||'—')+'</td>'+
-        '<td>'+qty+'</td>'+
-        '<td class="td-live-price">'+priceDisplay+'</td>'+
-        '<td class="td-div">'+divPct.toFixed(1)+'%</td>'+
-        '<td>'+fmtN(Math.round(totVal))+'</td>'+
-        '<td class="td-pnl">'+(pnl!==null?`<span class="${pnlClass}">${pnl>=0?'+':''}${fmtN(Math.round(pnl))}</span>`:'—')+'</td>'+
-        '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+j+')">×</button></td></tr>';
-    }).join('')+
-    '</table></div>'+
-    '<div class="sec-summary-divs"><div class="sd-label">💰 Дивідендний дохід</div>'+
-    '<div class="sd-row"><span class="sd-key">Річний дохід (за ціною)</span><span class="sd-val">+'+fmtN(Math.round(totalDiv))+' ₴/рік</span></div>'+
-    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">Абс. дивіденд ($/акція)</span><span class="sd-val">+'+fmtN(Math.round(totalDivAbs))+' ₴/рік</span></div>':'')+
-    '<div class="sd-row"><span class="sd-key">В місяць</span><span class="sd-val">~'+fmtN(Math.round(totalDiv/12))+' ₴</span></div>'+
-    '</div>'+
+    '<table class="sec-table"><tr>'+
+    '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th><th>'+lang.secPrice+'</th><th>'+lang.secDiv+'</th><th>'+lang.secTotal+'</th><th></th></tr>'+
+    s.items.map((it,j)=>
+      '<tr><td class="td-name">'+(it.name||'—')+'</td><td>'+(it.qty||0)+'</td><td>'+fmtN(parseFloat(it.price)||0)+'</td>'+
+      '<td class="td-div">'+(it.div||0)+'%</td>'+
+      '<td>'+fmtN(Math.round((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)))+'</td>'+
+      '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+j+')">×</button></td></tr>'
+    ).join('')+
+    '</table>'+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(Math.round(total))+' ₴</span></div>'+
-    '</div>'+
-    (hasTickers?`<div class="auto-refresh-bar">
-      <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
-      <button class="refresh-btn" id="refreshAllBtn_${s.id}" onclick="refreshAllStockPrices('${s.id}')">⟳ Оновити</button>
-    </div>`:'')
+    '<div class="result-row"><span class="result-key">'+lang.secDiv+'</span><span class="result-val green">+'+fmtN(Math.round(totalDiv))+' ₴/рік</span></div>'+
+    '</div>'
   ):'';
-
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
@@ -1552,49 +1172,27 @@ function getSecCardHtml(s,idx){
       ${rows}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
-        <div class="ticker-search-row">
-          <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="Тікер: AAPL, MSFT...">
-          <button class="ticker-fetch-btn" id="fetchBtn_${s.id}" onclick="fetchTickerForInput('${s.id}')">🔍 Отримати ціну</button>
-        </div>
-        <div class="stock-price-info" id="stockInfo_${s.id}"></div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Кількість акцій</div>
-            <input class="field-input" type="text" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
+            <div class="field-label">${lang.secName}</div>
+            <input class="field-input" type="text" id="secName_${s.id}" placeholder="${lang.secNamePh}">
           </div>
           <div class="field-group">
-            <div class="field-label">Ціна купівлі (₴)</div>
-            <input class="field-input" type="text" id="secBuyPrice_${s.id}" placeholder="для P&L" inputmode="decimal">
+            <div class="field-label">${lang.secQty}</div>
+            <input class="field-input" type="number" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Поточна ціна (₴) <span style="color:var(--muted);font-size:9px">авто</span></div>
-            <input class="field-input" type="text" id="secPrice_${s.id}" placeholder="автоматично" inputmode="decimal">
+            <div class="field-label">${lang.secPrice}</div>
+            <input class="field-input" type="number" id="secPrice_${s.id}" placeholder="500" inputmode="decimal">
           </div>
           <div class="field-group">
-            <div class="field-label">Дивіденди (% річних) <span style="color:var(--muted);font-size:9px">авто</span></div>
-            <input class="field-input" type="text" id="secDiv_${s.id}" placeholder="авто" inputmode="decimal">
+            <div class="field-label">${lang.secDiv}</div>
+            <input class="field-input" type="number" id="secDiv_${s.id}" placeholder="5" inputmode="decimal">
           </div>
         </div>
         <button class="add-btn" onclick="addSecItem('${s.id}')">${lang.addSecItem}</button>
-      </div>
-      <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--blue2);text-transform:uppercase;margin-bottom:6px;">
-          ⚙️ Cloudflare Worker URL <span style="color:var(--muted);font-size:8px">(для GitHub Pages / App)</span>
-        </div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:8px;">
-          Розгорніть <span style="color:var(--green2)">stock-worker.js</span> на workers.cloudflare.com та вставте URL нижче
-        </div>
-        <div style="display:flex;gap:6px;">
-          <input type="text" id="workerUrlInput_${s.id}" placeholder="https://your-worker.workers.dev" 
-            style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);outline:none;"
-            value="${WORKER_URL||''}">
-          <button onclick="saveWorkerUrl('${s.id}')" style="background:#5b9cf620;border:1px solid #5b9cf640;border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;white-space:nowrap;">
-            💾 Зберегти
-          </button>
-        </div>
-        <div id="workerUrlStatus_${s.id}" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;"></div>
       </div>
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeSecCard('${s.id}')">${lang.removeSection}</button>
     </div></div>
@@ -1602,36 +1200,14 @@ function getSecCardHtml(s,idx){
 }
 
 function addSecItem(secId){
-  const _secFreemium = securitiesSections.find(s=>s.id===secId);
-  if(!isPro && _secFreemium && _secFreemium.items.length >= FREE_LIMITS.stockItems){
-    openPaywall('Більше 3 акцій — тільки в PRO');
-    return;
-  }
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
-  const ticker=($('secName_'+secId)?.value||'').trim().toUpperCase();
+  const name=($('secName_'+secId)?.value||'').trim();
   const qty=parseFloat($('secQty_'+secId)?.value)||0;
   const price=parseFloat($('secPrice_'+secId)?.value)||0;
-  const divYield=parseFloat($('secDiv_'+secId)?.value)||0;
-  const buyPrice=parseFloat($('secBuyPrice_'+secId)?.value)||0;
-  if(!ticker&&!qty&&!price)return;
-  // Try to use cached data for this ticker
-  const cached=ticker?stockPriceCache[ticker]:null;
-  const name=cached?.name||ticker;
-  securitiesSections[idx].items.push({
-    name, ticker, qty, price, divYield, buyPrice,
-    div:divYield, // backward compat
-    liveChange:cached?.changePct??null,
-    liveName:cached?.name||null,
-    liveCurrency:cached?.currency||null,
-    liveOrigPrice:cached?.price||null,
-    divAbs:cached?.divAbs||0,
-  });
+  const div=parseFloat($('secDiv_'+secId)?.value)||0;
+  if(!name&&!qty&&!price)return;
+  securitiesSections[idx].items.push({name,qty,price,div});
   renderSecuritiesCards(); updateAll(); saveData();
-  // Auto-refresh only for PRO or first ticker (free demo)
-  if(ticker){
-    const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(isPro || totalLive <= 1) refreshAllStockPrices(secId);
-  }
 }
 function removeSecItem(secId,itemIdx){
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
@@ -1970,90 +1546,6 @@ updateAll();
 restoreOrder();
 initDrag();
 applyTranslations();
-
-// Auto-refresh stock prices on startup if any tickers saved
-setTimeout(()=>{
-  securitiesSections.forEach(s=>{
-    if(s.items.some(it=>it.ticker))refreshAllStockPrices(s.id);
-  });
-},500);
-startAutoRefresh();
-// ── FREEMIUM ─────────────────────────────────────────────────
-// isPro, FREE_LIMITS and openPaywall declared at top of script
-function checkPro(){ return isPro; }
-function closePaywall(){ document.getElementById('paywallOverlay').classList.remove('open'); }
-function closePaywallIfOutside(e){ if(e.target===document.getElementById('paywallOverlay'))closePaywall(); }
-
-function activatePro(){
-  // In real app: trigger StoreKit / Google Play purchase flow
-  // For now: simulate activation
-  isPro = true;
-  localStorage.setItem('kapital_pro','true');
-  closePaywall();
-  updateProUI();
-  showProToast();
-}
-
-function restorePurchase(){
-  // In real app: restore purchases via StoreKit
-  alert('У реальному додатку тут буде відновлення покупки через App Store');
-}
-
-function showProToast(){
-  const t = document.createElement('div');
-  t.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),#c9a84c);color:#0a0a0f;padding:10px 20px;border-radius:20px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;z-index:600;';
-  t.textContent='👑 PRO активовано!';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 3000);
-}
-
-function updateProUI(){
-  // Show/hide PRO badge in header
-  const badge = document.getElementById('proBadge');
-  if(badge) badge.style.display = isPro ? 'inline-flex' : 'none';
-}
-
-// addDepositSlide freemium check is now built into the function directly
-
-// openAddSection freemium check is built into the function directly
-
-// addSecItem freemium check is built into the function directly
-
-// Override fetchTickerForInput — 1st stock FREE as demo, rest PRO
-const _origFetchTicker = fetchTickerForInput;
-fetchTickerForInput = async function(secId){
-  if(!isPro){
-    // Count already SAVED items with tickers (not counting current input)
-    const savedLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(savedLive >= 1){
-      // Check if this section already has a saved ticker (allow refresh of existing)
-      const sec = securitiesSections.find(s=>s.id===secId);
-      const thisAlreadySaved = sec && sec.items.some(it=>it.ticker);
-      if(!thisAlreadySaved){
-        openPaywall('Живі ціни для 2+ акцій — тільки в PRO. 1-а акція безкоштовно як демо ✨');
-        return;
-      }
-    }
-  }
-  await _origFetchTicker(secId);
-};
-
-// Override refreshAllStockPrices — allow only if PRO or only 1 ticker total
-const _origRefreshAll = refreshAllStockPrices;
-refreshAllStockPrices = async function(secId){
-  if(!isPro){
-    const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(totalLive > 1){
-      // Мовчки зупиняємо — paywall відкриється тільки при натисканні "Отримати ціну"
-      return;
-    }
-  }
-  await _origRefreshAll(secId);
-};
-
-// Update UI after load
-setTimeout(updateProUI, 100);
-
 </script>
 </body>
 </html>
