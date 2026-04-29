@@ -280,6 +280,33 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .sec-summary-divs .sd-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
 .sec-summary-divs .sd-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--orange2);font-weight:500;}
 
+
+/* FREEMIUM */
+.pro-badge{display:inline-flex;align-items:center;gap:3px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 7px;border-radius:20px;background:linear-gradient(135deg,#e8c97a22,#f5dfa022);border:1px solid #e8c97a40;color:var(--gold2);text-transform:uppercase;vertical-align:middle;margin-left:5px;}
+.paywall-overlay{position:fixed;inset:0;background:#000000cc;z-index:500;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
+.paywall-overlay.open{opacity:1;pointer-events:all;}
+.paywall-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:28px 24px 48px;width:100%;transform:translateY(100%);transition:transform .35s cubic-bezier(0.4,0,0.2,1);}
+.paywall-overlay.open .paywall-box{transform:translateY(0);}
+.paywall-crown{font-size:48px;text-align:center;margin-bottom:12px;}
+.paywall-title{font-size:22px;font-weight:800;text-align:center;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.paywall-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);text-align:center;margin-bottom:24px;}
+.paywall-features{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.paywall-feature{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:12px;border:1px solid var(--border);}
+.paywall-feature-icon{font-size:20px;flex-shrink:0;}
+.paywall-feature-text{font-size:13px;font-weight:600;}
+.paywall-feature-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.paywall-price{text-align:center;font-family:'DM Mono',monospace;font-size:13px;color:var(--muted2);margin-bottom:16px;}
+.paywall-price strong{font-size:28px;font-weight:900;color:var(--gold);font-family:'Inter',sans-serif;}
+.paywall-btn{width:100%;background:linear-gradient(135deg,var(--gold),#c9a84c);border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;margin-bottom:10px;}
+.paywall-restore{width:100%;background:transparent;border:1px solid var(--border2);border-radius:14px;padding:12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);cursor:pointer;}
+.paywall-close{width:100%;background:transparent;border:none;padding:10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;}
+.free-limit-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 0;margin-bottom:8px;}
+.free-limit-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.free-limit-dots{display:flex;gap:4px;}
+.free-limit-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);}
+.free-limit-dot.used{background:var(--green);}
+.free-limit-dot.locked{background:var(--gold);opacity:0.5;}
+
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
@@ -300,7 +327,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-currency">₴</div>
   </div>
-  <div class="total-subs">
+  <div class="total-subs" style="align-items:center;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
     <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
   </div>
@@ -601,6 +628,38 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
 </div>
 
+
+<!-- PAYWALL -->
+<div class="paywall-overlay" id="paywallOverlay" onclick="closePaywallIfOutside(event)">
+  <div class="paywall-box">
+    <div class="paywall-crown">👑</div>
+    <div class="paywall-title">Капітал PRO</div>
+    <div class="paywall-sub">Розблокуйте всі можливості</div>
+    <div class="paywall-features">
+      <div class="paywall-feature">
+        <div class="paywall-feature-icon">📈</div>
+        <div><div class="paywall-feature-text">Живі ціни акцій</div><div class="paywall-feature-sub">Необмежено · 1-а акція безкоштовно як демо</div></div>
+      </div>
+      <div class="paywall-feature">
+        <div class="paywall-feature-icon">🏦</div>
+        <div><div class="paywall-feature-text">До 3 депозитів</div><div class="paywall-feature-sub">Відстежуйте всі вклади</div></div>
+      </div>
+      <div class="paywall-feature">
+        <div class="paywall-feature-icon">📊</div>
+        <div><div class="paywall-feature-text">Необмежені розділи</div><div class="paywall-feature-sub">Власні категорії активів</div></div>
+      </div>
+      <div class="paywall-feature">
+        <div class="paywall-feature-icon">📄</div>
+        <div><div class="paywall-feature-text">Експорт PDF</div><div class="paywall-feature-sub">Звіт по всіх активах</div></div>
+      </div>
+    </div>
+    <div class="paywall-price"><strong>$2.99</strong> / місяць</div>
+    <button class="paywall-btn" onclick="activatePro()">✨ Підключити PRO</button>
+    <button class="paywall-restore" onclick="restorePurchase()">Відновити покупку</button>
+    <button class="paywall-close" onclick="closePaywall()">Не зараз</button>
+  </div>
+</div>
+
 <div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 </div>
 
@@ -864,11 +923,18 @@ function slideDeposit(dir){goToSlide(currentDepSlide+dir);}
 function updateSlidePosition(){
   $('depositsTrack').style.transform=`translateX(-${currentDepSlide*100}%)`;
 }
-function addDepositSlide(){
+function _addDepositSlideCore(){
   if(deposits.length>=3){alert(t('maxDep'));return;}
   const id='dep'+Date.now();
   deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''});
   renderDeposits(); goToSlide(deposits.length-1); saveData();
+}
+function addDepositSlide(){
+  if(typeof isPro !== 'undefined' && !isPro && deposits.length >= 1){
+    openPaywall('Більше 1 депозиту — тільки в PRO');
+    return;
+  }
+  _addDepositSlideCore();
 }
 function removeDeposit(idx){
   if(!confirm(t('deleteDep')))return;
@@ -1012,6 +1078,10 @@ function deleteBuiltinCard(name){
 const EMOJIS=['💰','📈','🏠','🚗','💎','🎯','🏆','💡','🔑','🌟','💼','📊','🏗','⚡','🌱','🛡','🎪','💫','🏅','🎁'];
 let selectedEmoji='💰';
 function openAddSection(){
+  if(typeof isPro !== 'undefined' && !isPro && customSections.length >= 1){
+    openPaywall('Більше 1 власного розділу — тільки в PRO');
+    return;
+  }
   selectedEmoji='💰'; $('modalName').value='';
   renderEmojiGrid(); $('modalOverlay').classList.add('open');
   setTimeout(()=>$('modalName').focus(),300);
@@ -1159,7 +1229,7 @@ let stockLastError='';
 // ── CONFIG ────────────────────────────────────────────────────
 // Ваш Cloudflare Worker URL (після деплою stock-worker.js)
 // Залиште '' щоб використовувати вбудований Claude API (тільки Claude.ai)
-let WORKER_URL = localStorage.getItem('worker_url') || '';
+let WORKER_URL = localStorage.getItem('worker_url') || 'https://plain-bread-df6d.mnacik1988.workers.dev';
 
 // ── Source 1: Власний Cloudflare Worker (працює скрізь) ───────
 async function workerGetStock(tickers){
@@ -1189,7 +1259,11 @@ async function claudeGetStockData(tickers){
       }]
     })
   });
-  if(!resp.ok){const t=await resp.text();throw new Error('Claude API '+resp.status+': '+t.slice(0,80));}
+  if(!resp.ok){
+    const t=await resp.text();
+    if(resp.status===429) throw new Error('Забагато запитів — зачекайте 30 сек і спробуйте ще раз');
+    throw new Error('Claude API '+resp.status+': '+t.slice(0,80));
+  }
   const data=await resp.json();
   const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
   let jsonStr=null;
@@ -1250,7 +1324,7 @@ async function fetchMultipleStocks(tickers){
       const now=Date.now();
       Object.entries(result.stocks||{}).forEach(([t,s])=>{stockPriceCache[t]={...s,updated:now};});
       return result.stocks||{};
-    }catch(e){console.warn('Worker multi error:',e.message);}
+    }catch(e){}
   }
   // Fallback: fetch one by one
   const results={};
@@ -1288,7 +1362,10 @@ async function fetchTickerForInput(secId){
     if(info){info.className='stock-price-info visible';info.innerHTML=
       `<div class="spi-name" style="color:var(--red)">⚠ Не вдалося отримати дані для "${ticker}"</div>`+
       `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${errMsg}</div>`+
-      `<div class="spi-meta" style="margin-top:6px;color:var(--muted)">Введіть ціну вручну або спробуйте ще раз</div>`;}
+      `<div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="fetchTickerForInput('${secId}')" style="flex:1;background:#4ecb8d20;border:1px solid #4ecb8d40;border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;">↺ Спробувати ще раз</button>
+        <button onclick="document.getElementById('stockInfo_${secId}').className='stock-price-info'" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);cursor:pointer;">Ввести вручну</button>
+      </div>`;}
     return;
   }
   const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
@@ -1494,6 +1571,11 @@ function getSecCardHtml(s,idx){
 }
 
 function addSecItem(secId){
+  const _secFreemium = securitiesSections.find(s=>s.id===secId);
+  if(typeof isPro !== 'undefined' && !isPro && _secFreemium && _secFreemium.items.length >= 3){
+    openPaywall('Більше 3 акцій — тільки в PRO');
+    return;
+  }
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
   const ticker=($('secName_'+secId)?.value||'').trim().toUpperCase();
   const qty=parseFloat($('secQty_'+secId)?.value)||0;
@@ -1862,6 +1944,97 @@ setTimeout(()=>{
   });
 },500);
 startAutoRefresh();
+// ── FREEMIUM ─────────────────────────────────────────────────
+// In production replace with real in-app purchase validation
+let isPro = localStorage.getItem('kapital_pro') === 'true';
+
+const FREE_LIMITS = {
+  deposits: 1,        // max 1 deposit
+  stockItems: 3,      // max 3 stock positions per section
+  customSections: 1,  // max 1 custom section
+  livePrice: false,   // no live prices
+};
+
+function checkPro(){ return isPro; }
+
+function openPaywall(reason){
+  const sub = document.querySelector('.paywall-sub');
+  if(sub && reason) sub.textContent = reason;
+  document.getElementById('paywallOverlay').classList.add('open');
+}
+function closePaywall(){ document.getElementById('paywallOverlay').classList.remove('open'); }
+function closePaywallIfOutside(e){ if(e.target===document.getElementById('paywallOverlay'))closePaywall(); }
+
+function activatePro(){
+  // In real app: trigger StoreKit / Google Play purchase flow
+  // For now: simulate activation
+  isPro = true;
+  localStorage.setItem('kapital_pro','true');
+  closePaywall();
+  updateProUI();
+  showProToast();
+}
+
+function restorePurchase(){
+  // In real app: restore purchases via StoreKit
+  alert('У реальному додатку тут буде відновлення покупки через App Store');
+}
+
+function showProToast(){
+  const t = document.createElement('div');
+  t.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),#c9a84c);color:#0a0a0f;padding:10px 20px;border-radius:20px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;z-index:600;';
+  t.textContent='👑 PRO активовано!';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+function updateProUI(){
+  // Show/hide PRO badge in header
+  const badge = document.getElementById('proBadge');
+  if(badge) badge.style.display = isPro ? 'inline-flex' : 'none';
+}
+
+// addDepositSlide freemium check is now built into the function directly
+
+// openAddSection freemium check is built into the function directly
+
+// addSecItem freemium check is built into the function directly
+
+// Override fetchTickerForInput — 1st stock FREE as demo, rest PRO
+const _origFetchTicker = fetchTickerForInput;
+fetchTickerForInput = async function(secId){
+  if(!isPro){
+    // Count total items with live prices across ALL sections
+    const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
+    // Also check current section's items that already have ticker
+    const sec = securitiesSections.find(s=>s.id===secId);
+    const thisHasTicker = sec && sec.items.some(it=>it.ticker);
+    // Allow if total live tickers < 1 (first one is free demo)
+    if(totalLive >= 1 && !thisHasTicker){
+      openPaywall('Живі ціни для 2+ акцій — тільки в PRO. 1-а акція безкоштовно як демо ✨');
+      return;
+    }
+    // If this section already has a live ticker, allow refresh of existing
+  }
+  await _origFetchTicker(secId);
+};
+
+// Override refreshAllStockPrices — allow only if PRO or only 1 ticker total
+const _origRefreshAll = refreshAllStockPrices;
+refreshAllStockPrices = async function(secId){
+  if(!isPro){
+    const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
+    if(totalLive > 1){
+      openPaywall('Автооновлення всіх акцій — тільки в PRO');
+      return;
+    }
+  }
+  await _origRefreshAll(secId);
+};
+
+// Update UI after load
+setTimeout(updateProUI, 100);
+
 </script>
 </body>
 </html>
