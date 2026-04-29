@@ -1151,18 +1151,28 @@ function getCustomTotal(){
   return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
 }
 
-// ── LIVE STOCK PRICES (dual-mode: Claude.ai + direct) ──────
+// ── LIVE STOCK PRICES ────────────────────────────────────────
 let stockPriceCache={};
 let usdUahRate=41;
 let stockLastError='';
 
-// Detect if we're running inside Claude.ai (Anthropic API available without key)
-const isClaudeEnv=(()=>{
-  try{return window.location.hostname.includes('claude.ai')||window.location.hostname.includes('anthropic.com');}
-  catch(e){return false;}
-})();
+// ── CONFIG ────────────────────────────────────────────────────
+// Ваш Cloudflare Worker URL (після деплою stock-worker.js)
+// Залиште '' щоб використовувати вбудований Claude API (тільки Claude.ai)
+let WORKER_URL = localStorage.getItem('worker_url') || '';
 
-// ── Source A: Anthropic API with web_search (works in Claude.ai) ──
+// ── Source 1: Власний Cloudflare Worker (працює скрізь) ───────
+async function workerGetStock(tickers){
+  if(!WORKER_URL) throw new Error('Worker URL not configured');
+  const url = WORKER_URL.replace(/\/$/,'') + '/multi?tickers=' + tickers.map(encodeURIComponent).join(',');
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('Worker HTTP ' + r.status);
+  const d = await r.json();
+  if(d.error) throw new Error('Worker: ' + d.error);
+  return d; // { usdUah, stocks: { AAPL: {...} } }
+}
+
+// ── Source 2: Anthropic Claude API (працює в Claude.ai) ───────
 async function claudeGetStockData(tickers){
   const tickerList=tickers.map(t=>t.toUpperCase()).join(', ');
   const resp=await fetch('https://api.anthropic.com/v1/messages',{
@@ -1179,7 +1189,7 @@ async function claudeGetStockData(tickers){
       }]
     })
   });
-  if(!resp.ok){const t=await resp.text();throw new Error('API '+resp.status+': '+t.slice(0,80));}
+  if(!resp.ok){const t=await resp.text();throw new Error('Claude API '+resp.status+': '+t.slice(0,80));}
   const data=await resp.json();
   const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
   let jsonStr=null;
@@ -1192,35 +1202,6 @@ async function claudeGetStockData(tickers){
   return parsed;
 }
 
-// ── Source B: Yahoo Finance direct (works on GitHub Pages, local) ──
-async function yahooGetStockData(ticker){
-  // Yahoo Finance v8 — works fine from non-Claude environments
-  const url='https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(ticker)+'?interval=1d&range=2d';
-  const r=await fetch(url);
-  if(!r.ok)throw new Error('Yahoo HTTP '+r.status);
-  const d=await r.json();
-  const meta=d?.chart?.result?.[0]?.meta;
-  if(!meta||!meta.regularMarketPrice)throw new Error('No Yahoo data');
-  const price=meta.regularMarketPrice;
-  const prev=meta.chartPreviousClose||meta.previousClose||price;
-  const change=price-prev, changePct=prev?(change/prev*100):0;
-  // Get dividends + name via quote endpoint
-  let divYield=0,divAbs=0,name=meta.symbol||ticker;
-  try{
-    const qr=await fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+encodeURIComponent(ticker));
-    const qd=await qr.json();
-    const q=qd?.quoteResponse?.result?.[0];
-    if(q){divYield=(q.trailingAnnualDividendYield||0)*100;divAbs=q.trailingAnnualDividendRate||0;name=q.longName||q.shortName||name;}
-  }catch(e2){}
-  // Get USD/UAH rate
-  try{
-    const rr=await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json');
-    const rd=await rr.json();
-    if(rd&&rd[0]&&rd[0].rate)usdUahRate=rd[0].rate;
-  }catch(e3){}
-  return{usdUah:usdUahRate,stocks:{[ticker]:{price,change,changePct,divYield,divAbs,name,currency:meta.currency||'USD'}}};
-}
-
 async function fetchUsdUahRate(){}
 
 async function fetchStockPrice(ticker){
@@ -1228,26 +1209,29 @@ async function fetchStockPrice(ticker){
   if(!ticker)return null;
   const cached=stockPriceCache[ticker];
   if(cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
-  let claudeErr='', yahooErr='';
-  // Try Claude API
+  let errors=[];
   let result=null;
+
+  // 1. Worker (працює скрізь — GitHub Pages, App Store WebView, локально)
   try{
-    result=await claudeGetStockData([ticker]);
-  }catch(e1){claudeErr=e1.message;}
-  // Fallback to Yahoo
+    result=await workerGetStock([ticker]);
+  }catch(e1){errors.push('Worker: '+e1.message);}
+
+  // 2. Claude API (fallback для Claude.ai без Worker)
   if(!result){
-    try{
-      result=await yahooGetStockData(ticker);
-    }catch(e2){yahooErr=e2.message;}
+    try{result=await claudeGetStockData([ticker]);}
+    catch(e2){errors.push('Claude: '+e2.message);}
   }
+
   if(!result){
-    stockLastError='Claude: '+(claudeErr||'—')+' | Yahoo: '+(yahooErr||'—');
+    stockLastError=errors.join(' | ');
+    if(!WORKER_URL) stockLastError+=' | 💡 Налаштуйте Cloudflare Worker для роботи поза Claude.ai';
     return null;
   }
   if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
   const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
   if(!s||!s.price){
-    stockLastError='Дані отримано але ціна відсутня: '+JSON.stringify(result).slice(0,100);
+    stockLastError='Дані отримано але ціна відсутня';
     return null;
   }
   const entry={...s,updated:Date.now()};
@@ -1258,13 +1242,33 @@ async function fetchStockPrice(ticker){
 
 async function fetchMultipleStocks(tickers){
   if(!tickers.length)return{};
+  // Try Worker for all at once (efficient)
+  if(WORKER_URL){
+    try{
+      const result=await workerGetStock(tickers);
+      if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
+      const now=Date.now();
+      Object.entries(result.stocks||{}).forEach(([t,s])=>{stockPriceCache[t]={...s,updated:now};});
+      return result.stocks||{};
+    }catch(e){console.warn('Worker multi error:',e.message);}
+  }
+  // Fallback: fetch one by one
   const results={};
-  // Fetch all in parallel
   await Promise.all(tickers.map(async t=>{
     const d=await fetchStockPrice(t);
     if(d)results[t]=d;
   }));
   return results;
+}
+
+function saveWorkerUrl(secId){
+  const input=document.getElementById('workerUrlInput_'+secId);
+  const url=(input?.value||'').trim().replace(/\/$/,'');
+  WORKER_URL=url;
+  localStorage.setItem('worker_url',url);
+  const status=document.getElementById('workerUrlStatus_'+secId);
+  if(status)status.textContent=url?'✓ Worker URL збережено. Спробуйте отримати ціну.':' URL очищено.';
+  document.querySelectorAll('[id^="workerUrlInput_"]').forEach(el=>el.value=url);
 }
 
 async function fetchTickerForInput(secId){
@@ -1466,6 +1470,23 @@ function getSecCardHtml(s,idx){
           </div>
         </div>
         <button class="add-btn" onclick="addSecItem('${s.id}')">${lang.addSecItem}</button>
+      </div>
+      <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--blue2);text-transform:uppercase;margin-bottom:6px;">
+          ⚙️ Cloudflare Worker URL <span style="color:var(--muted);font-size:8px">(для GitHub Pages / App)</span>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:8px;">
+          Розгорніть <span style="color:var(--green2)">stock-worker.js</span> на workers.cloudflare.com та вставте URL нижче
+        </div>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="workerUrlInput_${s.id}" placeholder="https://your-worker.workers.dev" 
+            style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);outline:none;"
+            value="${WORKER_URL||''}">
+          <button onclick="saveWorkerUrl('${s.id}')" style="background:#5b9cf620;border:1px solid #5b9cf640;border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;white-space:nowrap;">
+            💾 Зберегти
+          </button>
+        </div>
+        <div id="workerUrlStatus_${s.id}" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;"></div>
       </div>
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeSecCard('${s.id}')">${lang.removeSection}</button>
     </div></div>
