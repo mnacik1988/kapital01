@@ -311,6 +311,40 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .free-limit-dot.used{background:var(--green);}
 .free-limit-dot.locked{background:var(--gold);opacity:0.5;}
 
+
+/* ── CALCULATOR POPUP ── */
+.calc-fab{position:fixed;bottom:28px;right:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--green),#3ab87a);border:none;font-size:24px;cursor:pointer;z-index:400;box-shadow:0 4px 24px #4ecb8d50;display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+.calc-fab:active{transform:scale(0.9);}
+.calc-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
+.calc-overlay.open{display:flex;}
+.calc-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px 16px 44px;width:100%;max-height:88vh;overflow-y:auto;}
+.calc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.calc-head-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.calc-head-close{background:var(--bg3);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);display:flex;align-items:center;justify-content:center;}
+.calc-tabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px;}
+.calc-tab{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.calc-tab.active{background:var(--green);border-color:var(--green);color:#0a0a0f;font-weight:700;}
+.calc-panel{display:none;}
+.calc-panel.active{display:block;}
+.calc-field-row{display:flex;gap:10px;margin-bottom:10px;}
+.calc-field{flex:1;min-width:0;}
+.calc-field label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px;}
+.calc-field input,.calc-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'DM Mono',monospace;font-size:14px;color:var(--text);outline:none;box-sizing:border-box;}
+.calc-field input:focus,.calc-field select:focus{border-color:var(--green);}
+.calc-res{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-top:14px;}
+.calc-res-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.calc-res-row:last-child{border-bottom:none;}
+.calc-res-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.calc-res-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;}
+/* Simple calc buttons */
+.simple-calc-display{background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:16px;font-family:'DM Mono',monospace;font-size:28px;color:var(--text);text-align:right;margin-bottom:12px;min-height:60px;word-break:break-all;}
+.simple-calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.sc-btn{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 8px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);cursor:pointer;text-align:center;transition:all .1s;border:none;}
+.sc-btn:active{transform:scale(0.93);}
+.sc-btn.op{background:#4ecb8d20;color:var(--green2);font-size:18px;}
+.sc-btn.eq{background:var(--green);color:#0a0a0f;font-weight:700;font-size:18px;}
+.sc-btn.cl{background:#f8717120;color:var(--red);}
+
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
@@ -607,7 +641,14 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
   <div class="section-type-row">
     <button class="section-type-btn" onclick="addSecuritiesCard('ovdp')">🏛 <span data-i18n="ovdpBtn">ОВДП</span></button>
-    <button class="add-section-btn" onclick="openAddSection()" style="margin-bottom:0;border:1px solid var(--border2);">
+    <button class="section-type-btn" onclick="addSimpleCard('gold')">🥇 <span data-i18n="goldBtn">Золото</span></button>
+  </div>
+  <div class="section-type-row">
+    <button class="section-type-btn" onclick="addSimpleCard('silver')">🥈 <span data-i18n="silverBtn">Срібло</span></button>
+    <button class="section-type-btn" onclick="addSimpleCard('business')">💼 <span data-i18n="businessBtn">Бізнес</span></button>
+  </div>
+  <div class="section-type-row">
+    <button class="add-section-btn" onclick="openAddSection()" style="margin-bottom:0;border:1px solid var(--border2);grid-column:span 2;">
       <span class="plus">+</span>
       <span data-i18n="addCustom">Власний розділ</span>
     </button>
@@ -664,6 +705,94 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
 </div>
 
+
+<!-- CALCULATOR FAB -->
+<button class="calc-fab" onclick="openCalc()" title="Калькулятор">🧮</button>
+
+<!-- CALCULATOR MODAL -->
+<div class="calc-overlay" id="calcOverlay" onclick="calcCloseOutside(event)">
+  <div class="calc-box">
+    <div class="calc-head">
+      <div class="calc-head-title">🧮 Калькулятор</div>
+      <button class="calc-head-close" onclick="closeCalc()">✕</button>
+    </div>
+    <div class="calc-tabs">
+      <button class="calc-tab active" onclick="switchCalc('simple',this)">Простий</button>
+      <button class="calc-tab" onclick="switchCalc('compound',this)">Складний %</button>
+      <button class="calc-tab" onclick="switchCalc('currency',this)">Валюта</button>
+    </div>
+
+    <!-- SIMPLE CALCULATOR -->
+    <div class="calc-panel active" id="calcPanel_simple">
+      <div class="simple-calc-display" id="sc_display">0</div>
+      <div class="simple-calc-grid">
+        <button class="sc-btn cl" onclick="sc('C')">C</button>
+        <button class="sc-btn cl" onclick="sc('±')">±</button>
+        <button class="sc-btn cl" onclick="sc('%')">%</button>
+        <button class="sc-btn op" onclick="sc('/')">÷</button>
+        <button class="sc-btn" onclick="sc('7')">7</button>
+        <button class="sc-btn" onclick="sc('8')">8</button>
+        <button class="sc-btn" onclick="sc('9')">9</button>
+        <button class="sc-btn op" onclick="sc('*')">×</button>
+        <button class="sc-btn" onclick="sc('4')">4</button>
+        <button class="sc-btn" onclick="sc('5')">5</button>
+        <button class="sc-btn" onclick="sc('6')">6</button>
+        <button class="sc-btn op" onclick="sc('-')">−</button>
+        <button class="sc-btn" onclick="sc('1')">1</button>
+        <button class="sc-btn" onclick="sc('2')">2</button>
+        <button class="sc-btn" onclick="sc('3')">3</button>
+        <button class="sc-btn op" onclick="sc('+')">+</button>
+        <button class="sc-btn" onclick="sc('0')" style="grid-column:span 2">0</button>
+        <button class="sc-btn" onclick="sc('.')">.</button>
+        <button class="sc-btn eq" onclick="sc('=')">=</button>
+      </div>
+    </div>
+
+    <!-- COMPOUND INTEREST -->
+    <div class="calc-panel" id="calcPanel_compound">
+      <div class="calc-field-row">
+        <div class="calc-field"><label>Сума (₴)</label><input type="text" inputmode="decimal" id="cp_sum" placeholder="100 000" oninput="runCompound()"></div>
+        <div class="calc-field"><label>Ставка % / рік</label><input type="text" inputmode="decimal" id="cp_rate" placeholder="16" oninput="runCompound()"></div>
+      </div>
+      <div class="calc-field-row">
+        <div class="calc-field"><label>Термін (міс)</label><input type="text" inputmode="decimal" id="cp_months" placeholder="12" oninput="runCompound()"></div>
+        <div class="calc-field"><label>Капіталізація</label>
+          <select id="cp_freq" onchange="runCompound()">
+            <option value="12">Щомісяця</option>
+            <option value="4">Щокварталу</option>
+            <option value="1">Щорічно</option>
+            <option value="0">Без капіт.</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-field-row">
+        <div class="calc-field"><label>Податок на прибуток (%)</label><input type="text" inputmode="decimal" id="cp_tax" placeholder="0" oninput="runCompound()"></div>
+        <div class="calc-field"><label>Без податку = 0%</label><input type="text" inputmode="decimal" id="cp_taxfree" placeholder="Необл. мінімум ₴" oninput="runCompound()"></div>
+      </div>
+      <div class="calc-res" id="cp_result" style="display:none"></div>
+    </div>
+
+    <!-- CURRENCY -->
+    <div class="calc-panel" id="calcPanel_currency">
+      <div class="calc-field-row">
+        <div class="calc-field"><label>Сума</label><input type="text" inputmode="decimal" id="cur_sum" placeholder="1000" oninput="runCurrency()"></div>
+        <div class="calc-field"><label>Курс USD/₴</label><input type="text" inputmode="decimal" id="cur_rate" placeholder="41" oninput="runCurrency()"></div>
+      </div>
+      <div class="calc-field-row">
+        <div class="calc-field"><label>Євро/₴</label><input type="text" inputmode="decimal" id="cur_eur" placeholder="45" oninput="runCurrency()"></div>
+        <div class="calc-field"><label>Конвертую з</label>
+          <select id="cur_from" onchange="runCurrency()">
+            <option value="uah">₴ Гривня</option>
+            <option value="usd">$ Долар</option>
+            <option value="eur">€ Євро</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-res" id="cur_result" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
 <div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 </div>
 
@@ -695,7 +824,7 @@ const LANGS={
     forexName:'Валютні накопичення',currency:'Валюта',amount:'Сума',rateUah:'Курс / ₴',other:'Інша',addCurrency:'+ Додати валюту',totalUah:'Усього у ₴',
     cashName:'Готівка (₴)',amountUah:'Сума (₴)',whereStored:'Де зберігається',
     currentAcc:'Поточний рахунок',balanceUah:'Баланс (₴)',bank:'Банк',
-    stocksBtn:'Акції',bondsBtn:'Облігації',ovdpBtn:'ОВДП',addCustom:'Власний розділ',
+    stocksBtn:'Акції',bondsBtn:'Облігації',ovdpBtn:'ОВДП',goldBtn:'Золото',silverBtn:'Срібло',businessBtn:'Бізнес',addCustom:'Власний розділ',
     newSection:'Новий розділ',newSectionSub:'Як депозит — з відсотками та датами',
     sectionNameLabel:'Назва розділу',iconLabel:'Іконка',createSection:'Створити розділ',cancel:'Скасувати',
     footer:'КАПІТАЛ · дані зберігаються локально на пристрої',
@@ -726,7 +855,7 @@ const LANGS={
     forexName:'Валютные накопления',currency:'Валюта',amount:'Сумма',rateUah:'Курс / ₴',other:'Другая',addCurrency:'+ Добавить валюту',totalUah:'Итого в ₴',
     cashName:'Наличные (₴)',amountUah:'Сумма (₴)',whereStored:'Где хранится',
     currentAcc:'Текущий счёт',balanceUah:'Баланс (₴)',bank:'Банк',
-    stocksBtn:'Акции',bondsBtn:'Облигации',ovdpBtn:'ОВГЗ',addCustom:'Свой раздел',
+    stocksBtn:'Акции',bondsBtn:'Облигации',ovdpBtn:'ОВГЗ',goldBtn:'Золото',silverBtn:'Серебро',businessBtn:'Бизнес',addCustom:'Свой раздел',
     newSection:'Новый раздел',newSectionSub:'Как депозит — с процентами и датами',
     sectionNameLabel:'Название раздела',iconLabel:'Иконка',createSection:'Создать раздел',cancel:'Отмена',
     footer:'КАПИТАЛ · данные хранятся локально на устройстве',
@@ -757,7 +886,7 @@ const LANGS={
     forexName:'Forex Savings',currency:'Currency',amount:'Amount',rateUah:'Rate / ₴',other:'Other',addCurrency:'+ Add Currency',totalUah:'Total in ₴',
     cashName:'Cash (₴)',amountUah:'Amount (₴)',whereStored:'Where stored',
     currentAcc:'Current Account',balanceUah:'Balance (₴)',bank:'Bank',
-    stocksBtn:'Stocks',bondsBtn:'Bonds',ovdpBtn:'Gov. Bonds',addCustom:'Custom Section',
+    stocksBtn:'Stocks',bondsBtn:'Bonds',ovdpBtn:'Gov. Bonds',goldBtn:'Gold',silverBtn:'Silver',businessBtn:'Business',addCustom:'Custom Section',
     newSection:'New Section',newSectionSub:'Like a deposit — with rates and dates',
     sectionNameLabel:'Section Name',iconLabel:'Icon',createSection:'Create Section',cancel:'Cancel',
     footer:'CAPITAL · data is stored locally on device',
@@ -1450,6 +1579,22 @@ function startAutoRefresh(){
 }
 
 // ── SECURITIES (Stocks / Bonds / OVDP) ───────
+function addSimpleCard(type){
+  if(!isPro && customSections.length >= FREE_LIMITS.customSections){
+    openPaywall('Більше 1 додаткового розділу — тільки в PRO 👑');
+    return;
+  }
+  const cfg={
+    gold:{icon:'🥇',uk:'Золото',ru:'Золото',en:'Gold'},
+    silver:{icon:'🥈',uk:'Срібло',ru:'Серебро',en:'Silver'},
+    business:{icon:'💼',uk:'Бізнес',ru:'Бизнес',en:'Business'}
+  }[type];
+  if(!cfg)return;
+  const id='custom_'+type+'_'+Date.now();
+  customSections.push({id,name:cfg[currentLang]||cfg.uk,icon:cfg.icon,amount:'',note:'',color:'green'});
+  renderCustomCards(); updateAll(); saveData();
+}
+
 function addSecuritiesCard(type){
   const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
   const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
@@ -2013,20 +2158,14 @@ function updateProUI(){
 
 // addSecItem freemium check is built into the function directly
 
-// Override fetchTickerForInput — 1st stock FREE as demo, rest PRO
+// Override fetchTickerForInput — blocked after 3 stocks for free users
 const _origFetchTicker = fetchTickerForInput;
 fetchTickerForInput = async function(secId){
   if(!isPro){
-    // Count already SAVED items with tickers (not counting current input)
-    const savedLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(savedLive >= 1){
-      // Check if this section already has a saved ticker (allow refresh of existing)
-      const sec = securitiesSections.find(s=>s.id===secId);
-      const thisAlreadySaved = sec && sec.items.some(it=>it.ticker);
-      if(!thisAlreadySaved){
-        openPaywall('Живі ціни для 2+ акцій — тільки в PRO. 1-а акція безкоштовно як демо ✨');
-        return;
-      }
+    const totalWithTicker = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
+    if(totalWithTicker >= FREE_LIMITS.stockItems){
+      openPaywall('Онлайн ціни для 4+ акцій — тільки в PRO 👑');
+      return;
     }
   }
   await _origFetchTicker(secId);
@@ -2047,6 +2186,113 @@ refreshAllStockPrices = async function(secId){
 
 // Update UI after load
 setTimeout(updateProUI, 100);
+
+// ── CALCULATOR ────────────────────────────────────────────
+function openCalc(){
+  document.getElementById('calcOverlay').classList.add('open');
+  // Pre-fill currency rate from app
+  const rateEl=document.getElementById('cur_rate');
+  if(rateEl&&!rateEl.value&&typeof usdUahRate!=='undefined')rateEl.value=usdUahRate.toFixed(2);
+}
+function closeCalc(){document.getElementById('calcOverlay').classList.remove('open');}
+function calcCloseOutside(e){if(e.target===document.getElementById('calcOverlay'))closeCalc();}
+function switchCalc(tab,btn){
+  document.querySelectorAll('.calc-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.calc-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('calcPanel_'+tab).classList.add('active');
+}
+
+// ── SIMPLE CALCULATOR ────────────────────────────────────
+let sc_expr='',sc_prev='',sc_op='',sc_newNum=true;
+function sc(v){
+  const disp=document.getElementById('sc_display');
+  if(v==='C'){sc_expr='';sc_prev='';sc_op='';sc_newNum=true;disp.textContent='0';return;}
+  if(v==='±'){const n=parseFloat(disp.textContent)||0;disp.textContent=String(-n);return;}
+  if(v==='%'){const n=parseFloat(disp.textContent)||0;disp.textContent=String(n/100);return;}
+  if(['+','-','*','/'].includes(v)){
+    sc_prev=disp.textContent;sc_op=v;sc_newNum=true;
+    disp.textContent=disp.textContent;return;
+  }
+  if(v==='='){
+    if(!sc_op||!sc_prev)return;
+    const a=parseFloat(sc_prev),b=parseFloat(disp.textContent);
+    let res=0;
+    if(sc_op==='+')res=a+b;
+    else if(sc_op==='-')res=a-b;
+    else if(sc_op==='*')res=a*b;
+    else if(sc_op==='/')res=b!==0?a/b:0;
+    disp.textContent=parseFloat(res.toFixed(8)).toString();
+    sc_op='';sc_newNum=true;return;
+  }
+  if(v==='.'&&disp.textContent.includes('.')&&!sc_newNum)return;
+  if(sc_newNum){disp.textContent=v==='.'?'0.':v;sc_newNum=false;}
+  else{disp.textContent=disp.textContent==='0'&&v!=='.'?v:disp.textContent+v;}
+  if(disp.textContent.length>14)disp.textContent=disp.textContent.slice(0,14);
+}
+
+// ── COMPOUND INTEREST ────────────────────────────────────
+function runCompound(){
+  const sum=parseFloat(document.getElementById('cp_sum')?.value)||0;
+  const rate=parseFloat(document.getElementById('cp_rate')?.value)||0;
+  const months=parseFloat(document.getElementById('cp_months')?.value)||0;
+  const freq=parseInt(document.getElementById('cp_freq')?.value)||12;
+  const taxPct=parseFloat(document.getElementById('cp_tax')?.value)||0;
+  const taxFree=parseFloat(document.getElementById('cp_taxfree')?.value)||0;
+  const box=document.getElementById('cp_result');
+  if(!sum||!rate||!months){box.style.display='none';return;}
+  let total;
+  if(freq===0){total=sum*(1+rate/100*months/12);}
+  else{const r=rate/100/freq;const n=freq*months/12;total=sum*Math.pow(1+r,n);}
+  const profit=total-sum;
+  const taxableProfit=Math.max(0,profit-taxFree);
+  const tax=taxableProfit*taxPct/100;
+  const net=profit-tax;
+  const fmt=n=>new Intl.NumberFormat('uk-UA',{maximumFractionDigits:0}).format(n);
+  box.style.display='block';
+  const taxLabel=taxPct>0?`Податок ${taxPct}%`:'Без податку';
+  box.innerHTML=[
+    ['Підсумкова сума',fmt(Math.round(total))+' ₴','var(--text)'],
+    ['Нараховано відсотків','+'+fmt(Math.round(profit))+' ₴','var(--green2)'],
+    [taxLabel,taxPct>0?'-'+fmt(Math.round(tax))+' ₴':'0 ₴',taxPct>0?'var(--red)':'var(--muted2)'],
+    ['Чистий прибуток','+'+fmt(Math.round(net))+' ₴','var(--green2)'],
+    ['В місяць','~'+fmt(Math.round(net/months))+' ₴/міс','var(--muted2)'],
+  ].map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
+}
+
+// ── CURRENCY ─────────────────────────────────────────────
+function runCurrency(){
+  const sum=parseFloat(document.getElementById('cur_sum')?.value)||0;
+  const usd=parseFloat(document.getElementById('cur_rate')?.value)||usdUahRate||41;
+  const eur=parseFloat(document.getElementById('cur_eur')?.value)||usd*1.08;
+  const from=document.getElementById('cur_from')?.value||'uah';
+  const box=document.getElementById('cur_result');
+  if(!sum){box.style.display='none';return;}
+  const fmt=n=>new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(n);
+  let rows=[];
+  if(from==='uah'){
+    rows=[
+      ['₴ → $',fmt(sum/usd)+' $','var(--green2)'],
+      ['₴ → €',fmt(sum/eur)+' €','var(--blue2)'],
+      ['Курс USD',usd.toFixed(2)+' ₴','var(--muted2)'],
+      ['Курс EUR',eur.toFixed(2)+' ₴','var(--muted2)'],
+    ];
+  }else if(from==='usd'){
+    rows=[
+      ['$ → ₴',fmt(sum*usd)+' ₴','var(--green2)'],
+      ['$ → €',fmt(sum*usd/eur)+' €','var(--blue2)'],
+      ['Курс USD',usd.toFixed(2)+' ₴','var(--muted2)'],
+    ];
+  }else{
+    rows=[
+      ['€ → ₴',fmt(sum*eur)+' ₴','var(--green2)'],
+      ['€ → $',fmt(sum*eur/usd)+' $','var(--blue2)'],
+      ['Курс EUR',eur.toFixed(2)+' ₴','var(--muted2)'],
+    ];
+  }
+  box.style.display='block';
+  box.innerHTML=rows.map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
+}
 
 </script>
 </body>
