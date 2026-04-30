@@ -1620,7 +1620,14 @@ function addSecuritiesCard(type){
 function renderSecuritiesCards(){
   const container=$('securitiesContainer');
   if(!container)return;
+  // Save expanded state before re-render
+  const expanded=new Set();
+  container.querySelectorAll('.card.expanded').forEach(el=>expanded.add(el.id));
   container.innerHTML=securitiesSections.map((s,i)=>getSecCardHtml(s,i)).join('');
+  // Restore expanded state
+  container.querySelectorAll('.card').forEach(el=>{
+    if(expanded.has(el.id))el.classList.add('expanded');
+  });
   container.querySelectorAll('.card').forEach(c=>c.setAttribute('draggable','true'));
   refreshDrag();
 }
