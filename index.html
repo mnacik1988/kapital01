@@ -810,7 +810,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 let isPro = localStorage.getItem('kapital_pro') === 'true';
-const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1 };
+const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1, stockSections:1 };
 function openPaywall(reason){
   const sub=document.querySelector('.paywall-sub');
   if(sub&&reason)sub.textContent=reason;
@@ -1605,6 +1605,10 @@ function addSimpleCard(type){
 }
 
 function addSecuritiesCard(type){
+  if(!isPro && securitiesSections.length >= FREE_LIMITS.stockSections){
+    openPaywall('Більше 1 розділу акцій — тільки в PRO 👑');
+    return;
+  }
   const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
   const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
   const id='sec_'+type+'_'+Date.now();
