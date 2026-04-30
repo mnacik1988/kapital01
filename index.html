@@ -698,7 +698,19 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div><div class="paywall-feature-text">Експорт PDF</div><div class="paywall-feature-sub">Звіт по всіх активах</div></div>
       </div>
     </div>
-    <div class="paywall-price"><strong>$2.99</strong> / місяць</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <div onclick="selectPlan('monthly')" id="plan_monthly" style="flex:1;border:1.5px solid var(--gold);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;background:#e8c97a10;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px;">Щомісяця</div>
+        <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:900;color:var(--gold);">$2.99</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);">/ місяць</div>
+      </div>
+      <div onclick="selectPlan('yearly')" id="plan_yearly" style="flex:1;border:1.5px solid var(--border2);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;position:relative;">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--green);color:#0a0a0f;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;">-30% ВИГОДА</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px;">Щорічно</div>
+        <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:900;color:var(--text);">$24.99</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);">/ рік · $2.08/міс</div>
+      </div>
+    </div>
     <button class="paywall-btn" onclick="activatePro()">✨ Підключити PRO</button>
     <button class="paywall-restore" onclick="restorePurchase()">Відновити покупку</button>
     <button class="paywall-close" onclick="closePaywall()">Не зараз</button>
@@ -2312,6 +2324,26 @@ function runCurrency(){
   }
   box.style.display='block';
   box.innerHTML=rows.map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
+}
+
+// Plan selection
+let selectedPlan='monthly';
+function selectPlan(plan){
+  selectedPlan=plan;
+  const monthly=document.getElementById('plan_monthly');
+  const yearly=document.getElementById('plan_yearly');
+  if(!monthly||!yearly)return;
+  if(plan==='monthly'){
+    monthly.style.border='1.5px solid var(--gold)';
+    monthly.style.background='#e8c97a10';
+    yearly.style.border='1.5px solid var(--border2)';
+    yearly.style.background='transparent';
+  }else{
+    yearly.style.border='1.5px solid var(--gold)';
+    yearly.style.background='#e8c97a10';
+    monthly.style.border='1.5px solid var(--border2)';
+    monthly.style.background='transparent';
+  }
 }
 
 </script>
