@@ -35,11 +35,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .lang-btn.active{background:var(--bg3);color:var(--text);}
 
 /* HEADER */
-.header{padding:56px 20px 20px;background:linear-gradient(180deg,#0a0a1a 0%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.header{padding:56px 20px 20px;padding-right:20px;background:linear-gradient(180deg,#0a0a1a 0%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
 .header-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
 .header-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
-.total-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
-.total-amount{font-family:'Inter',sans-serif;font-size:clamp(36px,9vw,54px);font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
+.total-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0;overflow:hidden;}
+.total-amount{font-family:'Inter',sans-serif;font-size:clamp(28px,7.5vw,54px);font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";min-width:0;}
 .total-currency{font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--gold);opacity:0.7;letter-spacing:-0.5px;}
 .total-subs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
 .badge{font-family:'DM Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px;display:inline-block;}
@@ -313,8 +313,8 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 
 /* ── CALCULATOR POPUP ── */
-.calc-fab{position:fixed;bottom:28px;right:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--green),#3ab87a);border:none;font-size:24px;cursor:pointer;z-index:400;box-shadow:0 4px 24px #4ecb8d50;display:flex;align-items:center;justify-content:center;transition:transform .15s;}
-.calc-fab:active{transform:scale(0.9);}
+.calc-fab{position:fixed;bottom:28px;right:18px;height:40px;padding:0 14px;border-radius:12px;background:var(--bg2);border:none;outline:1.5px solid transparent;background-clip:padding-box;box-shadow:0 0 0 1.5px #4ecb8d60;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted2);cursor:pointer;z-index:400;display:flex;align-items:center;gap:7px;transition:opacity .15s;letter-spacing:0.1em;text-transform:uppercase;}
+.calc-fab:active{opacity:0.5;}
 .calc-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
 .calc-overlay.open{display:flex;}
 .calc-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px 16px 44px;width:100%;max-height:88vh;overflow-y:auto;}
@@ -707,7 +707,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 
 <!-- CALCULATOR FAB -->
-<button class="calc-fab" onclick="openCalc()" title="Калькулятор">🧮</button>
+<button class="calc-fab" onclick="openCalc()" title="Калькулятор">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4" y="2" width="16" height="20" rx="2"/>
+    <line x1="8" y1="6" x2="16" y2="6"/>
+    <line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/>
+    <line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/>
+    <line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/>
+  </svg>
+  Калькулятор
+</button>
 
 <!-- CALCULATOR MODAL -->
 <div class="calc-overlay" id="calcOverlay" onclick="calcCloseOutside(event)">
