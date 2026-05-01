@@ -313,7 +313,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 
 /* ── CALCULATOR POPUP ── */
-.calc-fab{position:fixed;bottom:28px;right:18px;height:40px;padding:0 14px;border-radius:12px;background:var(--bg2);border:none;outline:1.5px solid transparent;background-clip:padding-box;box-shadow:0 0 0 1.5px #4ecb8d60;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted2);cursor:pointer;z-index:400;display:flex;align-items:center;gap:7px;transition:opacity .15s;letter-spacing:0.1em;text-transform:uppercase;}
+.calc-fab{position:fixed;bottom:24px;right:18px;width:50px;height:50px;border-radius:14px;background:var(--bg2);border:none;box-shadow:0 0 0 1.5px #4ecb8d60;cursor:pointer;z-index:400;display:flex;align-items:center;justify-content:center;transition:opacity .15s;}
 .calc-fab:active{opacity:0.5;}
 .calc-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
 .calc-overlay.open{display:flex;}
@@ -345,6 +345,52 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .sc-btn.eq{background:var(--green);color:#0a0a0f;font-weight:700;font-size:18px;}
 .sc-btn.cl{background:#f8717120;color:var(--red);}
 
+
+.gear-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;width:36px;height:36px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s;}
+.gear-btn:active{opacity:0.6;}
+.settings-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
+.settings-overlay.open{display:flex;}
+.settings-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;}
+.settings-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
+.settings-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);}
+.settings-section{margin-bottom:20px;}
+.settings-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.settings-langs{display:flex;flex-wrap:wrap;gap:8px;}
+.settings-lang-btn{font-family:'DM Mono',monospace;font-size:11px;padding:8px 14px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s;}
+.settings-lang-btn.active{background:var(--green);border-color:var(--green);color:#0a0a0f;font-weight:700;}
+.settings-currency-row{display:flex;gap:8px;}
+.settings-curr-btn{flex:1;font-family:'DM Mono',monospace;font-size:11px;padding:10px 8px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;text-align:center;transition:all .15s;}
+.settings-curr-btn.active{background:var(--blue2);border-color:var(--blue2);color:#fff;font-weight:700;}
+
+
+/* METALS */
+.metal-item-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+.metal-item-row:last-child{border-bottom:none;}
+.metal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.metal-summary{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:12px;margin-bottom:10px;}
+.metal-summary-row{display:flex;justify-content:space-between;padding:4px 0;}
+.metal-summary-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.metal-summary-val{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:var(--gold2);}
+
+
+/* SECTION PICKER */
+.add-one-btn{width:100%;background:var(--bg2);border:1px dashed var(--border2);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .15s;margin-bottom:8px;}
+.add-one-btn:active{background:var(--bg3);}
+.add-one-btn .plus{font-size:18px;color:var(--purple);font-weight:300;}
+.add-one-btn span{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);}
+.picker-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
+.picker-overlay.open{display:flex;}
+.picker-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px 16px 44px;width:100%;}
+.picker-head{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.picker-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);}
+.picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.picker-item{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 10px;cursor:pointer;transition:all .15s;text-align:center;}
+.picker-item:active{border-color:var(--green);background:var(--bg2);}
+.picker-item-icon{font-size:26px;margin-bottom:6px;}
+.picker-item-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.picker-item-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.05em;}
+.picker-divider{grid-column:span 2;height:1px;background:var(--border);margin:4px 0;}
+
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
@@ -355,15 +401,11 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <div class="header">
   <div class="header-top-row">
     <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
-    <div class="lang-bar">
-      <button class="lang-btn active" id="lang-uk" onclick="setLang('uk')">УКР</button>
-      <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">РУС</button>
-      <button class="lang-btn" id="lang-en" onclick="setLang('en')">ENG</button>
-    </div>
+    <button class="gear-btn" onclick="openSettings()" title="Налаштування">⚙️</button>
   </div>
   <div class="total-wrap">
     <div class="total-amount" id="totalAmount">0</div>
-    <div class="total-currency">₴</div>
+    <div class="total-currency" id="totalCurrSym">₴</div>
   </div>
   <div class="total-subs" style="align-items:center;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
@@ -635,23 +677,51 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 <!-- ADD SECTION BUTTONS -->
 <div class="add-section-wrap" style="margin-top:14px;">
-  <div class="section-type-row">
-    <button class="section-type-btn" onclick="addSecuritiesCard('stocks')">📈 <span data-i18n="stocksBtn">Акції</span></button>
-    <button class="section-type-btn" onclick="addSecuritiesCard('bonds')">📜 <span data-i18n="bondsBtn">Облігації</span></button>
-  </div>
-  <div class="section-type-row">
-    <button class="section-type-btn" onclick="addSecuritiesCard('ovdp')">🏛 <span data-i18n="ovdpBtn">ОВДП</span></button>
-    <button class="section-type-btn" onclick="addSimpleCard('gold')">🥇 <span data-i18n="goldBtn">Золото</span></button>
-  </div>
-  <div class="section-type-row">
-    <button class="section-type-btn" onclick="addSimpleCard('silver')">🥈 <span data-i18n="silverBtn">Срібло</span></button>
-    <button class="section-type-btn" onclick="addSimpleCard('business')">💼 <span data-i18n="businessBtn">Бізнес</span></button>
-  </div>
-  <div class="section-type-row">
-    <button class="add-section-btn" onclick="openAddSection()" style="margin-bottom:0;border:1px solid var(--border2);grid-column:span 2;">
-      <span class="plus">+</span>
-      <span data-i18n="addCustom">Власний розділ</span>
-    </button>
+  <button class="add-one-btn" onclick="openSectionPicker()">
+    <span class="plus">+</span>
+    <span id="addSectionBtnLabel" data-i18n="addCustom">Додати розділ</span>
+  </button>
+</div>
+
+<!-- SECTION PICKER MODAL -->
+<div class="picker-overlay" id="pickerOverlay" onclick="pickerCloseOutside(event)">
+  <div class="picker-box">
+    <div class="picker-head">
+      <span id="picker_title">➕ Новий розділ</span>
+      <button class="picker-close" onclick="closeSectionPicker()">✕</button>
+    </div>
+    <div class="picker-grid">
+      <div class="picker-item" onclick="pickerAdd('stocks')">
+        <div class="picker-item-icon">📈</div>
+        <div class="picker-item-name" data-i18n="stocksBtn">Акції</div>
+        <div class="picker-item-desc" id="picker_desc_stocks">NYSE, NASDAQ, дивіденди</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('bonds')">
+        <div class="picker-item-icon">📜</div>
+        <div class="picker-item-name" data-i18n="bondsBtn">Облігації</div>
+        <div class="picker-item-desc" id="picker_desc_bonds">Корпоративні, державні</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('ovdp')">
+        <div class="picker-item-icon">🏛</div>
+        <div class="picker-item-name" data-i18n="ovdpBtn">ОВДП</div>
+        <div class="picker-item-desc" id="picker_desc_ovdp">Державні облігації України</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('metals')">
+        <div class="picker-item-icon">💎</div>
+        <div class="picker-item-name" data-i18n="metalsBtn">Дорог. метали</div>
+        <div class="picker-item-desc" id="picker_desc_metals">Золото, срібло, платина</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('business')">
+        <div class="picker-item-icon">💼</div>
+        <div class="picker-item-name" data-i18n="businessBtn">Бізнес</div>
+        <div class="picker-item-desc" id="picker_desc_biz">Власна справа, частка</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('custom')">
+        <div class="picker-item-icon">✏️</div>
+        <div class="picker-item-name" data-i18n="addCustom">Власний розділ</div>
+        <div class="picker-item-desc" id="picker_desc_custom">Будь-який актив</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -678,24 +748,24 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <div class="paywall-overlay" id="paywallOverlay" onclick="closePaywallIfOutside(event)">
   <div class="paywall-box">
     <div class="paywall-crown">👑</div>
-    <div class="paywall-title">Капітал PRO</div>
-    <div class="paywall-sub">Розблокуйте всі можливості</div>
+    <div class="paywall-title" id="pw_title">Капітал PRO</div>
+    <div class="paywall-sub" id="pw_sub">Розблокуйте всі можливості</div>
     <div class="paywall-features">
       <div class="paywall-feature">
         <div class="paywall-feature-icon">📈</div>
-        <div><div class="paywall-feature-text">Живі ціни акцій</div><div class="paywall-feature-sub">Необмежено · 1-а акція безкоштовно як демо</div></div>
+        <div><div class="paywall-feature-text" id="pw_f1">Живі ціни акцій</div><div class="paywall-feature-sub" id="pw_f1sub">Необмежено акцій з дивідендами</div></div>
       </div>
       <div class="paywall-feature">
         <div class="paywall-feature-icon">🏦</div>
-        <div><div class="paywall-feature-text">До 3 депозитів</div><div class="paywall-feature-sub">Відстежуйте всі вклади</div></div>
+        <div><div class="paywall-feature-text" id="pw_f2">До 3 депозитів</div><div class="paywall-feature-sub" id="pw_f2sub">Відстежуйте всі вклади</div></div>
       </div>
       <div class="paywall-feature">
         <div class="paywall-feature-icon">📊</div>
-        <div><div class="paywall-feature-text">Необмежені розділи</div><div class="paywall-feature-sub">Власні категорії активів</div></div>
+        <div><div class="paywall-feature-text" id="pw_f3">Необмежені розділи</div><div class="paywall-feature-sub" id="pw_f3sub">Власні категорії активів</div></div>
       </div>
       <div class="paywall-feature">
         <div class="paywall-feature-icon">📄</div>
-        <div><div class="paywall-feature-text">Експорт PDF</div><div class="paywall-feature-sub">Звіт по всіх активах</div></div>
+        <div><div class="paywall-feature-text" id="pw_f4">Експорт PDF</div><div class="paywall-feature-sub" id="pw_f4sub">Звіт по всіх активах</div></div>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-bottom:16px;">
@@ -711,36 +781,35 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);">/ рік · $2.08/міс</div>
       </div>
     </div>
-    <button class="paywall-btn" onclick="activatePro()">✨ Підключити PRO</button>
-    <button class="paywall-restore" onclick="restorePurchase()">Відновити покупку</button>
-    <button class="paywall-close" onclick="closePaywall()">Не зараз</button>
+    <button class="paywall-btn" id="pw_btn" onclick="activatePro()">✨ Підключити PRO</button>
+    <button class="paywall-restore" id="pw_restore" onclick="restorePurchase()">Відновити покупку</button>
+    <button class="paywall-close" id="pw_close" onclick="closePaywall()">Не зараз</button>
   </div>
 </div>
 
 
 <!-- CALCULATOR FAB -->
 <button class="calc-fab" onclick="openCalc()" title="Калькулятор">
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ecb8d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <rect x="4" y="2" width="16" height="20" rx="2"/>
     <line x1="8" y1="6" x2="16" y2="6"/>
-    <line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/>
-    <line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/>
-    <line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/>
+    <circle cx="8" cy="10" r="0.8" fill="#4ecb8d"/><circle cx="12" cy="10" r="0.8" fill="#4ecb8d"/><circle cx="16" cy="10" r="0.8" fill="#4ecb8d"/>
+    <circle cx="8" cy="14" r="0.8" fill="#4ecb8d"/><circle cx="12" cy="14" r="0.8" fill="#4ecb8d"/><circle cx="16" cy="14" r="0.8" fill="#4ecb8d"/>
+    <line x1="8" y1="18" x2="12" y2="18" stroke-width="2"/><circle cx="16" cy="18" r="0.8" fill="#4ecb8d"/>
   </svg>
-  Калькулятор
 </button>
 
 <!-- CALCULATOR MODAL -->
 <div class="calc-overlay" id="calcOverlay" onclick="calcCloseOutside(event)">
   <div class="calc-box">
     <div class="calc-head">
-      <div class="calc-head-title">🧮 Калькулятор</div>
+      <div class="calc-head-title" id="calc_title">🧮 Калькулятор</div>
       <button class="calc-head-close" onclick="closeCalc()">✕</button>
     </div>
     <div class="calc-tabs">
-      <button class="calc-tab active" onclick="switchCalc('simple',this)">Простий</button>
-      <button class="calc-tab" onclick="switchCalc('compound',this)">Складний %</button>
-      <button class="calc-tab" onclick="switchCalc('currency',this)">Валюта</button>
+      <button class="calc-tab active" id="calc_tab_simple" onclick="switchCalc('simple',this)">Простий</button>
+      <button class="calc-tab" id="calc_tab_compound" onclick="switchCalc('compound',this)">Складний %</button>
+      <button class="calc-tab" id="calc_tab_currency" onclick="switchCalc('currency',this)">Валюта</button>
     </div>
 
     <!-- SIMPLE CALCULATOR -->
@@ -772,12 +841,12 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <!-- COMPOUND INTEREST -->
     <div class="calc-panel" id="calcPanel_compound">
       <div class="calc-field-row">
-        <div class="calc-field"><label>Сума (₴)</label><input type="text" inputmode="decimal" id="cp_sum" placeholder="100 000" oninput="runCompound()"></div>
-        <div class="calc-field"><label>Ставка % / рік</label><input type="text" inputmode="decimal" id="cp_rate" placeholder="16" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_sum_label">Сума (₴)</label><input type="text" inputmode="decimal" id="cp_sum" placeholder="100 000" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_rate_label">Ставка % / рік</label><input type="text" inputmode="decimal" id="cp_rate" placeholder="16" oninput="runCompound()"></div>
       </div>
       <div class="calc-field-row">
-        <div class="calc-field"><label>Термін (міс)</label><input type="text" inputmode="decimal" id="cp_months" placeholder="12" oninput="runCompound()"></div>
-        <div class="calc-field"><label>Капіталізація</label>
+        <div class="calc-field"><label id="cp_months_label">Термін (міс)</label><input type="text" inputmode="decimal" id="cp_months" placeholder="12" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_capitaliz_label">Капіталізація</label>
           <select id="cp_freq" onchange="runCompound()">
             <option value="12">Щомісяця</option>
             <option value="4">Щокварталу</option>
@@ -787,8 +856,8 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         </div>
       </div>
       <div class="calc-field-row">
-        <div class="calc-field"><label>Податок на прибуток (%)</label><input type="text" inputmode="decimal" id="cp_tax" placeholder="0" oninput="runCompound()"></div>
-        <div class="calc-field"><label>Без податку = 0%</label><input type="text" inputmode="decimal" id="cp_taxfree" placeholder="Необл. мінімум ₴" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_tax_label">Податок на прибуток (%)</label><input type="text" inputmode="decimal" id="cp_tax" placeholder="0" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_taxfree_label">Без податку = 0%</label><input type="text" inputmode="decimal" id="cp_taxfree" placeholder="Необл. мінімум ₴" oninput="runCompound()"></div>
       </div>
       <div class="calc-res" id="cp_result" style="display:none"></div>
     </div>
@@ -796,20 +865,58 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <!-- CURRENCY -->
     <div class="calc-panel" id="calcPanel_currency">
       <div class="calc-field-row">
-        <div class="calc-field"><label>Сума</label><input type="text" inputmode="decimal" id="cur_sum" placeholder="1000" oninput="runCurrency()"></div>
-        <div class="calc-field"><label>Курс USD/₴</label><input type="text" inputmode="decimal" id="cur_rate" placeholder="41" oninput="runCurrency()"></div>
+        <div class="calc-field"><label id="cur_sum_label">Сума</label><input type="text" inputmode="decimal" id="cur_sum" placeholder="1000" oninput="runCurrencyWithRates()"></div>
+        <div class="calc-field"><label id="cur_rate_label">Курс USD/₴</label><input type="text" inputmode="decimal" id="cur_rate" placeholder="41" oninput="runCurrencyWithRates()"></div>
       </div>
       <div class="calc-field-row">
-        <div class="calc-field"><label>Євро/₴</label><input type="text" inputmode="decimal" id="cur_eur" placeholder="45" oninput="runCurrency()"></div>
+        <div class="calc-field"><label id="cur_eur_label">Євро/₴</label><input type="text" inputmode="decimal" id="cur_eur" placeholder="45" oninput="runCurrencyWithRates()"></div>
+        <div class="calc-field"><label id="cur_rub_label">₽ Рубль/₴</label><input type="text" inputmode="decimal" id="cur_rub" placeholder="0.44" oninput="runCurrencyWithRates()"></div>
+      </div>
+      <div class="calc-field-row">
+        <div class="calc-field"><label id="cur_cny_label">¥ Юань/₴</label><input type="text" inputmode="decimal" id="cur_cny" placeholder="5.7" oninput="runCurrencyWithRates()"></div>
         <div class="calc-field"><label>Конвертую з</label>
-          <select id="cur_from" onchange="runCurrency()">
+          <select id="cur_from" onchange="runCurrencyWithRates()">
             <option value="uah">₴ Гривня</option>
             <option value="usd">$ Долар</option>
             <option value="eur">€ Євро</option>
+            <option value="rub">₽ Рубль</option>
+            <option value="cny">¥ Юань</option>
           </select>
         </div>
       </div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;" id="cur_rate_source"></div>
       <div class="calc-res" id="cur_result" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SETTINGS MODAL -->
+<div class="settings-overlay" id="settingsOverlay" onclick="settingsCloseOutside(event)">
+  <div class="settings-box">
+    <div class="settings-title">
+      <span id="settingsTitleText">⚙️ Налаштування</span>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label" id="set_lang_label">Мова / Language</div>
+      <div class="settings-langs">
+        <button class="settings-lang-btn" id="slang-en" onclick="setLangFromSettings('en')">🇬🇧 Eng</button>
+        <button class="settings-lang-btn active" id="slang-uk" onclick="setLangFromSettings('uk')">🇺🇦 Укр</button>
+        <button class="settings-lang-btn" id="slang-ru" onclick="setLangFromSettings('ru')">🇷🇺 Рус</button>
+        <button class="settings-lang-btn" id="slang-de" onclick="setLangFromSettings('de')">🇩🇪 Deu</button>
+        <button class="settings-lang-btn" id="slang-zh" onclick="setLangFromSettings('zh')">🇨🇳 中文</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label" id="set_curr_label">Відображення суми</div>
+      <div class="settings-currency-row">
+        <button class="settings-curr-btn active" id="scurr-uah" onclick="setDisplayCurrency('uah')">₴ UAH</button>
+        <button class="settings-curr-btn" id="scurr-usd" onclick="setDisplayCurrency('usd')">$ USD</button>
+        <button class="settings-curr-btn" id="scurr-eur" onclick="setDisplayCurrency('eur')">€ EUR</button>
+        <button class="settings-curr-btn" id="scurr-rub" onclick="setDisplayCurrency('rub')">₽ RUB</button>
+        <button class="settings-curr-btn" id="scurr-cny" onclick="setDisplayCurrency('cny')">¥ CNY</button>
+      </div>
     </div>
   </div>
 </div>
@@ -823,6 +930,8 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 let isPro = localStorage.getItem('kapital_pro') === 'true';
 const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1, stockSections:1 };
+let displayCurrency = localStorage.getItem('display_currency') || 'uah';
+let metalsSections = [];
 function openPaywall(reason){
   const sub=document.querySelector('.paywall-sub');
   if(sub&&reason)sub.textContent=reason;
@@ -864,6 +973,8 @@ const LANGS={
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Живі ціни акцій',pwF1sub:'Необмежено акцій з дивідендами',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Експорт PDF',pwF4sub:'Звіт по всіх активах',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
+    secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'💰 Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
     totalCapital:'Общий капитал',enterData:'введите данные',sectionLabel:'Активы · удерживай и перетаскивай для сортировки',
@@ -895,6 +1006,8 @@ const LANGS={
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Живые цены акций',pwF1sub:'Неограниченно акций с дивидендами',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'Экспорт PDF',pwF4sub:'Отчёт по всем активам',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
+    secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'💰 Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
     totalCapital:'Total Capital',enterData:'enter data',sectionLabel:'Assets · hold and drag to sort',
@@ -926,14 +1039,88 @@ const LANGS={
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-  }
+    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock prices',pwF1sub:'Unlimited stocks with dividends',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'PDF Export',pwF4sub:'Full asset report',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
+    secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'💰 Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
+  },
+  de:{
+    totalCapital:'Gesamtkapital',enterData:'Daten eingeben',sectionLabel:'Vermögen · Halten & Ziehen zum Sortieren',
+    liveCnt:'Live-Zähler',addDeposit:'+ Einlage',deleteDep:'Einlage löschen?',maxDep:'Max. 3 Einlagen',
+    deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
+    stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
+    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienpreise',pwF1sub:'Unbegrenzte Aktien mit Dividenden',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'PDF-Export',pwF4sub:'Vollständiger Asset-Bericht',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
+    secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
+    sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
+    cryptoName:'Krypto · USDT',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
+    costPrice:'Einstandspreis (₴)',uahEquiv:'UAH-Äquivalent',addCoinTitle:'Münze hinzufügen',
+    coinName:'Münzname',coinQty:'Menge',coinBuyPrice:'Kaufpreis (USDT)',coinCurPrice:'Aktueller Preis (USDT)',addCoinBtn:'+ Hinzufügen',
+    usdName:'USD · Dollar-Ersparnisse',usdAmount:'Betrag in USD ($)',rateUsdUah:'USD/₴ Kurs',
+    note:'Notiz',convUah:'💱 Umrechnen → ₴',inTotal:'Im Gesamt enthalten',yes:'Ja',
+    forexName:'Forex-Ersparnisse',currency:'Währung',amount:'Betrag',rateUah:'Kurs/₴',other:'Sonstige',addCurrency:'+ Währung',totalUah:'Gesamt ₴',
+    cashName:'Bargeld (₴)',amountUah:'Betrag (₴)',whereStored:'Wo aufbewahrt',
+    currentAcc:'Girokonto',balanceUah:'Kontostand (₴)',bank:'Bank',
+    depSetup:'Startdatum, Betrag und Zinssatz eingeben',
+    depSettings:'⚙ Einlageneinstellungen',depPrincipalLbl:'Einlagenbetrag (₴)',depStart:'Eröffnungsdatum',depEnd:'Enddatum',
+    rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
+    monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
+    compCalc:'⚡ Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
+    finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',
+    incomeDays:'📊 Tageseinkommen (erste 30 Tage)',
+    calcTitle:'Zinseszinsrechner',totalSum:'Gesamtbetrag',taxBase:'Steuerbasis',
+    perSecond:'Pro Sekunde',perDay:'Pro Tag',perSec:'⚡ Pro Sekunde',
+    secName:'Name',secQty:'Menge',secPrice:'Preis (₴)',secDiv:'Dividende (%)',secTotal:'Wert',
+    addSecItem:'+ Position hinzufügen',secNamePh:'Apple, AAPL...',assets:'Aktiva',pctOfCapital:'% des Kapitals',
+    taxLabel:'🏛 Steuer',accruedPct:'📈 Aufgelaufen %',netProfitLabel:'✅ Nettogewinn',
+    daysPassed:'vergangen',daysLeft:'verbleibend',days:'T',
+    maxDep:'Max. 3 Einlagen',depName:'Einlagenname',depPlaceholder:'Einlage',
+    deleteDep:'Diese Einlage löschen?',footer:'KAPITAL · Daten lokal gespeichert',
+    confirmDeleteCard:'Diesen Block löschen?',yield:'⚡ Rendite',
+  },
+  zh:{
+    totalCapital:'总资产',enterData:'输入数据',sectionLabel:'资产 · 按住拖动排序',
+    liveCnt:'实时计数器',addDeposit:'+ 存款',deleteDep:'删除存款?',maxDep:'最多3个存款',
+    deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
+    stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
+    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票价格',pwF1sub:'无限股票含股息',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'PDF导出',pwF4sub:'完整资产报告',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
+    secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
+    sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
+    cryptoName:'加密货币 · USDT',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
+    costPrice:'成本价 (₴)',uahEquiv:'₴等值',addCoinTitle:'添加币种',
+    coinName:'币种名称',coinQty:'数量',coinBuyPrice:'买入价 (USDT)',coinCurPrice:'当前价 (USDT)',addCoinBtn:'+ 添加',
+    usdName:'USD · 美元储蓄',usdAmount:'美元金额 ($)',rateUsdUah:'USD/₴汇率',
+    note:'备注',convUah:'💱 换算 → ₴',inTotal:'计入总计',yes:'是',
+    forexName:'外汇储蓄',currency:'货币',amount:'金额',rateUah:'汇率/₴',other:'其他',addCurrency:'+ 添加货币',totalUah:'总计 ₴',
+    cashName:'现金 (₴)',amountUah:'金额 (₴)',whereStored:'存放位置',
+    currentAcc:'活期账户',balanceUah:'余额 (₴)',bank:'银行',
+    depSetup:'输入开始日期、金额和利率',
+    depSettings:'⚙ 存款设置',depPrincipalLbl:'存款金额 (₴)',depStart:'开始日期',depEnd:'结束日期',
+    rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
+    monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
+    compCalc:'⚡ 复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
+    finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',
+    incomeDays:'📊 每日收入（前30天）',
+    calcTitle:'复利计算器',totalSum:'总金额',
+    perSecond:'每秒',perDay:'每天',perSec:'⚡ 每秒',
+    secName:'名称',secQty:'数量',secPrice:'价格 (₴)',secDiv:'股息 (%)',secTotal:'总值',
+    addSecItem:'+ 添加头寸',secNamePh:'苹果, AAPL...',assets:'资产',pctOfCapital:'占总资产%',
+    taxLabel:'🏛 税款',accruedPct:'📈 累计利息%',netProfitLabel:'✅ 净利润',
+    daysPassed:'已过',daysLeft:'剩余',days:'天',
+    maxDep:'最多3个存款',depName:'存款名称',depPlaceholder:'存款',
+    deleteDep:'删除此存款?',footer:'资本 · 数据本地存储',
+    confirmDeleteCard:'删除此区块？数据将丢失。',yield:'⚡ 收益',
+  },
 };
 let currentLang='uk';
-function t(key){return LANGS[currentLang][key]||LANGS['uk'][key]||key;}
+function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LANGS['uk'][key]||key;}
 function setLang(lang){
   currentLang=lang;
+  // Update old lang-btn if exists (backward compat)
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('lang-'+lang).classList.add('active');
+  const oldBtn=document.getElementById('lang-'+lang);
+  if(oldBtn)oldBtn.classList.add('active');
+  // Update settings lang buttons
+  document.querySelectorAll('.settings-lang-btn').forEach(b=>{
+    b.classList.toggle('active', b.id==='slang-'+lang);
+  });
   applyTranslations();
   saveData();
 }
@@ -945,6 +1132,8 @@ function applyTranslations(){
   renderDeposits();
   renderCustomCards();
   renderSecuritiesCards();
+  if(typeof renderMetalsCards==='function')renderMetalsCards();
+  translateDynamicUI();
   updateAll();
 }
 
@@ -1005,8 +1194,17 @@ function getDepositHtml(dep,idx){
         <div style="padding-top:14px;">
         <div class="field-group">
           <div class="field-label">${lang.depPrincipalLbl}</div>
-          <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}"
-            oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
+          <div style="display:flex;gap:6px;">
+            <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}" style="flex:1;"
+              oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
+            <select class="field-input" id="depCurrency_${dep.id}" style="width:72px;padding:10px 4px;"
+              onchange="deposits[${idx}].depCurrency=this.value;updateAll();startLiveTicker('${dep.id}')">
+              <option value="UAH" ${dep.depCurrency==='UAH'||!dep.depCurrency?'selected':''}>₴</option>
+              <option value="USD" ${dep.depCurrency==='USD'?'selected':''}>$</option>
+              <option value="EUR" ${dep.depCurrency==='EUR'?'selected':''}>€</option>
+              <option value="GBP" ${dep.depCurrency==='GBP'?'selected':''}>£</option>
+            </select>
+          </div>
         </div>
         <div class="row2">
           <div class="field-group">
@@ -1124,8 +1322,34 @@ document.addEventListener('touchend',e=>{
 },{passive:true});
 
 // ── DEPOSIT CALC ─────────────────────────────
+function getDepositPrincipalUah(d){
+  const principal=parseFloat(d.principal)||0;
+  const cur=d.depCurrency||'UAH';
+  if(cur==='UAH')return principal;
+  const rate=liveRates[cur]||usdUahRate||41;
+  return principal*rate;
+}
+function getDepositMonthlyAccrued(d){
+  const P=getDepositPrincipalUah(d);
+  if(!P||!d.startDate||!d.endDate)return 0;
+  const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
+  if(now<start||end<=start)return 0;
+  const rAnn=(parseFloat(d.rate)||16)/100;
+  const n=parseFloat(d.freq)||12;
+  const startDay=start.getDate();
+  let completedMonths=0;
+  let checkDate=new Date(start);
+  while(true){
+    checkDate=new Date(checkDate.getFullYear(),checkDate.getMonth()+1,startDay);
+    if(checkDate>now||checkDate>end)break;
+    completedMonths++;
+  }
+  if(completedMonths===0)return 0;
+  const yMonthly=completedMonths/12;
+  return P*Math.pow(1+rAnn/n,n*yMonthly)-P;
+}
 function getAllDepositsTotal(){
-  return deposits.reduce((sum,d)=>sum+(parseFloat(d.principal)||0),0);
+  return deposits.reduce((sum,d)=>sum+getDepositPrincipalUah(d)+getDepositMonthlyAccrued(d),0);
 }
 function calcDeposit(depId){
   const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
@@ -1175,22 +1399,41 @@ function calcLive(depId){
   if(s)s.style.display='none'; if(m)m.style.display='block';
   const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
   const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
+  // Full continuous accrual (for stats display)
   const A=P*Math.pow(1+rAnn/n,n*yEl);
   const interest=A-P, taxBase=Math.max(0,interest-tf);
   const taxAmt=taxBase*tax, net=interest-taxAmt;
+  // Monthly anniversary: count only fully completed months from start date
+  const startDay=start.getDate();
+  let completedMonths=0;
+  let checkDate=new Date(start);
+  while(true){
+    checkDate=new Date(checkDate.getFullYear(),checkDate.getMonth()+1,startDay);
+    if(checkDate>now||checkDate>end)break;
+    completedMonths++;
+  }
+  const yMonthly=completedMonths/12;
+  const Amonthly=completedMonths>0?P*Math.pow(1+rAnn/n,n*yMonthly):P;
+  const monthlyAccrued=Amonthly-P;
+  const monthlyTaxBase=Math.max(0,monthlyAccrued-tf);
+  const monthlyTax=monthlyTaxBase*tax;
+  const monthlyNet=monthlyAccrued-monthlyTax;
   const rPerSec=rAnn/(365.25*24*3600);
   const perSec=A*rPerSec*(1-(interest>tf?tax:0));
   const perDay=perSec*86400;
-  const intPart=Math.floor(A).toLocaleString('uk-UA');
-  const decPart=(A%1).toFixed(2).slice(1);
+  // Show P + monthlyAccrued in the main counter (as per spec)
+  const displayA=P+monthlyAccrued;
+  const intPart=Math.floor(displayA).toLocaleString('uk-UA');
+  const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
   if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' ₴</span>';
   const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
   const dGone=Math.round(yEl*365.25);
   setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days'));
-  setText('liveInterest_'+depId,'+'+fmtLive(interest));
-  setText('liveTaxLive_'+depId,'−'+fmtLive(taxAmt));
-  setText('liveNet_'+depId,'+'+fmtLive(net));
+  // Stats: show monthly accrued for capitalization total; keep continuous for other stats
+  setText('liveInterest_'+depId,'+'+fmtLive(monthlyAccrued)+' ('+completedMonths+' міс)');
+  setText('liveTaxLive_'+depId,'−'+fmtLive(monthlyTax));
+  setText('liveNet_'+depId,'+'+fmtLive(monthlyNet));
   setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' ₴/с');
   setText('livePerDay_'+depId,'+'+fmtLive(perDay));
   const lb=$('liveBar_'+depId);
@@ -1392,6 +1635,9 @@ function getCustomTotal(){
 // ── LIVE STOCK PRICES ────────────────────────────────────────
 let stockPriceCache={};
 let usdUahRate=41;
+// Live exchange rates (UAH base) from frankfurter.app
+let liveRates={UAH:1,USD:41,EUR:45,RUB:0.44,CNY:5.7,GBP:52,PLN:10};
+let ratesLastFetched=0;
 let stockLastError='';
 
 // ── CONFIG ────────────────────────────────────────────────────
@@ -1444,7 +1690,26 @@ async function claudeGetStockData(tickers){
   return parsed;
 }
 
-async function fetchUsdUahRate(){}
+async function fetchUsdUahRate(){
+  try{
+    // Fetch all rates with UAH as base from ECB via frankfurter.app
+    const r=await fetch('https://api.frankfurter.app/latest?from=UAH&to=USD,EUR,RUB,CNY,GBP,PLN,CHF,JPY,CZK,TRY');
+    if(!r.ok)return;
+    const d=await r.json();
+    if(d.rates){
+      // frankfurter returns: how many USD per 1 UAH
+      // We need: how many UAH per 1 USD
+      Object.entries(d.rates).forEach(([cur,rate])=>{
+        liveRates[cur]=1/rate; // UAH per 1 unit of currency
+      });
+      liveRates.UAH=1;
+      usdUahRate=liveRates.USD||41;
+      ratesLastFetched=Date.now();
+      // Refresh display if currency is not UAH
+      if(displayCurrency!=='uah') updateAll();
+    }
+  }catch(e){}
+}
 
 async function fetchStockPrice(ticker){
   ticker=ticker.toUpperCase().trim();
@@ -1683,17 +1948,17 @@ function getSecCardHtml(s,idx){
         '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+j+')">×</button></td></tr>';
     }).join('')+
     '</table></div>'+
-    '<div class="sec-summary-divs"><div class="sd-label">💰 Дивідендний дохід</div>'+
-    '<div class="sd-row"><span class="sd-key">Річний дохід (за ціною)</span><span class="sd-val">+'+fmtN(Math.round(totalDiv))+' ₴/рік</span></div>'+
-    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">Абс. дивіденд ($/акція)</span><span class="sd-val">+'+fmtN(Math.round(totalDivAbs))+' ₴/рік</span></div>':'')+
-    '<div class="sd-row"><span class="sd-key">В місяць</span><span class="sd-val">~'+fmtN(Math.round(totalDiv/12))+' ₴</span></div>'+
+    '<div class="sec-summary-divs"><div class="sd-label">'+t('divIncome')+'</div>'+
+    '<div class="sd-row"><span class="sd-key">'+t('divAnnual')+'</span><span class="sd-val">+'+fmtN(Math.round(totalDiv))+' ₴'+t('perYear')+'</span></div>'+
+    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+fmtN(Math.round(totalDivAbs))+' ₴'+t('perYear')+'</span></div>':'')+
+    '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+fmtN(Math.round(totalDiv/12))+' ₴</span></div>'+
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(Math.round(total))+' ₴</span></div>'+
     '</div>'+
     (hasTickers?`<div class="auto-refresh-bar">
       <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
-      <button class="refresh-btn" id="refreshAllBtn_${s.id}" onclick="refreshAllStockPrices('${s.id}')">⟳ Оновити</button>
+      <button class="refresh-btn" id="refreshAllBtn_${s.id}" onclick="refreshAllStockPrices('${s.id}')">${t('secRefreshBtn')}</button>
     </div>`:'')
   ):'';
 
@@ -1717,13 +1982,13 @@ function getSecCardHtml(s,idx){
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
         <div class="ticker-search-row">
-          <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="Тікер: AAPL, MSFT...">
+          <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="${t('secTicker')}">
           <button class="ticker-fetch-btn" id="fetchBtn_${s.id}" onclick="fetchTickerForInput('${s.id}')">🔍 Отримати ціну</button>
         </div>
         <div class="stock-price-info" id="stockInfo_${s.id}"></div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Кількість акцій</div>
+            <div class="field-label">${t('secQtyShares')}</div>
             <input class="field-input" type="text" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
           </div>
           <div class="field-group">
@@ -1733,11 +1998,11 @@ function getSecCardHtml(s,idx){
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Поточна ціна (₴) <span style="color:var(--muted);font-size:9px">авто</span></div>
+            <div class="field-label">${t('secPriceCurrent')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
             <input class="field-input" type="text" id="secPrice_${s.id}" placeholder="автоматично" inputmode="decimal">
           </div>
           <div class="field-group">
-            <div class="field-label">Дивіденди (% річних) <span style="color:var(--muted);font-size:9px">авто</span></div>
+            <div class="field-label">${t('secDivPct')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
             <input class="field-input" type="text" id="secDiv_${s.id}" placeholder="авто" inputmode="decimal">
           </div>
         </div>
@@ -1831,8 +2096,13 @@ function updateAll(){
   const total=dep+crypto+usd+forex+cash+other+custom+securities;
   const nonZero=[dep,crypto,usd,forex,cash,other,custom,securities].filter(v=>v>0).length;
 
-  setText('totalAmount', fmtN(total));
-  setText('totalBreakdown', nonZero+' '+t('assets')+' · '+fmtN(total)+' ₴');
+  // Display in selected currency
+  const sym=getCurrSym();
+  const dispTotal=toDisplayCurr(total);
+  setText('totalAmount', fmtN(dispTotal));
+  const symEl=document.getElementById('totalCurrSym');
+  if(symEl)symEl.textContent=sym;
+  setText('totalBreakdown', nonZero+' '+t('assets')+' · '+fmtN(dispTotal)+' '+sym);
 
   const chEl=$('totalChange');
   if(dep&&total){
@@ -1845,43 +2115,43 @@ function updateAll(){
   }
 
   if(!hiddenCards['deposit']){
-    setText('depositDisplay', fmtN(dep)+' ₴');
+    setText('depositDisplay', fmtN(toDisplayCurr(dep))+' '+sym);
     setText('depositPct', pct(dep,total)+' '+t('pctOfCapital'));
     const sl=$('depositSummaryList');
     if(sl)sl.innerHTML=deposits.map(d=>`<div class="result-row">
       <span class="result-key">${d.name||t('deposit')}</span>
-      <span class="result-val blue">${fmtN(parseFloat(d.principal)||0)} ₴</span>
+      <span class="result-val blue">${fmtN(toDisplayCurr(parseFloat(d.principal)||0))} ${sym}</span>
     </div>`).join('');
   }
   if(!hiddenCards['crypto']){
-    setText('cryptoDisplay', fmtN(crypto)+' ₴');
+    setText('cryptoDisplay', fmtN(toDisplayCurr(crypto))+' '+sym);
     setText('cryptoPct', pct(crypto,total)+' '+t('pctOfCapital'));
-    setText('cryptoUahVal', fmtN(crypto)+' ₴');
+    setText('cryptoUahVal', fmtN(toDisplayCurr(crypto))+' '+sym);
     updateCryptoPnl();
     renderCoins();
   }
   if(!hiddenCards['usd']){
-    setText('usdDisplay', fmtN(usd)+' ₴');
+    setText('usdDisplay', fmtN(toDisplayCurr(usd))+' '+sym);
     setText('usdPct', pct(usd,total)+' '+t('pctOfCapital'));
-    setText('usdToUah', fmtN(usd)+' ₴');
+    setText('usdToUah', fmtN(toDisplayCurr(usd))+' '+sym);
   }
   if(!hiddenCards['forex']){
-    setText('forexDisplay', fmtN(forex)+' ₴');
+    setText('forexDisplay', fmtN(toDisplayCurr(forex))+' '+sym);
     setText('forexPct', pct(forex,total)+' '+t('pctOfCapital'));
     renderForex();
   }
   if(!hiddenCards['cash']){
-    setText('cashDisplay', fmtN(cash)+' ₴');
+    setText('cashDisplay', fmtN(toDisplayCurr(cash))+' '+sym);
     setText('cashPct', pct(cash,total)+' '+t('pctOfCapital'));
   }
   if(!hiddenCards['other']){
-    setText('otherDisplay', fmtN(other)+' ₴');
+    setText('otherDisplay', fmtN(toDisplayCurr(other))+' '+sym);
     setText('otherPct', pct(other,total)+' '+t('pctOfCapital'));
   }
 
   customSections.forEach(s=>{
     const v=parseFloat(s.principal)||0;
-    setText('customDisplay_'+s.id, fmtN(v)+' ₴');
+    setText('customDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
     setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
     calcCustomSection(s.id);
   });
@@ -1889,8 +2159,16 @@ function updateAll(){
   // Update securities display
   securitiesSections.forEach(s=>{
     const v=s.items.reduce((sum,it)=>sum+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0);
-    setText('secDisplay_'+s.id, fmtN(Math.round(v))+' ₴');
+    setText('secDisplay_'+s.id, fmtN(toDisplayCurr(Math.round(v)))+' '+sym);
     setText('secPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
+  });
+
+  // Update metals display
+  metalsSections.forEach(s=>{
+    const v=s.items.reduce((ss,it)=>ss+(getMetalPriceUah(it.type)>0?it.grams*getMetalPriceUah(it.type):it.grams*it.price),0);
+    const el=document.getElementById('card-'+s.id+' .card-value');
+    const valEl=document.querySelector('#card-'+s.id+' .card-value');
+    if(valEl)valEl.textContent=sym+fmtN(toDisplayCurr(v));
   });
 
   saveData();
@@ -2101,6 +2379,7 @@ function loadData(){
     if(Array.isArray(d.forexItems))forexItems=d.forexItems;
     if(Array.isArray(d.customSections))customSections=d.customSections;
     if(Array.isArray(d.securitiesSections))securitiesSections=d.securitiesSections;
+  if(Array.isArray(d.metalsSections))metalsSections=d.metalsSections;
     if(Array.isArray(d.cardOrder))cardOrder=d.cardOrder;
     if(d.hiddenCards)hiddenCards=d.hiddenCards;
     if(d.currentLang)currentLang=d.currentLang;
@@ -2113,6 +2392,12 @@ const secContainerEl=document.createElement('div');
 secContainerEl.id='securitiesContainer';
 secContainerEl.style.display='contents';
 $('customCardsContainer').after(secContainerEl);
+
+// Metals container
+const metalsContainerEl=document.createElement('div');
+metalsContainerEl.id='metalsContainer';
+metalsContainerEl.style.display='contents';
+secContainerEl.after(metalsContainerEl);
 
 // ── INIT ──────────────────────────────────────
 loadData();
@@ -2127,9 +2412,12 @@ Object.keys(hiddenCards).forEach(name=>{
   if(hiddenCards[name]){const c=$('card-'+name);if(c)c.style.display='none';}
 });
 
+// Create default sections on first load
+if(!securitiesSections.length) addDefaultSecuritiesCard();
 renderDeposits();
 renderCustomCards();
 renderSecuritiesCards();
+renderMetalsCards();
 updateAll();
 restoreOrder();
 initDrag();
@@ -2141,6 +2429,10 @@ setTimeout(()=>{
     if(s.items.some(it=>it.ticker))refreshAllStockPrices(s.id);
   });
 },500);
+// Fetch live exchange rates on startup
+fetchUsdUahRate();
+// Refresh rates every 6 hours
+setInterval(fetchUsdUahRate, 6*60*60*1000);
 startAutoRefresh();
 // ── FREEMIUM ─────────────────────────────────────────────────
 // isPro, FREE_LIMITS and openPaywall declared at top of script
@@ -2222,9 +2514,20 @@ setTimeout(updateProUI, 100);
 // ── CALCULATOR ────────────────────────────────────────────
 function openCalc(){
   document.getElementById('calcOverlay').classList.add('open');
-  // Pre-fill currency rate from app
-  const rateEl=document.getElementById('cur_rate');
-  if(rateEl&&!rateEl.value&&typeof usdUahRate!=='undefined')rateEl.value=usdUahRate.toFixed(2);
+  translateDynamicUI();
+  // Always update with latest live rates
+  const fields={cur_rate:liveRates.USD,cur_eur:liveRates.EUR,cur_rub:liveRates.RUB,cur_cny:liveRates.CNY};
+  Object.entries(fields).forEach(([id,rate])=>{
+    const el=document.getElementById(id);
+    if(el&&rate&&rate>0)el.value=rate.toFixed(2);
+  });
+  // Show rate source
+  const srcEl=document.getElementById('cur_rate_source');
+  if(srcEl){
+    const updated=ratesLastFetched?new Date(ratesLastFetched).toLocaleTimeString():'—';
+    srcEl.textContent='ECB via frankfurter.app · '+updated;
+  }
+  runCurrencyWithRates();
 }
 function closeCalc(){document.getElementById('calcOverlay').classList.remove('open');}
 function calcCloseOutside(e){if(e.target===document.getElementById('calcOverlay'))closeCalc();}
@@ -2344,6 +2647,368 @@ function selectPlan(plan){
     monthly.style.border='1.5px solid var(--border2)';
     monthly.style.background='transparent';
   }
+}
+
+// ── SETTINGS ─────────────────────────────────────────────
+const currencyRates={usd:0,eur:0,rub:0,cny:0};
+
+const SETTINGS_I18N={
+  uk:{title:'⚙️ Налаштування',langLbl:'Мова / Language',currLbl:'Відображення суми'},
+  ru:{title:'⚙️ Настройки',langLbl:'Язык / Language',currLbl:'Отображение суммы'},
+  en:{title:'⚙️ Settings',langLbl:'Language',currLbl:'Display currency'},
+  de:{title:'⚙️ Einstellungen',langLbl:'Sprache / Language',currLbl:'Währungsanzeige'},
+  zh:{title:'⚙️ 设置',langLbl:'语言 / Language',currLbl:'显示货币'},
+};
+function openSettings(){
+  const lang=currentLang||'uk';
+  const si=SETTINGS_I18N[lang]||SETTINGS_I18N.en;
+  const titleEl=document.getElementById('settingsTitleText');
+  if(titleEl)titleEl.textContent=si.title;
+  const langLblEl=document.getElementById('set_lang_label');
+  if(langLblEl)langLblEl.textContent=si.langLbl;
+  const currLblEl=document.getElementById('set_curr_label');
+  if(currLblEl)currLblEl.textContent=si.currLbl;
+  document.querySelectorAll('.settings-lang-btn').forEach(b=>{
+    b.classList.toggle('active', b.id==='slang-'+lang);
+  });
+  document.querySelectorAll('.settings-curr-btn').forEach(b=>{
+    b.classList.toggle('active', b.id==='scurr-'+displayCurrency);
+  });
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
+function settingsCloseOutside(e){if(e.target===document.getElementById('settingsOverlay'))closeSettings();}
+
+function setLangFromSettings(lang){
+  setLang(lang);
+  document.querySelectorAll('.settings-lang-btn').forEach(b=>{
+    b.classList.toggle('active', b.id==='slang-'+lang);
+  });
+}
+
+function getCurrSym(){return {'uah':'₴','usd':'$','eur':'€','rub':'₽','cny':'¥'}[displayCurrency]||'₴';}
+function getCurrRate(){
+  const cur=displayCurrency.toUpperCase();
+  if(cur==='UAH')return 1;
+  const rateUahPerCur=liveRates[cur];
+  if(rateUahPerCur&&rateUahPerCur>0)return 1/rateUahPerCur; // UAH → currency
+  // Fallback
+  return {'usd':1/(usdUahRate||41),'eur':1/((usdUahRate||41)*1.08),'rub':1/((usdUahRate||41)*0.009),'cny':1/((usdUahRate||41)/7.3)}[displayCurrency]||1;
+}
+function toDisplayCurr(uah){return Math.round(uah*getCurrRate());}
+
+function setDisplayCurrency(cur){
+  displayCurrency=cur;
+  localStorage.setItem('display_currency',cur);
+  document.querySelectorAll('.settings-curr-btn').forEach(b=>{
+    b.classList.toggle('active', b.id==='scurr-'+cur);
+  });
+  // Update all currency symbols in UI
+  document.querySelectorAll('.curr-sym').forEach(el=>el.textContent=getCurrSym());
+  updateAll();
+}
+
+function getTotalInCurrency(totalUah){
+  if(displayCurrency==='uah')return fmtN(Math.round(totalUah))+' ₴';
+  return getCurrSym()+fmtN(toDisplayCurr(totalUah));
+}
+
+// ── DEFAULT SECTION ON FIRST LOAD ────────────────────────
+function addDefaultSecuritiesCard(){
+  securitiesSections.push({id:'sec_stocks_default',type:'stocks',name:'Акції',icon:'📈',items:[],lastRefresh:null});
+}
+
+// ── PRECIOUS METALS ───────────────────────────────────────
+// Live prices per gram (USD) — fetched or fallback
+let metalPrices={gold:0,silver:0,platinum:0};
+// Fallback prices per gram in USD
+const METAL_FALLBACK={gold:97,silver:1.1,platinum:32};
+const METAL_NAMES={uk:{gold:'Золото',silver:'Срібло',platinum:'Платина'},ru:{gold:'Золото',silver:'Серебро',platinum:'Платина'},en:{gold:'Gold',silver:'Silver',platinum:'Platinum'},de:{gold:'Gold',silver:'Silber',platinum:'Platin'},zh:{gold:'黄金',silver:'白银',platinum:'铂金'}};
+const METAL_COLORS={gold:'#e8c97a',silver:'#a0aec0',platinum:'#b794f4'};
+
+function addMetalsCard(){
+  if(!isPro && metalsSections.length >= 1){
+    openPaywall('Більше 1 розділу металів — тільки в PRO 👑');
+    return;
+  }
+  const id='metals_'+Date.now();
+  metalsSections.push({id,items:[]});
+  renderMetalsCards();
+  saveData(); updateAll();
+}
+
+function addMetalItem(secId){
+  const typeEl=document.getElementById('metal_type_'+secId);
+  const gramsEl=document.getElementById('metal_grams_'+secId);
+  const priceEl=document.getElementById('metal_price_'+secId);
+  const type=typeEl?.value||'gold';
+  const grams=parseFloat(gramsEl?.value)||0;
+  const price=parseFloat(priceEl?.value)||0;
+  if(!grams||!price)return;
+  const idx=metalsSections.findIndex(s=>s.id===secId);
+  if(idx<0)return;
+  metalsSections[idx].items.push({type,grams,price});
+  if(gramsEl)gramsEl.value='';
+  if(priceEl)priceEl.value='';
+  renderMetalsCards(); updateAll(); saveData();
+}
+
+function removeMetalItem(secId,itemIdx){
+  const idx=metalsSections.findIndex(s=>s.id===secId);
+  if(idx<0)return;
+  metalsSections[idx].items.splice(itemIdx,1);
+  renderMetalsCards(); updateAll(); saveData();
+}
+
+function removeMetalsCard(secId){
+  if(!confirm(t('confirmDelete')))return;
+  metalsSections=metalsSections.filter(s=>s.id!==secId);
+  renderMetalsCards(); updateAll(); saveData();
+}
+
+function getMetalPriceUah(type){
+  const usd=metalPrices[type]||METAL_FALLBACK[type]||0;
+  return usd*(usdUahRate||41);
+}
+
+function getMetalsTotalUah(){
+  return metalsSections.reduce((sum,s)=>sum+s.items.reduce((ss,it)=>{
+    const currentPriceUah=getMetalPriceUah(it.type);
+    return ss+(currentPriceUah>0?it.grams*currentPriceUah:it.grams*it.price);
+  },0),0);
+}
+
+function renderMetalsCards(){
+  const container=document.getElementById('metalsContainer');
+  if(!container)return;
+  // Save expanded
+  const expanded=new Set();
+  container.querySelectorAll('.card.expanded').forEach(el=>expanded.add(el.id));
+  container.innerHTML=metalsSections.map(s=>getMetalsCardHtml(s)).join('');
+  container.querySelectorAll('.card').forEach(el=>{
+    if(expanded.has(el.id))el.classList.add('expanded');
+    el.setAttribute('draggable','true');
+  });
+  refreshDrag();
+}
+
+function getMetalsCardHtml(s){
+  const names=METAL_NAMES[currentLang]||METAL_NAMES.uk;
+  const sym=getCurrSym();
+
+  // Group by type
+  const byType={gold:{grams:0,value:0,items:[]},silver:{grams:0,value:0,items:[]},platinum:{grams:0,value:0,items:[]}};
+  s.items.forEach((it,idx)=>{
+    const priceUah=getMetalPriceUah(it.type);
+    const val=priceUah>0 ? it.grams*priceUah : it.grams*it.price;
+    byType[it.type].grams+=it.grams;
+    byType[it.type].value+=val;
+    byType[it.type].items.push({...it,idx,val});
+  });
+  const totalUah=Object.values(byType).reduce((a,b)=>a+b.value,0);
+  const totalGrams=Object.values(byType).reduce((a,b)=>a+b.grams,0);
+  const totalDisp=toDisplayCurr(totalUah);
+
+  // Summary cards for each metal
+  const metaSummary=['gold','silver','platinum'].map(m=>{
+    if(!byType[m].grams) return '';
+    const color=METAL_COLORS[m];
+    return `<div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;">
+      <div style="font-size:16px;margin-bottom:4px;">${m==='gold'?'🥇':m==='silver'?'🥈':'🔘'}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:${color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">${names[m]}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);margin-bottom:2px;">${byType[m].grams.toFixed(2)}г</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:${color};">${sym}${fmtN(toDisplayCurr(byType[m].value))}</div>
+    </div>`;
+  }).join('');
+
+  // Items list
+  const itemRows=s.items.map((it,j)=>{
+    const priceUah=getMetalPriceUah(it.type);
+    const val=priceUah>0?it.grams*priceUah:it.grams*it.price;
+    return `<div class="metal-item-row">
+      <div class="metal-dot" style="background:${METAL_COLORS[it.type]}"></div>
+      <div style="flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);">${names[it.type]} · ${it.grams}г</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold2);">${sym}${fmtN(toDisplayCurr(val))}</div>
+      <button class="rm-btn" onclick="removeMetalItem('${s.id}',${j})">×</button>
+    </div>`;
+  }).join('');
+
+  return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">💎</div>
+      <div class="card-info" onclick="toggleCard('${s.id}')">
+        <div class="card-name">${t('metalsBtn')||'Дорогоцінні метали'}</div>
+        <div class="card-value">${sym}${fmtN(totalDisp)}</div>
+        <div class="card-pct">~${totalGrams.toFixed(1)}г</div>
+      </div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="removeMetalsCard('${s.id}')">✕</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+      </div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      ${s.items.length?`
+      <!-- SUMMARY BY METAL -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        ${metaSummary}
+      </div>
+      <!-- TOTAL -->
+      <div class="result-box" style="margin-bottom:12px;">
+        <div class="result-row">
+          <span class="result-key">${t('metalTotalValue')}</span>
+          <span class="result-val gold">${sym}${fmtN(totalDisp)}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-key">${t('metalTotalGrams')}</span>
+          <span class="result-val">${totalGrams.toFixed(2)} г</span>
+        </div>
+      </div>
+      <!-- ITEMS LIST -->
+      <div style="margin-bottom:12px;">${itemRows}</div>
+      `:''}
+      <!-- ADD FORM -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
+        <div class="calc-title">${t('metalAdd')}</div>
+        <div class="row2" style="margin-bottom:10px;">
+          <div class="field-group">
+            <div class="field-label">${t('metalType')}</div>
+            <select class="field-input" id="metal_type_${s.id}" style="background:var(--bg3);">
+              <option value="gold">🥇 ${names.gold}</option>
+              <option value="silver">🥈 ${names.silver}</option>
+              <option value="platinum">🔘 ${names.platinum}</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">${t('metalGrams')}</div>
+            <input class="field-input" type="text" inputmode="decimal" id="metal_grams_${s.id}" placeholder="10.5">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${t('metalPrice')}</div>
+            <input class="field-input" type="text" inputmode="decimal" id="metal_price_${s.id}" placeholder="4000">
+          </div>
+        </div>
+        <button class="add-btn" onclick="addMetalItem('${s.id}')">+ Додати</button>
+      </div>
+      <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeMetalsCard('${s.id}')">${t('removeSection')}</button>
+    </div></div>
+  </div>`;
+}
+
+
+// ── SETTINGS & CURRENCY JS ────────────────────────────────
+function updateTotalDisplay(){
+  const totalEl=document.getElementById('totalAmount');
+  if(!totalEl)return;
+  const totalUah=parseFloat(totalEl.dataset.uah||0);
+  if(!totalUah)return;
+  if(displayCurrency==='uah'){
+    totalEl.textContent=fmtN(Math.round(totalUah));
+    return;
+  }
+  const rates={usd:usdUahRate||41,eur:(usdUahRate||41)*1.08,rub:(usdUahRate||41)*0.009,cny:(usdUahRate||41)*0.14};
+  const syms={usd:'$',eur:'€',rub:'₽',cny:'¥'};
+  const rate=rates[displayCurrency]||1;
+  totalEl.textContent=fmtN(Math.round(totalUah/rate));
+  const symEl=document.getElementById('totalCurrencySymbol');
+  if(symEl)symEl.textContent=syms[displayCurrency]||'₴';
+}
+
+// ── CALCULATOR: add RUB, CNY ──────────────────────────────
+function runCurrencyWithRates(){
+  const sum=parseFloat(document.getElementById('cur_sum')?.value)||0;
+  // Use live rates, fall back to manual input or estimate
+  const usd=parseFloat(document.getElementById('cur_rate')?.value)||(liveRates.USD||usdUahRate||41);
+  const eur=parseFloat(document.getElementById('cur_eur')?.value)||(liveRates.EUR||usd*1.08);
+  const rub=parseFloat(document.getElementById('cur_rub')?.value)||(liveRates.RUB||0.44);
+  const cny=parseFloat(document.getElementById('cur_cny')?.value)||(liveRates.CNY||5.7);
+  const from=document.getElementById('cur_from')?.value||'uah';
+  const box=document.getElementById('cur_result');
+  if(!sum){box.style.display='none';return;}
+  const fmt=n=>new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(n);
+  let rows=[];
+  const toUah={uah:1,usd:usd,eur:eur,rub:1/rub,cny:1/cny};
+  const syms={uah:'₴',usd:'$',eur:'€',rub:'₽',cny:'¥'};
+  const sumInUah=sum*(toUah[from]||1);
+  Object.entries(syms).forEach(([cur,sym])=>{
+    if(cur===from)return;
+    const val=sumInUah/(toUah[cur]||1);
+    rows.push([`${syms[from]}→${sym}`,fmt(val)+' '+sym,'var(--green2)']);
+  });
+  box.style.display='block';
+  box.innerHTML=rows.map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
+}
+
+// ── TRANSLATE CALCULATOR & PAYWALL ───────────────────────
+function translateDynamicUI(){
+  const ids={
+    'calc_title':'calcTitle','calc_tab_simple':'calcSimple','calc_tab_compound':'calcCompound','calc_tab_currency':'calcCurrency',
+    'picker_title':'pickerTitle',
+    'pw_title':'pwTitle','pw_sub':'pwSub',
+    'pw_f1':'pwF1','pw_f1sub':'pwF1sub','pw_f2':'pwF2','pw_f2sub':'pwF2sub',
+    'pw_f3':'pwF3','pw_f3sub':'pwF3sub','pw_f4':'pwF4','pw_f4sub':'pwF4sub',
+    'pw_btn':'pwBtn','pw_restore':'pwRestore','pw_close':'pwClose',
+  };
+  Object.entries(ids).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=t(key);
+  });
+  // Calculator labels
+  const labels={
+    'cp_sum_label':'calcSum','cp_rate_label':'calcRate','cp_months_label':'calcMonths',
+    'cp_capitaliz_label':'calcCapitaliz','cp_tax_label':'calcTax','cp_taxfree_label':'calcTaxFree',
+    'cur_sum_label':'calcCurSum','cur_rate_label':'calcCurUsd','cur_eur_label':'calcCurEur',
+    'cur_rub_label':'calcCurRub','cur_cny_label':'calcCurCny','cur_from_label':'calcCurFrom',
+  };
+  Object.entries(labels).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=t(key);
+  });
+  // Select options
+  const cpFreq=document.getElementById('cp_freq');
+  if(cpFreq){
+    const opts=cpFreq.options;
+    const keys=['calcMonthly','calcQuarterly','calcYearly','calcNoCapitaliz'];
+    for(let i=0;i<opts.length&&i<keys.length;i++) opts[i].text=t(keys[i]);
+  }
+  const curFrom=document.getElementById('cur_from');
+  if(curFrom){
+    const opts=curFrom.options;
+    const keys=['calcCurFromUah','calcCurFromUsd','calcCurFromEur','calcCurFromRub','calcCurFromCny'];
+    for(let i=0;i<opts.length&&i<keys.length;i++) opts[i].text=t(keys[i]);
+  }
+  // Picker descriptions
+  const pickerDescs={
+    'picker_desc_stocks':'metalStocksDesc','picker_desc_bonds':'metalBondsDesc',
+    'picker_desc_ovdp':'metalOvdpDesc','picker_desc_metals':'metalMetalsDesc',
+    'picker_desc_biz':'metalBizDesc','picker_desc_custom':'metalCustomDesc'
+  };
+  Object.entries(pickerDescs).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=t(key);
+  });
+}
+
+// ── SECTION PICKER ────────────────────────────────────────
+function openSectionPicker(){
+  translateDynamicUI();
+  document.getElementById('pickerOverlay').classList.add('open');
+}
+function closeSectionPicker(){
+  document.getElementById('pickerOverlay').classList.remove('open');
+}
+function pickerCloseOutside(e){
+  if(e.target===document.getElementById('pickerOverlay'))closeSectionPicker();
+}
+function pickerAdd(type){
+  closeSectionPicker();
+  if(type==='stocks'||type==='bonds'||type==='ovdp') addSecuritiesCard(type);
+  else if(type==='metals') addMetalsCard();
+  else if(type==='business') addSimpleCard('business');
+  else if(type==='custom') openAddSection();
 }
 
 </script>
