@@ -817,7 +817,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="simple-calc-display" id="sc_display">0</div>
       <div class="simple-calc-grid">
         <button class="sc-btn cl" onclick="sc('C')">C</button>
-        <button class="sc-btn cl" onclick="sc('±')">±</button>
+        <button class="sc-btn cl" onclick="sc('⌫')">⌫</button>
         <button class="sc-btn cl" onclick="sc('%')">%</button>
         <button class="sc-btn op" onclick="sc('/')">÷</button>
         <button class="sc-btn" onclick="sc('7')">7</button>
@@ -870,7 +870,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       </div>
       <div class="calc-field-row">
         <div class="calc-field"><label id="cur_eur_label">Євро/₴</label><input type="text" inputmode="decimal" id="cur_eur" placeholder="45" oninput="runCurrencyWithRates()"></div>
-        <div class="calc-field"><label id="cur_rub_label">₽ Рубль/₴</label><input type="text" inputmode="decimal" id="cur_rub" placeholder="0.44" oninput="runCurrencyWithRates()"></div>
+        <div class="calc-field"><label id="cur_rub_label">₽ Рубль/₴</label><input type="text" inputmode="decimal" id="cur_rub" placeholder="0.59" oninput="runCurrencyWithRates()"></div>
       </div>
       <div class="calc-field-row">
         <div class="calc-field"><label id="cur_cny_label">¥ Юань/₴</label><input type="text" inputmode="decimal" id="cur_cny" placeholder="5.7" oninput="runCurrencyWithRates()"></div>
@@ -1636,7 +1636,7 @@ function getCustomTotal(){
 let stockPriceCache={};
 let usdUahRate=41;
 // Live exchange rates (UAH base) from frankfurter.app
-let liveRates={UAH:1,USD:41,EUR:45,RUB:0.44,CNY:5.7,GBP:52,PLN:10};
+let liveRates={UAH:1,USD:41,EUR:45,RUB:0.59,CNY:5.7,GBP:52,PLN:10}; // RUB: ~1₽=0.59₴
 let ratesLastFetched=0;
 let stockLastError='';
 
@@ -1691,24 +1691,66 @@ async function claudeGetStockData(tickers){
 }
 
 async function fetchUsdUahRate(){
+  let success=false;
+
+  // Source 1: exchangerate-api.com (free, no key for v6 open endpoint)
   try{
-    // Fetch all rates with UAH as base from ECB via frankfurter.app
-    const r=await fetch('https://api.frankfurter.app/latest?from=UAH&to=USD,EUR,RUB,CNY,GBP,PLN,CHF,JPY,CZK,TRY');
-    if(!r.ok)return;
-    const d=await r.json();
-    if(d.rates){
-      // frankfurter returns: how many USD per 1 UAH
-      // We need: how many UAH per 1 USD
-      Object.entries(d.rates).forEach(([cur,rate])=>{
-        liveRates[cur]=1/rate; // UAH per 1 unit of currency
-      });
-      liveRates.UAH=1;
-      usdUahRate=liveRates.USD||41;
-      ratesLastFetched=Date.now();
-      // Refresh display if currency is not UAH
-      if(displayCurrency!=='uah') updateAll();
+    const r=await fetch('https://open.er-api.com/v6/latest/UAH');
+    if(r.ok){
+      const d=await r.json();
+      if(d.rates){
+        // Returns: how many of each currency per 1 UAH
+        // We need: how many UAH per 1 unit (invert)
+        Object.entries(d.rates).forEach(([cur,rate])=>{
+          if(rate&&rate>0) liveRates[cur.toUpperCase()]=1/rate;
+        });
+        liveRates.UAH=1;
+        usdUahRate=liveRates.USD||41;
+        ratesLastFetched=Date.now();
+        success=true;
+      }
     }
   }catch(e){}
+
+  // Source 2: frankfurter.app (ECB) — no RUB, but good for USD/EUR/CNY
+  if(!success){
+    try{
+      const r=await fetch('https://api.frankfurter.app/latest?from=UAH&to=USD,EUR,CNY,GBP,PLN,CHF,JPY,CZK,TRY');
+      if(r.ok){
+        const d=await r.json();
+        if(d.rates){
+          Object.entries(d.rates).forEach(([cur,rate])=>{
+            if(rate&&rate>0) liveRates[cur]=1/rate;
+          });
+          liveRates.UAH=1;
+          usdUahRate=liveRates.USD||41;
+          ratesLastFetched=Date.now();
+          success=true;
+        }
+      }
+    }catch(e){}
+  }
+
+  // Source 3: NBU for UAH/RUB specifically (if not already fetched)
+  // RUB not in ECB since 2022, use cross-rate: UAH/USD * USD/RUB
+  if(liveRates.USD&&liveRates.USD>1){
+    // Approximate: 1 RUB ≈ 0.011 USD * UAH/USD
+    // Better: use actual cross from open.er-api via USD base
+    try{
+      const r=await fetch('https://open.er-api.com/v6/latest/RUB');
+      if(r.ok){
+        const d=await r.json();
+        if(d.rates&&d.rates.UAH){
+          liveRates.RUB=d.rates.UAH; // UAH per 1 RUB
+        }
+      }
+    }catch(e){
+      // Fallback cross-rate
+      if(liveRates.USD>1) liveRates.RUB=liveRates.USD/85;
+    }
+  }
+
+  if(success&&displayCurrency!=='uah') updateAll();
 }
 
 async function fetchStockPrice(ticker){
@@ -1922,30 +1964,60 @@ function getSecCardHtml(s,idx){
   const hasTickers=s.items.some(it=>it.ticker);
   const themeClass='card-'+s.type;
 
+  // Group items by ticker symbol
+  const tickerGroups={};
+  s.items.forEach((it,j)=>{
+    const key=it.ticker||('__'+j);
+    if(!tickerGroups[key]) tickerGroups[key]={
+      ticker:it.ticker||null, name:it.liveName||it.name||it.ticker||'—',
+      liveChange:it.liveChange, curPrice:parseFloat(it.price)||0,
+      divYield:parseFloat(it.divYield)||parseFloat(it.div)||0, trades:[]
+    };
+    tickerGroups[key].trades.push({...it,origIdx:j});
+    if(it.liveName) tickerGroups[key].name=it.liveName;
+    if(it.liveChange!=null) tickerGroups[key].liveChange=it.liveChange;
+    if(parseFloat(it.price)>0) tickerGroups[key].curPrice=parseFloat(it.price);
+  });
+
   const rows=s.items.length>0?(
     '<div style="overflow-x:auto"><table class="sec-table"><tr>'+
     '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th>'+
     '<th>Ціна</th><th>Дивіденди</th><th>'+lang.secTotal+'</th><th>P&L</th><th></th></tr>'+
-    s.items.map((it,j)=>{
-      const qty=parseFloat(it.qty)||0;
-      const price=parseFloat(it.price)||0;
-      const buyPrice=parseFloat(it.buyPrice)||0;
-      const totVal=qty*price;
-      const divPct=parseFloat(it.divYield)||parseFloat(it.div)||0;
-      const pnl=buyPrice>0?totVal-qty*buyPrice:null;
+    Object.entries(tickerGroups).map(([key,g])=>{
+      const totalQty=g.trades.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
+      const totalBuyCost=g.trades.reduce((s,t)=>s+(parseFloat(t.buyPrice)>0?(parseFloat(t.qty)||0)*parseFloat(t.buyPrice):0),0);
+      const hasBuyPrice=g.trades.some(t=>parseFloat(t.buyPrice)>0);
+      const curVal=totalQty*g.curPrice;
+      const pnl=hasBuyPrice?curVal-totalBuyCost:null;
       const pnlClass=pnl===null?'':pnl>=0?'pnl-positive':'pnl-negative';
-      const changeClass=it.liveChange==null?'':(it.liveChange>=0?'price-up':'price-down');
-      const priceDisplay=it.ticker?
-        `<span class="${changeClass}">${fmtN(Math.round(price))}</span>${it.liveChange!=null?`<span style="font-size:9px;color:${it.liveChange>=0?'var(--green2)':'var(--red)'}">${it.liveChange>=0?'▲':'▼'}${Math.abs(it.liveChange).toFixed(1)}%</span>`:''}`
-        :fmtN(price);
-      return '<tr>'+
-        '<td class="td-name">'+(it.ticker?`<span style="font-family:\'DM Mono\',monospace;font-size:10px;background:#4ecb8d15;padding:1px 5px;border-radius:6px">${it.ticker}</span> `:'')+(it.liveName||it.name||'—')+'</td>'+
-        '<td>'+qty+'</td>'+
-        '<td class="td-live-price">'+priceDisplay+'</td>'+
-        '<td class="td-div">'+divPct.toFixed(1)+'%</td>'+
-        '<td>'+fmtN(Math.round(totVal))+'</td>'+
-        '<td class="td-pnl">'+(pnl!==null?`<span class="${pnlClass}">${pnl>=0?'+':''}${fmtN(Math.round(pnl))}</span>`:'—')+'</td>'+
-        '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+j+')">×</button></td></tr>';
+      const changeClass=g.liveChange==null?'':(g.liveChange>=0?'price-up':'price-down');
+      const isGrouped=g.trades.length>1;
+      const trId='tr_'+s.id+'_'+key.replace(/[^a-z0-9]/gi,'_');
+      const tickerBadge=g.ticker?'<span style="font-family:\'DM Mono\',monospace;font-size:10px;background:#4ecb8d15;padding:1px 5px;border-radius:6px">'+g.ticker+'</span> ':'';
+
+      const subRows=isGrouped?g.trades.map(t=>{
+        const qty=parseFloat(t.qty)||0, bp=parseFloat(t.buyPrice)||0, cp=parseFloat(t.price)||0;
+        const tv=qty*cp, tpnl=bp>0?tv-qty*bp:null;
+        const tpnlCol=tpnl===null?'var(--muted)':tpnl>=0?'var(--green2)':'var(--red)';
+        return '<tr style="background:var(--bg3);display:none" class="sub_'+trId+'">'+
+          '<td style="padding-left:20px;font-size:10px;color:var(--muted2)">↳ '+qty+' шт</td>'+
+          '<td style="font-size:10px;color:var(--muted2)">'+(bp>0?fmtN(Math.round(bp))+'₴':'—')+'</td>'+
+          '<td style="font-size:10px">'+fmtN(Math.round(cp))+'₴</td><td></td>'+
+          '<td style="font-size:10px">'+fmtN(Math.round(tv))+'</td>'+
+          '<td style="font-size:10px;color:'+tpnlCol+'">'+(tpnl!==null?(tpnl>=0?'+':'')+fmtN(Math.round(tpnl)):'—')+'</td>'+
+          '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+t.origIdx+')">×</button></td></tr>';
+      }).join(''):'';
+
+      const expandHint=isGrouped?' <span style="font-size:9px;color:var(--muted)">▼ '+g.trades.length+'</span>':'';
+      return '<tr'+(isGrouped?' onclick="toggleSecTrades(\''+trId+'\',this)" style="cursor:pointer"':'')+'>'+
+        '<td class="td-name">'+tickerBadge+g.name+expandHint+'</td>'+
+        '<td>'+totalQty+'</td>'+
+        '<td class="td-live-price"><span class="'+changeClass+'">'+fmtN(Math.round(g.curPrice))+'</span>'+(g.liveChange!=null?'<span style="font-size:9px;color:'+(g.liveChange>=0?'var(--green2)':'var(--red)')+'">'+(g.liveChange>=0?'▲':'▼')+Math.abs(g.liveChange).toFixed(1)+'%</span>':'')+'</td>'+
+        '<td class="td-div">'+g.divYield.toFixed(1)+'%</td>'+
+        '<td>'+fmtN(Math.round(curVal))+'</td>'+
+        '<td class="td-pnl">'+(pnl!==null?'<span class="'+pnlClass+'">'+(pnl>=0?'+':'')+fmtN(Math.round(pnl))+'</span>':'—')+'</td>'+
+        '<td>'+(isGrouped?'':'<button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+g.trades[0].origIdx+')">×</button>')+'</td></tr>'+
+        subRows;
     }).join('')+
     '</table></div>'+
     '<div class="sec-summary-divs"><div class="sd-label">'+t('divIncome')+'</div>'+
@@ -2432,7 +2504,7 @@ setTimeout(()=>{
 // Fetch live exchange rates on startup
 fetchUsdUahRate();
 // Refresh rates every 6 hours
-setInterval(fetchUsdUahRate, 6*60*60*1000);
+setInterval(fetchUsdUahRate, 15*60*1000); // refresh every 15 min
 startAutoRefresh();
 // ── FREEMIUM ─────────────────────────────────────────────────
 // isPro, FREE_LIMITS and openPaywall declared at top of script
@@ -2515,7 +2587,7 @@ setTimeout(updateProUI, 100);
 function openCalc(){
   document.getElementById('calcOverlay').classList.add('open');
   translateDynamicUI();
-  // Always update with latest live rates
+  // Pre-fill: UAH per 1 unit of each currency
   const fields={cur_rate:liveRates.USD,cur_eur:liveRates.EUR,cur_rub:liveRates.RUB,cur_cny:liveRates.CNY};
   Object.entries(fields).forEach(([id,rate])=>{
     const el=document.getElementById(id);
@@ -2525,7 +2597,7 @@ function openCalc(){
   const srcEl=document.getElementById('cur_rate_source');
   if(srcEl){
     const updated=ratesLastFetched?new Date(ratesLastFetched).toLocaleTimeString():'—';
-    srcEl.textContent='ECB via frankfurter.app · '+updated;
+    const src=ratesLastFetched?'open.er-api.com · ':'Fallback · ';srcEl.textContent=src+updated;
   }
   runCurrencyWithRates();
 }
@@ -2543,6 +2615,12 @@ let sc_expr='',sc_prev='',sc_op='',sc_newNum=true;
 function sc(v){
   const disp=document.getElementById('sc_display');
   if(v==='C'){sc_expr='';sc_prev='';sc_op='';sc_newNum=true;disp.textContent='0';return;}
+  if(v==='⌫'){
+    if(sc_newNum||disp.textContent==='0')return;
+    const s=disp.textContent.slice(0,-1);
+    disp.textContent=s===''||s==='-'?'0':s;
+    return;
+  }
   if(v==='±'){const n=parseFloat(disp.textContent)||0;disp.textContent=String(-n);return;}
   if(v==='%'){const n=parseFloat(disp.textContent)||0;disp.textContent=String(n/100);return;}
   if(['+','-','*','/'].includes(v)){
@@ -2773,8 +2851,9 @@ function getMetalPriceUah(type){
 
 function getMetalsTotalUah(){
   return metalsSections.reduce((sum,s)=>sum+s.items.reduce((ss,it)=>{
-    const currentPriceUah=getMetalPriceUah(it.type);
-    return ss+(currentPriceUah>0?it.grams*currentPriceUah:it.grams*it.price);
+    const curPrice=getMetalPriceUah(it.type);
+    // Use current price if available, else buy price
+    return ss+(curPrice>0?it.grams*curPrice:it.grams*it.price);
   },0),0);
 }
 
@@ -2796,40 +2875,64 @@ function getMetalsCardHtml(s){
   const names=METAL_NAMES[currentLang]||METAL_NAMES.uk;
   const sym=getCurrSym();
 
-  // Group by type
-  const byType={gold:{grams:0,value:0,items:[]},silver:{grams:0,value:0,items:[]},platinum:{grams:0,value:0,items:[]}};
-  s.items.forEach((it,idx)=>{
-    const priceUah=getMetalPriceUah(it.type);
-    const val=priceUah>0 ? it.grams*priceUah : it.grams*it.price;
+  // Group by type — track both buy cost and current value separately
+  const byType={
+    gold:{grams:0,buyCost:0,currentVal:0},
+    silver:{grams:0,buyCost:0,currentVal:0},
+    platinum:{grams:0,buyCost:0,currentVal:0}
+  };
+  s.items.forEach(it=>{
+    const curPriceUah=getMetalPriceUah(it.type); // live price per gram
+    const buyVal=it.grams*it.price;              // what you paid
+    const curVal=curPriceUah>0?it.grams*curPriceUah:buyVal; // current worth
     byType[it.type].grams+=it.grams;
-    byType[it.type].value+=val;
-    byType[it.type].items.push({...it,idx,val});
+    byType[it.type].buyCost+=buyVal;
+    byType[it.type].currentVal+=curVal;
   });
-  const totalUah=Object.values(byType).reduce((a,b)=>a+b.value,0);
-  const totalGrams=Object.values(byType).reduce((a,b)=>a+b.grams,0);
-  const totalDisp=toDisplayCurr(totalUah);
 
-  // Summary cards for each metal
+  const totalBuy=Object.values(byType).reduce((a,b)=>a+b.buyCost,0);
+  const totalCur=Object.values(byType).reduce((a,b)=>a+b.currentVal,0);
+  const totalGrams=Object.values(byType).reduce((a,b)=>a+b.grams,0);
+  const pnl=totalCur-totalBuy;
+  const pnlPct=totalBuy>0?(pnl/totalBuy*100):0;
+  const pnlColor=pnl>=0?'var(--green2)':'var(--red)';
+  const pnlSign=pnl>=0?'+':'';
+
+  // Summary cards per metal type
   const metaSummary=['gold','silver','platinum'].map(m=>{
     if(!byType[m].grams) return '';
     const color=METAL_COLORS[m];
+    const mpnl=byType[m].currentVal-byType[m].buyCost;
+    const mpnlSign=mpnl>=0?'+':'';
+    const mpnlColor=mpnl>=0?'var(--green2)':'var(--red)';
     return `<div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;">
-      <div style="font-size:16px;margin-bottom:4px;">${m==='gold'?'🥇':m==='silver'?'🥈':'🔘'}</div>
+      <div style="font-size:16px;margin-bottom:3px;">${m==='gold'?'🥇':m==='silver'?'🥈':'🔘'}</div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:${color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">${names[m]}</div>
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);margin-bottom:2px;">${byType[m].grams.toFixed(2)}г</div>
-      <div style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:${color};">${sym}${fmtN(toDisplayCurr(byType[m].value))}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${byType[m].grams.toFixed(2)}г</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${color};margin-top:2px;">${sym}${fmtN(toDisplayCurr(byType[m].currentVal))}</div>
+      ${mpnl!==0?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:${mpnlColor};">${mpnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(mpnl)))}</div>`:''}
     </div>`;
   }).join('');
 
-  // Items list
+  // Items list with buy price and current value
   const itemRows=s.items.map((it,j)=>{
-    const priceUah=getMetalPriceUah(it.type);
-    const val=priceUah>0?it.grams*priceUah:it.grams*it.price;
-    return `<div class="metal-item-row">
-      <div class="metal-dot" style="background:${METAL_COLORS[it.type]}"></div>
-      <div style="flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);">${names[it.type]} · ${it.grams}г</div>
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold2);">${sym}${fmtN(toDisplayCurr(val))}</div>
-      <button class="rm-btn" onclick="removeMetalItem('${s.id}',${j})">×</button>
+    const curPriceUah=getMetalPriceUah(it.type);
+    const buyVal=it.grams*it.price;
+    const curVal=curPriceUah>0?it.grams*curPriceUah:buyVal;
+    const ipnl=curVal-buyVal;
+    const ipnlSign=ipnl>=0?'+':'';
+    const ipnlCol=ipnl>=0?'var(--green2)':'var(--red)';
+    return `<div class="metal-item-row" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="metal-dot" style="background:${METAL_COLORS[it.type]};flex-shrink:0;"></div>
+        <div style="flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);">${names[it.type]} · ${it.grams}г</div>
+        <button class="rm-btn" onclick="removeMetalItem('${s.id}',${j})">×</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0 16px;font-family:'DM Mono',monospace;font-size:10px;">
+        <span style="color:var(--muted2)">Куплено: ${sym}${fmtN(toDisplayCurr(buyVal))}</span>
+        <span style="color:var(--gold2)">Зараз: ${sym}${fmtN(toDisplayCurr(curVal))}</span>
+        <span style="color:${ipnlCol}">${ipnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(ipnl)))}</span>
+      </div>
     </div>`;
   }).join('');
 
@@ -2839,8 +2942,8 @@ function getMetalsCardHtml(s){
       <div class="card-icon">💎</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${t('metalsBtn')||'Дорогоцінні метали'}</div>
-        <div class="card-value">${sym}${fmtN(totalDisp)}</div>
-        <div class="card-pct">~${totalGrams.toFixed(1)}г</div>
+        <div class="card-value">${sym}${fmtN(toDisplayCurr(totalCur))}</div>
+        <div class="card-pct" style="color:${pnlColor}">${pnlSign}${pnlPct.toFixed(1)}% · ${totalGrams.toFixed(1)}г</div>
       </div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeMetalsCard('${s.id}')">✕</button>
@@ -2850,25 +2953,26 @@ function getMetalsCardHtml(s){
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       ${s.items.length?`
-      <!-- SUMMARY BY METAL -->
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-        ${metaSummary}
-      </div>
-      <!-- TOTAL -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;">${metaSummary}</div>
       <div class="result-box" style="margin-bottom:12px;">
         <div class="result-row">
+          <span class="result-key">Куплено за</span>
+          <span class="result-val" style="color:var(--muted2)">${sym}${fmtN(toDisplayCurr(totalBuy))}</span>
+        </div>
+        <div class="result-row">
           <span class="result-key">${t('metalTotalValue')}</span>
-          <span class="result-val gold">${sym}${fmtN(totalDisp)}</span>
+          <span class="result-val gold">${sym}${fmtN(toDisplayCurr(totalCur))}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-key">P&L</span>
+          <span class="result-val" style="color:${pnlColor}">${pnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(pnl)))} (${pnlSign}${pnlPct.toFixed(1)}%)</span>
         </div>
         <div class="result-row">
           <span class="result-key">${t('metalTotalGrams')}</span>
           <span class="result-val">${totalGrams.toFixed(2)} г</span>
         </div>
       </div>
-      <!-- ITEMS LIST -->
-      <div style="margin-bottom:12px;">${itemRows}</div>
-      `:''}
-      <!-- ADD FORM -->
+      <div style="margin-bottom:12px;">${itemRows}</div>`:''}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
         <div class="calc-title">${t('metalAdd')}</div>
         <div class="row2" style="margin-bottom:10px;">
@@ -2920,26 +3024,43 @@ function updateTotalDisplay(){
 // ── CALCULATOR: add RUB, CNY ──────────────────────────────
 function runCurrencyWithRates(){
   const sum=parseFloat(document.getElementById('cur_sum')?.value)||0;
-  // Use live rates, fall back to manual input or estimate
-  const usd=parseFloat(document.getElementById('cur_rate')?.value)||(liveRates.USD||usdUahRate||41);
-  const eur=parseFloat(document.getElementById('cur_eur')?.value)||(liveRates.EUR||usd*1.08);
-  const rub=parseFloat(document.getElementById('cur_rub')?.value)||(liveRates.RUB||0.44);
-  const cny=parseFloat(document.getElementById('cur_cny')?.value)||(liveRates.CNY||5.7);
-  const from=document.getElementById('cur_from')?.value||'uah';
   const box=document.getElementById('cur_result');
   if(!sum){box.style.display='none';return;}
-  const fmt=n=>new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(n);
-  let rows=[];
-  const toUah={uah:1,usd:usd,eur:eur,rub:1/rub,cny:1/cny};
-  const syms={uah:'₴',usd:'$',eur:'€',rub:'₽',cny:'¥'};
-  const sumInUah=sum*(toUah[from]||1);
+  const from=document.getElementById('cur_from')?.value||'uah';
+
+  // All rates = UAH per 1 unit of currency (e.g. USD=41 means 1$=41₴)
+  // Field values are also UAH per 1 unit
+  const uahPerUsd=parseFloat(document.getElementById('cur_rate')?.value)||(liveRates.USD||41);
+  const uahPerEur=parseFloat(document.getElementById('cur_eur')?.value)||(liveRates.EUR||45);
+  const uahPerRub=parseFloat(document.getElementById('cur_rub')?.value)||(liveRates.RUB||0.44);
+  const uahPerCny=parseFloat(document.getElementById('cur_cny')?.value)||(liveRates.CNY||5.7);
+
+  // UAH per 1 unit map
+  const uahPer={uah:1, usd:uahPerUsd, eur:uahPerEur, rub:uahPerRub, cny:uahPerCny};
+  const syms={uah:'₴', usd:'$', eur:'€', rub:'₽', cny:'¥'};
+
+  // Convert input to UAH first, then to each target currency
+  const sumInUah=sum*(uahPer[from]||1);
+
+  const fmt=n=>{
+    if(n>=1000)return new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(n);
+    if(n>=1)return n.toFixed(2);
+    return n.toFixed(4);
+  };
+
+  const rows=[];
   Object.entries(syms).forEach(([cur,sym])=>{
     if(cur===from)return;
-    const val=sumInUah/(toUah[cur]||1);
-    rows.push([`${syms[from]}→${sym}`,fmt(val)+' '+sym,'var(--green2)']);
+    const rate=uahPer[cur]||1;
+    const val=sumInUah/rate;
+    rows.push([syms[from]+'→'+sym, fmt(val)+' '+sym]);
   });
+
   box.style.display='block';
-  box.innerHTML=rows.map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
+  box.innerHTML=rows.map(r=>`<div class="calc-res-row">
+    <span class="calc-res-key">${r[0]}</span>
+    <span class="calc-res-val" style="color:var(--green2)">${r[1]}</span>
+  </div>`).join('');
 }
 
 // ── TRANSLATE CALCULATOR & PAYWALL ───────────────────────
@@ -3009,6 +3130,11 @@ function pickerAdd(type){
   else if(type==='metals') addMetalsCard();
   else if(type==='business') addSimpleCard('business');
   else if(type==='custom') openAddSection();
+}
+
+function toggleSecTrades(id){
+  const rows=document.querySelectorAll('.sub_'+id);
+  rows.forEach(r=>r.style.display=r.style.display==='none'?'table-row':'none');
 }
 
 </script>
