@@ -391,6 +391,45 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .picker-item-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.05em;}
 .picker-divider{grid-column:span 2;height:1px;background:var(--border);margin:4px 0;}
 
+
+/* ── LIABILITIES ─────────────────────────────────────────── */
+.liab-section{padding:0 16px;margin-bottom:14px;}
+.liab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.liab-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;}
+.liab-card{background:var(--bg2);border:1px solid #f8717130;border-radius:16px;margin-bottom:10px;overflow:hidden;}
+.liab-card-header{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.liab-card-icon{font-size:20px;flex-shrink:0;}
+.liab-card-info{flex:1;min-width:0;}
+.liab-card-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text);}
+.liab-card-amount{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--red);}
+.liab-card-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-top:2px;}
+.liab-card-toggle{font-size:12px;color:var(--muted);transition:transform .2s;}
+.liab-card.expanded .liab-card-toggle{transform:rotate(180deg);}
+.liab-card-body{display:none;padding:0 16px 16px;}
+.liab-card.expanded .liab-card-body{display:block;}
+.liab-progress-wrap{margin:10px 0;}
+.liab-progress-bar-bg{background:var(--bg3);border-radius:20px;height:8px;overflow:hidden;margin:6px 0;}
+.liab-progress-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),#3ab87a);transition:width .3s;}
+.liab-progress-labels{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);}
+.liab-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.liab-stat-box{background:var(--bg3);border-radius:10px;padding:10px;text-align:center;}
+.liab-stat-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.liab-stat-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;}
+.liab-payment-breakdown{background:var(--bg3);border-radius:10px;padding:12px;margin:8px 0;}
+.liab-breakdown-row{display:flex;justify-content:space-between;padding:4px 0;font-family:'DM Mono',monospace;font-size:10px;}
+.liab-breakdown-key{color:var(--muted2);}
+.liab-breakdown-val{font-weight:600;}
+.liab-extra-box{background:#4ecb8d10;border:1px solid #4ecb8d30;border-radius:10px;padding:12px;margin-top:10px;}
+.liab-extra-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+.liab-extra-input-row{display:flex;gap:8px;align-items:center;}
+.liab-extra-result{font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);margin-top:6px;}
+.liab-net-banner{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:12px 16px;margin:8px 16px;display:flex;justify-content:space-between;align-items:center;}
+.liab-net-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+.liab-net-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;}
+.liab-add-btn{width:100%;background:var(--bg2);border:1px dashed #f8717140;border-radius:14px;padding:13px;font-family:'DM Mono',monospace;font-size:11px;color:var(--red);cursor:pointer;letter-spacing:0.05em;margin-bottom:8px;}
+.liab-toggle-net{font-family:'DM Mono',monospace;font-size:9px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;}
+.liab-toggle-net.active{background:var(--green);border-color:var(--green);color:#0a0a0f;font-weight:700;}
+
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
@@ -407,7 +446,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-currency" id="totalCurrSym">₴</div>
   </div>
-  <div class="total-subs" style="align-items:center;">
+  <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
     <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
   </div>
@@ -921,6 +960,87 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
 </div>
 
+
+<!-- TOP-UP MODAL -->
+<div class="picker-overlay" id="topupOverlay" onclick="topupCloseOutside(event)">
+  <div class="picker-box">
+    <div class="picker-head">
+      <span id="topup_title">+ Поповнити депозит</span>
+      <button class="picker-close" onclick="closeTopUpModal()">✕</button>
+    </div>
+    <input type="hidden" id="topup_dep_id" value="">
+    <div style="margin-bottom:12px;">
+      <div class="field-label" id="topup_amount_label">Сума поповнення (₴)</div>
+      <input class="field-input" type="text" inputmode="decimal" id="topup_amount_input" placeholder="1000">
+    </div>
+    <div style="margin-bottom:16px;">
+      <div class="field-label" id="topup_date_label">Дата поповнення</div>
+      <input class="field-input" type="date" id="topup_date_input">
+    </div>
+    <button class="add-btn" onclick="confirmTopUp()" id="topup_add_btn">Додати поповнення</button>
+  </div>
+</div>
+
+
+<!-- LIABILITIES SECTION -->
+<div class="liab-section" id="liabilitiesSection">
+  <div class="liab-header">
+    <div class="liab-title" id="liab_section_title">⚠️ ЗОБОВ'ЯЗАННЯ</div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="liab-toggle-net active" id="netCapitalToggle" onclick="toggleNetCapital(this)">Нетто</button>
+      <button class="liab-add-btn" style="width:auto;padding:6px 12px;margin:0;font-size:10px;" onclick="openLiabModal()" id="liab_add_btn_top">+ Кредит</button>
+    </div>
+  </div>
+  <div id="liabCardsContainer"></div>
+  <div id="liabNetBanner" style="display:none;" class="liab-net-banner">
+    <div>
+      <div class="liab-net-label" id="liab_net_label">НЕТТО-КАПІТАЛ</div>
+      <div class="liab-net-val" id="liabNetAmount" style="color:var(--green2)">0 ₴</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="liab-net-label" id="liab_debt_label">ЗАГАЛЬНИЙ БОРГ</div>
+      <div class="liab-net-val" id="liabTotalDebtAmount" style="color:var(--red)">0 ₴</div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LIAB MODAL -->
+<div class="picker-overlay" id="liabModal" onclick="liabModalCloseOutside(event)">
+  <div class="picker-box" style="max-height:90vh;overflow-y:auto;">
+    <div class="picker-head">
+      <span id="liab_modal_title">➕ Новий кредит</span>
+      <button class="picker-close" onclick="closeLiabModal()">✕</button>
+    </div>
+    <div class="calc-field-row">
+      <div class="calc-field">
+        <label id="liab_name_label">Назва</label>
+        <input class="field-input" type="text" id="liab_name_input" placeholder="Іпотека, авто-кредит...">
+      </div>
+    </div>
+    <div class="calc-field-row">
+      <div class="calc-field">
+        <label id="liab_amount_label">Сума боргу (₴)</label>
+        <input class="field-input" type="text" inputmode="decimal" id="liab_amount_input" placeholder="500 000">
+      </div>
+      <div class="calc-field">
+        <label id="liab_rate_label">Ставка (%/рік)</label>
+        <input class="field-input" type="text" inputmode="decimal" id="liab_rate_input" placeholder="20">
+      </div>
+    </div>
+    <div class="calc-field-row">
+      <div class="calc-field">
+        <label id="liab_months_label">Термін (місяців)</label>
+        <input class="field-input" type="text" inputmode="decimal" id="liab_months_input" placeholder="120">
+      </div>
+      <div class="calc-field">
+        <label id="liab_start_label">Дата відкриття</label>
+        <input class="field-input" type="date" id="liab_start_input">
+      </div>
+    </div>
+    <button class="add-btn" id="liab_confirm_btn" onclick="confirmAddLiab()" style="margin-top:8px;">Додати</button>
+  </div>
+</div>
+
 <div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 </div>
 
@@ -931,6 +1051,8 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 let isPro = localStorage.getItem('kapital_pro') === 'true';
 const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1, stockSections:1 };
 let displayCurrency = localStorage.getItem('display_currency') || 'uah';
+let liabilities = [];
+let showNetCapital = true;
 let metalsSections = [];
 function openPaywall(reason){
   const sub=document.querySelector('.paywall-sub');
@@ -960,7 +1082,15 @@ const LANGS={
     footer:'КАПІТАЛ · дані зберігаються локально на пристрої',
     confirmDelete:'Видалити цей розділ?',confirmDeleteCard:'Видалити цей блок? Дані будуть втрачені.',
     depSetup:'Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює',
-    depSettings:'⚙ Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depEnd:'Дата закінчення',
+    liabSection:'Зобовʼязання',liabBtn:'+ Додати кредит',liabTitle:'Кредити та іпотека',
+    liabName:'Назва',liabNamePh:'Іпотека, авто-кредит...',liabAmount:'Сума боргу',liabRate:'Ставка (%/рік)',
+    liabMonths:'Термін (місяців)',liabStartDate:'Дата відкриття',liabMonthlyPayment:'Щомісячний платіж',
+    liabPaid:'Виплачено',liabLeft:'Залишилось',liabOverpay:'Переплата',liabEffRate:'Ефективна ставка',
+    liabProgress:'Прогрес погашення',liabBodyDebt:'Тіло боргу',liabInterestPart:'Відсотки',
+    liabNetCapital:'Нетто-капітал (з урахуванням боргів)',liabGrossCapital:'Брутто-капітал',
+    liabTotalDebt:'Загальний борг',liabExtraPayment:'Якщо платити +X на місяць',liabSaveMonths:'Заощадить місяців',
+    liabAddBtn:'Додати',liabDeleteBtn:'Видалити кредит',
+    topupBtn:'+ Поповнити',topupTitle:'Поповнення депозиту',topupAmount:'Сума поповнення',topupDate:'Дата поповнення',topupAdd:'Додати поповнення',topupHistory:'Історія поповнень',topupTotal:'Загалом поповнено',topupDelete:'Видалити',depSettings:'⚙ Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depEnd:'Дата закінчення',
     compCalc:'⚡ Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
     taxPct:'Податок на прибуток (%)',taxFree:'Неоподатк. мінімум',
@@ -993,7 +1123,15 @@ const LANGS={
     footer:'КАПИТАЛ · данные хранятся локально на устройстве',
     confirmDelete:'Удалить этот раздел?',confirmDeleteCard:'Удалить этот блок? Данные будут потеряны.',
     depSetup:'Укажите дату открытия, сумму и ставку депозита — счётчик заработает',
-    depSettings:'⚙ Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depEnd:'Дата окончания',
+    liabSection:'Обязательства',liabBtn:'+ Добавить кредит',liabTitle:'Кредиты и ипотека',
+    liabName:'Название',liabNamePh:'Ипотека, авто-кредит...',liabAmount:'Сумма долга',liabRate:'Ставка (%/год)',
+    liabMonths:'Срок (месяцев)',liabStartDate:'Дата открытия',liabMonthlyPayment:'Ежемесячный платёж',
+    liabPaid:'Выплачено',liabLeft:'Осталось',liabOverpay:'Переплата',liabEffRate:'Эффективная ставка',
+    liabProgress:'Прогресс погашения',liabBodyDebt:'Тело долга',liabInterestPart:'Проценты',
+    liabNetCapital:'Нетто-капитал (с учётом долгов)',liabGrossCapital:'Брутто-капитал',
+    liabTotalDebt:'Общий долг',liabExtraPayment:'Если платить +X в месяц',liabSaveMonths:'Сэкономит месяцев',
+    liabAddBtn:'Добавить',liabDeleteBtn:'Удалить кредит',
+    topupBtn:'+ Пополнить',topupTitle:'Пополнение депозита',topupAmount:'Сумма пополнения',topupDate:'Дата пополнения',topupAdd:'Добавить пополнение',topupHistory:'История пополнений',topupTotal:'Итого пополнено',topupDelete:'Удалить',depSettings:'⚙ Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depEnd:'Дата окончания',
     compCalc:'⚡ Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
     taxPct:'Налог на прибыль (%)',taxFree:'Необлаг. минимум',
@@ -1026,7 +1164,15 @@ const LANGS={
     footer:'CAPITAL · data is stored locally on device',
     confirmDelete:'Delete this section?',confirmDeleteCard:'Delete this block? Data will be lost.',
     depSetup:'Enter start date, amount and rate — the counter will start',
-    depSettings:'⚙ Deposit Settings',depPrincipalLbl:'Deposit Amount (₴)',depStart:'Start Date',depEnd:'End Date',
+    liabSection:'Liabilities',liabBtn:'+ Add loan',liabTitle:'Loans & Mortgages',
+    liabName:'Name',liabNamePh:'Mortgage, car loan...',liabAmount:'Debt amount',liabRate:'Rate (%/year)',
+    liabMonths:'Term (months)',liabStartDate:'Start date',liabMonthlyPayment:'Monthly payment',
+    liabPaid:'Paid',liabLeft:'Remaining',liabOverpay:'Overpayment',liabEffRate:'Effective rate',
+    liabProgress:'Repayment progress',liabBodyDebt:'Principal',liabInterestPart:'Interest',
+    liabNetCapital:'Net capital (after debts)',liabGrossCapital:'Gross capital',
+    liabTotalDebt:'Total debt',liabExtraPayment:'If paying +X/month',liabSaveMonths:'Months saved',
+    liabAddBtn:'Add',liabDeleteBtn:'Delete loan',
+    topupBtn:'+ Top Up',topupTitle:'Deposit Top-Up',topupAmount:'Top-up amount',topupDate:'Top-up date',topupAdd:'Add top-up',topupHistory:'Top-up history',topupTotal:'Total topped up',topupDelete:'Delete',depSettings:'⚙ Deposit Settings',depPrincipalLbl:'Deposit Amount (₴)',depStart:'Start Date',depEnd:'End Date',
     compCalc:'⚡ Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
     monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
     taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
@@ -1059,7 +1205,15 @@ const LANGS={
     cashName:'Bargeld (₴)',amountUah:'Betrag (₴)',whereStored:'Wo aufbewahrt',
     currentAcc:'Girokonto',balanceUah:'Kontostand (₴)',bank:'Bank',
     depSetup:'Startdatum, Betrag und Zinssatz eingeben',
-    depSettings:'⚙ Einlageneinstellungen',depPrincipalLbl:'Einlagenbetrag (₴)',depStart:'Eröffnungsdatum',depEnd:'Enddatum',
+    liabSection:'Verbindlichkeiten',liabBtn:'+ Kredit hinzufügen',liabTitle:'Kredite & Hypotheken',
+    liabName:'Name',liabNamePh:'Hypothek, Autokredit...',liabAmount:'Schuldbetrag',liabRate:'Zinssatz (%/Jahr)',
+    liabMonths:'Laufzeit (Monate)',liabStartDate:'Startdatum',liabMonthlyPayment:'Monatliche Rate',
+    liabPaid:'Bezahlt',liabLeft:'Verbleibend',liabOverpay:'Mehrkosten',liabEffRate:'Effektivzins',
+    liabProgress:'Rückzahlungsfortschritt',liabBodyDebt:'Hauptschuld',liabInterestPart:'Zinsen',
+    liabNetCapital:'Nettovermögen (nach Schulden)',liabGrossCapital:'Bruttovermögen',
+    liabTotalDebt:'Gesamtschuld',liabExtraPayment:'Bei Zahlung +X/Monat',liabSaveMonths:'Monate gespart',
+    liabAddBtn:'Hinzufügen',liabDeleteBtn:'Kredit löschen',
+    topupBtn:'+ Einzahlen',topupTitle:'Einlagenaufstockung',topupAmount:'Aufstockungsbetrag',topupDate:'Aufstockungsdatum',topupAdd:'Aufstockung hinzufügen',topupHistory:'Aufstockungsverlauf',topupTotal:'Gesamt aufgestockt',topupDelete:'Löschen',depSettings:'⚙ Einlageneinstellungen',depPrincipalLbl:'Einlagenbetrag (₴)',depStart:'Eröffnungsdatum',depEnd:'Enddatum',
     rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
     monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
     compCalc:'⚡ Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
@@ -1092,7 +1246,15 @@ const LANGS={
     cashName:'现金 (₴)',amountUah:'金额 (₴)',whereStored:'存放位置',
     currentAcc:'活期账户',balanceUah:'余额 (₴)',bank:'银行',
     depSetup:'输入开始日期、金额和利率',
-    depSettings:'⚙ 存款设置',depPrincipalLbl:'存款金额 (₴)',depStart:'开始日期',depEnd:'结束日期',
+    liabSection:'负债',liabBtn:'+ 添加贷款',liabTitle:'贷款与按揭',
+    liabName:'名称',liabNamePh:'按揭、汽车贷款...',liabAmount:'债务金额',liabRate:'利率（%/年）',
+    liabMonths:'期限（月）',liabStartDate:'开始日期',liabMonthlyPayment:'月供',
+    liabPaid:'已还',liabLeft:'剩余',liabOverpay:'超额支付',liabEffRate:'实际利率',
+    liabProgress:'还款进度',liabBodyDebt:'本金',liabInterestPart:'利息',
+    liabNetCapital:'净资产（扣除债务）',liabGrossCapital:'总资产',
+    liabTotalDebt:'总债务',liabExtraPayment:'若每月多付+X',liabSaveMonths:'节省月数',
+    liabAddBtn:'添加',liabDeleteBtn:'删除贷款',
+    topupBtn:'+ 追加',topupTitle:'追加存款',topupAmount:'追加金额',topupDate:'追加日期',topupAdd:'添加追加',topupHistory:'追加历史',topupTotal:'共追加',topupDelete:'删除',depSettings:'⚙ 存款设置',depPrincipalLbl:'存款金额 (₴)',depStart:'开始日期',depEnd:'结束日期',
     rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
     monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
     compCalc:'⚡ 复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
@@ -1186,6 +1348,21 @@ function getDepositHtml(dep,idx){
           <div class="daily-scroll" id="dailyLog_${dep.id}"></div>
         </div>
       </div>
+      <button style="width:100%;margin:10px 0 6px;background:#5b9cf615;border:1px solid #5b9cf640;border-radius:12px;padding:11px;font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);cursor:pointer;letter-spacing:0.05em;" onclick="openTopUpModal('${dep.id}')">
+        ${t('topupBtn')||'+ Поповнити'}
+      </button>
+      ${(dep.topups&&dep.topups.length)?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">📋 ${t('topupHistory')||'Історія поповнень'}</div>
+        ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${new Date(tp.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'})}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600;">+${fmtN(tp.amount)} ₴</span>
+          <button class="rm-btn" onclick="removeTopUp('${dep.id}',${ti})">×</button>
+        </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding:6px 0 2px;font-family:'DM Mono',monospace;font-size:10px;margin-top:4px;">
+          <span style="color:var(--muted)">${t('topupTotal')||'Загалом'}</span>
+          <span style="color:var(--blue2);font-weight:700;">+${fmtN(dep.topups.reduce((s,tp)=>s+tp.amount,0))} ₴</span>
+        </div>
+      </div>`:''}
       <div class="dep-calc-toggle" id="depCalcToggle_${dep.id}" onclick="toggleDepCalc('${dep.id}')">
         <span class="dep-calc-toggle-label">${lang.depSettings}</span>
         <span class="dep-calc-toggle-icon">▼</span>
@@ -1215,7 +1392,8 @@ function getDepositHtml(dep,idx){
           <div class="field-group">
             <div class="field-label">${lang.depEnd}</div>
             <input class="field-input" type="date" id="depEndDate_${dep.id}" value="${dep.endDate}"
-              oninput="deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')">
+              oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')">
+            <div id="depDateError_${dep.id}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);margin-top:4px;display:none;">⚠ Невірна дата — перевірте кількість днів у місяці</div>
           </div>
         </div>
         <div class="calc-section">
@@ -1349,7 +1527,7 @@ function getDepositMonthlyAccrued(d){
   return P*Math.pow(1+rAnn/n,n*yMonthly)-P;
 }
 function getAllDepositsTotal(){
-  return deposits.reduce((sum,d)=>sum+getDepositPrincipalUah(d)+getDepositMonthlyAccrued(d),0);
+  return deposits.reduce((sum,d)=>sum+getDepositTotalWithTopups(d)+getDepositMonthlyAccruedWithTopups(d),0);
 }
 function calcDeposit(depId){
   const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
@@ -1379,7 +1557,10 @@ function fmtLive(n){
   return n.toFixed(2)+' ₴';
 }
 function calcLive(depId){
-  const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
+  const dep=deposits.find(d=>d.id===depId);
+  const P=getDepositPrincipalUah(dep||{})||parseFloat($('depPrincipal_'+depId)?.value)||0;
+  const topupsTotal=(dep?.topups||[]).reduce((s,tp)=>s+tp.amount,0);
+  const totalPrincipal=P+topupsTotal;
   const rAnn=parseFloat($('depRate_'+depId)?.value||16)/100;
   const n=parseFloat($('depFreq_'+depId)?.value||12);
   const tax=parseFloat($('depTax_'+depId)?.value||0)/100;
@@ -1421,8 +1602,9 @@ function calcLive(depId){
   const rPerSec=rAnn/(365.25*24*3600);
   const perSec=A*rPerSec*(1-(interest>tf?tax:0));
   const perDay=perSec*86400;
-  // Show P + monthlyAccrued in the main counter (as per spec)
-  const displayA=P+monthlyAccrued;
+  // Show (P + topups) + monthlyAccrued in the main counter
+  const accruedWithTopups=dep?getDepositMonthlyAccruedWithTopups(dep):monthlyAccrued;
+  const displayA=totalPrincipal+accruedWithTopups;
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
@@ -2452,6 +2634,7 @@ function loadData(){
     if(Array.isArray(d.customSections))customSections=d.customSections;
     if(Array.isArray(d.securitiesSections))securitiesSections=d.securitiesSections;
   if(Array.isArray(d.metalsSections))metalsSections=d.metalsSections;
+  if(Array.isArray(d.liabilities))liabilities=d.liabilities;
     if(Array.isArray(d.cardOrder))cardOrder=d.cardOrder;
     if(d.hiddenCards)hiddenCards=d.hiddenCards;
     if(d.currentLang)currentLang=d.currentLang;
@@ -2491,6 +2674,7 @@ renderCustomCards();
 renderSecuritiesCards();
 renderMetalsCards();
 updateAll();
+renderLiabilities();
 restoreOrder();
 initDrag();
 applyTranslations();
@@ -3101,6 +3285,20 @@ function translateDynamicUI(){
     const keys=['calcCurFromUah','calcCurFromUsd','calcCurFromEur','calcCurFromRub','calcCurFromCny'];
     for(let i=0;i<opts.length&&i<keys.length;i++) opts[i].text=t(keys[i]);
   }
+  // Liabilities section labels
+  const liabSectionTitle=document.getElementById('liab_section_title');
+  if(liabSectionTitle)liabSectionTitle.textContent='⚠️ '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
+  const liabAddBtnTop=document.getElementById('liab_add_btn_top');
+  if(liabAddBtnTop)liabAddBtnTop.textContent='+ '+(t('liabName')||'Кредит');
+  const netToggle=document.getElementById('netCapitalToggle');
+  if(netToggle)netToggle.title=t('liabNetCapital')||'Нетто-капітал';
+  const liabNetLabel=document.getElementById('liab_net_label');
+  if(liabNetLabel)liabNetLabel.textContent=(t('liabNetCapital')||'НЕТТО-КАПІТАЛ').toUpperCase();
+  const liabDebtLabel=document.getElementById('liab_debt_label');
+  if(liabDebtLabel)liabDebtLabel.textContent=(t('liabTotalDebt')||'ЗАГАЛЬНИЙ БОРГ').toUpperCase();
+  // Re-render liabilities with new language
+  if(typeof renderLiabilities==='function')renderLiabilities();
+
   // Picker descriptions
   const pickerDescs={
     'picker_desc_stocks':'metalStocksDesc','picker_desc_bonds':'metalBondsDesc',
@@ -3136,6 +3334,337 @@ function toggleSecTrades(id){
   const rows=document.querySelectorAll('.sub_'+id);
   rows.forEach(r=>r.style.display=r.style.display==='none'?'table-row':'none');
 }
+
+// ── TOP-UP DEPOSIT ───────────────────────────────────────
+function openTopUpModal(depId){
+  document.getElementById('topup_dep_id').value=depId;
+  // Set default date to today
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('topup_date_input').value=today;
+  document.getElementById('topup_amount_input').value='';
+  // Translate labels
+  document.getElementById('topup_title').textContent=t('topupTitle');
+  document.getElementById('topup_amount_label').textContent=t('topupAmount');
+  document.getElementById('topup_date_label').textContent=t('topupDate');
+  document.getElementById('topup_add_btn').textContent=t('topupAdd');
+  document.getElementById('topupOverlay').classList.add('open');
+}
+function closeTopUpModal(){
+  document.getElementById('topupOverlay').classList.remove('open');
+}
+function topupCloseOutside(e){
+  if(e.target===document.getElementById('topupOverlay'))closeTopUpModal();
+}
+function confirmTopUp(){
+  const depId=document.getElementById('topup_dep_id').value;
+  const amount=parseFloat(document.getElementById('topup_amount_input').value)||0;
+  const date=document.getElementById('topup_date_input').value;
+  if(!amount||!date){alert('Вкажіть суму і дату');return;}
+  const idx=deposits.findIndex(d=>d.id===depId);
+  if(idx<0)return;
+  if(!deposits[idx].topups) deposits[idx].topups=[];
+  // Insert sorted by date
+  deposits[idx].topups.push({amount,date});
+  deposits[idx].topups.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  closeTopUpModal();
+  renderDeposits();
+  startLiveTicker(depId);
+  updateAll();
+  saveData();
+}
+function removeTopUp(depId,topupIdx){
+  const idx=deposits.findIndex(d=>d.id===depId);
+  if(idx<0)return;
+  deposits[idx].topups.splice(topupIdx,1);
+  renderDeposits();
+  startLiveTicker(depId);
+  updateAll();
+  saveData();
+}
+
+// ── UPDATED DEPOSIT CALCULATIONS WITH TOP-UPS ────────────
+function getDepositTotalWithTopups(d){
+  // Base principal in UAH
+  const base=getDepositPrincipalUah(d);
+  // Sum of all top-ups in UAH
+  const topupsTotal=(d.topups||[]).reduce((s,tp)=>s+tp.amount,0);
+  return base+topupsTotal;
+}
+
+function getDepositMonthlyAccruedWithTopups(d){
+  const P=getDepositPrincipalUah(d);
+  if(!P||!d.startDate||!d.endDate)return 0;
+  const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
+  if(now<start||end<=start)return 0;
+  const rAnn=(parseFloat(d.rate)||16)/100;
+  const n=parseFloat(d.freq)||12;
+
+  function monthsCompleted(fromDate, toDate, limitDate){
+    const startDay=fromDate.getDate();
+    let months=0, check=new Date(fromDate);
+    while(true){
+      check=new Date(check.getFullYear(),check.getMonth()+1,startDay);
+      if(check>toDate||check>limitDate)break;
+      months++;
+    }
+    return months;
+  }
+
+  // Base principal accrual
+  const baseMonths=monthsCompleted(start,now,end);
+  const baseAccrued=baseMonths>0?P*Math.pow(1+rAnn/n,n*baseMonths/12)-P:0;
+
+  // Each top-up accrues from (topup date + 1 month)
+  let topupAccrued=0;
+  (d.topups||[]).forEach(tp=>{
+    const tpDate=new Date(tp.date);
+    if(tpDate>=end||tpDate<start)return;
+    const tpMonths=monthsCompleted(tpDate,now,end);
+    if(tpMonths>0){
+      topupAccrued+=tp.amount*Math.pow(1+rAnn/n,n*tpMonths/12)-tp.amount;
+    }
+  });
+
+  return baseAccrued+topupAccrued;
+}
+
+function validateDepDate(depId, input){
+  const val=input.value;
+  const errEl=document.getElementById('depDateError_'+depId);
+  if(!val||!errEl)return;
+  const d=new Date(val);
+  const isInvalid=isNaN(d.getTime());
+  errEl.style.display=isInvalid?'block':'none';
+  if(isInvalid) input.style.borderColor='var(--red)';
+  else input.style.borderColor='';
+}
+
+// ── LIABILITIES ──────────────────────────────────────────
+
+function getLiabilitiesTotal(){
+  return liabilities.reduce((sum,l)=>sum+getLiabRemaining(l),0);
+}
+
+function getLiabRemaining(l){
+  if(!l.startDate||!l.amount||!l.months)return l.amount||0;
+  const start=new Date(l.startDate), now=new Date();
+  const monthsPassed=Math.max(0,Math.floor((now-start)/(1000*60*60*24*365.25/12)));
+  const monthsDone=Math.min(monthsPassed,l.months);
+  const payment=calcAnnuity(l.amount,l.rate,l.months);
+  const r=(l.rate/100)/12;
+  // Calculate remaining balance after monthsDone payments
+  if(r===0)return Math.max(0,l.amount-payment*monthsDone);
+  return Math.max(0,l.amount*Math.pow(1+r,monthsDone)-payment*((Math.pow(1+r,monthsDone)-1)/r));
+}
+
+function calcAnnuity(P,annRate,months){
+  const r=(annRate/100)/12;
+  if(r===0)return P/months;
+  return P*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1);
+}
+
+function openLiabModal(editId){
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('liab_start_input').value=today;
+  document.getElementById('liab_name_input').value='';
+  document.getElementById('liab_amount_input').value='';
+  document.getElementById('liab_rate_input').value='';
+  document.getElementById('liab_months_input').value='';
+  document.getElementById('liab_confirm_btn').dataset.editId=editId||'';
+  // Translate
+  document.getElementById('liab_modal_title').textContent=t('liabBtn')||'+ Кредит';
+  document.getElementById('liab_name_label').textContent=t('liabName');
+  document.getElementById('liab_amount_label').textContent=t('liabAmount')+' (₴)';
+  document.getElementById('liab_rate_label').textContent=t('liabRate');
+  document.getElementById('liab_months_label').textContent=t('liabMonths');
+  document.getElementById('liab_start_label').textContent=t('liabStartDate');
+  document.getElementById('liab_confirm_btn').textContent=t('liabAddBtn');
+  document.getElementById('liabModal').classList.add('open');
+}
+function closeLiabModal(){document.getElementById('liabModal').classList.remove('open');}
+function liabModalCloseOutside(e){if(e.target===document.getElementById('liabModal'))closeLiabModal();}
+
+function confirmAddLiab(){
+  const name=document.getElementById('liab_name_input').value.trim()||t('liabNamePh');
+  const amount=parseFloat(document.getElementById('liab_amount_input').value)||0;
+  const rate=parseFloat(document.getElementById('liab_rate_input').value)||0;
+  const months=parseInt(document.getElementById('liab_months_input').value)||0;
+  const startDate=document.getElementById('liab_start_input').value;
+  if(!amount||!rate||!months){alert(t('enterData'));return;}
+  liabilities.push({id:'liab_'+Date.now(),name,amount,rate,months,startDate});
+  closeLiabModal();
+  renderLiabilities();
+  updateAll();
+  saveData();
+}
+
+function removeLiab(id){
+  if(!confirm(t('confirmDelete')))return;
+  liabilities=liabilities.filter(l=>l.id!==id);
+  renderLiabilities();
+  updateAll();
+  saveData();
+}
+
+function toggleNetCapital(btn){
+  showNetCapital=!showNetCapital;
+  btn.classList.toggle('active',showNetCapital);
+  renderLiabilities();
+  updateAll();
+}
+
+function renderLiabilities(){
+  const container=document.getElementById('liabCardsContainer');
+  if(!container)return;
+  const sym=getCurrSym();
+  const totalDebt=getLiabilitiesTotal();
+
+  // Net capital banner
+  const banner=document.getElementById('liabNetBanner');
+  if(banner){
+    banner.style.display=liabilities.length?'flex':'none';
+    if(liabilities.length){
+      // Get gross total from updateAll's last computed total
+      const grossTotal=parseFloat(document.getElementById('totalAmount')?.textContent?.replace(/\s/g,'')||0)*((usdUahRate||41)/toDisplayCurr(usdUahRate||41))||0;
+      document.getElementById('liabNetAmount').textContent=sym+fmtN(toDisplayCurr(Math.max(0,grossTotal-totalDebt)));
+      document.getElementById('liabTotalDebtAmount').textContent='-'+sym+fmtN(toDisplayCurr(totalDebt));
+    }
+  }
+
+  // Translate static labels
+  const secTitle=document.getElementById('liab_section_title');
+  if(secTitle)secTitle.textContent='⚠️ '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
+  const addBtn=document.getElementById('liab_add_btn_top');
+  if(addBtn)addBtn.textContent='+ '+(t('liabName')||'Кредит');
+
+  container.innerHTML=liabilities.map(l=>{
+    const payment=calcAnnuity(l.amount,l.rate,l.months);
+    const totalPay=payment*l.months;
+    const overpay=totalPay-l.amount;
+    const effRate=(overpay/l.amount/(l.months/12)*100);
+    const remaining=getLiabRemaining(l);
+    const paid=Math.max(0,l.amount-remaining+(totalPay-l.amount)*(1-remaining/l.amount));
+    const progress=Math.min(100,Math.max(0,(1-remaining/l.amount)*100));
+
+    // Monthly breakdown: principal vs interest for current payment
+    const r=(l.rate/100)/12;
+    const curInterest=remaining*r;
+    const curPrincipal=payment-curInterest;
+
+    // Extra payment calculator
+    const extraId='extra_'+l.id;
+
+    return `<div class="liab-card expanded" id="liab_card_${l.id}">
+      <div class="liab-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+        <div class="liab-card-icon">🏦</div>
+        <div class="liab-card-info">
+          <div class="liab-card-name">${l.name}</div>
+          <div class="liab-card-amount">-${sym}${fmtN(toDisplayCurr(remaining))}</div>
+          <div class="liab-card-sub">${sym}${fmtN(toDisplayCurr(payment))}/міс · ${l.months} міс · ${l.rate}%</div>
+        </div>
+        <div class="liab-card-toggle">▼</div>
+      </div>
+      <div class="liab-card-body">
+        <!-- PROGRESS BAR -->
+        <div class="liab-progress-wrap">
+          <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;margin-bottom:4px;">
+            <span style="color:var(--green2)">✓ ${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,l.amount-remaining)))}</span>
+            <span style="color:var(--red)">⟳ ${t('liabLeft')}: ${sym}${fmtN(toDisplayCurr(remaining))}</span>
+          </div>
+          <div class="liab-progress-bar-bg">
+            <div class="liab-progress-bar-fill" style="width:${progress.toFixed(1)}%"></div>
+          </div>
+          <div class="liab-progress-labels">
+            <span>${l.startDate?new Date(l.startDate).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'}):''}</span>
+            <span style="color:var(--green2)">${progress.toFixed(0)}%</span>
+            <span>${l.startDate?new Date(new Date(l.startDate).setMonth(new Date(l.startDate).getMonth()+l.months)).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'}):''}</span>
+          </div>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="liab-stats-grid">
+          <div class="liab-stat-box">
+            <div class="liab-stat-label">${t('liabMonthlyPayment')}</div>
+            <div class="liab-stat-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(payment))}</div>
+          </div>
+          <div class="liab-stat-box">
+            <div class="liab-stat-label">${t('liabOverpay')}</div>
+            <div class="liab-stat-val" style="color:var(--orange2)">${sym}${fmtN(toDisplayCurr(overpay))}</div>
+          </div>
+          <div class="liab-stat-box">
+            <div class="liab-stat-label">${t('liabBodyDebt')} / платіж</div>
+            <div class="liab-stat-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(curPrincipal))}</div>
+          </div>
+          <div class="liab-stat-box">
+            <div class="liab-stat-label">${t('liabInterestPart')} / платіж</div>
+            <div class="liab-stat-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(curInterest))}</div>
+          </div>
+        </div>
+
+        <!-- FULL BREAKDOWN -->
+        <div class="liab-payment-breakdown">
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">Сума боргу</span><span class="liab-breakdown-val" style="color:var(--text)">${sym}${fmtN(toDisplayCurr(l.amount))}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabLeft')}</span><span class="liab-breakdown-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(remaining))}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">Всього виплат</span><span class="liab-breakdown-val">${sym}${fmtN(toDisplayCurr(totalPay))}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabOverpay')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">+${sym}${fmtN(toDisplayCurr(overpay))}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabEffRate')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">${effRate.toFixed(2)}%</span></div>
+        </div>
+
+        <!-- EXTRA PAYMENT CALCULATOR -->
+        <div class="liab-extra-box">
+          <div class="liab-extra-label">💡 ${t('liabExtraPayment')}</div>
+          <div class="liab-extra-input-row">
+            <input class="field-input" type="text" inputmode="decimal" id="${extraId}" placeholder="+500 ₴"
+              style="flex:1;" oninput="calcExtraPayment('${l.id}',this.value,${l.amount},${l.rate},${l.months},${remaining})">
+          </div>
+          <div class="liab-extra-result" id="${extraId}_result"></div>
+        </div>
+
+        <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px;width:100%;" onclick="removeLiab('${l.id}')">
+          ${t('liabDeleteBtn')}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function calcExtraPayment(liabId,extraStr,amount,rate,months,remaining){
+  const extra=parseFloat(extraStr)||0;
+  if(!extra)return;
+  const r=(rate/100)/12;
+  const basePayment=calcAnnuity(amount,rate,months);
+  const totalPayment=basePayment+extra;
+  // Calculate how many months to pay off remaining balance with extra payment
+  let bal=remaining, m=0;
+  while(bal>0&&m<months*2){
+    bal=bal*(1+r)-totalPayment;
+    m++;
+  }
+  const baseMon=Math.ceil(remaining>0?Math.log(totalPayment/(totalPayment-remaining*r))/Math.log(1+r):0);
+  const saved=months-m;
+  const resultEl=document.getElementById('extra_'+liabId+'_result');
+  if(resultEl&&m>0){
+    resultEl.textContent=`✓ ${t('liabSaveMonths')}: ${Math.max(0,saved)} міс → закриєте за ${m} міс`;
+  }
+}
+
+// Update updateAll to subtract liabilities in net mode
+const _origUpdateAll=updateAll;
+updateAll=function(){
+  _origUpdateAll();
+  renderLiabilities();
+  // Update net capital display
+  if(showNetCapital&&liabilities.length>0){
+    const totalDebt=getLiabilitiesTotal();
+    const netEl=document.getElementById('liabNetAmount');
+    const debtEl=document.getElementById('liabTotalDebtAmount');
+    const sym=getCurrSym();
+    const grossDisp=parseFloat(document.getElementById('totalAmount')?.textContent?.replace(/[\s,]/g,'')||0);
+    const grossUah=grossDisp/(getCurrRate()||1);
+    if(netEl)netEl.textContent=sym+fmtN(toDisplayCurr(Math.max(0,grossUah-totalDebt)));
+    if(debtEl)debtEl.textContent='-'+sym+fmtN(toDisplayCurr(totalDebt));
+  }
+};
 
 </script>
 </body>
