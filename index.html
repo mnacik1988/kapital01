@@ -430,6 +430,24 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .liab-toggle-net{font-family:'DM Mono',monospace;font-size:9px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;}
 .liab-toggle-net.active{background:var(--green);border-color:var(--green);color:#0a0a0f;font-weight:700;}
 
+
+/* ── CAPITAL CHART ───────────────────────────────────────── */
+.chart-section{padding:0 16px;margin-bottom:14px;}
+.chart-card{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:16px;}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.chart-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+.chart-total{font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--gold2);}
+.chart-period-tabs{display:flex;gap:4px;}
+.chart-ptab{font-family:'DM Mono',monospace;font-size:9px;padding:4px 8px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;}
+.chart-ptab.active{background:var(--green);border-color:var(--green);color:#0a0a0f;font-weight:700;}
+.chart-wrap{position:relative;height:120px;margin-bottom:8px;}
+.chart-wrap svg{width:100%;height:100%;}
+.chart-labels{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);}
+.chart-stats{display:flex;gap:8px;margin-top:10px;}
+.chart-stat{flex:1;text-align:center;}
+.chart-stat-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;}
+.chart-stat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;}
+
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
 </style>
 </head>
@@ -473,6 +491,47 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <!-- CARDS -->
+
+<!-- CAPITAL GROWTH CHART -->
+<div class="chart-section" id="chartSection">
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title" id="chart_title_lbl">📉 ДИНАМІКА КАПІТАЛУ</div>
+        <div class="chart-total" id="chartCurrentTotal">0 ₴</div>
+      </div>
+      <div class="chart-period-tabs">
+        <button class="chart-ptab active" onclick="setChartPeriod('7d',this)" id="cpt_7d">7Д</button>
+        <button class="chart-ptab" onclick="setChartPeriod('30d',this)" id="cpt_30d">30Д</button>
+        <button class="chart-ptab" onclick="setChartPeriod('90d',this)" id="cpt_90d">90Д</button>
+        <button class="chart-ptab" onclick="setChartPeriod('1y',this)" id="cpt_1y">1Р</button>
+      </div>
+    </div>
+    <div class="chart-wrap" id="chartWrap">
+      <svg id="mainChart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="chart-labels" id="chartLabels"></div>
+    <div class="chart-stats">
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartMin">—</div>
+        <div class="chart-stat-lbl">Мін</div>
+      </div>
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartMax">—</div>
+        <div class="chart-stat-lbl">Макс</div>
+      </div>
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartChange">—</div>
+        <div class="chart-stat-lbl">Зміна</div>
+      </div>
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartGrowth">—</div>
+        <div class="chart-stat-lbl">Зростання</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="cards" id="cardsContainer">
 
   <!-- DEPOSIT CARD -->
@@ -620,13 +679,15 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="row3">
         <div class="field-group">
           <div class="field-label" data-i18n="currency">Валюта</div>
-          <select class="field-input" id="newForexCur">
+          <select class="field-input" id="newForexCur" onchange="autoFillForexRate()">
+            <option value="USD">$ USD</option>
             <option value="EUR">€ EUR</option>
             <option value="GBP">£ GBP</option>
             <option value="PLN">zł PLN</option>
             <option value="CHF">Fr CHF</option>
             <option value="CZK">Kč CZK</option>
             <option value="RUB">₽ RUB</option>
+            <option value="CNY">¥ CNY</option>
             <option value="KZT">₸ KZT</option>
             <option value="OTHER" data-i18n="other">Інша</option>
           </select>
@@ -714,6 +775,22 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 </div>
 
+<!-- STOCKS SUMMARY CARD (always in main menu) -->
+<div class="card card-stocks" id="stocksSummaryCard" style="display:none;cursor:pointer;" onclick="scrollToSecurities()">
+  <div class="card-header">
+    <div class="drag-handle">⠿</div>
+    <div class="card-icon">📈</div>
+    <div class="card-info">
+      <div class="card-name" id="stocks_summary_name">Акції</div>
+      <div class="card-value" id="stocks_summary_value">0 ₴</div>
+      <div class="card-pct" id="stocks_summary_pct">0% від капіталу</div>
+    </div>
+    <div class="card-actions">
+      <div style="font-size:16px;color:var(--muted)">↓</div>
+    </div>
+  </div>
+</div>
+
 <!-- ADD SECTION BUTTONS -->
 <div class="add-section-wrap" style="margin-top:14px;">
   <button class="add-one-btn" onclick="openSectionPicker()">
@@ -755,6 +832,11 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div class="picker-item-name" data-i18n="businessBtn">Бізнес</div>
         <div class="picker-item-desc" id="picker_desc_biz">Власна справа, частка</div>
       </div>
+      <div class="picker-item" onclick="pickerAdd('family')">
+        <div class="picker-item-icon">👨‍👩‍👧‍👦</div>
+        <div class="picker-item-name" id="picker_family_name">Сімейні витрати</div>
+        <div class="picker-item-desc" id="picker_desc_family">Комуналка, їжа, діти...</div>
+      </div>
       <div class="picker-item" onclick="pickerAdd('custom')">
         <div class="picker-item-icon">✏️</div>
         <div class="picker-item-name" data-i18n="addCustom">Власний розділ</div>
@@ -792,7 +874,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <div class="paywall-features">
       <div class="paywall-feature">
         <div class="paywall-feature-icon">📈</div>
-        <div><div class="paywall-feature-text" id="pw_f1">Живі ціни акцій</div><div class="paywall-feature-sub" id="pw_f1sub">Необмежено акцій з дивідендами</div></div>
+        <div><div class="paywall-feature-text" id="pw_f1">Онлайн статистика акцій</div><div class="paywall-feature-sub" id="pw_f1sub">Живі ціни, дивіденди, P&L в реальному часі</div></div>
       </div>
       <div class="paywall-feature">
         <div class="paywall-feature-icon">🏦</div>
@@ -803,8 +885,12 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div><div class="paywall-feature-text" id="pw_f3">Необмежені розділи</div><div class="paywall-feature-sub" id="pw_f3sub">Власні категорії активів</div></div>
       </div>
       <div class="paywall-feature">
+        <div class="paywall-feature-icon">📉</div>
+        <div><div class="paywall-feature-text" id="pw_f4">Графік динаміки капіталу</div><div class="paywall-feature-sub" id="pw_f4sub">Щоденна історія зростання активів</div></div>
+      </div>
+      <div class="paywall-feature">
         <div class="paywall-feature-icon">📄</div>
-        <div><div class="paywall-feature-text" id="pw_f4">Експорт PDF</div><div class="paywall-feature-sub" id="pw_f4sub">Звіт по всіх активах</div></div>
+        <div><div class="paywall-feature-text" id="pw_f5">Експорт PDF</div><div class="paywall-feature-sub" id="pw_f5sub">Повний звіт по всіх активах</div></div>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-bottom:16px;">
@@ -1041,6 +1127,28 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
 </div>
 
+
+<!-- PARTIAL PAYMENT MODAL -->
+<div class="picker-overlay" id="partialPayModal" onclick="partialPayCloseOutside(event)">
+  <div class="picker-box">
+    <div class="picker-head">
+      <span id="partial_pay_title">💳 Часткове погашення</span>
+      <button class="picker-close" onclick="closePartialPayModal()">✕</button>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);margin-bottom:12px;" id="partial_pay_info"></div>
+    <input type="hidden" id="partial_pay_liab_id">
+    <div style="margin-bottom:16px;">
+      <label class="field-label" id="partial_pay_amount_label">Сума платежу (₴)</label>
+      <input class="field-input" type="text" inputmode="decimal" id="partial_pay_amount" placeholder="5000">
+    </div>
+    <div style="margin-bottom:16px;">
+      <label class="field-label">Дата</label>
+      <input class="field-input" type="date" id="partial_pay_date">
+    </div>
+    <button class="add-btn" id="partial_pay_confirm" onclick="confirmPartialPay()">Погасити</button>
+  </div>
+</div>
+
 <div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 </div>
 
@@ -1082,7 +1190,7 @@ const LANGS={
     footer:'КАПІТАЛ · дані зберігаються локально на пристрої',
     confirmDelete:'Видалити цей розділ?',confirmDeleteCard:'Видалити цей блок? Дані будуть втрачені.',
     depSetup:'Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює',
-    liabSection:'Зобовʼязання',liabBtn:'+ Додати кредит',liabTitle:'Кредити та іпотека',
+    familyBtn:'Сімейні витрати',familyTitle:'Сімейні витрати',familyCommunal:'Комунальні послуги',familyFood:'Їжа',familyEntertain:'Розваги',familyMed:'Медицина',familyKids:'Діти',familyOther:'Інші витрати',familyAlimony:'Аліменти',familyTotal:'Загальні витрати',bizRent:'Оренда',bizSalary:'Зарплата',bizTax:'Податок',bizExpense:'Витрати',bizProfit:'Прибуток',bizTotal:'Чистий прибуток',bizIncome:'Доходи',partialPayBtn:'Частково погасити',partialPayTitle:'Часткове погашення',partialPayAmount:'Сума платежу',liabSection:'Зобовʼязання',liabBtn:'+ Додати кредит',liabTitle:'Кредити та іпотека',
     liabName:'Назва',liabNamePh:'Іпотека, авто-кредит...',liabAmount:'Сума боргу',liabRate:'Ставка (%/рік)',
     liabMonths:'Термін (місяців)',liabStartDate:'Дата відкриття',liabMonthlyPayment:'Щомісячний платіж',
     liabPaid:'Виплачено',liabLeft:'Залишилось',liabOverpay:'Переплата',liabEffRate:'Ефективна ставка',
@@ -1103,7 +1211,7 @@ const LANGS={
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Живі ціни акцій',pwF1sub:'Необмежено акцій з дивідендами',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Експорт PDF',pwF4sub:'Звіт по всіх активах',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Онлайн статистика акцій',pwF1sub:'Живі ціни, дивіденди, P&L в реальному часі',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Графік динаміки капіталу',pwF4sub:'Щоденна історія зростання активів',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
     secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'💰 Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
@@ -1123,7 +1231,7 @@ const LANGS={
     footer:'КАПИТАЛ · данные хранятся локально на устройстве',
     confirmDelete:'Удалить этот раздел?',confirmDeleteCard:'Удалить этот блок? Данные будут потеряны.',
     depSetup:'Укажите дату открытия, сумму и ставку депозита — счётчик заработает',
-    liabSection:'Обязательства',liabBtn:'+ Добавить кредит',liabTitle:'Кредиты и ипотека',
+    familyBtn:'Семейные расходы',familyTitle:'Семейные расходы',familyCommunal:'Коммунальные услуги',familyFood:'Еда',familyEntertain:'Развлечения',familyMed:'Медицина',familyKids:'Дети',familyOther:'Другие расходы',familyAlimony:'Алименты',familyTotal:'Общие расходы',bizRent:'Аренда',bizSalary:'Зарплата',bizTax:'Налог',bizExpense:'Расходы',bizProfit:'Прибыль',bizTotal:'Чистая прибыль',bizIncome:'Доходы',partialPayBtn:'Частично погасить',partialPayTitle:'Частичное погашение',partialPayAmount:'Сумма платежа',liabSection:'Обязательства',liabBtn:'+ Добавить кредит',liabTitle:'Кредиты и ипотека',
     liabName:'Название',liabNamePh:'Ипотека, авто-кредит...',liabAmount:'Сумма долга',liabRate:'Ставка (%/год)',
     liabMonths:'Срок (месяцев)',liabStartDate:'Дата открытия',liabMonthlyPayment:'Ежемесячный платёж',
     liabPaid:'Выплачено',liabLeft:'Осталось',liabOverpay:'Переплата',liabEffRate:'Эффективная ставка',
@@ -1144,7 +1252,7 @@ const LANGS={
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Живые цены акций',pwF1sub:'Неограниченно акций с дивидендами',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'Экспорт PDF',pwF4sub:'Отчёт по всем активам',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Онлайн статистика акций',pwF1sub:'Живые цены, дивиденды, P&L в реальном времени',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'График динамики капитала',pwF4sub:'Ежедневная история роста активов',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
     secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'💰 Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
@@ -1164,7 +1272,7 @@ const LANGS={
     footer:'CAPITAL · data is stored locally on device',
     confirmDelete:'Delete this section?',confirmDeleteCard:'Delete this block? Data will be lost.',
     depSetup:'Enter start date, amount and rate — the counter will start',
-    liabSection:'Liabilities',liabBtn:'+ Add loan',liabTitle:'Loans & Mortgages',
+    familyBtn:'Family expenses',familyTitle:'Family expenses',familyCommunal:'Utilities',familyFood:'Food',familyEntertain:'Entertainment',familyMed:'Healthcare',familyKids:'Children',familyOther:'Other expenses',familyAlimony:'Alimony',familyTotal:'Total expenses',bizRent:'Rent',bizSalary:'Salary',bizTax:'Tax',bizExpense:'Expenses',bizProfit:'Revenue',bizTotal:'Net profit',bizIncome:'Income',partialPayBtn:'Partial payment',partialPayTitle:'Partial repayment',partialPayAmount:'Payment amount',liabSection:'Liabilities',liabBtn:'+ Add loan',liabTitle:'Loans & Mortgages',
     liabName:'Name',liabNamePh:'Mortgage, car loan...',liabAmount:'Debt amount',liabRate:'Rate (%/year)',
     liabMonths:'Term (months)',liabStartDate:'Start date',liabMonthlyPayment:'Monthly payment',
     liabPaid:'Paid',liabLeft:'Remaining',liabOverpay:'Overpayment',liabEffRate:'Effective rate',
@@ -1185,7 +1293,7 @@ const LANGS={
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock prices',pwF1sub:'Unlimited stocks with dividends',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'PDF Export',pwF4sub:'Full asset report',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
+    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock statistics',pwF1sub:'Real-time prices, dividends & P&L',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'Capital growth chart',pwF4sub:'Daily asset growth history',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
     secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'💰 Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
@@ -1193,7 +1301,7 @@ const LANGS={
     liveCnt:'Live-Zähler',addDeposit:'+ Einlage',deleteDep:'Einlage löschen?',maxDep:'Max. 3 Einlagen',
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
-    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienpreise',pwF1sub:'Unbegrenzte Aktien mit Dividenden',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'PDF-Export',pwF4sub:'Vollständiger Asset-Bericht',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
+    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienstatistiken',pwF1sub:'Echtzeit-Preise, Dividenden & P&L',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'Kapitalwachstumsdiagramm',pwF4sub:'Tägliche Vermögenswachstumsgeschichte',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
     secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
     cryptoName:'Krypto · USDT',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
@@ -1205,7 +1313,7 @@ const LANGS={
     cashName:'Bargeld (₴)',amountUah:'Betrag (₴)',whereStored:'Wo aufbewahrt',
     currentAcc:'Girokonto',balanceUah:'Kontostand (₴)',bank:'Bank',
     depSetup:'Startdatum, Betrag und Zinssatz eingeben',
-    liabSection:'Verbindlichkeiten',liabBtn:'+ Kredit hinzufügen',liabTitle:'Kredite & Hypotheken',
+    familyBtn:'Familienausgaben',familyTitle:'Familienausgaben',familyCommunal:'Nebenkosten',familyFood:'Lebensmittel',familyEntertain:'Unterhaltung',familyMed:'Gesundheit',familyKids:'Kinder',familyOther:'Sonstige Ausgaben',familyAlimony:'Unterhalt',familyTotal:'Gesamtausgaben',bizRent:'Miete',bizSalary:'Gehalt',bizTax:'Steuer',bizExpense:'Ausgaben',bizProfit:'Umsatz',bizTotal:'Nettogewinn',bizIncome:'Einnahmen',partialPayBtn:'Teilzahlung',partialPayTitle:'Teilrückzahlung',partialPayAmount:'Zahlungsbetrag',liabSection:'Verbindlichkeiten',liabBtn:'+ Kredit hinzufügen',liabTitle:'Kredite & Hypotheken',
     liabName:'Name',liabNamePh:'Hypothek, Autokredit...',liabAmount:'Schuldbetrag',liabRate:'Zinssatz (%/Jahr)',
     liabMonths:'Laufzeit (Monate)',liabStartDate:'Startdatum',liabMonthlyPayment:'Monatliche Rate',
     liabPaid:'Bezahlt',liabLeft:'Verbleibend',liabOverpay:'Mehrkosten',liabEffRate:'Effektivzins',
@@ -1234,7 +1342,7 @@ const LANGS={
     liveCnt:'实时计数器',addDeposit:'+ 存款',deleteDep:'删除存款?',maxDep:'最多3个存款',
     deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
     stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
-    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票价格',pwF1sub:'无限股票含股息',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'PDF导出',pwF4sub:'完整资产报告',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
+    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票统计',pwF1sub:'实时价格、股息和P&L',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'资本增长图表',pwF4sub:'每日资产增长历史',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
     secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
     cryptoName:'加密货币 · USDT',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
@@ -1246,7 +1354,7 @@ const LANGS={
     cashName:'现金 (₴)',amountUah:'金额 (₴)',whereStored:'存放位置',
     currentAcc:'活期账户',balanceUah:'余额 (₴)',bank:'银行',
     depSetup:'输入开始日期、金额和利率',
-    liabSection:'负债',liabBtn:'+ 添加贷款',liabTitle:'贷款与按揭',
+    familyBtn:'家庭支出',familyTitle:'家庭支出',familyCommunal:'公用事业',familyFood:'食物',familyEntertain:'娱乐',familyMed:'医疗',familyKids:'孩子',familyOther:'其他支出',familyAlimony:'赡养费',familyTotal:'总支出',bizRent:'租金',bizSalary:'工资',bizTax:'税款',bizExpense:'支出',bizProfit:'营收',bizTotal:'净利润',bizIncome:'收入',partialPayBtn:'部分还款',partialPayTitle:'部分还款',partialPayAmount:'还款金额',liabSection:'负债',liabBtn:'+ 添加贷款',liabTitle:'贷款与按揭',
     liabName:'名称',liabNamePh:'按揭、汽车贷款...',liabAmount:'债务金额',liabRate:'利率（%/年）',
     liabMonths:'期限（月）',liabStartDate:'开始日期',liabMonthlyPayment:'月供',
     liabPaid:'已还',liabLeft:'剩余',liabOverpay:'超额支付',liabEffRate:'实际利率',
@@ -1721,6 +1829,7 @@ function getCustomCardHtml(s,idx){
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
+      ${(s.sectionType!=='business'&&s.sectionType!=='family')?`
       <div class="field-group">
         <div class="field-label">${lang.amountUah}</div>
         <input class="field-input" type="text" id="customPrincipal_${s.id}" placeholder="100 000" inputmode="decimal" value="${s.principal}"
@@ -1781,7 +1890,39 @@ function getCustomCardHtml(s,idx){
           <div class="result-row"><span class="result-key">${lang.netProfit}</span><span class="result-val green" id="cust-net_${s.id}">—</span></div>
           <div class="result-row"><span class="result-key">${lang.effRate}</span><span class="result-val" id="cust-eff_${s.id}">—</span></div>
         </div>
-      </div>
+      </div>`:''}
+      ${s.sectionType==='family'?`
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--orange2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">👨‍👩‍👧‍👦 ${t('familyTitle')||'Сімейні витрати'}</div>
+        ${['communal','food','entertain','med','kids','alimony','other'].map(field=>`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);width:110px;flex-shrink:0;">${t('family'+field.charAt(0).toUpperCase()+field.slice(1))||field}</div>
+            <input class="field-input" type="text" inputmode="decimal" id="family_${field}_${s.id}"
+              value="${(s.family&&s.family[field])||''}" placeholder="0"
+              style="flex:1;padding:8px 10px;font-size:13px;"
+              oninput="updateFamilyField('${s.id}','${field}',this.value)">
+          </div>`).join('')}
+        <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${t('familyTotal')||'Загальні витрати'}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--red);" id="family_total_${s.id}">0 ₴</span>
+        </div>
+      </div>`:''}
+      ${s.sectionType==='business'?`
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">💼 ${t('bizIncome')||'Доходи'} / ${t('bizExpense')||'Витрати'}</div>
+        ${['profit','rent','salary','tax','expense'].map(field=>`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:${['profit'].includes(field)?'var(--green2)':'var(--muted2)'};width:90px;flex-shrink:0;">${t('biz'+field.charAt(0).toUpperCase()+field.slice(1))||field}</div>
+            <input class="field-input" type="text" inputmode="decimal" id="biz_${field}_${s.id}"
+              value="${(s.biz&&s.biz[field])||''}" placeholder="0"
+              style="flex:1;padding:8px 10px;font-size:13px;"
+              oninput="updateBizField('${s.id}','${field}',this.value)">
+          </div>`).join('')}
+        <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${t('bizTotal')||'Чистий прибуток'}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;" id="biz_net_${s.id}" style="">0 ₴</span>
+        </div>
+      </div>`:''}
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">${lang.removeSection}</button>
     </div></div>
   </div>`;
@@ -2097,11 +2238,15 @@ function addSimpleCard(type){
   const cfg={
     gold:{icon:'🥇',uk:'Золото',ru:'Золото',en:'Gold'},
     silver:{icon:'🥈',uk:'Срібло',ru:'Серебро',en:'Silver'},
-    business:{icon:'💼',uk:'Бізнес',ru:'Бизнес',en:'Business'}
+    business:{icon:'💼',uk:'Бізнес',ru:'Бизнес',en:'Business',de:'Geschäft',zh:'商业'},
+    family:{icon:'👨‍👩‍👧‍👦',uk:'Сімейні витрати',ru:'Семейные расходы',en:'Family expenses',de:'Familienausgaben',zh:'家庭支出'}
   }[type];
   if(!cfg)return;
   const id='custom_'+type+'_'+Date.now();
-  customSections.push({id,name:cfg[currentLang]||cfg.uk,icon:cfg.icon,amount:'',note:'',color:'green'});
+  const section={id,name:cfg[currentLang]||cfg.uk,icon:cfg.icon,amount:'',note:'',color:'green',sectionType:type};
+  // Business gets extra fields
+  if(type==='business') section.biz={rent:0,salary:0,tax:0,expense:0,profit:0};
+  customSections.push(section);
   renderCustomCards(); updateAll(); saveData();
 }
 
@@ -2417,6 +2562,20 @@ function updateAll(){
     setText('secPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
   });
 
+  // Record daily snapshot for chart
+  recordDailySnapshot(total);
+  renderChart();
+
+  // Update stocks summary card in main menu
+  const totalSecurities=getSecuritiesTotal();
+  const stocksCard=document.getElementById('stocksSummaryCard');
+  if(stocksCard){
+    stocksCard.style.display=totalSecurities>0||securitiesSections.some(s=>s.items.length>0)?'block':'none';
+    setText('stocks_summary_name', t('stocksBtn')||'Акції');
+    setText('stocks_summary_value', fmtN(toDisplayCurr(totalSecurities))+' '+sym);
+    setText('stocks_summary_pct', pct(totalSecurities,total)+' '+t('pctOfCapital'));
+  }
+
   // Update metals display
   metalsSections.forEach(s=>{
     const v=s.items.reduce((ss,it)=>ss+(getMetalPriceUah(it.type)>0?it.grams*getMetalPriceUah(it.type):it.grams*it.price),0);
@@ -2678,6 +2837,10 @@ renderLiabilities();
 restoreOrder();
 initDrag();
 applyTranslations();
+
+// Load capital history and check onboarding
+loadCapitalHistory();
+setTimeout(checkOnboarding, 500);
 
 // Auto-refresh stock prices on startup if any tickers saved
 setTimeout(()=>{
@@ -3256,6 +3419,7 @@ function translateDynamicUI(){
     'pw_f1':'pwF1','pw_f1sub':'pwF1sub','pw_f2':'pwF2','pw_f2sub':'pwF2sub',
     'pw_f3':'pwF3','pw_f3sub':'pwF3sub','pw_f4':'pwF4','pw_f4sub':'pwF4sub',
     'pw_btn':'pwBtn','pw_restore':'pwRestore','pw_close':'pwClose',
+    'pw_f5':'pwF5','pw_f5sub':'pwF5sub',
   };
   Object.entries(ids).forEach(([id,key])=>{
     const el=document.getElementById(id);
@@ -3303,7 +3467,8 @@ function translateDynamicUI(){
   const pickerDescs={
     'picker_desc_stocks':'metalStocksDesc','picker_desc_bonds':'metalBondsDesc',
     'picker_desc_ovdp':'metalOvdpDesc','picker_desc_metals':'metalMetalsDesc',
-    'picker_desc_biz':'metalBizDesc','picker_desc_custom':'metalCustomDesc'
+    'picker_desc_biz':'metalBizDesc','picker_desc_custom':'metalCustomDesc',
+    'picker_family_name':'familyBtn','picker_desc_family':'familyBtn'
   };
   Object.entries(pickerDescs).forEach(([id,key])=>{
     const el=document.getElementById(id);
@@ -3327,6 +3492,7 @@ function pickerAdd(type){
   if(type==='stocks'||type==='bonds'||type==='ovdp') addSecuritiesCard(type);
   else if(type==='metals') addMetalsCard();
   else if(type==='business') addSimpleCard('business');
+  else if(type==='family') addSimpleCard('family');
   else if(type==='custom') openAddSection();
 }
 
@@ -3446,15 +3612,35 @@ function getLiabilitiesTotal(){
 }
 
 function getLiabRemaining(l){
-  if(!l.startDate||!l.amount||!l.months)return l.amount||0;
-  const start=new Date(l.startDate), now=new Date();
-  const monthsPassed=Math.max(0,Math.floor((now-start)/(1000*60*60*24*365.25/12)));
-  const monthsDone=Math.min(monthsPassed,l.months);
-  const payment=calcAnnuity(l.amount,l.rate,l.months);
+  if(!l.amount||!l.months)return l.amount||0;
   const r=(l.rate/100)/12;
-  // Calculate remaining balance after monthsDone payments
-  if(r===0)return Math.max(0,l.amount-payment*monthsDone);
-  return Math.max(0,l.amount*Math.pow(1+r,monthsDone)-payment*((Math.pow(1+r,monthsDone)-1)/r));
+  const payment=calcAnnuity(l.amount,l.rate,l.months);
+  let bal=l.amount;
+  const now=new Date();
+
+  // Step 1: Apply all partial payments made up to today (regardless of monthly cycle)
+  const partials=(l.partialPayments||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  partials.forEach(pp=>{
+    const pd=new Date(pp.date);
+    if(pd<=now) bal=Math.max(0,bal-pp.amount);
+  });
+
+  // Step 2: Apply regular monthly payments (annuity) from start date up to today
+  if(l.startDate){
+    const start=new Date(l.startDate);
+    // First payment is due 1 month AFTER start date
+    let paymentDate=new Date(start.getFullYear(),start.getMonth()+1,start.getDate());
+    let month=0;
+    while(month<l.months&&paymentDate<=now&&bal>0){
+      const interest=bal*r;
+      const principal=Math.min(payment-interest,bal);
+      bal=Math.max(0,bal-principal);
+      paymentDate=new Date(paymentDate.getFullYear(),paymentDate.getMonth()+1,paymentDate.getDate());
+      month++;
+      if(bal<=0.01)break;
+    }
+  }
+  return Math.max(0,bal);
 }
 
 function calcAnnuity(P,annRate,months){
@@ -3610,6 +3796,19 @@ function renderLiabilities(){
           <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabEffRate')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">${effRate.toFixed(2)}%</span></div>
         </div>
 
+        <!-- PARTIAL PAYMENTS HISTORY -->
+        ${l.partialPayments&&l.partialPayments.length?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:8px 0;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--blue2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">💳 Часткові погашення</div>
+          ${l.partialPayments.map((pp,pi)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;">
+            <span style="color:var(--muted2)">${new Date(pp.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'})}</span>
+            <span style="color:var(--blue2)">-${fmtN(pp.amount)} ₴</span>
+            <button class="rm-btn" onclick="removePartialPay('${l.id}',${pi})">×</button>
+          </div>`).join('')}
+          <div style="font-family:'DM Mono',monospace;font-size:10px;padding-top:6px;display:flex;justify-content:space-between;">
+            <span style="color:var(--muted)">Разом погашено</span>
+            <span style="color:var(--blue2);font-weight:600;">-${fmtN(l.partialPayments.reduce((s,pp)=>s+pp.amount,0))} ₴</span>
+          </div>
+        </div>`:''}
         <!-- EXTRA PAYMENT CALCULATOR -->
         <div class="liab-extra-box">
           <div class="liab-extra-label">💡 ${t('liabExtraPayment')}</div>
@@ -3620,7 +3819,10 @@ function renderLiabilities(){
           <div class="liab-extra-result" id="${extraId}_result"></div>
         </div>
 
-        <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px;width:100%;" onclick="removeLiab('${l.id}')">
+        <button class="add-btn" style="color:var(--blue2);border-color:#5b9cf640;background:#5b9cf610;margin-top:8px;width:100%;" onclick="openPartialPayModal('${l.id}','${(l.name||'').replace(/'/g,'').replace(/"/g,'')}',${remaining})">
+          ${t('partialPayBtn')||'+ Часткове погашення'}
+        </button>
+        <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:8px;width:100%;" onclick="removeLiab('${l.id}')">
           ${t('liabDeleteBtn')}
         </button>
       </div>
@@ -3665,6 +3867,335 @@ updateAll=function(){
     if(debtEl)debtEl.textContent='-'+sym+fmtN(toDisplayCurr(totalDebt));
   }
 };
+
+// ── FOREX AUTO-FILL RATE ─────────────────────────────────
+function autoFillForexRate(){
+  const cur=document.getElementById('newForexCur')?.value;
+  const rateEl=document.getElementById('newForexRate');
+  if(cur&&rateEl&&liveRates[cur]&&liveRates[cur]>0){
+    rateEl.value=liveRates[cur].toFixed(2);
+  }
+}
+
+// ── BUSINESS SECTION ─────────────────────────────────────
+function updateBizField(secId,field,val){
+  const idx=customSections.findIndex(s=>s.id===secId);
+  if(idx<0)return;
+  if(!customSections[idx].biz)customSections[idx].biz={};
+  customSections[idx].biz[field]=parseFloat(val)||0;
+  // Calculate net profit: profit - rent - salary - tax - expense
+  const b=customSections[idx].biz;
+  const net=(b.profit||0)-(b.rent||0)-(b.salary||0)-(b.tax||0)-(b.expense||0);
+  const netEl=document.getElementById('biz_net_'+secId);
+  if(netEl){
+    netEl.textContent=(net>=0?'+':'')+fmtN(Math.round(net))+' ₴';
+    netEl.style.color=net>=0?'var(--green2)':'var(--red)';
+  }
+  // Set section amount to net profit for total capital
+  customSections[idx].amount=Math.max(0,net);
+  updateAll();
+  saveData();
+}
+
+// ── PARTIAL LOAN PAYMENT ─────────────────────────────────
+function openPartialPayModal(liabId,liabName,remaining){
+  const el=document.getElementById('partial_pay_liab_id');
+  if(!el)return;
+  el.value=liabId||'';
+  document.getElementById('partial_pay_title').textContent=t('partialPayTitle')||'Часткове погашення';
+  document.getElementById('partial_pay_amount_label').textContent=t('partialPayAmount')||'Сума платежу (₴)';
+  document.getElementById('partial_pay_info').textContent=(liabName||'')+' · '+t('liabLeft')+': '+getCurrSym()+fmtN(toDisplayCurr(remaining||0));
+  document.getElementById('partial_pay_amount').value='';
+  document.getElementById('partial_pay_date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('partialPayModal').classList.add('open');
+}
+function closePartialPayModal(){document.getElementById('partialPayModal').classList.remove('open');}
+function partialPayCloseOutside(e){if(e.target===document.getElementById('partialPayModal'))closePartialPayModal();}
+
+function confirmPartialPay(){
+  const id=document.getElementById('partial_pay_liab_id').value;
+  const amount=parseFloat(document.getElementById('partial_pay_amount').value)||0;
+  const date=document.getElementById('partial_pay_date').value;
+  if(!amount||!date){alert(t('enterData'));return;}
+  const idx=liabilities.findIndex(l=>l.id===id);
+  if(idx<0)return;
+  if(!liabilities[idx].partialPayments)liabilities[idx].partialPayments=[];
+  liabilities[idx].partialPayments.push({amount,date});
+  liabilities[idx].partialPayments.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  closePartialPayModal();
+  renderLiabilities();
+  updateAll();
+  saveData();
+}
+
+function removePartialPay(liabId,idx){
+  const li=liabilities.findIndex(l=>l.id===liabId);
+  if(li<0)return;
+  liabilities[li].partialPayments.splice(idx,1);
+  renderLiabilities();updateAll();saveData();
+}
+
+function scrollToSecurities(){
+  const el=document.getElementById('securitiesContainer');
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function updateFamilyField(secId,field,val){
+  const idx=customSections.findIndex(s=>s.id===secId);
+  if(idx<0)return;
+  if(!customSections[idx].family)customSections[idx].family={};
+  customSections[idx].family[field]=parseFloat(val)||0;
+  const f=customSections[idx].family;
+  const total=(f.communal||0)+(f.food||0)+(f.entertain||0)+(f.med||0)+(f.kids||0)+(f.alimony||0)+(f.other||0);
+  const totalEl=document.getElementById('family_total_'+secId);
+  if(totalEl)totalEl.textContent=fmtN(Math.round(total))+' ₴';
+  customSections[idx].amount=total;
+  updateAll();saveData();
+}
+
+// ── DAILY CAPITAL SNAPSHOT ────────────────────────────────
+let capitalHistory = []; // [{date:'2026-01-01', total: 150000}]
+let chartPeriod = '30d';
+
+function loadCapitalHistory(){
+  const d=localStorage.getItem('cap_history');
+  if(d) capitalHistory=JSON.parse(d);
+}
+function saveCapitalHistory(){
+  // Keep max 365 entries
+  if(capitalHistory.length>365) capitalHistory=capitalHistory.slice(-365);
+  localStorage.setItem('cap_history',JSON.stringify(capitalHistory));
+}
+function recordDailySnapshot(total){
+  const today=new Date().toISOString().split('T')[0];
+  const existing=capitalHistory.findIndex(h=>h.date===today);
+  if(existing>=0) capitalHistory[existing].total=total;
+  else capitalHistory.push({date:today,total});
+  saveCapitalHistory();
+}
+
+function setChartPeriod(p,btn){
+  chartPeriod=p;
+  document.querySelectorAll('.chart-ptab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderChart();
+}
+
+function renderChart(){
+  const days={
+    '7d':7,'30d':30,'90d':90,'1y':365
+  }[chartPeriod]||30;
+
+  // Get data points for period
+  const now=new Date();
+  const points=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const dateStr=d.toISOString().split('T')[0];
+    const entry=capitalHistory.find(h=>h.date===dateStr);
+    points.push({date:dateStr,val:entry?.total||null});
+  }
+
+  // Fill gaps with last known value
+  let lastVal=points.find(p=>p.val!==null)?.val||0;
+  const filled=points.map(p=>{if(p.val!==null)lastVal=p.val;return{...p,val:lastVal};});
+
+  const vals=filled.map(p=>p.val);
+  const minVal=Math.min(...vals);
+  const maxVal=Math.max(...vals,minVal+1);
+  const range=maxVal-minVal||1;
+  const sym=getCurrSym();
+  const currentTotal=vals[vals.length-1]||0;
+  const firstVal=vals[0]||0;
+  const change=currentTotal-firstVal;
+  const changePct=firstVal>0?(change/firstVal*100):0;
+
+  // SVG path
+  const W=300,H=100;
+  const pathPoints=filled.map((p,i)=>{
+    const x=(i/(filled.length-1||1))*W;
+    const y=H-((p.val-minVal)/range)*(H-10)-5;
+    return`${x},${y}`;
+  });
+
+  const pathD='M'+pathPoints.join(' L');
+  const areaD=pathD+` L${W},${H+5} L0,${H+5} Z`;
+  const color=change>=0?'var(--green2)':'var(--red)';
+
+  const svg=document.getElementById('mainChart');
+  if(!svg)return;
+  svg.innerHTML=`
+    <defs>
+      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${change>=0?'#69f0ae':'#ff5252'}" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="${change>=0?'#69f0ae':'#ff5252'}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaD}" fill="url(#chartGrad)"/>
+    <path d="${pathD}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${W}" cy="${H-((currentTotal-minVal)/range)*(H-10)-5}" r="3" fill="${color}"/>
+  `;
+
+  // Labels
+  const labelEl=document.getElementById('chartLabels');
+  if(labelEl){
+    const step=Math.floor(filled.length/4);
+    const labelPoints=[0,step,step*2,step*3,filled.length-1].map(i=>filled[Math.min(i,filled.length-1)]);
+    labelEl.innerHTML=labelPoints.map(p=>
+      `<span>${new Date(p.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>`
+    ).join('');
+  }
+
+  // Stats
+  setText('chartCurrentTotal', sym+fmtN(toDisplayCurr(currentTotal)));
+  setText('chartMin', sym+fmtN(toDisplayCurr(minVal)));
+  setText('chartMax', sym+fmtN(toDisplayCurr(maxVal)));
+  const changeEl=document.getElementById('chartChange');
+  if(changeEl){changeEl.textContent=(change>=0?'+':'')+sym+fmtN(toDisplayCurr(Math.abs(change)));changeEl.style.color=change>=0?'var(--green2)':'var(--red)';}
+  const growthEl=document.getElementById('chartGrowth');
+  if(growthEl){growthEl.textContent=(changePct>=0?'+':'')+changePct.toFixed(1)+'%';growthEl.style.color=changePct>=0?'var(--green2)':'var(--red)';}
+}
+
+// ── ONBOARDING ────────────────────────────────────────────
+function checkOnboarding(){
+  if(localStorage.getItem('onboarded')==='1')return;
+  showOnboarding();
+}
+
+function showOnboarding(){
+  const overlay=document.createElement('div');
+  overlay.id='onboardingOverlay';
+  overlay.style.cssText='position:fixed;inset:0;background:#0c0c0fee;z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 48px;';
+  overlay.innerHTML=`
+    <div style="width:100%;max-width:480px;padding:0 16px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="font-size:56px;margin-bottom:12px;">💰</div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">Капітал</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);line-height:1.6;">Відстежуйте всі свої активи<br>в одному місці</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+        ${[
+          ['🏦','Депозити','Додайте банківський вклад з живим лічильником'],
+          ['📈','Акції','Відстежуйте портфель з онлайн цінами'],
+          ['💎','Метали','Золото, срібло, платина — все в одному місці'],
+          ['⚠️','Кредити','Контролюйте борги і часткові погашення'],
+        ].map(([i,n,d])=>`
+          <div style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;">
+            <div style="font-size:22px;flex-shrink:0;">${i}</div>
+            <div><div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:#fff;">${n}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-top:2px;">${d}</div></div>
+          </div>`).join('')}
+      </div>
+      <button onclick="finishOnboarding()" style="width:100%;background:linear-gradient(135deg,var(--gold),#c9a84c);border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;">
+        Почати →
+      </button>
+      <button onclick="finishOnboarding()" style="width:100%;background:transparent;border:none;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;">
+        Вже користуюсь
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function finishOnboarding(){
+  localStorage.setItem('onboarded','1');
+  const el=document.getElementById('onboardingOverlay');
+  if(el)el.remove();
+}
+
+// ── PDF EXPORT ────────────────────────────────────────────
+function exportPDF(){
+  if(!isPro){openPaywall('Експорт PDF — тільки в PRO 👑');return;}
+  const sym=getCurrSym();
+  const now=new Date().toLocaleDateString('uk-UA',{day:'numeric',month:'long',year:'numeric'});
+  let html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;color:#111;max-width:800px;margin:0 auto;padding:20px;}
+    h1{font-size:28px;margin-bottom:4px;}
+    .sub{color:#666;font-size:13px;margin-bottom:24px;}
+    table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+    th{background:#f5f5f5;padding:8px 12px;text-align:left;font-size:12px;color:#666;text-transform:uppercase;}
+    td{padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;}
+    .total{font-size:20px;font-weight:bold;color:#111;}
+    .section{margin-bottom:28px;}
+    h2{font-size:16px;margin-bottom:10px;color:#333;}
+    .positive{color:#00897b;}.negative{color:#e53935;}
+    .summary-box{background:#f9f9f9;border-radius:8px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;}
+    .summary-item{text-align:center;}
+    .summary-val{font-size:18px;font-weight:bold;}
+    .summary-lbl{font-size:11px;color:#999;margin-top:4px;}
+  </style></head><body>`;
+
+  // Header
+  const totalUah=getDepositsTotal()+getCryptoTotal()+getUsdTotal()+getForexTotal()+getCashTotal()+getCurrentTotal()+getSecuritiesTotal()+getCustomTotal()+getMetalsTotalUah();
+  html+=`<h1>💰 Капітал — Фінансовий звіт</h1>
+  <div class="sub">Згенеровано ${now}</div>
+  <div class="summary-box">
+    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(totalUah))}</div><div class="summary-lbl">Загальний капітал</div></div>
+    <div class="summary-item"><div class="summary-val">${deposits.length}</div><div class="summary-lbl">Депозитів</div></div>
+    <div class="summary-item"><div class="summary-val">${securitiesSections.reduce((s,sec)=>s+sec.items.length,0)}</div><div class="summary-lbl">Акцій</div></div>
+    <div class="summary-item"><div class="summary-val">${liabilities.length}</div><div class="summary-lbl">Кредитів</div></div>
+  </div>`;
+
+  // Deposits
+  if(deposits.length){
+    html+=`<div class="section"><h2>🏦 Депозити</h2><table>
+    <tr><th>Назва</th><th>Сума</th><th>Ставка</th><th>Закінчення</th><th>Нараховано</th></tr>`;
+    deposits.forEach(d=>{
+      const p=getDepositPrincipalUah(d);
+      const acc=getDepositMonthlyAccruedWithTopups(d);
+      html+=`<tr><td>${d.name||'Депозит'}</td><td>${sym}${fmtN(toDisplayCurr(p))}</td><td>${d.rate||0}%</td><td>${d.endDate||'—'}</td><td class="positive">+${sym}${fmtN(toDisplayCurr(acc))}</td></tr>`;
+    });
+    html+=`</table></div>`;
+  }
+
+  // Securities
+  if(securitiesSections.some(s=>s.items.length)){
+    html+=`<div class="section"><h2>📈 Акції</h2><table>
+    <tr><th>Тікер</th><th>Назва</th><th>К-сть</th><th>Ціна</th><th>Вартість</th></tr>`;
+    securitiesSections.forEach(sec=>{
+      sec.items.forEach(it=>{
+        const val=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
+        html+=`<tr><td>${it.ticker||'—'}</td><td>${it.liveName||it.name||'—'}</td><td>${it.qty}</td><td>${sym}${fmtN(toDisplayCurr(parseFloat(it.price)||0))}</td><td>${sym}${fmtN(toDisplayCurr(val))}</td></tr>`;
+      });
+    });
+    html+=`</table></div>`;
+  }
+
+  // Liabilities
+  if(liabilities.length){
+    html+=`<div class="section"><h2>⚠️ Зобов'язання</h2><table>
+    <tr><th>Назва</th><th>Початкова сума</th><th>Залишок</th><th>Платіж/міс</th><th>Ставка</th></tr>`;
+    liabilities.forEach(l=>{
+      const rem=getLiabRemaining(l);
+      const pay=calcAnnuity(l.amount,l.rate,l.months);
+      html+=`<tr><td>${l.name}</td><td>${sym}${fmtN(toDisplayCurr(l.amount))}</td><td class="negative">${sym}${fmtN(toDisplayCurr(rem))}</td><td>${sym}${fmtN(toDisplayCurr(pay))}</td><td>${l.rate}%</td></tr>`;
+    });
+    html+=`</table></div>`;
+  }
+
+  const netCapital=totalUah-getLiabilitiesTotal();
+  html+=`<div class="summary-box" style="margin-top:20px;">
+    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(totalUah))}</div><div class="summary-lbl">Брутто-капітал</div></div>
+    <div class="summary-item"><div class="summary-val negative">-${sym}${fmtN(toDisplayCurr(getLiabilitiesTotal()))}</div><div class="summary-lbl">Борги</div></div>
+    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(netCapital))}</div><div class="summary-lbl">Нетто-капітал</div></div>
+  </div>`;
+
+  html+=`</body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='Kapital_'+new Date().toISOString().split('T')[0]+'.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── PDF EXPORT BUTTON IN SETTINGS ────────────────────────
+function addExportButton(){
+  // Will be called from settings or header
+}
 
 </script>
 </body>
