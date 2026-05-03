@@ -495,43 +495,38 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <!-- CAPITAL GROWTH CHART -->
 <div class="chart-section" id="chartSection">
   <div class="chart-card">
-    <div class="chart-header" onclick="toggleChart()" style="cursor:pointer;">
+    <div class="chart-header">
       <div>
         <div class="chart-title" id="chart_title_lbl">📉 ДИНАМІКА КАПІТАЛУ</div>
         <div class="chart-total" id="chartCurrentTotal">0 ₴</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="chart-period-tabs" id="chartPeriodTabs" onclick="event.stopPropagation()">
-          <button class="chart-ptab active" onclick="setChartPeriod('7d',this)" id="cpt_7d">7Д</button>
-          <button class="chart-ptab" onclick="setChartPeriod('30d',this)" id="cpt_30d">30Д</button>
-          <button class="chart-ptab" onclick="setChartPeriod('90d',this)" id="cpt_90d">90Д</button>
-          <button class="chart-ptab" onclick="setChartPeriod('1y',this)" id="cpt_1y">1Р</button>
-        </div>
-        <div id="chartToggleArrow" style="font-size:11px;color:var(--muted);transition:transform .2s;">▼</div>
+      <div class="chart-period-tabs">
+        <button class="chart-ptab active" onclick="setChartPeriod('7d',this)" id="cpt_7d">7Д</button>
+        <button class="chart-ptab" onclick="setChartPeriod('30d',this)" id="cpt_30d">30Д</button>
+        <button class="chart-ptab" onclick="setChartPeriod('90d',this)" id="cpt_90d">90Д</button>
+        <button class="chart-ptab" onclick="setChartPeriod('1y',this)" id="cpt_1y">1Р</button>
       </div>
     </div>
-    <div id="chartBody">
-      <div class="chart-wrap" id="chartWrap">
-        <svg id="mainChart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+    <div class="chart-wrap" id="chartWrap">
+      <svg id="mainChart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="chart-labels" id="chartLabels"></div>
+    <div class="chart-stats">
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartMin">—</div>
+        <div class="chart-stat-lbl">Мін</div>
       </div>
-      <div class="chart-labels" id="chartLabels"></div>
-      <div class="chart-stats">
-        <div class="chart-stat">
-          <div class="chart-stat-val" id="chartMin">—</div>
-          <div class="chart-stat-lbl">Мін</div>
-        </div>
-        <div class="chart-stat">
-          <div class="chart-stat-val" id="chartMax">—</div>
-          <div class="chart-stat-lbl">Макс</div>
-        </div>
-        <div class="chart-stat">
-          <div class="chart-stat-val" id="chartChange">—</div>
-          <div class="chart-stat-lbl">Зміна</div>
-        </div>
-        <div class="chart-stat">
-          <div class="chart-stat-val" id="chartGrowth">—</div>
-          <div class="chart-stat-lbl">Зростання</div>
-        </div>
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartMax">—</div>
+        <div class="chart-stat-lbl">Макс</div>
+      </div>
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartChange">—</div>
+        <div class="chart-stat-lbl">Зміна</div>
+      </div>
+      <div class="chart-stat">
+        <div class="chart-stat-val" id="chartGrowth">—</div>
+        <div class="chart-stat-lbl">Зростання</div>
       </div>
     </div>
   </div>
@@ -1216,7 +1211,7 @@ const LANGS={
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Онлайн статистика акцій',pwF1sub:'Живі ціни, дивіденди, P&L в реальному часі',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Графік динаміки капіталу',pwF4sub:'Щоденна історія зростання активів',pwF5:'Експорт PDF',pwF5sub:'Повний звіт по всіх активах',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Онлайн статистика акцій',pwF1sub:'Живі ціни, дивіденди, P&L в реальному часі',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Графік динаміки капіталу',pwF4sub:'Щоденна історія зростання активів',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
     secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'💰 Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
@@ -1257,7 +1252,7 @@ const LANGS={
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Онлайн статистика акций',pwF1sub:'Живые цены, дивиденды, P&L в реальном времени',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'График динамики капитала',pwF4sub:'Ежедневная история роста активов',pwF5:'Экспорт PDF',pwF5sub:'Полный отчёт по всем активам',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Онлайн статистика акций',pwF1sub:'Живые цены, дивиденды, P&L в реальном времени',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'График динамики капитала',pwF4sub:'Ежедневная история роста активов',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
     secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'💰 Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
@@ -1298,7 +1293,7 @@ const LANGS={
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock statistics',pwF1sub:'Real-time prices, dividends & P&L',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'Capital growth chart',pwF4sub:'Daily asset growth history',pwF5:'PDF Export',pwF5sub:'Full report on all assets',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
+    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock statistics',pwF1sub:'Real-time prices, dividends & P&L',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'Capital growth chart',pwF4sub:'Daily asset growth history',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
     secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'💰 Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
@@ -1306,7 +1301,7 @@ const LANGS={
     liveCnt:'Live-Zähler',addDeposit:'+ Einlage',deleteDep:'Einlage löschen?',maxDep:'Max. 3 Einlagen',
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
-    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienstatistiken',pwF1sub:'Echtzeit-Preise, Dividenden & P&L',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'Kapitalwachstumsdiagramm',pwF4sub:'Tägliche Vermögenswachstumsgeschichte',pwF5:'PDF-Export',pwF5sub:'Vollständiger Vermögensbericht',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
+    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienstatistiken',pwF1sub:'Echtzeit-Preise, Dividenden & P&L',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'Kapitalwachstumsdiagramm',pwF4sub:'Tägliche Vermögenswachstumsgeschichte',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
     secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
     cryptoName:'Krypto · USDT',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
@@ -1347,7 +1342,7 @@ const LANGS={
     liveCnt:'实时计数器',addDeposit:'+ 存款',deleteDep:'删除存款?',maxDep:'最多3个存款',
     deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
     stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
-    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票统计',pwF1sub:'实时价格、股息和P&L',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'资本增长图表',pwF4sub:'每日资产增长历史',pwF5:'PDF导出',pwF5sub:'完整资产报告',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
+    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票统计',pwF1sub:'实时价格、股息和P&L',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'资本增长图表',pwF4sub:'每日资产增长历史',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
     secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
     cryptoName:'加密货币 · USDT',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
@@ -4200,25 +4195,6 @@ function exportPDF(){
 // ── PDF EXPORT BUTTON IN SETTINGS ────────────────────────
 function addExportButton(){
   // Will be called from settings or header
-}
-
-// ── CHART COLLAPSE ────────────────────────────────────────
-let chartExpanded = true;
-function toggleChart(){
-  chartExpanded = !chartExpanded;
-  const body = document.getElementById('chartBody');
-  const arrow = document.getElementById('chartToggleArrow');
-  const tabs = document.getElementById('chartPeriodTabs');
-  if(body){body.style.display = chartExpanded ? 'block' : 'none';}
-  if(arrow){arrow.style.transform = chartExpanded ? '' : 'rotate(-90deg)';}
-  if(tabs){tabs.style.display = chartExpanded ? 'flex' : 'none';}
-  localStorage.setItem('chartExpanded', chartExpanded ? '1' : '0');
-}
-// Restore collapse state
-const _savedChartExp = localStorage.getItem('chartExpanded');
-if(_savedChartExp === '0'){
-  chartExpanded = true;
-  toggleChart();
 }
 
 </script>
