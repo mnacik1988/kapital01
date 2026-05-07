@@ -195,7 +195,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 /* DAILY LOG */
 .daily-section{margin-top:14px;}
 .daily-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
-.daily-scroll{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;}
+.daily-scroll{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scroll-behavior:smooth;}
 .daily-row{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;}
 .daily-row:last-child{border-bottom:none;}
 .daily-date{color:var(--muted2);}
@@ -430,7 +430,79 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .liab-toggle-net{font-family:'DM Mono',monospace;font-size:9px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;}
 .liab-toggle-net.active{background:var(--green);border-color:var(--green);color:#0a0a0f;font-weight:700;}
 
+
+/* ── CAPITAL CHART ───────────────────────────────────────── */
+.chart-section{padding:0 16px;margin-bottom:14px;}
+.chart-card{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:16px;}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.chart-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+.chart-total{font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--gold2);}
+.chart-period-tabs{display:flex;gap:4px;}
+.chart-ptab{font-family:'DM Mono',monospace;font-size:9px;padding:4px 8px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;}
+.chart-ptab.active{background:var(--green);border-color:var(--green);color:#0a0a0f;font-weight:700;}
+.chart-wrap{position:relative;height:120px;margin-bottom:8px;}
+.chart-wrap svg{width:100%;height:100%;}
+.chart-labels{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);}
+.chart-stats{display:flex;gap:8px;margin-top:10px;}
+.chart-stat{flex:1;text-align:center;}
+.chart-stat-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;}
+.chart-stat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;}
+
 .footer{text-align:center;padding:30px 20px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);}
+
+/* ── DIAGNOSTICS POPUP ── */
+.diag-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;width:36px;height:36px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s;margin-right:4px;}
+.diag-btn:active{opacity:0.6;}
+.diag-overlay{position:fixed;inset:0;background:#000000cc;z-index:510;display:none;align-items:flex-end;}
+.diag-overlay.open{display:flex;}
+.diag-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.diag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.diag-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.diag-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);}
+.diag-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.diag-stat{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center;}
+.diag-stat-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;margin-bottom:2px;}
+.diag-stat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+.diag-section{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+.diag-section-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.diag-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.diag-row:last-child{border-bottom:none;}
+.diag-row-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.diag-row-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;}
+
+/* ── COLLAPSIBLE DAILY LOG ── */
+.daily-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:6px 0;user-select:none;}
+.daily-toggle-arrow{font-size:11px;color:var(--muted);transition:transform .25s;}
+.daily-toggle.collapsed .daily-toggle-arrow{transform:rotate(-90deg);}
+.daily-toggle.collapsed+.daily-scroll{display:none;}
+
+/* ── TRIAL BANNER ── */
+.trial-overlay{position:fixed;inset:0;background:#0c0c0fee;z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 20px;}
+.trial-box{width:100%;max-width:400px;text-align:center;}
+.trial-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;background:linear-gradient(135deg,#4ecb8d20,#2dd4bf20);border:1px solid #4ecb8d40;color:var(--green2);margin-bottom:16px;letter-spacing:0.1em;}
+.trial-days{font-family:'Inter',sans-serif;font-size:48px;font-weight:900;background:linear-gradient(135deg,var(--green),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
+.trial-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);margin-bottom:24px;line-height:1.6;}
+.trial-features{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left;}
+.trial-feature{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;}
+.trial-feature-icon{flex-shrink:0;}
+.trial-feature-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);}
+
+/* ── STARTUP CARD ── */
+.card-startup{border-top:2px solid var(--teal);}
+.card-startup .card-icon{background:#2dd4bf14;}
+.card-startup .card-value{color:var(--teal2);}
+.startup-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.startup-stat{background:var(--bg3);border-radius:10px;padding:10px;text-align:center;}
+.startup-stat-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;}
+.startup-stat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+/* ── CRYPTO MONITORING ── */
+.crypto-live-badge{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:#a78bfa15;color:var(--purple2);vertical-align:middle;}
+.crypto-price-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.crypto-price-row:last-child{border-bottom:none;}
+.crypto-coin-name{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);font-weight:500;}
+.crypto-coin-price{font-family:'DM Mono',monospace;font-size:11px;color:var(--purple2);}
+.crypto-coin-change{font-family:'DM Mono',monospace;font-size:10px;}
 </style>
 </head>
 <body>
@@ -440,7 +512,10 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <div class="header">
   <div class="header-top-row">
     <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
-    <button class="gear-btn" onclick="openSettings()" title="Налаштування">⚙️</button>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="diag-btn" onclick="openDiagnostics()" title="Діагностика">📊</button>
+      <button class="gear-btn" onclick="openSettings()" title="Налаштування">⚙️</button>
+    </div>
   </div>
   <div class="total-wrap">
     <div class="total-amount" id="totalAmount">0</div>
@@ -449,6 +524,8 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
     <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
+    <div class="pro-badge" id="proBadge" style="display:none;">👑 PRO</div>
+    <div id="trialBadge" style="display:none;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:20px;background:#4ecb8d15;border:1px solid #4ecb8d40;color:var(--green2);"></div>
   </div>
 </div>
 
@@ -473,6 +550,52 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <!-- CARDS -->
+
+<!-- CAPITAL GROWTH CHART -->
+<div class="chart-section" id="chartSection">
+  <div class="chart-card">
+    <div class="chart-header" onclick="toggleChart()" style="cursor:pointer;">
+      <div>
+        <div class="chart-title" id="chart_title_lbl">📉 ДИНАМІКА КАПІТАЛУ</div>
+        <div class="chart-total" id="chartCurrentTotal">0 ₴</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="chart-period-tabs" id="chartPeriodTabs" onclick="event.stopPropagation()">
+          <button class="chart-ptab active" onclick="setChartPeriod('7d',this)" id="cpt_7d">7Д</button>
+          <button class="chart-ptab" onclick="setChartPeriod('30d',this)" id="cpt_30d">30Д</button>
+          <button class="chart-ptab" onclick="setChartPeriod('90d',this)" id="cpt_90d">90Д</button>
+          <button class="chart-ptab" onclick="setChartPeriod('1y',this)" id="cpt_1y">1Р</button>
+        </div>
+        <div id="chartToggleArrow" style="font-size:11px;color:var(--muted);transition:transform .2s;">▼</div>
+      </div>
+    </div>
+    <div id="chartBody">
+      <div class="chart-wrap" id="chartWrap">
+        <svg id="mainChart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-labels" id="chartLabels"></div>
+      <div class="chart-stats">
+        <div class="chart-stat">
+          <div class="chart-stat-val" id="chartMin">—</div>
+          <div class="chart-stat-lbl">Мін</div>
+        </div>
+        <div class="chart-stat">
+          <div class="chart-stat-val" id="chartMax">—</div>
+          <div class="chart-stat-lbl">Макс</div>
+        </div>
+        <div class="chart-stat">
+          <div class="chart-stat-val" id="chartChange">—</div>
+          <div class="chart-stat-lbl">Зміна</div>
+        </div>
+        <div class="chart-stat">
+          <div class="chart-stat-val" id="chartGrowth">—</div>
+          <div class="chart-stat-lbl">Зростання</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="cards" id="cardsContainer">
 
   <!-- DEPOSIT CARD -->
@@ -534,6 +657,10 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       </div>
       <!-- COINS LIST -->
       <div id="cryptoRows" style="margin-top:12px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+        <span class="crypto-live-badge" id="cryptoRefreshStatus"><span class="live-dot" style="width:5px;height:5px;"></span> Онлайн ціни</span>
+        <button class="refresh-btn" onclick="refreshCryptoPrices()" id="cryptoRefreshBtn" style="font-family:'DM Mono',monospace;font-size:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;color:var(--purple2);cursor:pointer;">⟳ Оновити ціни</button>
+      </div>
       <div style="margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
         <div class="calc-title" data-i18n="addCoinTitle">+ Додати монету</div>
         <div class="row2">
@@ -778,6 +905,11 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div class="picker-item-name" id="picker_family_name">Сімейні витрати</div>
         <div class="picker-item-desc" id="picker_desc_family">Комуналка, їжа, діти...</div>
       </div>
+      <div class="picker-item" onclick="pickerAdd('startup')">
+        <div class="picker-item-icon">🚀</div>
+        <div class="picker-item-name">Стартап</div>
+        <div class="picker-item-desc" id="picker_desc_startup">Вкладення в стартап</div>
+      </div>
       <div class="picker-item" onclick="pickerAdd('custom')">
         <div class="picker-item-icon">✏️</div>
         <div class="picker-item-name" data-i18n="addCustom">Власний розділ</div>
@@ -815,7 +947,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <div class="paywall-features">
       <div class="paywall-feature">
         <div class="paywall-feature-icon">📈</div>
-        <div><div class="paywall-feature-text" id="pw_f1">Живі ціни акцій</div><div class="paywall-feature-sub" id="pw_f1sub">Необмежено акцій з дивідендами</div></div>
+        <div><div class="paywall-feature-text" id="pw_f1">Онлайн статистика акцій</div><div class="paywall-feature-sub" id="pw_f1sub">Живі ціни, дивіденди, P&L в реальному часі</div></div>
       </div>
       <div class="paywall-feature">
         <div class="paywall-feature-icon">🏦</div>
@@ -826,8 +958,12 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div><div class="paywall-feature-text" id="pw_f3">Необмежені розділи</div><div class="paywall-feature-sub" id="pw_f3sub">Власні категорії активів</div></div>
       </div>
       <div class="paywall-feature">
+        <div class="paywall-feature-icon">📉</div>
+        <div><div class="paywall-feature-text" id="pw_f4">Графік динаміки капіталу</div><div class="paywall-feature-sub" id="pw_f4sub">Щоденна історія зростання активів</div></div>
+      </div>
+      <div class="paywall-feature">
         <div class="paywall-feature-icon">📄</div>
-        <div><div class="paywall-feature-text" id="pw_f4">Експорт PDF</div><div class="paywall-feature-sub" id="pw_f4sub">Звіт по всіх активах</div></div>
+        <div><div class="paywall-feature-text" id="pw_f5">Експорт PDF</div><div class="paywall-feature-sub" id="pw_f5sub">Повний звіт по всіх активах</div></div>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-bottom:16px;">
@@ -980,11 +1116,25 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <button class="settings-curr-btn" id="scurr-cny" onclick="setDisplayCurrency('cny')">¥ CNY</button>
       </div>
     </div>
+    <!-- DEV TOOLS -->
+    <div class="settings-section" style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
+      <div class="settings-label" style="color:var(--orange2);">🛠 Розробник</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);">Статус:</span>
+        <span id="devProStatus" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:700;"></span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="devSetPro(true)" id="devBtnPro" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--green);background:#4ecb8d15;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;font-weight:600;">👑 PRO ON</button>
+        <button onclick="devSetPro(false)" id="devBtnFree" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--red);background:#f8717115;font-family:'DM Mono',monospace;font-size:11px;color:var(--red);cursor:pointer;font-weight:600;">🔒 FREE</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="devResetTrial()" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border2);background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);cursor:pointer;">↺ Скинути тріал</button>
+        <button onclick="devResetAll()" style="flex:1;padding:8px;border-radius:10px;border:1px solid #f8717140;background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;">🗑 Скинути все дані</button>
+      </div>
+      <div id="devTrialInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
+    </div>
   </div>
 </div>
-
-
-<!-- TOP-UP MODAL -->
 <div class="picker-overlay" id="topupOverlay" onclick="topupCloseOutside(event)">
   <div class="picker-box">
     <div class="picker-head">
@@ -1087,6 +1237,55 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
+
+<!-- DIAGNOSTICS POPUP -->
+<div class="diag-overlay" id="diagOverlay" onclick="diagCloseOutside(event)">
+  <div class="diag-box">
+    <div class="diag-header">
+      <div class="diag-title">📊 Діагностика капіталу</div>
+      <button class="diag-close" onclick="closeDiagnostics()">✕</button>
+    </div>
+    <div id="diagContent"></div>
+  </div>
+</div>
+
+<!-- TRIAL OVERLAY -->
+<div class="trial-overlay" id="trialOverlay" style="display:none;">
+  <div class="trial-box">
+    <div class="trial-badge">✦ БЕЗКОШТОВНИЙ ДОСТУП</div>
+    <div class="trial-days">7</div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;">днів PRO безкоштовно</div>
+    <div class="trial-text">Спробуйте всі можливості Капітал PRO<br>без обмежень протягом 7 днів</div>
+    <div class="trial-features">
+      <div class="trial-feature">
+        <div class="trial-feature-icon" style="background:#4ecb8d18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">📈</div>
+        <div class="trial-feature-text">Онлайн ціни акцій без ліміту</div>
+      </div>
+      <div class="trial-feature">
+        <div class="trial-feature-icon" style="background:#60a5fa18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">🏦</div>
+        <div class="trial-feature-text">До 3 депозитів одночасно</div>
+      </div>
+      <div class="trial-feature">
+        <div class="trial-feature-icon" style="background:#a78bfa18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">🪙</div>
+        <div class="trial-feature-text">Онлайн моніторинг криптовалют</div>
+      </div>
+      <div class="trial-feature">
+        <div class="trial-feature-icon" style="background:#2dd4bf18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">🚀</div>
+        <div class="trial-feature-text">Моніторинг стартапів</div>
+      </div>
+      <div class="trial-feature">
+        <div class="trial-feature-icon" style="background:#f59e0b18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">📄</div>
+        <div class="trial-feature-text">Експорт PDF звітів</div>
+      </div>
+    </div>
+    <button onclick="startTrial()" style="width:100%;background:linear-gradient(135deg,var(--green),var(--teal));border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;">
+      Почати пробний період →
+    </button>
+    <button onclick="skipTrial()" style="width:100%;background:transparent;border:none;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;">
+      Продовжити з обмеженнями
+    </button>
+  </div>
+</div>
 </div>
 
 <script>
@@ -1094,6 +1293,24 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 let isPro = localStorage.getItem('kapital_pro') === 'true';
+// Early trial check — must run before any rendering
+(function earlyTrialCheck(){
+  if(isPro){
+    const trialStart=localStorage.getItem('trial_start');
+    if(trialStart){
+      const elapsed=Date.now()-parseInt(trialStart);
+      const daysLeft=Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+      if(daysLeft<=0){isPro=false;localStorage.removeItem('kapital_pro');}
+    }
+  } else {
+    const trialStart=localStorage.getItem('trial_start');
+    if(trialStart){
+      const elapsed=Date.now()-parseInt(trialStart);
+      const daysLeft=Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+      if(daysLeft>0){isPro=true;}
+    }
+  }
+})();
 const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1, stockSections:1 };
 let displayCurrency = localStorage.getItem('display_currency') || 'uah';
 let liabilities = [];
@@ -1148,7 +1365,7 @@ const LANGS={
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Живі ціни акцій',pwF1sub:'Необмежено акцій з дивідендами',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Експорт PDF',pwF4sub:'Звіт по всіх активах',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Онлайн статистика акцій',pwF1sub:'Живі ціни, дивіденди, P&L в реальному часі',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Графік динаміки капіталу',pwF4sub:'Щоденна історія зростання активів',pwF5:'Експорт PDF',pwF5sub:'Повний звіт по всіх активах',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
     secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'💰 Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
@@ -1189,7 +1406,7 @@ const LANGS={
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Живые цены акций',pwF1sub:'Неограниченно акций с дивидендами',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'Экспорт PDF',pwF4sub:'Отчёт по всем активам',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Онлайн статистика акций',pwF1sub:'Живые цены, дивиденды, P&L в реальном времени',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'График динамики капитала',pwF4sub:'Ежедневная история роста активов',pwF5:'Экспорт PDF',pwF5sub:'Полный отчёт по всем активам',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
     secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'💰 Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
@@ -1230,7 +1447,7 @@ const LANGS={
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock prices',pwF1sub:'Unlimited stocks with dividends',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'PDF Export',pwF4sub:'Full asset report',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
+    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock statistics',pwF1sub:'Real-time prices, dividends & P&L',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'Capital growth chart',pwF4sub:'Daily asset growth history',pwF5:'PDF Export',pwF5sub:'Full report on all assets',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
     secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'💰 Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
@@ -1238,7 +1455,7 @@ const LANGS={
     liveCnt:'Live-Zähler',addDeposit:'+ Einlage',deleteDep:'Einlage löschen?',maxDep:'Max. 3 Einlagen',
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
-    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienpreise',pwF1sub:'Unbegrenzte Aktien mit Dividenden',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'PDF-Export',pwF4sub:'Vollständiger Asset-Bericht',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
+    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienstatistiken',pwF1sub:'Echtzeit-Preise, Dividenden & P&L',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'Kapitalwachstumsdiagramm',pwF4sub:'Tägliche Vermögenswachstumsgeschichte',pwF5:'PDF-Export',pwF5sub:'Vollständiger Vermögensbericht',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
     secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
     cryptoName:'Krypto · USDT',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
@@ -1279,7 +1496,7 @@ const LANGS={
     liveCnt:'实时计数器',addDeposit:'+ 存款',deleteDep:'删除存款?',maxDep:'最多3个存款',
     deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
     stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
-    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票价格',pwF1sub:'无限股票含股息',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'PDF导出',pwF4sub:'完整资产报告',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
+    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票统计',pwF1sub:'实时价格、股息和P&L',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'资本增长图表',pwF4sub:'每日资产增长历史',pwF5:'PDF导出',pwF5sub:'完整资产报告',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
     secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
     cryptoName:'加密货币 · USDT',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
@@ -1356,6 +1573,9 @@ const pct=(v,total)=>total?((v/total*100).toFixed(1)+'%'):'0%';
 // ── STATE ────────────────────────────────────
 let coins=[], forexItems=[], cardOrder=[], customSections=[], securitiesSections=[];
 let hiddenCards={}; // which builtin cards are hidden
+let capitalHistory = []; // [{date:'2026-01-01', total: 150000}]
+let chartPeriod = '30d';
+let chartExpanded = true;
 
 // ── DEPOSIT SLIDES ───────────────────────────
 let deposits=[{id:'dep0',name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''}];
@@ -1385,11 +1605,15 @@ function getDepositHtml(dep,idx){
           <div class="live-row"><span class="live-key">${lang.netProfitLabel}</span><span class="live-val g" id="liveNet_${dep.id}">—</span></div>
           <div class="live-row"><span class="live-key">${lang.perSec}</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
           <div class="live-row"><span class="live-key">${lang.perDay}</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">📅 Прогноз/місяць</span><span class="live-val g" id="livePerMonth_${dep.id}">—</span></div>
         </div>
         <div class="live-bar-wrap"><div class="live-bar" id="liveBar_${dep.id}" style="width:0%"></div></div>
         <div class="live-dates"><span id="liveDateStart_${dep.id}">—</span><span id="liveDatePct_${dep.id}">0%</span><span id="liveDateEnd_${dep.id}">—</span></div>
         <div class="daily-section">
-          <div class="daily-title">${lang.incomeDays}</div>
+          <div class="daily-toggle" id="dailyToggle_${dep.id}" onclick="toggleDailyLog('${dep.id}')">
+            <div class="daily-title" style="margin-bottom:0">${lang.incomeDays}</div>
+            <div class="daily-toggle-arrow" id="dailyArrow_${dep.id}">▼</div>
+          </div>
           <div class="daily-scroll" id="dailyLog_${dep.id}"></div>
         </div>
       </div>
@@ -1663,6 +1887,8 @@ function calcLive(depId){
   setText('liveNet_'+depId,'+'+fmtLive(monthlyNet));
   setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' ₴/с');
   setText('livePerDay_'+depId,'+'+fmtLive(perDay));
+  const perMonth=perDay*30.44;
+  setText('livePerMonth_'+depId,'+'+fmtLive(perMonth));
   const lb=$('liveBar_'+depId);
   if(lb)lb.style.width=Math.round(progress*100)+'%';
   const fmt2=d=>d.toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'});
@@ -1690,7 +1916,7 @@ function renderDailyLog(depId,P,rAnn,n,tax,tf,start,now){
       <span class="daily-total">${fmtN(Math.round(A1))} ₴</span>
     </div>`;
   }
-  el.innerHTML=rows; el.scrollTop=el.scrollHeight;
+  el.innerHTML=rows;
 }
 function startLiveTicker(depId){
   if(liveIntervals[depId])clearInterval(liveIntervals[depId]);
@@ -2203,6 +2429,11 @@ function addSecuritiesCard(type){
 function renderSecuritiesCards(){
   const container=$('securitiesContainer');
   if(!container)return;
+  // Remove any stale securities cards that may have been moved to cardsContainer by drag
+  securitiesSections.forEach(s=>{
+    const stale=document.querySelectorAll(`[data-card="${s.id}"]`);
+    stale.forEach(el=>{if(el.parentNode!==container)el.remove();});
+  });
   // Save expanded state before re-render
   const expanded=new Set();
   container.querySelectorAll('.card.expanded').forEach(el=>expanded.add(el.id));
@@ -2243,14 +2474,25 @@ function getSecCardHtml(s,idx){
     if(parseFloat(it.price)>0) tickerGroups[key].curPrice=parseFloat(it.price);
   });
 
+  // Pre-compute avg price data for stats section
+  const avgPriceData=Object.entries(tickerGroups).map(([key,g])=>{
+    const tq=g.trades.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
+    const tc=g.trades.reduce((s,t)=>{
+      const q=parseFloat(t.qty)||0;
+      const bp=parseFloat(t.buyPrice)||parseFloat(t.price)||0;
+      return s+q*bp;
+    },0);
+    return {name:g.name,ticker:g.ticker,totalQty:tq,totalBuyCost:tc,curPrice:g.curPrice};
+  }).filter(g=>g.totalQty>0&&g.totalBuyCost>0);
+
   const rows=s.items.length>0?(
     '<div style="overflow-x:auto"><table class="sec-table"><tr>'+
     '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th>'+
     '<th>Ціна</th><th>Дивіденди</th><th>'+lang.secTotal+'</th><th>P&L</th><th></th></tr>'+
     Object.entries(tickerGroups).map(([key,g])=>{
       const totalQty=g.trades.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
-      const totalBuyCost=g.trades.reduce((s,t)=>s+(parseFloat(t.buyPrice)>0?(parseFloat(t.qty)||0)*parseFloat(t.buyPrice):0),0);
-      const hasBuyPrice=g.trades.some(t=>parseFloat(t.buyPrice)>0);
+      const totalBuyCost=g.trades.reduce((s,t)=>{const q=parseFloat(t.qty)||0;const bp=parseFloat(t.buyPrice)||parseFloat(t.price)||0;return s+q*bp;},0);
+      const hasBuyPrice=totalBuyCost>0;
       const curVal=totalQty*g.curPrice;
       const pnl=hasBuyPrice?curVal-totalBuyCost:null;
       const pnlClass=pnl===null?'':pnl>=0?'pnl-positive':'pnl-negative';
@@ -2258,6 +2500,8 @@ function getSecCardHtml(s,idx){
       const isGrouped=g.trades.length>1;
       const trId='tr_'+s.id+'_'+key.replace(/[^a-z0-9]/gi,'_');
       const tickerBadge=g.ticker?'<span style="font-family:\'DM Mono\',monospace;font-size:10px;background:#4ecb8d15;padding:1px 5px;border-radius:6px">'+g.ticker+'</span> ':'';
+      const avgBuyPrice=hasBuyPrice&&totalQty>0?totalBuyCost/totalQty:0;
+      const avgBuyHint=avgBuyPrice>0?' <span style="font-size:8px;color:var(--muted);display:block;">Ø '+fmtN(Math.round(avgBuyPrice))+' ₴</span>':'';
 
       const subRows=isGrouped?g.trades.map(t=>{
         const qty=parseFloat(t.qty)||0, bp=parseFloat(t.buyPrice)||0, cp=parseFloat(t.price)||0;
@@ -2274,7 +2518,7 @@ function getSecCardHtml(s,idx){
 
       const expandHint=isGrouped?' <span style="font-size:9px;color:var(--muted)">▼ '+g.trades.length+'</span>':'';
       return '<tr'+(isGrouped?' onclick="toggleSecTrades(\''+trId+'\',this)" style="cursor:pointer"':'')+'>'+
-        '<td class="td-name">'+tickerBadge+g.name+expandHint+'</td>'+
+        '<td class="td-name">'+tickerBadge+g.name+expandHint+avgBuyHint+'</td>'+
         '<td>'+totalQty+'</td>'+
         '<td class="td-live-price"><span class="'+changeClass+'">'+fmtN(Math.round(g.curPrice))+'</span>'+(g.liveChange!=null?'<span style="font-size:9px;color:'+(g.liveChange>=0?'var(--green2)':'var(--red)')+'">'+(g.liveChange>=0?'▲':'▼')+Math.abs(g.liveChange).toFixed(1)+'%</span>':'')+'</td>'+
         '<td class="td-div">'+g.divYield.toFixed(1)+'%</td>'+
@@ -2289,6 +2533,23 @@ function getSecCardHtml(s,idx){
     (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+fmtN(Math.round(totalDivAbs))+' ₴'+t('perYear')+'</span></div>':'')+
     '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+fmtN(Math.round(totalDiv/12))+' ₴</span></div>'+
     '</div>'+
+    // ── Average Purchase Price Stats ──
+    (function(){
+      if(!avgPriceData.length)return '';
+      const avgRows=avgPriceData.map(g=>{
+        const avg=g.totalBuyCost/g.totalQty;
+        const cur=g.curPrice;
+        const diff=cur>0&&avg>0?(cur-avg):0;
+        const diffPct=avg>0?(diff/avg*100):0;
+        const col=diff>=0?'var(--green2)':'var(--red)';
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">'+
+          '<span style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2)">'+(g.ticker?'<span style="color:var(--green2)">'+g.ticker+'</span> ':'')+g.name+'</span>'+
+          '<span style="font-family:DM Mono,monospace;font-size:11px;font-weight:600">Ø '+fmtN(Math.round(avg))+' ₴'+
+          (cur>0?' → '+fmtN(Math.round(cur))+' ₴ <span style="font-size:9px;color:'+col+'">'+(diff>=0?'+':'')+diffPct.toFixed(1)+'%</span>':'')+
+          '</span></div>';
+      });
+      return '<div class="sec-summary-divs" style="margin-top:8px"><div class="sd-label">💹 Середня ціна покупки</div>'+avgRows.join('')+'</div>';
+    })()+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(Math.round(total))+' ₴</span></div>'+
     '</div>'+
@@ -2377,7 +2638,7 @@ function addSecItem(secId){
   const qty=parseFloat($('secQty_'+secId)?.value)||0;
   const price=parseFloat($('secPrice_'+secId)?.value)||0;
   const divYield=parseFloat($('secDiv_'+secId)?.value)||0;
-  const buyPrice=parseFloat($('secBuyPrice_'+secId)?.value)||0;
+  const buyPrice=parseFloat($('secBuyPrice_'+secId)?.value)||price||0;
   if(!ticker&&!qty&&!price)return;
   // Try to use cached data for this ticker
   const cached=ticker?stockPriceCache[ticker]:null;
@@ -2395,7 +2656,7 @@ function addSecItem(secId){
   // Auto-refresh only for PRO or first ticker (free demo)
   if(ticker){
     const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(isPro || totalLive <= 1) refreshAllStockPrices(secId);
+    if(isPro || totalLive <= FREE_LIMITS.stockItems) refreshAllStockPrices(secId);
   }
 }
 function removeSecItem(secId,itemIdx){
@@ -2499,6 +2760,10 @@ function updateAll(){
     setText('secPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
   });
 
+  // Record daily snapshot for chart
+  recordDailySnapshot(total);
+  renderChart();
+
   // Update stocks summary card in main menu
   const totalSecurities=getSecuritiesTotal();
   const stocksCard=document.getElementById('stocksSummaryCard');
@@ -2554,11 +2819,13 @@ function renderCoins(){
       const pnlUsd=(cur-buy)*qty;
       const pnlUah=pnlUsd*rate;
       const pnlClass=pnlUsd>=0?'green':'red';
+      const change24h=c.change24h||0;
+      const changeStr=change24h!==0?`<div style="font-size:9px;color:${change24h>=0?'var(--green2)':'var(--red)'}">${change24h>=0?'▲':'▼'}${Math.abs(change24h).toFixed(1)}%</div>`:'';
       return `<tr>
         <td class="td-name">${c.name}</td>
         <td>${qty}</td>
         <td>${fmtD(buy,0)}</td>
-        <td>${fmtD(cur,0)}</td>
+        <td>${fmtD(cur,0)}${changeStr}</td>
         <td class="${pnlClass}">${pnlUsd>=0?'+':''}${fmtN(Math.round(pnlUah))} ₴</td>
         <td><button class="rm-btn" onclick="removeCoin(${i})">×</button></td>
       </tr>`;
@@ -2690,9 +2957,13 @@ function saveOrder(){
 function restoreOrder(){
   if(!cardOrder||!cardOrder.length)return;
   const container=$('cardsContainer');
+  const secContainer=$('securitiesContainer');
   cardOrder.forEach(cardId=>{
     const el=document.querySelector(`[data-card="${cardId}"]`);
-    if(el&&el.parentNode)container.appendChild(el);
+    if(!el||!el.parentNode)return;
+    // Keep securities cards in securitiesContainer
+    if(el.parentNode===secContainer)return;
+    container.appendChild(el);
   });
 }
 
@@ -2706,7 +2977,8 @@ function saveData(){
       cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),
       otherAmount:sval('otherAmount'),otherName:sval('otherName'),otherNote:sval('otherNote'),
       coins,forexItems,cardOrder,customSections,securitiesSections,
-      hiddenCards,currentLang
+      hiddenCards,currentLang,liabilities,metalsSections,
+      trialStartDate:localStorage.getItem('trial_start')||''
     }));
   }catch(e){}
 }
@@ -2771,6 +3043,10 @@ restoreOrder();
 initDrag();
 applyTranslations();
 
+// Load capital history and check onboarding
+loadCapitalHistory();
+setTimeout(checkOnboarding, 1500);
+
 // Auto-refresh stock prices on startup if any tickers saved
 setTimeout(()=>{
   securitiesSections.forEach(s=>{
@@ -2822,6 +3098,18 @@ function updateProUI(){
   // Show/hide PRO badge in header
   const badge = document.getElementById('proBadge');
   if(badge) badge.style.display = isPro ? 'inline-flex' : 'none';
+  // Trial days badge
+  const trialBadge=document.getElementById('trialBadge');
+  if(trialBadge){
+    const daysLeft=getTrialDaysLeft();
+    if(daysLeft>0&&daysLeft<=7){
+      trialBadge.style.display='inline-block';
+      trialBadge.textContent='⏱ Тріал: '+daysLeft+' дн.';
+      if(daysLeft<=2){trialBadge.style.borderColor='#f8717140';trialBadge.style.color='var(--red)';trialBadge.style.background='#f8717115';}
+    } else {
+      trialBadge.style.display='none';
+    }
+  }
 }
 
 // addDepositSlide freemium check is now built into the function directly
@@ -2830,26 +3118,26 @@ function updateProUI(){
 
 // addSecItem freemium check is built into the function directly
 
-// Override fetchTickerForInput — blocked after 3 stocks for free users
+// fetchTickerForInput — blocked when 3+ stocks already added (free version)
 const _origFetchTicker = fetchTickerForInput;
 fetchTickerForInput = async function(secId){
   if(!isPro){
-    const totalWithTicker = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(totalWithTicker >= FREE_LIMITS.stockItems){
-      openPaywall('Онлайн ціни для 4+ акцій — тільки в PRO 👑');
+    const totalItems = securitiesSections.reduce((sum,s)=>sum+s.items.length, 0);
+    if(totalItems >= FREE_LIMITS.stockItems){
+      openPaywall('Онлайн статистика акцій при 3+ акціях — тільки в PRO 👑');
       return;
     }
   }
   await _origFetchTicker(secId);
 };
 
-// Override refreshAllStockPrices — allow only if PRO or only 1 ticker total
+// Override refreshAllStockPrices — allow up to 3 items with tickers for free
 const _origRefreshAll = refreshAllStockPrices;
 refreshAllStockPrices = async function(secId){
   if(!isPro){
     const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(totalLive > 1){
-      // Мовчки зупиняємо — paywall відкриється тільки при натисканні "Отримати ціну"
+    if(totalLive > FREE_LIMITS.stockItems){
+      openPaywall('Онлайн ціни для 4+ акцій — тільки в PRO 👑');
       return;
     }
   }
@@ -3029,6 +3317,7 @@ function openSettings(){
     b.classList.toggle('active', b.id==='scurr-'+displayCurrency);
   });
   document.getElementById('settingsOverlay').classList.add('open');
+  if(typeof devUpdateStatus==='function')devUpdateStatus();
 }
 function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
 function settingsCloseOutside(e){if(e.target===document.getElementById('settingsOverlay'))closeSettings();}
@@ -3348,6 +3637,7 @@ function translateDynamicUI(){
     'pw_f1':'pwF1','pw_f1sub':'pwF1sub','pw_f2':'pwF2','pw_f2sub':'pwF2sub',
     'pw_f3':'pwF3','pw_f3sub':'pwF3sub','pw_f4':'pwF4','pw_f4sub':'pwF4sub',
     'pw_btn':'pwBtn','pw_restore':'pwRestore','pw_close':'pwClose',
+    'pw_f5':'pwF5','pw_f5sub':'pwF5sub',
   };
   Object.entries(ids).forEach(([id,key])=>{
     const el=document.getElementById(id);
@@ -3879,6 +4169,855 @@ function updateFamilyField(secId,field,val){
   if(totalEl)totalEl.textContent=fmtN(Math.round(total))+' ₴';
   customSections[idx].amount=total;
   updateAll();saveData();
+}
+
+// ── DAILY CAPITAL SNAPSHOT ────────────────────────────────
+// capitalHistory and chartPeriod declared at top with other state vars
+
+function loadCapitalHistory(){
+  const d=localStorage.getItem('cap_history');
+  if(d) capitalHistory=JSON.parse(d);
+}
+function saveCapitalHistory(){
+  // Keep max 365 entries
+  if(capitalHistory.length>365) capitalHistory=capitalHistory.slice(-365);
+  localStorage.setItem('cap_history',JSON.stringify(capitalHistory));
+}
+function recordDailySnapshot(total){
+  const today=new Date().toISOString().split('T')[0];
+  const existing=capitalHistory.findIndex(h=>h.date===today);
+  if(existing>=0) capitalHistory[existing].total=total;
+  else capitalHistory.push({date:today,total});
+  saveCapitalHistory();
+}
+
+function setChartPeriod(p,btn){
+  chartPeriod=p;
+  document.querySelectorAll('.chart-ptab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderChart();
+}
+
+function renderChart(){
+  const days={
+    '7d':7,'30d':30,'90d':90,'1y':365
+  }[chartPeriod]||30;
+
+  // Get data points for period
+  const now=new Date();
+  const points=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const dateStr=d.toISOString().split('T')[0];
+    const entry=capitalHistory.find(h=>h.date===dateStr);
+    points.push({date:dateStr,val:entry?.total||null});
+  }
+
+  // Fill gaps with last known value
+  let lastVal=points.find(p=>p.val!==null)?.val||0;
+  const filled=points.map(p=>{if(p.val!==null)lastVal=p.val;return{...p,val:lastVal};});
+
+  const vals=filled.map(p=>p.val);
+  const minVal=Math.min(...vals);
+  const maxVal=Math.max(...vals,minVal+1);
+  const range=maxVal-minVal||1;
+  const sym=getCurrSym();
+  const currentTotal=vals[vals.length-1]||0;
+  const firstVal=vals[0]||0;
+  const change=currentTotal-firstVal;
+  const changePct=firstVal>0?(change/firstVal*100):0;
+
+  // SVG path
+  const W=300,H=100;
+  const pathPoints=filled.map((p,i)=>{
+    const x=(i/(filled.length-1||1))*W;
+    const y=H-((p.val-minVal)/range)*(H-10)-5;
+    return`${x},${y}`;
+  });
+
+  const pathD='M'+pathPoints.join(' L');
+  const areaD=pathD+` L${W},${H+5} L0,${H+5} Z`;
+  const color=change>=0?'var(--green2)':'var(--red)';
+
+  const svg=document.getElementById('mainChart');
+  if(!svg)return;
+  svg.innerHTML=`
+    <defs>
+      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${change>=0?'#69f0ae':'#ff5252'}" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="${change>=0?'#69f0ae':'#ff5252'}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaD}" fill="url(#chartGrad)"/>
+    <path d="${pathD}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${W}" cy="${H-((currentTotal-minVal)/range)*(H-10)-5}" r="3" fill="${color}"/>
+  `;
+
+  // Labels
+  const labelEl=document.getElementById('chartLabels');
+  if(labelEl){
+    const step=Math.floor(filled.length/4);
+    const labelPoints=[0,step,step*2,step*3,filled.length-1].map(i=>filled[Math.min(i,filled.length-1)]);
+    labelEl.innerHTML=labelPoints.map(p=>
+      `<span>${new Date(p.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>`
+    ).join('');
+  }
+
+  // Stats
+  setText('chartCurrentTotal', sym+fmtN(toDisplayCurr(currentTotal)));
+  setText('chartMin', sym+fmtN(toDisplayCurr(minVal)));
+  setText('chartMax', sym+fmtN(toDisplayCurr(maxVal)));
+  const changeEl=document.getElementById('chartChange');
+  if(changeEl){changeEl.textContent=(change>=0?'+':'')+sym+fmtN(toDisplayCurr(Math.abs(change)));changeEl.style.color=change>=0?'var(--green2)':'var(--red)';}
+  const growthEl=document.getElementById('chartGrowth');
+  if(growthEl){growthEl.textContent=(changePct>=0?'+':'')+changePct.toFixed(1)+'%';growthEl.style.color=changePct>=0?'var(--green2)':'var(--red)';}
+}
+
+// ── ONBOARDING ────────────────────────────────────────────
+function checkOnboarding(){
+  if(localStorage.getItem('onboarded')==='1')return;
+  // Don't show onboarding if trial overlay is currently visible
+  const trialEl=document.getElementById('trialOverlay');
+  if(trialEl && trialEl.style.display==='flex')return;
+  showOnboarding();
+}
+
+function showOnboarding(){
+  const overlay=document.createElement('div');
+  overlay.id='onboardingOverlay';
+  overlay.style.cssText='position:fixed;inset:0;background:#0c0c0fee;z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 48px;';
+  overlay.innerHTML=`
+    <div style="width:100%;max-width:480px;padding:0 16px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="font-size:56px;margin-bottom:12px;">💰</div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">Капітал</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);line-height:1.6;">Відстежуйте всі свої активи<br>в одному місці</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+        ${[
+          ['🏦','Депозити','Додайте банківський вклад з живим лічильником'],
+          ['📈','Акції','Відстежуйте портфель з онлайн цінами'],
+          ['💎','Метали','Золото, срібло, платина — все в одному місці'],
+          ['⚠️','Кредити','Контролюйте борги і часткові погашення'],
+        ].map(([i,n,d])=>`
+          <div style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;">
+            <div style="font-size:22px;flex-shrink:0;">${i}</div>
+            <div><div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:#fff;">${n}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-top:2px;">${d}</div></div>
+          </div>`).join('')}
+      </div>
+      <button onclick="finishOnboarding()" style="width:100%;background:linear-gradient(135deg,var(--gold),#c9a84c);border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;">
+        Почати →
+      </button>
+      <button onclick="finishOnboarding()" style="width:100%;background:transparent;border:none;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;">
+        Вже користуюсь
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function finishOnboarding(){
+  localStorage.setItem('onboarded','1');
+  const el=document.getElementById('onboardingOverlay');
+  if(el)el.remove();
+}
+
+// ── PDF EXPORT ────────────────────────────────────────────
+// Aliases for PDF export
+function getDepositsTotal(){return getAllDepositsTotal();}
+function getCryptoTotal(){return hiddenCards['crypto']?0:getCryptoVal();}
+function getUsdTotal(){return hiddenCards['usd']?0:getUsdVal();}
+function getForexTotal(){return hiddenCards['forex']?0:getForexVal();}
+function getCashTotal(){return hiddenCards['cash']?0:getCashVal();}
+function getCurrentTotal(){return hiddenCards['other']?0:getOtherVal();}
+function exportPDF(){
+  if(!isPro){openPaywall('Експорт PDF — тільки в PRO 👑');return;}
+  const sym=getCurrSym();
+  const now=new Date().toLocaleDateString('uk-UA',{day:'numeric',month:'long',year:'numeric'});
+  let html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;color:#111;max-width:800px;margin:0 auto;padding:20px;}
+    h1{font-size:28px;margin-bottom:4px;}
+    .sub{color:#666;font-size:13px;margin-bottom:24px;}
+    table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+    th{background:#f5f5f5;padding:8px 12px;text-align:left;font-size:12px;color:#666;text-transform:uppercase;}
+    td{padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;}
+    .total{font-size:20px;font-weight:bold;color:#111;}
+    .section{margin-bottom:28px;}
+    h2{font-size:16px;margin-bottom:10px;color:#333;}
+    .positive{color:#00897b;}.negative{color:#e53935;}
+    .summary-box{background:#f9f9f9;border-radius:8px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;}
+    .summary-item{text-align:center;}
+    .summary-val{font-size:18px;font-weight:bold;}
+    .summary-lbl{font-size:11px;color:#999;margin-top:4px;}
+  </style></head><body>`;
+
+  // Header
+  const totalUah=getDepositsTotal()+getCryptoTotal()+getUsdTotal()+getForexTotal()+getCashTotal()+getCurrentTotal()+getSecuritiesTotal()+getCustomTotal()+getMetalsTotalUah();
+  html+=`<h1>💰 Капітал — Фінансовий звіт</h1>
+  <div class="sub">Згенеровано ${now}</div>
+  <div class="summary-box">
+    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(totalUah))}</div><div class="summary-lbl">Загальний капітал</div></div>
+    <div class="summary-item"><div class="summary-val">${deposits.length}</div><div class="summary-lbl">Депозитів</div></div>
+    <div class="summary-item"><div class="summary-val">${securitiesSections.reduce((s,sec)=>s+sec.items.length,0)}</div><div class="summary-lbl">Акцій</div></div>
+    <div class="summary-item"><div class="summary-val">${liabilities.length}</div><div class="summary-lbl">Кредитів</div></div>
+  </div>`;
+
+  // Deposits
+  if(deposits.length){
+    html+=`<div class="section"><h2>🏦 Депозити</h2><table>
+    <tr><th>Назва</th><th>Сума</th><th>Ставка</th><th>Закінчення</th><th>Нараховано</th></tr>`;
+    deposits.forEach(d=>{
+      const p=getDepositPrincipalUah(d);
+      const acc=getDepositMonthlyAccruedWithTopups(d);
+      html+=`<tr><td>${d.name||'Депозит'}</td><td>${sym}${fmtN(toDisplayCurr(p))}</td><td>${d.rate||0}%</td><td>${d.endDate||'—'}</td><td class="positive">+${sym}${fmtN(toDisplayCurr(acc))}</td></tr>`;
+    });
+    html+=`</table></div>`;
+  }
+
+  // Securities
+  if(securitiesSections.some(s=>s.items.length)){
+    html+=`<div class="section"><h2>📈 Акції</h2><table>
+    <tr><th>Тікер</th><th>Назва</th><th>К-сть</th><th>Ціна</th><th>Вартість</th></tr>`;
+    securitiesSections.forEach(sec=>{
+      sec.items.forEach(it=>{
+        const val=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
+        html+=`<tr><td>${it.ticker||'—'}</td><td>${it.liveName||it.name||'—'}</td><td>${it.qty}</td><td>${sym}${fmtN(toDisplayCurr(parseFloat(it.price)||0))}</td><td>${sym}${fmtN(toDisplayCurr(val))}</td></tr>`;
+      });
+    });
+    html+=`</table></div>`;
+  }
+
+  // Liabilities
+  if(liabilities.length){
+    html+=`<div class="section"><h2>⚠️ Зобов'язання</h2><table>
+    <tr><th>Назва</th><th>Початкова сума</th><th>Залишок</th><th>Платіж/міс</th><th>Ставка</th></tr>`;
+    liabilities.forEach(l=>{
+      const rem=getLiabRemaining(l);
+      const pay=calcAnnuity(l.amount,l.rate,l.months);
+      html+=`<tr><td>${l.name}</td><td>${sym}${fmtN(toDisplayCurr(l.amount))}</td><td class="negative">${sym}${fmtN(toDisplayCurr(rem))}</td><td>${sym}${fmtN(toDisplayCurr(pay))}</td><td>${l.rate}%</td></tr>`;
+    });
+    html+=`</table></div>`;
+  }
+
+  const netCapital=totalUah-getLiabilitiesTotal();
+  html+=`<div class="summary-box" style="margin-top:20px;">
+    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(totalUah))}</div><div class="summary-lbl">Брутто-капітал</div></div>
+    <div class="summary-item"><div class="summary-val negative">-${sym}${fmtN(toDisplayCurr(getLiabilitiesTotal()))}</div><div class="summary-lbl">Борги</div></div>
+    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(netCapital))}</div><div class="summary-lbl">Нетто-капітал</div></div>
+  </div>`;
+
+  html+=`</body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='Kapital_'+new Date().toISOString().split('T')[0]+'.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── PDF EXPORT BUTTON IN SETTINGS ────────────────────────
+function addExportButton(){
+  // Will be called from settings or header
+}
+
+// ── CHART COLLAPSE ────────────────────────────────────────
+// chartExpanded declared at top with other state vars
+function toggleChart(){
+  chartExpanded = !chartExpanded;
+  const body = document.getElementById('chartBody');
+  const arrow = document.getElementById('chartToggleArrow');
+  const tabs = document.getElementById('chartPeriodTabs');
+  if(body){body.style.display = chartExpanded ? 'block' : 'none';}
+  if(arrow){arrow.style.transform = chartExpanded ? '' : 'rotate(-90deg)';}
+  if(tabs){tabs.style.display = chartExpanded ? 'flex' : 'none';}
+  localStorage.setItem('chartExpanded', chartExpanded ? '1' : '0');
+}
+// Restore collapse state
+const _savedChartExp = localStorage.getItem('chartExpanded');
+if(_savedChartExp === '0'){
+  chartExpanded = true;
+  toggleChart();
+}
+
+// ── COLLAPSIBLE DAILY LOG ────────────────────────────────
+function toggleDailyLog(depId){
+  const toggle=document.getElementById('dailyToggle_'+depId);
+  const arrow=document.getElementById('dailyArrow_'+depId);
+  const log=document.getElementById('dailyLog_'+depId);
+  if(!toggle||!log)return;
+  const collapsed=toggle.classList.toggle('collapsed');
+  if(arrow)arrow.style.transform=collapsed?'rotate(-90deg)':'';
+  log.style.display=collapsed?'none':'block';
+}
+
+// ── DIAGNOSTICS POPUP ────────────────────────────────────
+function openDiagnostics(){
+  const el=document.getElementById('diagOverlay');
+  if(el)el.classList.add('open');
+  renderDiagnostics();
+}
+function closeDiagnostics(){
+  const el=document.getElementById('diagOverlay');
+  if(el)el.classList.remove('open');
+}
+function diagCloseOutside(e){
+  if(e.target===document.getElementById('diagOverlay'))closeDiagnostics();
+}
+
+function renderDiagnostics(){
+  const container=document.getElementById('diagContent');
+  if(!container)return;
+  const sym=getCurrSym();
+
+  // Calculate totals
+  const dep=hiddenCards['deposit']?0:getAllDepositsTotal();
+  const crypto=hiddenCards['crypto']?0:getCryptoVal();
+  const usd=hiddenCards['usd']?0:getUsdVal();
+  const forex=hiddenCards['forex']?0:getForexVal();
+  const cash=hiddenCards['cash']?0:getCashVal();
+  const other=hiddenCards['other']?0:getOtherVal();
+  const custom=getCustomTotal();
+  const securities=getSecuritiesTotal();
+  const metals=getMetalsTotalUah();
+  const total=dep+crypto+usd+forex+cash+other+custom+securities+metals;
+  const debt=getLiabilitiesTotal();
+  const net=total-debt;
+
+  // Today's stats
+  const today=new Date().toISOString().split('T')[0];
+  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
+  const todayEntry=capitalHistory.find(h=>h.date===today);
+  const yesterdayEntry=capitalHistory.find(h=>h.date===yesterday);
+  const dailyChange=todayEntry&&yesterdayEntry?(todayEntry.total-yesterdayEntry.total):0;
+  const dailyChangePct=yesterdayEntry&&yesterdayEntry.total>0?(dailyChange/yesterdayEntry.total*100):0;
+
+  // Weekly stats
+  const weekAgo=new Date(Date.now()-7*86400000).toISOString().split('T')[0];
+  const weekEntry=capitalHistory.find(h=>h.date===weekAgo);
+  const weekChange=weekEntry?(total-weekEntry.total):0;
+  const weekChangePct=weekEntry&&weekEntry.total>0?(weekChange/weekEntry.total*100):0;
+
+  // Monthly stats
+  const monthAgo=new Date(Date.now()-30*86400000).toISOString().split('T')[0];
+  const monthEntry=capitalHistory.find(h=>h.date===monthAgo);
+  const monthChange=monthEntry?(total-monthEntry.total):0;
+  const monthChangePct=monthEntry&&monthEntry.total>0?(monthChange/monthEntry.total*100):0;
+
+  // Daily deposit income
+  let dailyDepIncome=0;
+  deposits.forEach(d=>{
+    if(!d.startDate||!d.endDate||!d.principal)return;
+    const P=getDepositPrincipalUah(d);
+    const rAnn=(parseFloat(d.rate)||16)/100;
+    const n=parseFloat(d.freq)||12;
+    const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
+    if(now<start||end<=start)return;
+    const yEl=Math.max(0,Math.min(now-start,end-start))/(1000*60*60*24*365.25);
+    const A=P*Math.pow(1+rAnn/n,n*yEl);
+    const rPerSec=rAnn/(365.25*24*3600);
+    dailyDepIncome+=A*rPerSec*86400;
+  });
+
+  // Securities stats
+  let totalSecVal=0, totalSecBuyCost=0;
+  securitiesSections.forEach(sec=>{
+    sec.items.forEach(it=>{
+      const qty=parseFloat(it.qty)||0;
+      const price=parseFloat(it.price)||0;
+      const buyPrice=parseFloat(it.buyPrice)||0;
+      totalSecVal+=qty*price;
+      if(buyPrice>0)totalSecBuyCost+=qty*buyPrice;
+    });
+  });
+  const secPnl=totalSecBuyCost>0?totalSecVal-totalSecBuyCost:0;
+  const secPnlPct=totalSecBuyCost>0?(secPnl/totalSecBuyCost*100):0;
+
+  // Average stock purchase
+  const tickerAvgs={};
+  securitiesSections.forEach(sec=>{
+    sec.items.forEach(it=>{
+      if(!it.ticker)return;
+      if(!tickerAvgs[it.ticker])tickerAvgs[it.ticker]={totalQty:0,totalCost:0,curPrice:0,name:it.liveName||it.name||it.ticker};
+      const qty=parseFloat(it.qty)||0;
+      const bp=parseFloat(it.buyPrice)||0;
+      tickerAvgs[it.ticker].totalQty+=qty;
+      if(bp>0)tickerAvgs[it.ticker].totalCost+=qty*bp;
+      tickerAvgs[it.ticker].curPrice=parseFloat(it.price)||0;
+    });
+  });
+
+  // Asset distribution
+  const assets=[
+    {name:'Депозити',val:dep,color:'var(--blue2)',icon:'🏦'},
+    {name:'Крипто',val:crypto,color:'var(--purple2)',icon:'₮'},
+    {name:'USD',val:usd,color:'var(--teal2)',icon:'💵'},
+    {name:'Валюта',val:forex,color:'var(--orange2)',icon:'🌐'},
+    {name:'Готівка',val:cash,color:'var(--gold2)',icon:'💴'},
+    {name:'Рахунок',val:other,color:'var(--green2)',icon:'💳'},
+    {name:'Акції',val:securities,color:'var(--green2)',icon:'📈'},
+    {name:'Метали',val:metals,color:'var(--gold2)',icon:'💎'},
+    {name:'Інше',val:custom,color:'var(--purple2)',icon:'✏️'},
+  ].filter(a=>a.val>0).sort((a,b)=>b.val-a.val);
+
+  const fmtChange=(v,p)=>{
+    const sign=v>=0?'+':'';
+    const col=v>=0?'var(--green2)':'var(--red)';
+    return `<span style="color:${col}">${sign}${sym}${fmtN(toDisplayCurr(Math.abs(v)))} (${sign}${p.toFixed(1)}%)</span>`;
+  };
+
+  let html=`
+    <div class="diag-stat-grid">
+      <div class="diag-stat">
+        <div class="diag-stat-val" style="color:var(--gold2)">${sym}${fmtN(toDisplayCurr(total))}</div>
+        <div class="diag-stat-lbl">Брутто-капітал</div>
+      </div>
+      <div class="diag-stat">
+        <div class="diag-stat-val" style="color:${net>=0?'var(--green2)':'var(--red)'}">${sym}${fmtN(toDisplayCurr(net))}</div>
+        <div class="diag-stat-lbl">Нетто-капітал</div>
+      </div>
+      <div class="diag-stat">
+        <div class="diag-stat-val" style="color:var(--red)">-${sym}${fmtN(toDisplayCurr(debt))}</div>
+        <div class="diag-stat-lbl">Борги</div>
+      </div>
+      <div class="diag-stat">
+        <div class="diag-stat-val" style="color:var(--blue2)">+${sym}${fmtN(toDisplayCurr(dailyDepIncome))}</div>
+        <div class="diag-stat-lbl">Дохід/день (деп.)</div>
+      </div>
+    </div>
+
+    <div class="diag-section">
+      <div class="diag-section-title">📅 Статистика за період</div>
+      <div class="diag-row"><span class="diag-row-key">Сьогодні</span><span class="diag-row-val">${fmtChange(dailyChange,dailyChangePct)}</span></div>
+      <div class="diag-row"><span class="diag-row-key">За 7 днів</span><span class="diag-row-val">${fmtChange(weekChange,weekChangePct)}</span></div>
+      <div class="diag-row"><span class="diag-row-key">За 30 днів</span><span class="diag-row-val">${fmtChange(monthChange,monthChangePct)}</span></div>
+    </div>
+
+    <div class="diag-section">
+      <div class="diag-section-title">📊 Розподіл активів</div>
+      ${assets.map(a=>`
+        <div class="diag-row">
+          <span class="diag-row-key">${a.icon} ${a.name}</span>
+          <span class="diag-row-val" style="color:${a.color}">${sym}${fmtN(toDisplayCurr(a.val))} <span style="font-size:9px;color:var(--muted)">${pct(a.val,total)}</span></span>
+        </div>`).join('')}
+    </div>`;
+
+  // Stocks P&L section
+  if(totalSecVal>0){
+    html+=`<div class="diag-section">
+      <div class="diag-section-title">📈 Акції — P&L</div>
+      <div class="diag-row"><span class="diag-row-key">Вартість портфелю</span><span class="diag-row-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(totalSecVal))}</span></div>
+      ${totalSecBuyCost>0?`
+      <div class="diag-row"><span class="diag-row-key">Вартість покупки</span><span class="diag-row-val">${sym}${fmtN(toDisplayCurr(totalSecBuyCost))}</span></div>
+      <div class="diag-row"><span class="diag-row-key">Прибуток / Збиток</span><span class="diag-row-val" style="color:${secPnl>=0?'var(--green2)':'var(--red)'}">${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(Math.abs(secPnl)))} (${secPnl>=0?'+':''}${secPnlPct.toFixed(1)}%)</span></div>`:''}
+    </div>`;
+  }
+
+  // Average purchase stats
+  const avgEntries=Object.entries(tickerAvgs).filter(([k,v])=>v.totalCost>0);
+  if(avgEntries.length){
+    html+=`<div class="diag-section">
+      <div class="diag-section-title">💹 Середня ціна покупки</div>
+      ${avgEntries.map(([ticker,data])=>{
+        const avgPrice=data.totalCost/data.totalQty;
+        const pnl=data.curPrice-avgPrice;
+        const pnlPct=avgPrice>0?(pnl/avgPrice*100):0;
+        const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
+        return `<div class="diag-row" style="flex-wrap:wrap;gap:4px;">
+          <span class="diag-row-key" style="min-width:60px;"><span style="color:var(--green2)">${ticker}</span> ${data.name}</span>
+          <span class="diag-row-val" style="font-size:10px;">
+            Ø ${sym}${fmtN(Math.round(toDisplayCurr(avgPrice)))} → ${sym}${fmtN(Math.round(toDisplayCurr(data.curPrice)))}
+            <span style="color:${pnlCol};font-size:9px">${pnl>=0?'+':''}${pnlPct.toFixed(1)}%</span>
+          </span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // Deposit tax info
+  if(deposits.some(d=>d.principal)){
+    html+=`<div class="diag-section">
+      <div class="diag-section-title">🏛 Податки (депозити)</div>
+      ${deposits.filter(d=>d.principal).map(d=>{
+        const tax=parseFloat(d.tax)||0;
+        const taxLabel=tax>0?tax+'% ПДФО':'Без податку';
+        return `<div class="diag-row"><span class="diag-row-key">🏦 ${d.name||'Депозит'}</span><span class="diag-row-val" style="color:${tax>0?'var(--red)':'var(--green2)'}">${taxLabel}</span></div>`;
+      }).join('')}
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;padding:6px;background:var(--bg);border-radius:8px;">
+        💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML=html;
+}
+
+// ── 7-DAY FREE TRIAL ─────────────────────────────────────
+function checkTrial(){
+  if(isPro)return;
+  const trialStart=localStorage.getItem('trial_start');
+  if(trialStart){
+    const elapsed=Date.now()-parseInt(trialStart);
+    const daysLeft=Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+    if(daysLeft>0){
+      isPro=true;
+      return;
+    }
+    isPro=false;
+    localStorage.removeItem('kapital_pro');
+    return;
+  }
+  // No trial started — show trial offer on FIRST launch
+  if(!localStorage.getItem('trial_shown')){
+    setTimeout(showTrialOffer, 800);
+  }
+}
+
+function showTrialOffer(){
+  localStorage.setItem('trial_shown','1');
+  const el=document.getElementById('trialOverlay');
+  if(el)el.style.display='flex';
+}
+
+function startTrial(){
+  localStorage.setItem('trial_start', Date.now().toString());
+  localStorage.setItem('onboarded','1');
+  isPro=true;
+  localStorage.setItem('kapital_pro','true');
+  const el=document.getElementById('trialOverlay');
+  if(el)el.style.display='none';
+  updateProUI();
+}
+
+function skipTrial(){
+  localStorage.setItem('trial_shown','1');
+  localStorage.setItem('onboarded','1');
+  const el=document.getElementById('trialOverlay');
+  if(el)el.style.display='none';
+}
+
+function getTrialDaysLeft(){
+  const trialStart=localStorage.getItem('trial_start');
+  if(!trialStart)return -1;
+  const elapsed=Date.now()-parseInt(trialStart);
+  return Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+}
+
+// Check trial on load
+checkTrial();
+
+// ── CRYPTO COIN LIMIT (FREE: 3 coins max) ───────────────
+const _origAddCoin=addCoin;
+addCoin=function(){
+  if(!isPro && coins.length >= 3){
+    openPaywall('Більше 3 монет — тільки в PRO 👑');
+    return;
+  }
+  _origAddCoin();
+};
+
+// ── CRYPTO ONLINE PRICE MONITORING ───────────────────────
+let cryptoPriceCache={};
+
+async function fetchCryptoPrice(coinName){
+  coinName=coinName.toUpperCase().trim();
+  if(!coinName)return null;
+  const cached=cryptoPriceCache[coinName];
+  if(cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
+  
+  // Try CoinGecko free API
+  const cgMap={
+    'BTC':'bitcoin','ETH':'ethereum','BNB':'binancecoin','SOL':'solana',
+    'XRP':'ripple','ADA':'cardano','DOT':'polkadot','DOGE':'dogecoin',
+    'AVAX':'avalanche-2','MATIC':'matic-network','LINK':'chainlink',
+    'UNI':'uniswap','ATOM':'cosmos','LTC':'litecoin','NEAR':'near',
+    'FTM':'fantom','ALGO':'algorand','APT':'aptos','ARB':'arbitrum',
+    'OP':'optimism','SUI':'sui','TON':'the-open-network','TRX':'tron',
+    'SHIB':'shiba-inu','PEPE':'pepe','WIF':'dogwifcoin',
+  };
+  const cgId=cgMap[coinName]||coinName.toLowerCase();
+  
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cgId+'&vs_currencies=usd&include_24hr_change=true');
+    if(r.ok){
+      const d=await r.json();
+      const data=d[cgId];
+      if(data){
+        const entry={price:data.usd,change24h:data.usd_24h_change||0,updated:Date.now()};
+        cryptoPriceCache[coinName]=entry;
+        return entry;
+      }
+    }
+  }catch(e){}
+  
+  // Fallback: try Worker
+  if(WORKER_URL){
+    try{
+      const r=await fetch(WORKER_URL.replace(/\/$/,'')+'/crypto?coin='+encodeURIComponent(coinName));
+      if(r.ok){
+        const d=await r.json();
+        if(d.price){
+          const entry={price:d.price,change24h:d.change24h||0,updated:Date.now()};
+          cryptoPriceCache[coinName]=entry;
+          return entry;
+        }
+      }
+    }catch(e){}
+  }
+  return null;
+}
+
+async function refreshCryptoPrices(){
+  if(!coins.length)return;
+  // Freemium check
+  if(!isPro && coins.length > 3)return;
+  
+  const rate=val('usdtUah')||41;
+  let anyUpdated=false;
+  
+  for(const coin of coins){
+    if(!coin.name)continue;
+    const data=await fetchCryptoPrice(coin.name);
+    if(data){
+      coin.curPrice=data.price;
+      coin.change24h=data.change24h;
+      anyUpdated=true;
+    }
+  }
+  
+  if(anyUpdated){
+    renderCoins();
+    saveData();
+  }
+}
+
+// Auto-refresh crypto on load and every 5 min
+setTimeout(refreshCryptoPrices, 2000);
+setInterval(refreshCryptoPrices, 5*60*1000);
+
+// ── STARTUP INVESTMENT SECTION ───────────────────────────
+function addStartupCard(){
+  if(!isPro && customSections.length >= FREE_LIMITS.customSections){
+    openPaywall('Більше 1 додаткового розділу — тільки в PRO 👑');
+    return;
+  }
+  const id='startup_'+Date.now();
+  const section={
+    id,
+    name:'Стартап',
+    icon:'🚀',
+    sectionType:'startup',
+    principal:'',
+    startupInvested:'',
+    startupValuation:'',
+    startupEquity:'',
+    startupStage:'seed',
+    startupName:'',
+    startupNote:'',
+    color:'teal'
+  };
+  customSections.push(section);
+  renderCustomCards(); updateAll(); saveData();
+}
+
+// Override pickerAdd to handle startup
+const _origPickerAdd=pickerAdd;
+pickerAdd=function(type){
+  if(type==='startup'){
+    closeSectionPicker();
+    addStartupCard();
+    return;
+  }
+  _origPickerAdd(type);
+};
+
+// Override getCustomCardHtml to handle startup type
+const _origGetCustomCardHtml=getCustomCardHtml;
+getCustomCardHtml=function(s,idx){
+  if(s.sectionType==='startup'){
+    const lang=LANGS[currentLang];
+    const invested=parseFloat(s.startupInvested)||0;
+    const valuation=parseFloat(s.startupValuation)||0;
+    const equity=parseFloat(s.startupEquity)||0;
+    const currentValue=valuation*(equity/100);
+    const pnl=currentValue-invested;
+    const pnlPct=invested>0?(pnl/invested*100):0;
+    const pnlColor=pnl>=0?'var(--green2)':'var(--red)';
+    const sym=getCurrSym();
+    
+    return `<div class="card card-startup" id="card-${s.id}" draggable="true" data-card="${s.id}">
+      <div class="card-header">
+        <div class="drag-handle">⠿</div>
+        <div class="card-icon">🚀</div>
+        <div class="card-info" onclick="toggleCard('${s.id}')">
+          <div class="card-name">${s.startupName||'Стартап'}</div>
+          <div class="card-value" id="customDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(currentValue))}</div>
+          <div class="card-pct" id="customPct_${s.id}" style="color:${pnlColor}">${pnl>=0?'+':''}${pnlPct.toFixed(1)}%</div>
+        </div>
+        <div class="card-actions">
+          <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">✕</button>
+          <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+        </div>
+      </div>
+      <div class="card-body"><div class="card-inner">
+        <div class="divider"></div>
+        <div class="field-group">
+          <div class="field-label">Назва стартапу</div>
+          <input class="field-input" type="text" id="startupName_${s.id}" value="${s.startupName||''}" placeholder="Назва проекту"
+            oninput="customSections[${idx}].startupName=this.value;saveData()">
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">Вкладено (₴)</div>
+            <input class="field-input" type="text" id="startupInvested_${s.id}" value="${s.startupInvested||''}" placeholder="50 000" inputmode="decimal"
+              oninput="customSections[${idx}].startupInvested=this.value;customSections[${idx}].principal=getStartupValue(${idx});updateAll()">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Ваша частка (%)</div>
+            <input class="field-input" type="text" id="startupEquity_${s.id}" value="${s.startupEquity||''}" placeholder="10" inputmode="decimal"
+              oninput="customSections[${idx}].startupEquity=this.value;customSections[${idx}].principal=getStartupValue(${idx});updateAll()">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">Оцінка стартапу (₴)</div>
+            <input class="field-input" type="text" id="startupValuation_${s.id}" value="${s.startupValuation||''}" placeholder="1 000 000" inputmode="decimal"
+              oninput="customSections[${idx}].startupValuation=this.value;customSections[${idx}].principal=getStartupValue(${idx});updateAll()">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Стадія</div>
+            <select class="field-input" id="startupStage_${s.id}" onchange="customSections[${idx}].startupStage=this.value;saveData()">
+              <option value="idea" ${s.startupStage==='idea'?'selected':''}>💡 Ідея</option>
+              <option value="pre-seed" ${s.startupStage==='pre-seed'?'selected':''}>🌱 Pre-seed</option>
+              <option value="seed" ${s.startupStage==='seed'?'selected':''}>🌿 Seed</option>
+              <option value="series-a" ${s.startupStage==='series-a'?'selected':''}>🚀 Series A</option>
+              <option value="series-b" ${s.startupStage==='series-b'?'selected':''}>📈 Series B+</option>
+              <option value="profit" ${s.startupStage==='profit'?'selected':''}>💰 Прибутковий</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Нотатка</div>
+          <input class="field-input" type="text" id="startupNote_${s.id}" value="${s.startupNote||''}" placeholder="Опис, роль..."
+            oninput="customSections[${idx}].startupNote=this.value;saveData()">
+        </div>
+        <div class="result-box" style="margin-top:12px;">
+          <div class="result-row"><span class="result-key">💰 Вкладено</span><span class="result-val">${sym}${fmtN(toDisplayCurr(invested))}</span></div>
+          <div class="result-row"><span class="result-key">📊 Ваша частка</span><span class="result-val" style="color:var(--teal2)">${equity}% = ${sym}${fmtN(toDisplayCurr(currentValue))}</span></div>
+          <div class="result-row"><span class="result-key">P&L</span><span class="result-val" style="color:${pnlColor}">${pnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(Math.abs(pnl)))} (${pnl>=0?'+':''}${pnlPct.toFixed(1)}%)</span></div>
+          <div class="result-row"><span class="result-key">ROI</span><span class="result-val" style="color:${pnlColor}">${invested>0?((currentValue/invested-1)*100).toFixed(1)+'x':'—'}</span></div>
+        </div>
+        <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">${t('removeSection')}</button>
+      </div></div>
+    </div>`;
+  }
+  return _origGetCustomCardHtml(s,idx);
+};
+
+function getStartupValue(idx){
+  const s=customSections[idx];
+  if(!s)return 0;
+  const valuation=parseFloat(s.startupValuation)||0;
+  const equity=parseFloat(s.startupEquity)||0;
+  return valuation*(equity/100);
+}
+
+// Override getCustomTotal to handle startup sections
+const _origGetCustomTotal=getCustomTotal;
+getCustomTotal=function(){
+  return customSections.reduce((sum,s)=>{
+    if(s.sectionType==='startup'){
+      const v=parseFloat(s.startupValuation)||0;
+      const e=parseFloat(s.startupEquity)||0;
+      return sum+v*(e/100);
+    }
+    return sum+(parseFloat(s.principal)||0);
+  },0);
+};
+
+// ── DEV TOOLS ─────────────────────────────────────────────
+function devSetPro(state){
+  isPro=state;
+  localStorage.setItem('kapital_pro', state?'true':'false');
+  if(!state) localStorage.removeItem('kapital_pro');
+  updateProUI();
+  devUpdateStatus();
+  renderSecuritiesCards();
+  updateAll();
+  const toast=document.createElement('div');
+  toast.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:20px;font-family:DM Mono,monospace;font-size:12px;font-weight:600;z-index:700;';
+  if(state){
+    toast.style.background='linear-gradient(135deg,var(--gold),#c9a84c)';toast.style.color='#0a0a0f';
+    toast.textContent='👑 PRO активовано';
+  } else {
+    toast.style.background='var(--bg3)';toast.style.border='1px solid var(--border2)';toast.style.color='var(--muted2)';
+    toast.textContent='🔒 FREE режим';
+  }
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),2000);
+}
+
+function devResetTrial(){
+  localStorage.removeItem('trial_start');
+  localStorage.removeItem('trial_shown');
+  isPro=false;
+  localStorage.removeItem('kapital_pro');
+  updateProUI();
+  devUpdateStatus();
+  alert('Тріал скинуто. Перезавантажте сторінку щоб побачити вікно тріалу.');
+}
+
+function devResetAll(){
+  if(!confirm('⚠️ Видалити ВСІ дані? Це незворотна дія!'))return;
+  if(!confirm('Точно видалити? Всі депозити, акції, налаштування будуть втрачені.'))return;
+  localStorage.clear();
+  location.reload();
+}
+
+function devUpdateStatus(){
+  const el=document.getElementById('devProStatus');
+  if(!el)return;
+  const trialStart=localStorage.getItem('trial_start');
+  const daysLeft=getTrialDaysLeft();
+  
+  if(isPro && trialStart && daysLeft>0){
+    el.textContent='👑 PRO (тріал: '+daysLeft+' дн.)';
+    el.style.color='var(--green2)';
+  } else if(isPro){
+    el.textContent='👑 PRO';
+    el.style.color='var(--gold2)';
+  } else {
+    el.textContent='🔒 FREE';
+    el.style.color='var(--red)';
+  }
+  
+  // Highlight active button
+  const btnPro=document.getElementById('devBtnPro');
+  const btnFree=document.getElementById('devBtnFree');
+  if(btnPro)btnPro.style.opacity=isPro?'1':'0.4';
+  if(btnFree)btnFree.style.opacity=isPro?'0.4':'1';
+  
+  // Trial info
+  const info=document.getElementById('devTrialInfo');
+  if(info){
+    const parts=[];
+    if(trialStart)parts.push('Тріал: '+(daysLeft>0?daysLeft+' дн.':'закінчився'));
+    else parts.push('Тріал: не розпочато');
+    parts.push('Депозитів: '+deposits.length+'/'+FREE_LIMITS.deposits);
+    const totalStocks=securitiesSections.reduce((s,sec)=>s+sec.items.length,0);
+    parts.push('Акцій: '+totalStocks+'/'+FREE_LIMITS.stockItems);
+    parts.push('Монет: '+coins.length+'/3');
+    info.textContent=parts.join(' · ');
+  }
+}
+
+// Re-render after all overrides are established
+if(customSections.some(s=>s.sectionType==='startup')){
+  renderCustomCards();
+  updateAll();
 }
 
 </script>
