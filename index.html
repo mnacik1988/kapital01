@@ -2413,6 +2413,8 @@ function addSecuritiesCard(type){
 function renderSecuritiesCards(){
   const container=$('securitiesContainer');
   if(!container)return;
+  // Hide gap when no sections
+  container.style.marginTop=securitiesSections.length?'14px':'0';
   // Save expanded state
   const expanded=new Set();
   container.querySelectorAll('.card.expanded').forEach(el=>expanded.add(el.id));
@@ -2990,13 +2992,13 @@ function loadData(){
 // Insert securities container AFTER cardsContainer (not inside it)
 const secContainerEl=document.createElement('div');
 secContainerEl.id='securitiesContainer';
-secContainerEl.style.display='contents';
+secContainerEl.style.cssText='padding:0 16px;display:flex;flex-direction:column;gap:14px;margin-top:14px;';
 $('cardsContainer').after(secContainerEl);
 
 // Metals container
 const metalsContainerEl=document.createElement('div');
 metalsContainerEl.id='metalsContainer';
-metalsContainerEl.style.display='contents';
+metalsContainerEl.style.cssText='padding:0 16px;display:flex;flex-direction:column;gap:14px;margin-top:14px;';
 secContainerEl.after(metalsContainerEl);
 
 // ── INIT ──────────────────────────────────────
@@ -4517,6 +4519,22 @@ function renderDiagnostics(){
   const secPnl=totalSecBuyCost>0?totalSecVal-totalSecBuyCost:0;
   const secPnlPct=totalSecBuyCost>0?(secPnl/totalSecBuyCost*100):0;
 
+  // Stock dividend income (annual)
+  let stockDivAnn=0;
+  securitiesSections.forEach(sec=>{
+    sec.items.forEach(it=>{
+      const qty=parseFloat(it.qty)||0;
+      const price=parseFloat(it.price)||0;
+      const divYield=(parseFloat(it.divYield)||parseFloat(it.div)||0)/100;
+      const divAbs=parseFloat(it.divAbs)||0;
+      if(divAbs>0) stockDivAnn+=qty*divAbs;
+      else if(divYield>0) stockDivAnn+=qty*price*divYield;
+    });
+  });
+  const stockDivMonth=stockDivAnn/12;
+  const depMonthIncome=dailyDepIncome*30.44;
+  const combinedMonth=depMonthIncome+stockDivMonth;
+
   // Average stock purchase
   const tickerAvgs={};
   securitiesSections.forEach(sec=>{
@@ -4567,6 +4585,16 @@ function renderDiagnostics(){
       <div class="diag-stat">
         <div class="diag-stat-val" style="color:var(--blue2)">+${sym}${fmtN(toDisplayCurr(dailyDepIncome))}</div>
         <div class="diag-stat-lbl">Дохід/день (деп.)</div>
+      </div>
+      <div class="diag-stat">
+        <div class="diag-stat-val" style="color:var(--green2)">+${sym}${fmtN(toDisplayCurr(stockDivMonth))}<span style="font-size:9px;color:var(--muted);font-weight:400;">/міс</span></div>
+        <div class="diag-stat-lbl">Дивіденди акцій/місяць</div>
+        <div style="font-size:9px;color:${secPnl>=0?'var(--green2)':'var(--red)'};margin-top:4px;font-family:'DM Mono',monospace;">P&L: ${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(secPnl))}</div>
+      </div>
+      <div class="diag-stat" style="grid-column:1/-1;background:linear-gradient(135deg,var(--bg3),#1a1a2e);border:1px solid var(--gold)30;">
+        <div class="diag-stat-val" style="color:var(--gold2);font-size:20px;">+${sym}${fmtN(toDisplayCurr(combinedMonth))}<span style="font-size:11px;color:var(--muted);font-weight:400;"> /місяць</span></div>
+        <div class="diag-stat-lbl">Загальний пасивний дохід (деп. + дивіденди)</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;">Деп: +${sym}${fmtN(toDisplayCurr(depMonthIncome))} · Дивід: +${sym}${fmtN(toDisplayCurr(stockDivMonth))}</div>
       </div>
     </div>
 
