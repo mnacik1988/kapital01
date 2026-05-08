@@ -843,22 +843,6 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 </div>
 
-<!-- STOCKS SUMMARY CARD (always in main menu) -->
-<div class="card card-stocks" id="stocksSummaryCard" style="display:none;cursor:pointer;" onclick="scrollToSecurities()">
-  <div class="card-header">
-    <div class="drag-handle">⠿</div>
-    <div class="card-icon">📈</div>
-    <div class="card-info">
-      <div class="card-name" id="stocks_summary_name">Акції</div>
-      <div class="card-value" id="stocks_summary_value">0 ₴</div>
-      <div class="card-pct" id="stocks_summary_pct">0% від капіталу</div>
-    </div>
-    <div class="card-actions">
-      <div style="font-size:16px;color:var(--muted)">↓</div>
-    </div>
-  </div>
-</div>
-
 <!-- ADD SECTION BUTTONS -->
 <div class="add-section-wrap" style="margin-top:14px;">
   <button class="add-one-btn" onclick="openSectionPicker()">
@@ -2429,20 +2413,16 @@ function addSecuritiesCard(type){
 function renderSecuritiesCards(){
   const container=$('securitiesContainer');
   if(!container)return;
-  // Remove any stale securities cards that may have been moved to cardsContainer by drag
-  securitiesSections.forEach(s=>{
-    const stale=document.querySelectorAll(`[data-card="${s.id}"]`);
-    stale.forEach(el=>{if(el.parentNode!==container)el.remove();});
-  });
-  // Save expanded state before re-render
+  // Save expanded state
   const expanded=new Set();
   container.querySelectorAll('.card.expanded').forEach(el=>expanded.add(el.id));
+  // Re-render
   container.innerHTML=securitiesSections.map((s,i)=>getSecCardHtml(s,i)).join('');
-  // Restore expanded state
+  // Restore expanded
   container.querySelectorAll('.card').forEach(el=>{
     if(expanded.has(el.id))el.classList.add('expanded');
   });
-  container.querySelectorAll('.card').forEach(c=>c.setAttribute('draggable','true'));
+  container.querySelectorAll('.card').forEach(c=>{c.setAttribute('draggable','true');c._dragBound=false;});
   refreshDrag();
 }
 
@@ -2764,16 +2744,6 @@ function updateAll(){
   recordDailySnapshot(total);
   renderChart();
 
-  // Update stocks summary card in main menu
-  const totalSecurities=getSecuritiesTotal();
-  const stocksCard=document.getElementById('stocksSummaryCard');
-  if(stocksCard){
-    stocksCard.style.display=totalSecurities>0||securitiesSections.some(s=>s.items.length>0)?'block':'none';
-    setText('stocks_summary_name', t('stocksBtn')||'Акції');
-    setText('stocks_summary_value', fmtN(toDisplayCurr(totalSecurities))+' '+sym);
-    setText('stocks_summary_pct', pct(totalSecurities,total)+' '+t('pctOfCapital'));
-  }
-
   // Update metals display
   metalsSections.forEach(s=>{
     const v=s.items.reduce((ss,it)=>ss+(getMetalPriceUah(it.type)>0?it.grams*getMetalPriceUah(it.type):it.grams*it.price),0);
@@ -2895,7 +2865,11 @@ function refreshDrag(){
       card.addEventListener('drop',e=>{
         e.preventDefault();card.classList.remove('drag-over');
         if(dragged&&card!==dragged){
-          const all=[...document.querySelectorAll('#cardsContainer .card, #securitiesContainer .card, .card[data-card]')];
+          // Only allow drops within the same container
+          const dragParent=dragged.parentNode;
+          const dropParent=card.parentNode;
+          if(dragParent!==dropParent)return;
+          const all=[...dropParent.querySelectorAll(':scope > .card')];
           if(all.indexOf(dragged)<all.indexOf(card))card.after(dragged);
           else card.before(dragged);
           saveOrder();
@@ -2936,10 +2910,13 @@ function refreshDrag(){
         const target=document.elementFromPoint(tc.clientX,tc.clientY)?.closest('.card');
         document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
         if(target&&target!==card){
-          const all=[...document.querySelectorAll('.card')];
-          if(all.indexOf(card)<all.indexOf(target))target.after(card);
-          else target.before(card);
-          saveOrder();
+          // Only allow drops within the same container
+          if(card.parentNode===target.parentNode){
+            const all=[...card.parentNode.querySelectorAll(':scope > .card')];
+            if(all.indexOf(card)<all.indexOf(target))target.after(card);
+            else target.before(card);
+            saveOrder();
+          }
         }
       };
       handle.addEventListener('touchstart',onTouchStart,{passive:true});
@@ -2950,20 +2927,19 @@ function refreshDrag(){
 }
 
 function saveOrder(){
-  cardOrder=[...document.querySelectorAll('.card')].map(c=>c.dataset.card).filter(Boolean);
+  // Only save cards from cardsContainer (builtin + custom). Securities/metals are outside.
+  const cards=$('cardsContainer')?.querySelectorAll('.card')||[];
+  cardOrder=[...cards].map(c=>c.dataset.card).filter(Boolean);
   saveData();
 }
 
 function restoreOrder(){
   if(!cardOrder||!cardOrder.length)return;
   const container=$('cardsContainer');
-  const secContainer=$('securitiesContainer');
+  if(!container)return;
   cardOrder.forEach(cardId=>{
-    const el=document.querySelector(`[data-card="${cardId}"]`);
-    if(!el||!el.parentNode)return;
-    // Keep securities cards in securitiesContainer
-    if(el.parentNode===secContainer)return;
-    container.appendChild(el);
+    const el=container.querySelector(`[data-card="${cardId}"]`);
+    if(el)container.appendChild(el);
   });
 }
 
@@ -2999,18 +2975,23 @@ function loadData(){
     if(Array.isArray(d.securitiesSections))securitiesSections=d.securitiesSections;
   if(Array.isArray(d.metalsSections))metalsSections=d.metalsSections;
   if(Array.isArray(d.liabilities))liabilities=d.liabilities;
-    if(Array.isArray(d.cardOrder))cardOrder=d.cardOrder;
+    if(Array.isArray(d.cardOrder)){
+      // Strip any securities/metals IDs that leaked into cardOrder
+      const _sIds=new Set((d.securitiesSections||[]).map(s=>s.id));
+      const _mIds=new Set((d.metalsSections||[]).map(s=>s.id));
+      cardOrder=d.cardOrder.filter(id=>!_sIds.has(id)&&!_mIds.has(id));
+    }
     if(d.hiddenCards)hiddenCards=d.hiddenCards;
     if(d.currentLang)currentLang=d.currentLang;
   }catch(e){}
 }
 
 // ── SECURITIES CONTAINER ─────────────────────
-// Insert securities container after customCardsContainer
+// Insert securities container AFTER cardsContainer (not inside it)
 const secContainerEl=document.createElement('div');
 secContainerEl.id='securitiesContainer';
 secContainerEl.style.display='contents';
-$('customCardsContainer').after(secContainerEl);
+$('cardsContainer').after(secContainerEl);
 
 // Metals container
 const metalsContainerEl=document.createElement('div');
