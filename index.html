@@ -1066,7 +1066,8 @@ select.field-input option{background:var(--bg3);color:var(--text);}
           </select>
         </div>
       </div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;" id="cur_rate_source"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;" id="cur_rate_source"></div>
+      <button onclick="fetchUsdUahRate().then(()=>fillCurrencyFields())" style="display:block;margin:8px auto 0;padding:6px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">⟳ Оновити курси онлайн</button>
       <div class="calc-res" id="cur_result" style="display:none"></div>
     </div>
   </div>
@@ -2106,7 +2107,7 @@ function getCustomTotal(){
 let stockPriceCache={};
 let usdUahRate=41;
 // Live exchange rates (UAH base) from frankfurter.app
-let liveRates={UAH:1,USD:41,EUR:45,RUB:0.59,CNY:5.7,GBP:52,PLN:10}; // RUB: ~1₽=0.59₴
+let liveRates={UAH:1,USD:41,EUR:45,RUB:0.59,CNY:5.6,GBP:52,PLN:10}; // RUB: 1₽≈0.59₴ (Google: 1000₴=1690₽)
 let ratesLastFetched=0;
 let stockLastError='';
 
@@ -2201,11 +2202,11 @@ async function fetchUsdUahRate(){
     }catch(e){}
   }
 
-  // Source 3: NBU for UAH/RUB specifically (if not already fetched)
-  // RUB not in ECB since 2022, use cross-rate: UAH/USD * USD/RUB
-  if(liveRates.USD&&liveRates.USD>1){
-    // Approximate: 1 RUB ≈ 0.011 USD * UAH/USD
-    // Better: use actual cross from open.er-api via USD base
+  // Source 3: NBU for UAH/RUB specifically
+  // Only if RUB wasn't already set correctly by Source 1
+  const rubFromSource1=liveRates.RUB;
+  const rubLooksCorrect=rubFromSource1&&rubFromSource1>0.3&&rubFromSource1<1.5; // sanity: 1 RUB = 0.3-1.5 UAH
+  if(!rubLooksCorrect&&liveRates.USD&&liveRates.USD>1){
     try{
       const r=await fetch('https://open.er-api.com/v6/latest/RUB');
       if(r.ok){
@@ -2215,12 +2216,35 @@ async function fetchUsdUahRate(){
         }
       }
     }catch(e){
-      // Fallback cross-rate
-      if(liveRates.USD>1) liveRates.RUB=liveRates.USD/85;
+      // Fallback cross-rate: 1 USD ≈ 80 RUB (as of 2025)
+      if(liveRates.USD>1) liveRates.RUB=liveRates.USD/80;
     }
   }
 
   if(success&&displayCurrency!=='uah') updateAll();
+
+  // Source 4: Worker fallback for rates
+  if(!success&&WORKER_URL){
+    try{
+      const r=await fetch(WORKER_URL.replace(/\/$/,'')+'/rates');
+      if(r.ok){
+        const d=await r.json();
+        if(d.USD){
+          Object.entries(d).forEach(([cur,rate])=>{
+            if(rate&&rate>0) liveRates[cur.toUpperCase()]=rate;
+          });
+          liveRates.UAH=1;
+          usdUahRate=liveRates.USD||41;
+          ratesLastFetched=Date.now();
+        }
+      }
+    }catch(e){}
+  }
+
+  // Auto-update calculator fields if open
+  if(typeof fillCurrencyFields==='function'){
+    try{fillCurrencyFields();}catch(e){}
+  }
 }
 
 async function fetchStockPrice(ticker){
@@ -3134,17 +3158,27 @@ setTimeout(updateProUI, 100);
 function openCalc(){
   document.getElementById('calcOverlay').classList.add('open');
   translateDynamicUI();
-  // Pre-fill: UAH per 1 unit of each currency
+  // Fetch fresh rates then fill fields
+  fillCurrencyFields();
+  if(!ratesLastFetched || Date.now()-ratesLastFetched > 5*60*1000){
+    fetchUsdUahRate().then(()=>fillCurrencyFields());
+  }
+  runCurrencyWithRates();
+}
+function fillCurrencyFields(){
   const fields={cur_rate:liveRates.USD,cur_eur:liveRates.EUR,cur_rub:liveRates.RUB,cur_cny:liveRates.CNY};
   Object.entries(fields).forEach(([id,rate])=>{
     const el=document.getElementById(id);
-    if(el&&rate&&rate>0)el.value=rate.toFixed(2);
+    if(el&&rate&&rate>0) el.value=rate.toFixed(2);
   });
-  // Show rate source
   const srcEl=document.getElementById('cur_rate_source');
   if(srcEl){
-    const updated=ratesLastFetched?new Date(ratesLastFetched).toLocaleTimeString():'—';
-    const src=ratesLastFetched?'open.er-api.com · ':'Fallback · ';srcEl.textContent=src+updated;
+    if(ratesLastFetched){
+      const updated=new Date(ratesLastFetched).toLocaleTimeString();
+      srcEl.innerHTML='<span style="color:var(--green2)">● Онлайн</span> · Оновлено: '+updated;
+    } else {
+      srcEl.innerHTML='<span style="color:var(--orange2)">● Офлайн</span> · Курси за замовчуванням';
+    }
   }
   runCurrencyWithRates();
 }
@@ -3169,7 +3203,21 @@ function sc(v){
     return;
   }
   if(v==='±'){const n=parseFloat(disp.textContent)||0;disp.textContent=String(-n);return;}
-  if(v==='%'){const n=parseFloat(disp.textContent)||0;disp.textContent=String(n/100);return;}
+  if(v==='%'){
+    const n=parseFloat(disp.textContent)||0;
+    if(sc_op&&sc_prev){
+      // 100 + 10% = 110, 100 - 10% = 90, 100 * 10% = 10, 100 / 10% = 1000
+      const a=parseFloat(sc_prev);
+      if(sc_op==='+'||sc_op==='-'){
+        disp.textContent=String(parseFloat((a*n/100).toFixed(8)));
+      } else {
+        disp.textContent=String(parseFloat((n/100).toFixed(8)));
+      }
+    } else {
+      disp.textContent=String(parseFloat((n/100).toFixed(8)));
+    }
+    return;
+  }
   if(['+','-','*','/'].includes(v)){
     sc_prev=disp.textContent;sc_op=v;sc_newNum=true;
     disp.textContent=disp.textContent;return;
@@ -3216,7 +3264,8 @@ function runCompound(){
     ['Нараховано відсотків','+'+fmt(Math.round(profit))+' ₴','var(--green2)'],
     [taxLabel,taxPct>0?'-'+fmt(Math.round(tax))+' ₴':'0 ₴',taxPct>0?'var(--red)':'var(--muted2)'],
     ['Чистий прибуток','+'+fmt(Math.round(net))+' ₴','var(--green2)'],
-    ['В місяць','~'+fmt(Math.round(net/months))+' ₴/міс','var(--muted2)'],
+    ['В місяць',fmt(Math.round(net/months))+' ₴/міс','var(--muted2)'],
+    ['Ефективна ставка',(sum>0?((total/sum-1)*100).toFixed(2):'0')+'%','var(--muted2)'],
   ].map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
 }
 
@@ -3576,19 +3625,19 @@ function runCurrencyWithRates(){
   if(!sum){box.style.display='none';return;}
   const from=document.getElementById('cur_from')?.value||'uah';
 
-  // All rates = UAH per 1 unit of currency (e.g. USD=41 means 1$=41₴)
-  // Field values are also UAH per 1 unit
+  // All rates = UAH per 1 unit of currency
   const uahPerUsd=parseFloat(document.getElementById('cur_rate')?.value)||(liveRates.USD||41);
   const uahPerEur=parseFloat(document.getElementById('cur_eur')?.value)||(liveRates.EUR||45);
   const uahPerRub=parseFloat(document.getElementById('cur_rub')?.value)||(liveRates.RUB||0.44);
   const uahPerCny=parseFloat(document.getElementById('cur_cny')?.value)||(liveRates.CNY||5.7);
 
-  // UAH per 1 unit map
   const uahPer={uah:1, usd:uahPerUsd, eur:uahPerEur, rub:uahPerRub, cny:uahPerCny};
   const syms={uah:'₴', usd:'$', eur:'€', rub:'₽', cny:'¥'};
+  const names={uah:'Гривня', usd:'Долар', eur:'Євро', rub:'Рубль', cny:'Юань'};
 
-  // Convert input to UAH first, then to each target currency
-  const sumInUah=sum*(uahPer[from]||1);
+  // Convert: sum in "from" currency → UAH → each target currency
+  const fromRate=uahPer[from]||1;
+  const sumInUah=sum*fromRate;
 
   const fmt=n=>{
     if(n>=1000)return new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(n);
@@ -3597,18 +3646,33 @@ function runCurrencyWithRates(){
   };
 
   const rows=[];
+  // Show UAH equivalent first (if not converting from UAH)
+  if(from!=='uah'){
+    rows.push([`${fmt(sum)} ${syms[from]} =`, `${fmt(sumInUah)} ₴`, 'var(--gold2)']);
+  }
   Object.entries(syms).forEach(([cur,sym])=>{
-    if(cur===from)return;
+    if(cur===from||cur==='uah'&&from!=='uah')return;
+    if(cur==='uah'&&from==='uah')return;
     const rate=uahPer[cur]||1;
     const val=sumInUah/rate;
-    rows.push([syms[from]+'→'+sym, fmt(val)+' '+sym]);
+    const crossRate=fromRate/rate;
+    rows.push([`${syms[from]} → ${sym} (${names[cur]})`, `${fmt(val)} ${sym}`, 'var(--green2)']);
+  });
+  // Show cross-rates
+  rows.push(['','','']);
+  Object.entries(uahPer).forEach(([cur,rate])=>{
+    if(cur==='uah')return;
+    rows.push([`1 ${syms[cur]} = `, `${rate.toFixed(2)} ₴`, 'var(--muted2)']);
   });
 
   box.style.display='block';
-  box.innerHTML=rows.map(r=>`<div class="calc-res-row">
+  box.innerHTML=rows.map(r=>{
+    if(!r[0]&&!r[1])return '<div style="border-top:1px solid var(--border);margin:6px 0"></div>';
+    return `<div class="calc-res-row">
     <span class="calc-res-key">${r[0]}</span>
-    <span class="calc-res-val" style="color:var(--green2)">${r[1]}</span>
-  </div>`).join('');
+    <span class="calc-res-val" style="color:${r[2]}">${r[1]}</span>
+  </div>`;
+  }).join('');
 }
 
 // ── TRANSLATE CALCULATOR & PAYWALL ───────────────────────
@@ -4490,19 +4554,22 @@ function renderDiagnostics(){
   const monthChange=monthEntry?(total-monthEntry.total):0;
   const monthChangePct=monthEntry&&monthEntry.total>0?(monthChange/monthEntry.total*100):0;
 
-  // Daily deposit income
+  // Daily deposit income (with tax from deposit settings)
   let dailyDepIncome=0;
+  let dailyDepIncomeGross=0;
   deposits.forEach(d=>{
     if(!d.startDate||!d.endDate||!d.principal)return;
     const P=getDepositPrincipalUah(d);
     const rAnn=(parseFloat(d.rate)||16)/100;
     const n=parseFloat(d.freq)||12;
+    const depTax=(parseFloat(d.tax)||0)/100;
     const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
     if(now<start||end<=start)return;
     const yEl=Math.max(0,Math.min(now-start,end-start))/(1000*60*60*24*365.25);
     const A=P*Math.pow(1+rAnn/n,n*yEl);
-    const rPerSec=rAnn/(365.25*24*3600);
-    dailyDepIncome+=A*rPerSec*86400;
+    const grossPerDay=A*(rAnn/365.25);
+    dailyDepIncomeGross+=grossPerDay;
+    dailyDepIncome+=grossPerDay*(1-depTax);
   });
 
   // Securities stats
@@ -4584,7 +4651,8 @@ function renderDiagnostics(){
       </div>
       <div class="diag-stat">
         <div class="diag-stat-val" style="color:var(--blue2)">+${sym}${fmtN(toDisplayCurr(dailyDepIncome))}</div>
-        <div class="diag-stat-lbl">Дохід/день (деп.)</div>
+        <div class="diag-stat-lbl">Дохід/день (деп. після податку)</div>
+        ${dailyDepIncomeGross!==dailyDepIncome?`<div style="font-size:8px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">до податку: +${sym}${fmtN(toDisplayCurr(dailyDepIncomeGross))}</div>`:''}
       </div>
       <div class="diag-stat">
         <div class="diag-stat-val" style="color:var(--green2)">+${sym}${fmtN(toDisplayCurr(stockDivMonth))}<span style="font-size:9px;color:var(--muted);font-weight:400;">/міс</span></div>
