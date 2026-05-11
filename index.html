@@ -1787,15 +1787,24 @@ function calcDeposit(depId){
   const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
   if(!P){['r-total','r-interest','r-taxbase','r-tax','r-net','r-eff'].forEach(k=>setText(k+'_'+depId,'—'));return;}
   const r=parseFloat($('depRate_'+depId)?.value||16)/100;
-  const n=parseFloat($('depFreq_'+depId)?.value||12);
-  const tt=(parseFloat($('depMonths_'+depId)?.value||12))/12;
+  const months=parseFloat($('depMonths_'+depId)?.value||12);
   const tax=parseFloat($('depTax_'+depId)?.value||0)/100;
   const tf=parseFloat($('depTaxFree_'+depId)?.value||0);
-  const A=P*Math.pow(1+r/n,n*tt);
-  const interest=A-P, taxBase=Math.max(0,interest-tf);
-  const taxAmt=taxBase*tax, net=interest-taxAmt;
-  const eff=P&&tt?(net/P/tt*100):0;
-  setText('r-total_'+depId,   fmtN(Math.round(A))+' ₴');
+  // Monobank formula: monthly capitalization of NET interest
+  let bal=P;
+  let totalGross=0;
+  for(let mo=0;mo<months;mo++){
+    const gross=bal*r/12;
+    totalGross+=gross;
+    const net=gross*(1-tax);
+    bal+=net; // only NET gets capitalized
+  }
+  const interest=totalGross;
+  const taxBase=Math.max(0,interest-tf);
+  const taxAmt=interest*tax;
+  const net=interest-taxAmt;
+  const eff=P&&months?(net/P/(months/12)*100):0;
+  setText('r-total_'+depId,   fmtN(Math.round(bal))+' ₴');
   setText('r-interest_'+depId,'+'+fmtN(Math.round(interest))+' ₴');
   setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' ₴');
   setText('r-tax_'+depId,     '−'+fmtN(Math.round(taxAmt))+' ₴');
@@ -1817,7 +1826,7 @@ function calcLive(depId){
   const totalPrincipal=P+topupsTotal;
   const rAnn=parseFloat($('depRate_'+depId)?.value||16)/100;
   const n=parseFloat($('depFreq_'+depId)?.value||12);
-  const tax=parseFloat($('depTax_'+depId)?.value||0)/100;
+  const tax=parseFloat($('depTax_'+depId)?.value||0)/100; // e.g. 0.23 for 23%
   const tf=parseFloat($('depTaxFree_'+depId)?.value||0);
   const sStr=$('depStartDate_'+depId)?.value;
   const eStr=$('depEndDate_'+depId)?.value;
@@ -1834,11 +1843,9 @@ function calcLive(depId){
   if(s)s.style.display='none'; if(m)m.style.display='block';
   const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
   const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
-  // Full continuous accrual (for stats display)
-  const A=P*Math.pow(1+rAnn/n,n*yEl);
-  const interest=A-P, taxBase=Math.max(0,interest-tf);
-  const taxAmt=taxBase*tax, net=interest-taxAmt;
-  // Monthly anniversary: count only fully completed months from start date
+
+  // ═══ MONOBANK FORMULA ═══
+  // 1. Count completed months from start date
   const startDay=start.getDate();
   let completedMonths=0;
   let checkDate=new Date(start);
@@ -1847,32 +1854,59 @@ function calcLive(depId){
     if(checkDate>now||checkDate>end)break;
     completedMonths++;
   }
-  const yMonthly=completedMonths/12;
-  const Amonthly=completedMonths>0?P*Math.pow(1+rAnn/n,n*yMonthly):P;
-  const monthlyAccrued=Amonthly-P;
-  const monthlyTaxBase=Math.max(0,monthlyAccrued-tf);
-  const monthlyTax=monthlyTaxBase*tax;
-  const monthlyNet=monthlyAccrued-monthlyTax;
-  const rPerSec=rAnn/(365.25*24*3600);
-  const perSec=A*rPerSec*(1-(interest>tf?tax:0));
-  const perDay=perSec*86400;
-  // Show (P + topups) + monthlyAccrued in the main counter
-  const accruedWithTopups=dep?getDepositMonthlyAccruedWithTopups(dep):monthlyAccrued;
-  const displayA=totalPrincipal+accruedWithTopups;
+
+  // 2. Simulate month-by-month capitalization (NET interest after tax)
+  //    Each month: gross = balance × rate × daysInMonth / 365
+  //    net = gross × (1 - tax), capitalized to balance
+  let simBalance=totalPrincipal; // principal + all topups (simplified)
+  let totalGrossInterest=0;
+  let totalTaxPaid=0;
+  let totalNetCapitalized=0;
+  let simDate=new Date(start);
+  for(let mo=0;mo<completedMonths;mo++){
+    const moStart=new Date(simDate.getFullYear(),simDate.getMonth()+mo,startDay);
+    const moEnd=new Date(simDate.getFullYear(),simDate.getMonth()+mo+1,startDay);
+    const daysInMonth=Math.round((moEnd-moStart)/(1000*60*60*24));
+    const grossMonth=simBalance*rAnn*daysInMonth/365;
+    const taxMonth=grossMonth*tax;
+    const netMonth=grossMonth-taxMonth;
+    totalGrossInterest+=grossMonth;
+    totalTaxPaid+=taxMonth;
+    totalNetCapitalized+=netMonth;
+    simBalance+=netMonth; // capitalization: add NET to balance
+  }
+
+  // 3. Current daily income (simple interest on current balance)
+  //    Bank formula: daily_gross = balance × rate / 365
+  //    daily_net = daily_gross × (1 - tax)
+  const currentBalance=totalPrincipal+totalNetCapitalized;
+  const dailyGross=currentBalance*rAnn/365;
+  const dailyNet=dailyGross*(1-tax);
+  const perSec=dailyNet/86400;
+  const perDay=dailyNet;
+  const perMonth=dailyNet*30.44;
+
+  // 4. Days since last capitalization (for fractional month display)
+  const lastCapDate=completedMonths>0?new Date(start.getFullYear(),start.getMonth()+completedMonths,startDay):start;
+  const daysSinceLastCap=Math.max(0,Math.round((now-lastCapDate)/(1000*60*60*24)));
+  const currentMonthGross=currentBalance*rAnn*daysSinceLastCap/365;
+  const currentMonthNet=currentMonthGross*(1-tax);
+
+  // 5. Display amount = principal + topups + capitalized net + current month accrual
+  const displayA=currentBalance+currentMonthNet;
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
   if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' ₴</span>';
+
   const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
   const dGone=Math.round(yEl*365.25);
   setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days'));
-  // Stats: show monthly accrued for capitalization total; keep continuous for other stats
-  setText('liveInterest_'+depId,'+'+fmtLive(monthlyAccrued)+' ('+completedMonths+' міс)');
-  setText('liveTaxLive_'+depId,'−'+fmtLive(monthlyTax));
-  setText('liveNet_'+depId,'+'+fmtLive(monthlyNet));
+  setText('liveInterest_'+depId,'+'+fmtLive(totalGrossInterest)+' ('+completedMonths+' міс)');
+  setText('liveTaxLive_'+depId,'−'+fmtLive(totalTaxPaid)+' ('+Math.round(tax*100)+'%)');
+  setText('liveNet_'+depId,'+'+fmtLive(totalNetCapitalized));
   setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' ₴/с');
   setText('livePerDay_'+depId,'+'+fmtLive(perDay));
-  const perMonth=perDay*30.44;
   setText('livePerMonth_'+depId,'+'+fmtLive(perMonth));
   const lb=$('liveBar_'+depId);
   if(lb)lb.style.width=Math.round(progress*100)+'%';
@@ -1880,25 +1914,26 @@ function calcLive(depId){
   setText('liveDateStart_'+depId,fmt2(start));
   setText('liveDatePct_'+depId,Math.round(progress*100)+'%');
   setText('liveDateEnd_'+depId,fmt2(end));
-  renderDailyLog(depId,P,rAnn,n,tax,tf,start,now);
+  renderDailyLog(depId,totalPrincipal,rAnn,n,tax,tf,start,now,currentBalance);
 }
-function renderDailyLog(depId,P,rAnn,n,tax,tf,start,now){
+function renderDailyLog(depId,totalPrincipal,rAnn,n,tax,tf,start,now,currentBalance){
   const el=$('dailyLog_'+depId); if(!el)return;
   const daysGone=Math.round((now-start)/(1000*60*60*24));
   const count=Math.min(daysGone,30);
   if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">—</div>';return;}
+  // Show last N days of simple daily income on current balance
+  const dailyGross=currentBalance*rAnn/365;
+  const dailyNet=dailyGross*(1-tax);
   let rows='';
-  for(let d=0;d<count;d++){
-    const t0=d/365.25, t1=(d+1)/365.25;
-    const A0=P*Math.pow(1+rAnn/n,n*t0), A1=P*Math.pow(1+rAnn/n,n*t1);
-    const gi=A1-A0;
-    const tb0=Math.max(0,A0-P-tf)*tax, tb1=Math.max(0,A1-P-tf)*tax;
-    const dayTax=Math.max(0,tb1-tb0), dayNet=gi-dayTax;
-    const date=new Date(start); date.setDate(date.getDate()+d);
+  for(let d=count-1;d>=0;d--){
+    const date=new Date(now);
+    date.setDate(date.getDate()-d);
+    // Check if this day was a capitalization day (1st of month matching start)
+    const isCap=(date.getDate()===start.getDate()&&d>0);
     rows+=`<div class="daily-row">
-      <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>
-      <span class="daily-income">+${dayNet.toFixed(2)} ₴/${t('days')}</span>
-      <span class="daily-total">${fmtN(Math.round(A1))} ₴</span>
+      <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}${isCap?' 💰':''}</span>
+      <span class="daily-income" style="color:var(--green2)">+${dailyNet.toFixed(2)} ₴/${t('days')}</span>
+      <span class="daily-total" style="color:var(--muted);font-size:9px">${dailyGross.toFixed(2)} − ${(dailyGross*tax).toFixed(2)} подат.</span>
     </div>`;
   }
   el.innerHTML=rows;
@@ -3828,35 +3863,35 @@ function getDepositMonthlyAccruedWithTopups(d){
   const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
   if(now<start||end<=start)return 0;
   const rAnn=(parseFloat(d.rate)||16)/100;
-  const n=parseFloat(d.freq)||12;
+  const tax=(parseFloat(d.tax)||0)/100;
+  const topups=(d.topups||[]).reduce((s,tp)=>s+tp.amount,0);
+  const totalP=P+topups;
 
-  function monthsCompleted(fromDate, toDate, limitDate){
-    const startDay=fromDate.getDate();
-    let months=0, check=new Date(fromDate);
-    while(true){
-      check=new Date(check.getFullYear(),check.getMonth()+1,startDay);
-      if(check>toDate||check>limitDate)break;
-      months++;
-    }
-    return months;
+  // Count completed months
+  const startDay=start.getDate();
+  let cm=0,chk=new Date(start);
+  while(true){
+    chk=new Date(chk.getFullYear(),chk.getMonth()+1,startDay);
+    if(chk>now||chk>end)break;
+    cm++;
   }
 
-  // Base principal accrual
-  const baseMonths=monthsCompleted(start,now,end);
-  const baseAccrued=baseMonths>0?P*Math.pow(1+rAnn/n,n*baseMonths/12)-P:0;
+  // Simulate month-by-month: capitalize NET interest (after tax)
+  let bal=totalP;
+  for(let mo=0;mo<cm;mo++){
+    const ms=new Date(start.getFullYear(),start.getMonth()+mo,startDay);
+    const me=new Date(start.getFullYear(),start.getMonth()+mo+1,startDay);
+    const dim=Math.round((me-ms)/(1000*60*60*24));
+    const gm=bal*rAnn*dim/365;
+    bal+=gm*(1-tax);
+  }
 
-  // Each top-up accrues from (topup date + 1 month)
-  let topupAccrued=0;
-  (d.topups||[]).forEach(tp=>{
-    const tpDate=new Date(tp.date);
-    if(tpDate>=end||tpDate<start)return;
-    const tpMonths=monthsCompleted(tpDate,now,end);
-    if(tpMonths>0){
-      topupAccrued+=tp.amount*Math.pow(1+rAnn/n,n*tpMonths/12)-tp.amount;
-    }
-  });
+  // Add fractional month accrual
+  const lastCap=cm>0?new Date(start.getFullYear(),start.getMonth()+cm,startDay):start;
+  const daysSince=Math.max(0,Math.round((now-lastCap)/(1000*60*60*24)));
+  const currentAccrual=bal*rAnn*daysSince/365*(1-tax);
 
-  return baseAccrued+topupAccrued;
+  return (bal-totalP)+currentAccrual;
 }
 
 function validateDepDate(depId, input){
@@ -4554,20 +4589,37 @@ function renderDiagnostics(){
   const monthChange=monthEntry?(total-monthEntry.total):0;
   const monthChangePct=monthEntry&&monthEntry.total>0?(monthChange/monthEntry.total*100):0;
 
-  // Daily deposit income (with tax from deposit settings)
+  // Daily deposit income (Monobank formula: balance × rate / 365 × (1 - tax))
   let dailyDepIncome=0;
   let dailyDepIncomeGross=0;
   deposits.forEach(d=>{
     if(!d.startDate||!d.endDate||!d.principal)return;
     const P=getDepositPrincipalUah(d);
+    const topups=(d.topups||[]).reduce((s,tp)=>s+tp.amount,0);
+    const totalP=P+topups;
     const rAnn=(parseFloat(d.rate)||16)/100;
     const n=parseFloat(d.freq)||12;
     const depTax=(parseFloat(d.tax)||0)/100;
     const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
     if(now<start||end<=start)return;
-    const yEl=Math.max(0,Math.min(now-start,end-start))/(1000*60*60*24*365.25);
-    const A=P*Math.pow(1+rAnn/n,n*yEl);
-    const grossPerDay=A*(rAnn/365.25);
+    // Simulate monthly capitalizations with NET interest
+    const startDay=start.getDate();
+    let cm=0,chk=new Date(start);
+    while(true){
+      chk=new Date(chk.getFullYear(),chk.getMonth()+1,startDay);
+      if(chk>now||chk>end)break;
+      cm++;
+    }
+    let bal=totalP;
+    let simD=new Date(start);
+    for(let mo=0;mo<cm;mo++){
+      const ms=new Date(simD.getFullYear(),simD.getMonth()+mo,startDay);
+      const me=new Date(simD.getFullYear(),simD.getMonth()+mo+1,startDay);
+      const dim=Math.round((me-ms)/(1000*60*60*24));
+      const gm=bal*rAnn*dim/365;
+      bal+=gm*(1-depTax);
+    }
+    const grossPerDay=bal*rAnn/365;
     dailyDepIncomeGross+=grossPerDay;
     dailyDepIncome+=grossPerDay*(1-depTax);
   });
