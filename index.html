@@ -663,25 +663,24 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       </div>
       <div style="margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
         <div class="calc-title" data-i18n="addCoinTitle">+ Додати монету</div>
+        <div class="ticker-search-row">
+          <input class="ticker-search-input field-input" type="text" id="newCoinName" placeholder="BTC, ETH, SOL..." style="text-transform:uppercase">
+          <button class="ticker-fetch-btn" onclick="fetchCoinPrice()">🔍 Отримати ціну</button>
+        </div>
+        <div id="cryptoLivePreview" style="display:none;margin:8px 0;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;"></div>
         <div class="row2">
-          <div class="field-group">
-            <div class="field-label" data-i18n="coinName">Назва монети</div>
-            <input class="field-input" type="text" id="newCoinName" placeholder="BTC" style="text-transform:uppercase">
-          </div>
           <div class="field-group">
             <div class="field-label" data-i18n="coinQty">Кількість</div>
             <input class="field-input" type="text" id="newCoinQty" placeholder="0.5" inputmode="decimal">
           </div>
-        </div>
-        <div class="row2">
           <div class="field-group">
-            <div class="field-label" data-i18n="coinBuyPrice">Ціна купівлі (USDT)</div>
+            <div class="field-label" data-i18n="coinBuyPrice">Ціна купівлі ($)</div>
             <input class="field-input" type="text" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
           </div>
-          <div class="field-group">
-            <div class="field-label" data-i18n="coinCurPrice">Поточна ціна (USDT)</div>
-            <input class="field-input" type="text" id="newCoinCurPrice" placeholder="65000" inputmode="decimal">
-          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label" data-i18n="coinCurPrice">Поточна ціна ($) авто</div>
+          <input class="field-input" type="text" id="newCoinCurPrice" placeholder="автоматично" inputmode="decimal">
         </div>
         <button class="add-btn" onclick="addCoin()" data-i18n="addCoinBtn">+ Додати монету</button>
       </div>
@@ -689,7 +688,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
 
   <!-- USD -->
-  <div class="card card-usd" id="card-usd" draggable="true" data-card="usd">
+  <div class="card card-usd" id="card-usd" draggable="true" data-card="usd" style="display:none;">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
       <div class="card-icon">💵</div>
@@ -794,8 +793,18 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <div class="field-group">
-        <div class="field-label" data-i18n="amountUah">Сума (₴)</div>
-        <input class="field-input" type="text" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <div class="field-label" data-i18n="amountUah">Сума</div>
+        <div style="display:flex;gap:6px;">
+          <input class="field-input" type="text" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()" style="flex:1;">
+          <select class="field-input" id="cashCurrency" style="width:72px;padding:10px 4px;" onchange="updateAll();saveData()">
+            <option value="UAH">₴ UAH</option>
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+            <option value="RUB">₽ RUB</option>
+            <option value="GBP">£ GBP</option>
+            <option value="CNY">¥ CNY</option>
+          </select>
+        </div>
       </div>
       <div class="field-group">
         <div class="field-label" data-i18n="whereStored">Де зберігається</div>
@@ -1141,7 +1150,13 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 
 
 <!-- LIABILITIES SECTION -->
-<div class="liab-section" id="liabilitiesSection">
+<div id="liabButtonWrap" style="padding:0 16px;margin-top:14px;">
+  <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;" onclick="openLiabModal()" id="liabAddMainBtn">
+    <span class="plus" style="color:var(--red)">+</span>
+    <span>Зобов'язання / Кредит</span>
+  </button>
+</div>
+<div class="liab-section" id="liabilitiesSection" style="display:none;">
   <div class="liab-header">
     <div class="liab-title" id="liab_section_title">⚠️ ЗОБОВ'ЯЗАННЯ</div>
     <div style="display:flex;gap:6px;align-items:center;">
@@ -1580,7 +1595,7 @@ function getDepositHtml(dep,idx){
         </div>
         ${deposits.length>1?`<button class="dep-delete-btn" onclick="removeDeposit(${idx})">✕</button>`:''}
       </div>
-      <div id="liveSetup_${dep.id}" class="live-setup">${lang.depSetup}</div>
+      <div id="liveSetup_${dep.id}" class="live-setup" style="cursor:pointer" onclick="toggleDepCalc('${dep.id}')">${lang.depSetup} <span style="font-size:16px">⚙️</span></div>
       <div id="liveMain_${dep.id}" style="display:none">
         <div class="live-num" id="liveAmount_${dep.id}">0<span class="live-kopeck">.00 ₴</span></div>
         <div class="live-sub" id="liveSub_${dep.id}">${lang.daysPassed} 0 ${lang.days}</div>
@@ -1591,6 +1606,7 @@ function getDepositHtml(dep,idx){
           <div class="live-row"><span class="live-key">${lang.perSec}</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
           <div class="live-row"><span class="live-key">${lang.perDay}</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
           <div class="live-row"><span class="live-key">📅 Прогноз/місяць</span><span class="live-val g" id="livePerMonth_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">💰 Проценти</span><span class="live-val" id="liveInterestTo_${dep.id}" style="font-size:9px;color:var(--muted2)">${dep.interestTo==='separate'?'→ окремий рахунок':'→ на тіло'}</span></div>
         </div>
         <div class="live-bar-wrap"><div class="live-bar" id="liveBar_${dep.id}" style="width:0%"></div></div>
         <div class="live-dates"><span id="liveDateStart_${dep.id}">—</span><span id="liveDatePct_${dep.id}">0%</span><span id="liveDateEnd_${dep.id}">—</span></div>
@@ -1602,21 +1618,6 @@ function getDepositHtml(dep,idx){
           <div class="daily-scroll" id="dailyLog_${dep.id}"></div>
         </div>
       </div>
-      <button style="width:100%;margin:10px 0 6px;background:#5b9cf615;border:1px solid #5b9cf640;border-radius:12px;padding:11px;font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);cursor:pointer;letter-spacing:0.05em;" onclick="openTopUpModal('${dep.id}')">
-        ${t('topupBtn')||'+ Поповнити'}
-      </button>
-      ${(dep.topups&&dep.topups.length)?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">📋 ${t('topupHistory')||'Історія поповнень'}</div>
-        ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
-          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${new Date(tp.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'})}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600;">+${fmtN(tp.amount)} ₴</span>
-          <button class="rm-btn" onclick="removeTopUp('${dep.id}',${ti})">×</button>
-        </div>`).join('')}
-        <div style="display:flex;justify-content:space-between;padding:6px 0 2px;font-family:'DM Mono',monospace;font-size:10px;margin-top:4px;">
-          <span style="color:var(--muted)">${t('topupTotal')||'Загалом'}</span>
-          <span style="color:var(--blue2);font-weight:700;">+${fmtN(dep.topups.reduce((s,tp)=>s+tp.amount,0))} ₴</span>
-        </div>
-      </div>`:''}
       <div class="dep-calc-toggle" id="depCalcToggle_${dep.id}" onclick="toggleDepCalc('${dep.id}')">
         <span class="dep-calc-toggle-label">${lang.depSettings}</span>
         <span class="dep-calc-toggle-icon">▼</span>
@@ -1634,6 +1635,7 @@ function getDepositHtml(dep,idx){
               <option value="USD" ${dep.depCurrency==='USD'?'selected':''}>$</option>
               <option value="EUR" ${dep.depCurrency==='EUR'?'selected':''}>€</option>
               <option value="GBP" ${dep.depCurrency==='GBP'?'selected':''}>£</option>
+              <option value="RUB" ${dep.depCurrency==='RUB'?'selected':''}>₽</option>
             </select>
           </div>
         </div>
@@ -1647,9 +1649,37 @@ function getDepositHtml(dep,idx){
             <div class="field-label">${lang.depEnd}</div>
             <input class="field-input" type="date" id="depEndDate_${dep.id}" value="${dep.endDate}"
               oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')">
-            <div id="depDateError_${dep.id}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);margin-top:4px;display:none;">⚠ Невірна дата — перевірте кількість днів у місяці</div>
+            <div id="depDateError_${dep.id}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);margin-top:4px;display:none;">⚠ Невірна дата</div>
           </div>
         </div>
+        <div class="field-group" style="margin-top:8px;">
+          <div class="field-label">💰 Виплата процентів</div>
+          <select class="field-input" id="depInterestTo_${dep.id}"
+            onchange="deposits[${idx}].interestTo=this.value;updateAll();startLiveTicker('${dep.id}');saveData()">
+            <option value="body" ${dep.interestTo!=='separate'?'selected':''}>→ Капіталізація (на тіло)</option>
+            <option value="separate" ${dep.interestTo==='separate'?'selected':''}>→ На окремий рахунок</option>
+          </select>
+        </div>
+        <button style="width:100%;margin:12px 0 8px;background:#5b9cf615;border:1px solid #5b9cf640;border-radius:12px;padding:11px;font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);cursor:pointer;" onclick="openTopUpModal('${dep.id}')">
+          ${t('topupBtn')||'+ Поповнити'}
+        </button>
+        ${(dep.topups&&dep.topups.length)?`<div style="margin-bottom:8px;">
+          <div class="daily-toggle" onclick="this.classList.toggle('collapsed');this.nextElementSibling.style.display=this.classList.contains('collapsed')?'none':'block'">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">📋 ${t('topupHistory')||'Історія поповнень'} (${dep.topups.length})</div>
+            <div class="daily-toggle-arrow">▼</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:4px;">
+            ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
+              <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${new Date(tp.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'})}</span>
+              <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600;">+${fmtN(tp.amount)} ₴</span>
+              <button class="rm-btn" onclick="removeTopUp('${dep.id}',${ti})">×</button>
+            </div>`).join('')}
+            <div style="display:flex;justify-content:space-between;padding:6px 0 2px;font-family:'DM Mono',monospace;font-size:10px;margin-top:4px;">
+              <span style="color:var(--muted)">${t('topupTotal')||'Загалом'}</span>
+              <span style="color:var(--blue2);font-weight:700;">+${fmtN(dep.topups.reduce((s,tp)=>s+tp.amount,0))} ₴</span>
+            </div>
+          </div>
+        </div>`:''}
         <div class="calc-section">
           <div class="calc-title">${lang.compCalc}</div>
           <div class="field-group">
@@ -1858,6 +1888,7 @@ function calcLive(depId){
   // 2. Simulate month-by-month capitalization (NET interest after tax)
   //    Each month: gross = balance × rate × daysInMonth / 365
   //    net = gross × (1 - tax), capitalized to balance
+  const interestToBody=dep?(dep.interestTo!=='separate'):true;
   let simBalance=totalPrincipal; // principal + all topups (simplified)
   let totalGrossInterest=0;
   let totalTaxPaid=0;
@@ -1873,7 +1904,7 @@ function calcLive(depId){
     totalGrossInterest+=grossMonth;
     totalTaxPaid+=taxMonth;
     totalNetCapitalized+=netMonth;
-    simBalance+=netMonth; // capitalization: add NET to balance
+    if(interestToBody) simBalance+=netMonth; // capitalize only if interest goes to body
   }
 
   // 3. Current daily income (simple interest on current balance)
@@ -1892,8 +1923,8 @@ function calcLive(depId){
   const currentMonthGross=currentBalance*rAnn*daysSinceLastCap/365;
   const currentMonthNet=currentMonthGross*(1-tax);
 
-  // 5. Display amount = principal + topups + capitalized net + current month accrual
-  const displayA=currentBalance+currentMonthNet;
+  // 5. Display amount
+  const displayA=interestToBody?(currentBalance+currentMonthNet):totalPrincipal;
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
@@ -2546,10 +2577,12 @@ function getSecCardHtml(s,idx){
 
       const subRows=isGrouped?g.trades.map(t=>{
         const qty=parseFloat(t.qty)||0, bp=parseFloat(t.buyPrice)||0, cp=parseFloat(t.price)||0;
-        const tv=qty*cp, tpnl=bp>0?tv-qty*bp:null;
+        const isSell=qty<0||(t.tradeType==='sell');
+        const tv=Math.abs(qty)*cp, tpnl=bp>0?tv-Math.abs(qty)*bp:null;
         const tpnlCol=tpnl===null?'var(--muted)':tpnl>=0?'var(--green2)':'var(--red)';
+        const tradeLabel=isSell?'<span style="color:var(--red)">📉 </span>':'';
         return '<tr style="background:var(--bg3);display:none" class="sub_'+trId+'">'+
-          '<td style="padding-left:20px;font-size:10px;color:var(--muted2)">↳ '+qty+' шт</td>'+
+          '<td style="padding-left:20px;font-size:10px;color:'+(isSell?'var(--red)':'var(--muted2)')+'">'+tradeLabel+'↳ '+Math.abs(qty)+' шт'+(isSell?' (продаж)':'')+'</td>'+
           '<td style="font-size:10px;color:var(--muted2)">'+(bp>0?fmtN(Math.round(bp))+'₴':'—')+'</td>'+
           '<td style="font-size:10px">'+fmtN(Math.round(cp))+'₴</td><td></td>'+
           '<td style="font-size:10px">'+fmtN(Math.round(tv))+'</td>'+
@@ -2624,6 +2657,11 @@ function getSecCardHtml(s,idx){
           <button class="ticker-fetch-btn" id="fetchBtn_${s.id}" onclick="fetchTickerForInput('${s.id}')">🔍 Отримати ціну</button>
         </div>
         <div class="stock-price-info" id="stockInfo_${s.id}"></div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <button id="secTypeBuy_${s.id}" onclick="setSecTradeType('${s.id}','buy')" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--green);background:#4ecb8d15;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;font-weight:600;">📈 Купівля</button>
+          <button id="secTypeSell_${s.id}" onclick="setSecTradeType('${s.id}','sell')" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:transparent;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;">📉 Продаж</button>
+        </div>
+        <input type="hidden" id="secTradeType_${s.id}" value="buy">
         <div class="row2">
           <div class="field-group">
             <div class="field-label">${t('secQtyShares')}</div>
@@ -2668,6 +2706,25 @@ function getSecCardHtml(s,idx){
   </div>`;
 }
 
+function setSecTradeType(secId, type){
+  const el=$('secTradeType_'+secId);
+  if(el) el.value=type;
+  const buyBtn=$('secTypeBuy_'+secId);
+  const sellBtn=$('secTypeSell_'+secId);
+  if(buyBtn){
+    buyBtn.style.background=type==='buy'?'#4ecb8d15':'transparent';
+    buyBtn.style.borderColor=type==='buy'?'var(--green)':'var(--border)';
+    buyBtn.style.color=type==='buy'?'var(--green2)':'var(--muted)';
+    buyBtn.style.fontWeight=type==='buy'?'600':'400';
+  }
+  if(sellBtn){
+    sellBtn.style.background=type==='sell'?'#f8717115':'transparent';
+    sellBtn.style.borderColor=type==='sell'?'var(--red)':'var(--border)';
+    sellBtn.style.color=type==='sell'?'var(--red)':'var(--muted)';
+    sellBtn.style.fontWeight=type==='sell'?'600':'400';
+  }
+}
+
 function addSecItem(secId){
   const _secFreemium = securitiesSections.find(s=>s.id===secId);
   if(!isPro && _secFreemium && _secFreemium.items.length >= FREE_LIMITS.stockItems){
@@ -2680,12 +2737,15 @@ function addSecItem(secId){
   const price=parseFloat($('secPrice_'+secId)?.value)||0;
   const divYield=parseFloat($('secDiv_'+secId)?.value)||0;
   const buyPrice=parseFloat($('secBuyPrice_'+secId)?.value)||price||0;
+  const tradeType=$('secTradeType_'+secId)?.value||'buy';
   if(!ticker&&!qty&&!price)return;
+  // For sell trades, store negative qty
+  const effectiveQty=tradeType==='sell'?-Math.abs(qty):Math.abs(qty);
   // Try to use cached data for this ticker
   const cached=ticker?stockPriceCache[ticker]:null;
   const name=cached?.name||ticker;
   securitiesSections[idx].items.push({
-    name, ticker, qty, price, divYield, buyPrice,
+    name, ticker, qty:effectiveQty, price, divYield, buyPrice, tradeType,
     div:divYield, // backward compat
     liveChange:cached?.changePct??null,
     liveName:cached?.name||null,
@@ -2718,8 +2778,22 @@ function getSecuritiesTotal(){
 // ── TOTALS ────────────────────────────────────
 function getCryptoVal(){const u=val('cryptoUsdt'),r=val('usdtUah')||41;return u*r;}
 function getUsdVal(){return val('usdAmount')*(val('usdUah')||41);}
-function getForexVal(){return forexItems.reduce((s,f)=>s+f.amt*f.rate,0);}
-function getCashVal(){return val('cashAmount');}
+function getForexVal(){
+  return forexItems.reduce((s,f)=>{
+    const cur=f.cur?.toUpperCase()||'EUR';
+    // Use live rate if available, fallback to stored rate
+    const liveRate=liveRates[cur];
+    const rate=(liveRate&&liveRate>0)?liveRate:(f.rate||0);
+    return s+f.amt*rate;
+  },0);
+}
+function getCashVal(){
+  const amount=val('cashAmount');
+  const cur=document.getElementById('cashCurrency')?.value||'UAH';
+  if(cur==='UAH')return amount;
+  const rate=liveRates[cur]||1;
+  return amount*rate;
+}
 function getOtherVal(){return val('otherAmount');}
 
 function updateAll(){
@@ -2843,24 +2917,78 @@ function renderCoins(){
   const rate=val('usdtUah')||41;
   const el=$('cryptoRows'); if(!el)return;
   if(!coins.length){el.innerHTML='';return;}
-  el.innerHTML='<div class="divider" style="margin:0 0 10px"></div>'+
-    '<table class="sec-table"><tr><th>'+t('coinName')+'</th><th>'+t('coinQty')+'</th><th>'+t('coinBuyPrice')+'</th><th>'+t('coinCurPrice')+'</th><th>P&L</th><th></th></tr>'+
-    coins.map((c,i)=>{
-      const qty=c.qty||0, buy=c.buyPrice||0, cur=c.curPrice||0;
-      const pnlUsd=(cur-buy)*qty;
-      const pnlUah=pnlUsd*rate;
-      const pnlClass=pnlUsd>=0?'green':'red';
-      const change24h=c.change24h||0;
-      const changeStr=change24h!==0?`<div style="font-size:9px;color:${change24h>=0?'var(--green2)':'var(--red)'}">${change24h>=0?'▲':'▼'}${Math.abs(change24h).toFixed(1)}%</div>`:'';
-      return `<tr>
-        <td class="td-name">${c.name}</td>
-        <td>${qty}</td>
-        <td>${fmtD(buy,0)}</td>
-        <td>${fmtD(cur,0)}${changeStr}</td>
-        <td class="${pnlClass}">${pnlUsd>=0?'+':''}${fmtN(Math.round(pnlUah))} ₴</td>
-        <td><button class="rm-btn" onclick="removeCoin(${i})">×</button></td>
-      </tr>`;
-    }).join('')+'</table>';
+  
+  // Group coins by name for average price
+  const groups={};
+  coins.forEach((c,i)=>{
+    if(!groups[c.name])groups[c.name]={trades:[],totalQty:0,totalCost:0,curPrice:0,change24h:0};
+    const g=groups[c.name];
+    g.trades.push({...c,idx:i});
+    g.totalQty+=(c.qty||0);
+    g.totalCost+=(c.qty||0)*(c.buyPrice||0);
+    g.curPrice=c.curPrice||g.curPrice;
+    g.change24h=c.change24h||g.change24h;
+  });
+  
+  let html='<div class="divider" style="margin:0 0 10px"></div>';
+  html+='<table class="sec-table"><tr><th>Монета</th><th>К-ть</th><th>Ø Покупка</th><th>Ціна</th><th>Вартість</th><th>P&L</th><th></th></tr>';
+  
+  Object.entries(groups).forEach(([name,g])=>{
+    const avgBuy=g.totalQty>0?g.totalCost/g.totalQty:0;
+    const value=g.totalQty*g.curPrice;
+    const pnl=value-g.totalCost;
+    const pnlPct=g.totalCost>0?(pnl/g.totalCost*100):0;
+    const pnlUah=pnl*rate;
+    const valUah=value*rate;
+    const pnlClass=pnl>=0?'green':'red';
+    const ch=g.change24h;
+    const chStr=ch?`<div style="font-size:8px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</div>`:'';
+    const expanded=g.trades.length>1?` <span style="font-size:9px;color:var(--muted)">×${g.trades.length}</span>`:'';
+    
+    html+=`<tr>
+      <td class="td-name" style="color:var(--purple2);font-weight:600;">${name}${expanded}</td>
+      <td>${g.totalQty}</td>
+      <td>$${fmtD(avgBuy,0)}</td>
+      <td>$${fmtD(g.curPrice,0)}${chStr}</td>
+      <td>${fmtN(Math.round(valUah))} ₴</td>
+      <td class="${pnlClass}">${pnl>=0?'+':''}${fmtN(Math.round(pnlUah))} ₴<div style="font-size:8px">${pnl>=0?'+':''}${pnlPct.toFixed(1)}%</div></td>
+      <td></td>
+    </tr>`;
+    
+    // Show individual trades if multiple
+    if(g.trades.length>1){
+      g.trades.forEach(tr=>{
+        html+=`<tr style="font-size:10px;color:var(--muted);">
+          <td style="padding-left:16px;">↳ ${tr.qty}</td>
+          <td></td>
+          <td>$${fmtD(tr.buyPrice,0)}</td>
+          <td>$${fmtD(tr.curPrice||g.curPrice,0)}</td>
+          <td></td>
+          <td></td>
+          <td><button class="rm-btn" onclick="removeCoin(${tr.idx})">×</button></td>
+        </tr>`;
+      });
+    } else {
+      // Single trade - add remove button
+      html=html.replace(/<td><\/td>\s*<\/tr>$/,'<td><button class="rm-btn" onclick="removeCoin('+g.trades[0].idx+')">×</button></td></tr>');
+    }
+  });
+  
+  html+='</table>';
+  
+  // Summary
+  const totalVal=coins.reduce((s,c)=>s+(c.qty||0)*(c.curPrice||0),0);
+  const totalCost=coins.reduce((s,c)=>s+(c.qty||0)*(c.buyPrice||0),0);
+  const totalPnl=totalVal-totalCost;
+  const totalPnlPct=totalCost>0?(totalPnl/totalCost*100):0;
+  if(totalVal>0){
+    html+=`<div class="result-box" style="margin-top:8px;">
+      <div class="result-row"><span class="result-key">💰 Портфель (монети)</span><span class="result-val" style="color:var(--purple2)">$${fmtN(Math.round(totalVal))} ≈ ${fmtN(Math.round(totalVal*rate))} ₴</span></div>
+      <div class="result-row"><span class="result-key">📊 P&L</span><span class="result-val" style="color:${totalPnl>=0?'var(--green2)':'var(--red)'}">${totalPnl>=0?'+':''}$${fmtN(Math.round(totalPnl))} (${totalPnl>=0?'+':''}${totalPnlPct.toFixed(1)}%)</span></div>
+    </div>`;
+  }
+  
+  el.innerHTML=html;
 }
 
 // ── FOREX ─────────────────────────────────────
@@ -2869,8 +2997,14 @@ const FSYM  ={EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸
 function addForex(){
   const cur=sval('newForexCur');
   const amt=parseFloat($('newForexAmt')?.value)||0;
-  const rate=parseFloat($('newForexRate')?.value)||0;
-  if(!amt||!rate)return;
+  // Auto-fill rate from live rates if not manually entered
+  let rate=parseFloat($('newForexRate')?.value)||0;
+  if(!rate){
+    const liveRate=liveRates[cur?.toUpperCase()];
+    if(liveRate&&liveRate>0) rate=liveRate;
+  }
+  if(!amt)return;
+  if(!rate) rate=1; // fallback
   forexItems.push({cur,amt,rate});
   if($('newForexAmt'))$('newForexAmt').value='';
   if($('newForexRate'))$('newForexRate').value='';
@@ -2879,16 +3013,25 @@ function addForex(){
 function removeForex(i){forexItems.splice(i,1);renderForex();updateAll();saveData();}
 function renderForex(){
   const el=$('forexRows');if(!el)return;
-  const total=forexItems.reduce((s,f)=>s+f.amt*f.rate,0);
+  const total=forexItems.reduce((s,f)=>{
+    const cur=f.cur?.toUpperCase()||'EUR';
+    const rate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:(f.rate||0);
+    return s+f.amt*rate;
+  },0);
   setText('forexTotal',fmtN(Math.round(total))+' ₴');
   if(!forexItems.length){el.innerHTML='';return;}
-  el.innerHTML=forexItems.map((f,i)=>`<div class="list-row">
-    <span style="font-size:16px;flex-shrink:0">${FFLAGS[f.cur]||'🌐'}</span>
-    <div class="list-sym" style="color:var(--orange2)">${FSYM[f.cur]||''} ${f.cur}</div>
-    <div class="list-info">${fmtD(f.amt)} × ${f.rate} ₴</div>
-    <div class="list-val">${fmtN(Math.round(f.amt*f.rate))} ₴</div>
-    <button class="rm-btn" onclick="removeForex(${i})">×</button>
-  </div>`).join('');
+  el.innerHTML=forexItems.map((f,i)=>{
+    const cur=f.cur?.toUpperCase()||'EUR';
+    const liveRate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:f.rate;
+    const isLive=(liveRates[cur]&&liveRates[cur]>0);
+    return `<div class="list-row">
+      <span style="font-size:16px;flex-shrink:0">${FFLAGS[f.cur]||'🌐'}</span>
+      <div class="list-sym" style="color:var(--orange2)">${FSYM[f.cur]||''} ${f.cur}</div>
+      <div class="list-info">${fmtD(f.amt)} × ${liveRate.toFixed(2)} ₴ ${isLive?'<span style="color:var(--green2);font-size:8px">●</span>':''}</div>
+      <div class="list-val">${fmtN(Math.round(f.amt*liveRate))} ₴</div>
+      <button class="rm-btn" onclick="removeForex(${i})">×</button>
+    </div>`;
+  }).join('');
 }
 
 // ── TOGGLE CARD ───────────────────────────────
@@ -2905,11 +3048,14 @@ function refreshDrag(){
   const allContainers=[container,secContainer].filter(Boolean);
   let dragged=null;
 
+  const isTouchDevice='ontouchstart' in window;
+
   allContainers.forEach(cont=>{
     cont.querySelectorAll('.card').forEach(card=>{
       if(card._dragBound)return;
       card._dragBound=true;
-      card.setAttribute('draggable','true');
+      // On touch devices, disable native HTML5 drag to prevent duplicates (Android)
+      card.setAttribute('draggable', isTouchDevice?'false':'true');
 
       card.addEventListener('dragstart',e=>{
         dragged=card;
@@ -3011,7 +3157,7 @@ function saveData(){
       deposits,
       cryptoUsdt:sval('cryptoUsdt'),usdtUah:sval('usdtUah'),cryptoCost:sval('cryptoCost'),
       usdAmount:sval('usdAmount'),usdUah:sval('usdUah'),usdNote:sval('usdNote'),
-      cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),
+      cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),cashCurrency:document.getElementById('cashCurrency')?.value||'UAH',
       otherAmount:sval('otherAmount'),otherName:sval('otherName'),otherNote:sval('otherNote'),
       coins,forexItems,cardOrder,customSections,securitiesSections,
       hiddenCards,currentLang,liabilities,metalsSections,
@@ -3029,6 +3175,7 @@ function loadData(){
     sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('cryptoCost',d.cryptoCost);
     sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
     sv('cashAmount',d.cashAmount);sv('cashNote',d.cashNote);
+    if(d.cashCurrency){const el=document.getElementById('cashCurrency');if(el)el.value=d.cashCurrency;}
     sv('otherAmount',d.otherAmount);sv('otherName',d.otherName);sv('otherNote',d.otherNote);
     if(Array.isArray(d.coins))coins=d.coins;
     if(Array.isArray(d.forexItems))forexItems=d.forexItems;
@@ -3877,13 +4024,17 @@ function getDepositMonthlyAccruedWithTopups(d){
   }
 
   // Simulate month-by-month: capitalize NET interest (after tax)
+  const capitalize=d.interestTo!=='separate';
   let bal=totalP;
+  let totalNetInterest=0;
   for(let mo=0;mo<cm;mo++){
     const ms=new Date(start.getFullYear(),start.getMonth()+mo,startDay);
     const me=new Date(start.getFullYear(),start.getMonth()+mo+1,startDay);
     const dim=Math.round((me-ms)/(1000*60*60*24));
     const gm=bal*rAnn*dim/365;
-    bal+=gm*(1-tax);
+    const nm=gm*(1-tax);
+    totalNetInterest+=nm;
+    if(capitalize) bal+=nm;
   }
 
   // Add fractional month accrual
@@ -3891,7 +4042,7 @@ function getDepositMonthlyAccruedWithTopups(d){
   const daysSince=Math.max(0,Math.round((now-lastCap)/(1000*60*60*24)));
   const currentAccrual=bal*rAnn*daysSince/365*(1-tax);
 
-  return (bal-totalP)+currentAccrual;
+  return capitalize?(bal-totalP)+currentAccrual:0; // if separate, interest not on body
 }
 
 function validateDepDate(depId, input){
@@ -4000,6 +4151,11 @@ function toggleNetCapital(btn){
 }
 
 function renderLiabilities(){
+  // Show section or button depending on whether liabilities exist
+  const btn=document.getElementById('liabButtonWrap');
+  const sec=document.getElementById('liabilitiesSection');
+  if(btn)btn.style.display=liabilities.length?'none':'block';
+  if(sec)sec.style.display=liabilities.length?'block':'none';
   const container=document.getElementById('liabCardsContainer');
   if(!container)return;
   const sym=getCurrSym();
@@ -5140,6 +5296,41 @@ function devUpdateStatus(){
     parts.push('Акцій: '+totalStocks+'/'+FREE_LIMITS.stockItems);
     parts.push('Монет: '+coins.length+'/3');
     info.textContent=parts.join(' · ');
+  }
+}
+
+// ── CRYPTO: FETCH COIN PRICE (like "Отримати ціну" in stocks) ──
+async function fetchCoinPrice(){
+  const nameEl=$('newCoinName');
+  if(!nameEl)return;
+  const name=nameEl.value.trim().toUpperCase();
+  if(!name){alert('Введіть символ монети (BTC, ETH, SOL...)');return;}
+  
+  const preview=$('cryptoLivePreview');
+  if(preview){
+    preview.style.display='block';
+    preview.innerHTML='<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted)">⏳ Завантаження...</div>';
+  }
+  
+  const data=await fetchCryptoPrice(name);
+  if(!data){
+    if(preview)preview.innerHTML='<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--red)">❌ Монету не знайдено</div>';
+    return;
+  }
+  
+  // Fill current price automatically
+  const priceEl=$('newCoinCurPrice');
+  if(priceEl) priceEl.value=data.price.toFixed(2);
+  
+  const ch=data.change24h||0;
+  const chCol=ch>=0?'var(--green2)':'var(--red)';
+  if(preview){
+    preview.innerHTML=`
+      <div style="font-family:'DM Mono',monospace;">
+        <div style="font-size:14px;font-weight:700;color:var(--purple2);">${name} · $${data.price.toLocaleString('en-US',{maximumFractionDigits:2})}</div>
+        <div style="font-size:10px;color:${chCol};margin-top:2px;">24h: ${ch>=0?'+':''}${ch.toFixed(2)}%</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;">Джерело: CoinGecko · ${new Date().toLocaleTimeString()}</div>
+      </div>`;
   }
 }
 
