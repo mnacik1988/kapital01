@@ -1875,56 +1875,115 @@ function calcLive(depId){
   const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
 
   // ═══ MONOBANK FORMULA ═══
-  // 1. Count completed months from start date
+  // Bank calculates: daily interest = balance × rate / 365
+  // Topup affects balance from the NEXT day
+  // Monthly capitalization = sum of daily interests, minus tax
+  
   const startDay=start.getDate();
-  let completedMonths=0;
-  let checkDate=new Date(start);
-  while(true){
-    checkDate=new Date(checkDate.getFullYear(),checkDate.getMonth()+1,startDay);
-    if(checkDate>now||checkDate>end)break;
-    completedMonths++;
-  }
-
-  // 2. Simulate month-by-month capitalization (NET interest after tax)
-  //    Each month: gross = balance × rate × daysInMonth / 365
-  //    net = gross × (1 - tax), capitalized to balance
   const interestToBody=dep?(dep.interestTo!=='separate'):true;
-  let simBalance=totalPrincipal; // principal + all topups (simplified)
+  const topups=(dep?.topups||[]).filter(tp=>new Date(tp.date)<=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  
+  // Build chronological balance timeline
+  let balance=P; // start with base principal only (no topups yet)
   let totalGrossInterest=0;
   let totalTaxPaid=0;
   let totalNetCapitalized=0;
-  let simDate=new Date(start);
+  let completedMonths=0;
+  
+  // Generate all monthly cap dates
+  const capDates=[];
+  let cd=new Date(start);
+  while(true){
+    cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
+    if(cd>now||cd>end)break;
+    capDates.push(new Date(cd));
+    completedMonths++;
+  }
+  
+  // Simulate month by month with topups
+  let periodStart=new Date(start);
   for(let mo=0;mo<completedMonths;mo++){
-    const moStart=new Date(simDate.getFullYear(),simDate.getMonth()+mo,startDay);
-    const moEnd=new Date(simDate.getFullYear(),simDate.getMonth()+mo+1,startDay);
-    const daysInMonth=Math.round((moEnd-moStart)/(1000*60*60*24));
-    const grossMonth=simBalance*rAnn*daysInMonth/365;
+    const periodEnd=capDates[mo];
+    const periodDays=Math.round((periodEnd-periodStart)/(1000*60*60*24));
+    
+    // Calculate weighted balance for this period (accounting for topups)
+    let weightedSum=0;
+    let curBal=balance;
+    let dayPointer=new Date(periodStart);
+    
+    // Find topups within this period
+    const periodTopups=topups.filter(tp=>{
+      const tpDate=new Date(tp.date);
+      // Topup affects balance from NEXT day
+      const effectiveDate=new Date(tpDate);
+      effectiveDate.setDate(effectiveDate.getDate()+1);
+      return effectiveDate>periodStart && effectiveDate<=periodEnd;
+    });
+    
+    if(periodTopups.length===0){
+      // No topups in this period - simple calculation
+      weightedSum=curBal*periodDays;
+    } else {
+      // Process each topup
+      let prevDay=periodStart;
+      for(const tp of periodTopups){
+        const effectiveDate=new Date(new Date(tp.date));
+        effectiveDate.setDate(effectiveDate.getDate()+1);
+        const daysBefore=Math.round((effectiveDate-prevDay)/(1000*60*60*24));
+        weightedSum+=curBal*Math.max(0,daysBefore);
+        curBal+=tp.amount;
+        prevDay=effectiveDate;
+      }
+      // Remaining days after last topup
+      const daysRemaining=Math.round((periodEnd-prevDay)/(1000*60*60*24));
+      weightedSum+=curBal*Math.max(0,daysRemaining);
+    }
+    
+    // Add topups that happened before this period starts (for balance tracking)
+    const prePeriodTopups=topups.filter(tp=>{
+      const effDate=new Date(new Date(tp.date));
+      effDate.setDate(effDate.getDate()+1);
+      return effDate<=periodStart && !tp._counted;
+    });
+    prePeriodTopups.forEach(tp=>{tp._counted=true;});
+    
+    const grossMonth=weightedSum*rAnn/365;
     const taxMonth=grossMonth*tax;
     const netMonth=grossMonth-taxMonth;
     totalGrossInterest+=grossMonth;
     totalTaxPaid+=taxMonth;
     totalNetCapitalized+=netMonth;
-    if(interestToBody) simBalance+=netMonth; // capitalize only if interest goes to body
+    
+    // Update balance: add topups from this period + capitalization
+    periodTopups.forEach(tp=>{
+      if(!tp._applied){balance+=tp.amount;tp._applied=true;}
+    });
+    if(interestToBody) balance+=netMonth;
+    
+    periodStart=periodEnd;
   }
-
-  // 3. Current daily income (simple interest on current balance)
-  //    Bank formula: daily_gross = balance × rate / 365
-  //    daily_net = daily_gross × (1 - tax)
-  const currentBalance=totalPrincipal+totalNetCapitalized;
+  
+  // Add remaining topups (after last capitalization or not yet counted)
+  topups.forEach(tp=>{
+    if(!tp._applied){
+      const effDate=new Date(new Date(tp.date));
+      effDate.setDate(effDate.getDate()+1);
+      if(effDate<=now){balance+=tp.amount;tp._applied=true;}
+    }
+  });
+  // Clean up temp flags
+  topups.forEach(tp=>{delete tp._counted;delete tp._applied;});
+  
+  const currentBalance=balance;
   const dailyGross=currentBalance*rAnn/365;
   const dailyNet=dailyGross*(1-tax);
   const perSec=dailyNet/86400;
   const perDay=dailyNet;
   const perMonth=dailyNet*30.44;
 
-  // 4. Days since last capitalization (for fractional month display)
-  const lastCapDate=completedMonths>0?new Date(start.getFullYear(),start.getMonth()+completedMonths,startDay):start;
-  const daysSinceLastCap=Math.max(0,Math.round((now-lastCapDate)/(1000*60*60*24)));
-  const currentMonthGross=currentBalance*rAnn*daysSinceLastCap/365;
-  const currentMonthNet=currentMonthGross*(1-tax);
-
-  // 5. Display amount
-  const displayA=interestToBody?(currentBalance+currentMonthNet):totalPrincipal;
+  // Display amount = current balance (principal + applied topups + completed capitalizations)
+  // NO daily accrual added to body
+  const displayA=currentBalance;
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
@@ -3951,9 +4010,10 @@ function toggleSecTrades(id){
 // ── TOP-UP DEPOSIT ───────────────────────────────────────
 function openTopUpModal(depId){
   document.getElementById('topup_dep_id').value=depId;
-  // Set default date to today
+  // Set default date to today, max = today (no future dates)
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('topup_date_input').value=today;
+  document.getElementById('topup_date_input').max=today;
   document.getElementById('topup_amount_input').value='';
   // Translate labels
   document.getElementById('topup_title').textContent=t('topupTitle');
@@ -3973,6 +4033,9 @@ function confirmTopUp(){
   const amount=parseFloat(document.getElementById('topup_amount_input').value)||0;
   const date=document.getElementById('topup_date_input').value;
   if(!amount||!date){alert('Вкажіть суму і дату');return;}
+  // Block future dates
+  const today=new Date().toISOString().split('T')[0];
+  if(date>today){alert('Не можна вказати майбутню дату поповнення');return;}
   const idx=deposits.findIndex(d=>d.id===depId);
   if(idx<0)return;
   if(!deposits[idx].topups) deposits[idx].topups=[];
@@ -4037,12 +4100,8 @@ function getDepositMonthlyAccruedWithTopups(d){
     if(capitalize) bal+=nm;
   }
 
-  // Add fractional month accrual
-  const lastCap=cm>0?new Date(start.getFullYear(),start.getMonth()+cm,startDay):start;
-  const daysSince=Math.max(0,Math.round((now-lastCap)/(1000*60*60*24)));
-  const currentAccrual=bal*rAnn*daysSince/365*(1-tax);
-
-  return capitalize?(bal-totalP)+currentAccrual:0; // if separate, interest not on body
+  // Only return completed monthly capitalizations, NOT fractional month accrual
+  return capitalize?(bal-totalP):0;
 }
 
 function validateDepDate(depId, input){
