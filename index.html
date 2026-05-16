@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Капітал">
+<meta name="application-name" content="Капітал">
+<meta name="description" content="Фінансовий трекер: депозити, акції, крипто">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Капітал">
@@ -1754,7 +1764,7 @@ function updateSlidePosition(){
 function _addDepositSlideCore(){
   if(deposits.length>=3){alert(t('maxDep'));return;}
   const id='dep'+Date.now();
-  deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:''});
+  deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:'',registeredDate:new Date().toISOString().split('T')[0]});
   renderDeposits(); goToSlide(deposits.length-1); saveData();
 }
 function addDepositSlide(){
@@ -1874,105 +1884,90 @@ function calcLive(depId){
   const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
   const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
 
-  // ═══ MONOBANK FORMULA ═══
-  // Bank calculates: daily interest = balance × rate / 365
-  // Topup affects balance from the NEXT day
-  // Monthly capitalization = sum of daily interests, minus tax
+  // ═══ MONOBANK FORMULA (exact daily-weighted balance) ═══
+  // Interest = SUM(daily_balance × rate / 365) for each day in the month
+  // Topup affects balance from the NEXT day after deposit date
+  // Capitalization: net interest (after tax) added to body on cap date
   
   const startDay=start.getDate();
   const interestToBody=dep?(dep.interestTo!=='separate'):true;
-  const topups=(dep?.topups||[]).filter(tp=>new Date(tp.date)<=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
   
-  // Build chronological balance timeline
-  let balance=P; // start with base principal only (no topups yet)
-  let totalGrossInterest=0;
-  let totalTaxPaid=0;
-  let totalNetCapitalized=0;
-  let completedMonths=0;
+  // Deep copy topups, compute effective dates in LOCAL time (not UTC)
+  const topups=(dep?.topups||[])
+    .map(tp=>{
+      const parts=tp.date.split('-');
+      const eff=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
+      return {effectiveDate:eff, amount:tp.amount};
+    })
+    .filter(tp=>tp.effectiveDate<=now)
+    .sort((a,b)=>a.effectiveDate-b.effectiveDate);
   
-  // Generate all monthly cap dates
+  // Generate all monthly capitalization dates
   const capDates=[];
   let cd=new Date(start);
   while(true){
     cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
     if(cd>now||cd>end)break;
     capDates.push(new Date(cd));
-    completedMonths++;
   }
+  const completedMonths=capDates.length;
   
-  // Simulate month by month with topups
-  let periodStart=new Date(start);
-  for(let mo=0;mo<completedMonths;mo++){
-    const periodEnd=capDates[mo];
-    const periodDays=Math.round((periodEnd-periodStart)/(1000*60*60*24));
-    
-    // Calculate weighted balance for this period (accounting for topups)
-    let weightedSum=0;
-    let curBal=balance;
-    let dayPointer=new Date(periodStart);
-    
-    // Find topups within this period
-    const periodTopups=topups.filter(tp=>{
-      const tpDate=new Date(tp.date);
-      // Topup affects balance from NEXT day
-      const effectiveDate=new Date(tpDate);
-      effectiveDate.setDate(effectiveDate.getDate()+1);
-      return effectiveDate>periodStart && effectiveDate<=periodEnd;
-    });
-    
-    if(periodTopups.length===0){
-      // No topups in this period - simple calculation
-      weightedSum=curBal*periodDays;
-    } else {
-      // Process each topup
-      let prevDay=periodStart;
-      for(const tp of periodTopups){
-        const effectiveDate=new Date(new Date(tp.date));
-        effectiveDate.setDate(effectiveDate.getDate()+1);
-        const daysBefore=Math.round((effectiveDate-prevDay)/(1000*60*60*24));
-        weightedSum+=curBal*Math.max(0,daysBefore);
-        curBal+=tp.amount;
-        prevDay=effectiveDate;
-      }
-      // Remaining days after last topup
-      const daysRemaining=Math.round((periodEnd-prevDay)/(1000*60*60*24));
-      weightedSum+=curBal*Math.max(0,daysRemaining);
-    }
-    
-    // Add topups that happened before this period starts (for balance tracking)
-    const prePeriodTopups=topups.filter(tp=>{
-      const effDate=new Date(new Date(tp.date));
-      effDate.setDate(effDate.getDate()+1);
-      return effDate<=periodStart && !tp._counted;
-    });
-    prePeriodTopups.forEach(tp=>{tp._counted=true;});
-    
-    const grossMonth=weightedSum*rAnn/365;
-    const taxMonth=grossMonth*tax;
-    const netMonth=grossMonth-taxMonth;
-    totalGrossInterest+=grossMonth;
-    totalTaxPaid+=taxMonth;
-    totalNetCapitalized+=netMonth;
-    
-    // Update balance: add topups from this period + capitalization
-    periodTopups.forEach(tp=>{
-      if(!tp._applied){balance+=tp.amount;tp._applied=true;}
-    });
-    if(interestToBody) balance+=netMonth;
-    
-    periodStart=periodEnd;
-  }
-  
-  // Add remaining topups (after last capitalization or not yet counted)
+  // Build sorted event timeline: [{date, type, amount}]
+  // Events: 'topup' (effective next day) and 'cap' (capitalization)
+  const events=[];
   topups.forEach(tp=>{
-    if(!tp._applied){
-      const effDate=new Date(new Date(tp.date));
-      effDate.setDate(effDate.getDate()+1);
-      if(effDate<=now){balance+=tp.amount;tp._applied=true;}
-    }
+    const effDate=new Date(new Date(tp.date));
+    effDate.setDate(effDate.getDate()+1); // topup effective NEXT day
+    events.push({date:effDate, type:'topup', amount:tp.amount});
   });
-  // Clean up temp flags
-  topups.forEach(tp=>{delete tp._counted;delete tp._applied;});
+  capDates.forEach(cd=>{
+    events.push({date:new Date(cd), type:'cap', amount:0});
+  });
+  events.sort((a,b)=>a.date-b.date||(a.type==='topup'?-1:1)); // topups before cap on same day
+  
+  // Simulate day by day using events
+  let balance=P; // start with base principal only
+  let totalGrossInterest=0;
+  let totalTaxPaid=0;
+  let totalNetCapitalized=0;
+  let periodStart=new Date(start);
+  let periodWeightedSum=0;
+  let periodDays=0;
+  
+  // Process each event in chronological order
+  for(const ev of events){
+    if(ev.date<=periodStart)continue; // skip events before/at current period start
+    
+    // Accumulate days from periodStart to this event at current balance
+    const daysBetween=Math.round((ev.date-periodStart)/(1000*60*60*24));
+    if(daysBetween>0){
+      periodWeightedSum+=balance*daysBetween;
+      periodDays+=daysBetween;
+      periodStart=new Date(ev.date);
+    }
+    
+    if(ev.type==='topup'){
+      balance+=ev.amount;
+    } else if(ev.type==='cap'){
+      // End of month: calculate interest from weighted sum
+      const grossMonth=periodWeightedSum*rAnn/365;
+      const taxMonth=grossMonth*tax;
+      const netMonth=grossMonth-taxMonth;
+      totalGrossInterest+=grossMonth;
+      totalTaxPaid+=taxMonth;
+      totalNetCapitalized+=netMonth;
+      if(interestToBody) balance+=netMonth;
+      // Reset for next period
+      periodWeightedSum=0;
+      periodDays=0;
+    }
+  }
+  
+  // Accumulate remaining days from last event to now (current partial month)
+  const remainingDays=Math.round((now-periodStart)/(1000*60*60*24));
+  if(remainingDays>0){
+    periodWeightedSum+=balance*remainingDays;
+  }
   
   const currentBalance=balance;
   const dailyGross=currentBalance*rAnn/365;
@@ -1981,9 +1976,10 @@ function calcLive(depId){
   const perDay=dailyNet;
   const perMonth=dailyNet*30.44;
 
-  // Display amount = current balance (principal + applied topups + completed capitalizations)
-  // NO daily accrual added to body
-  const displayA=currentBalance;
+  // Display: principal + all topups made to date + completed capitalizations
+  const todayStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  const totalTopupsMade=(dep?.topups||[]).filter(tp=>tp.date<=todayStr).reduce((s,tp)=>s+tp.amount,0);
+  const displayA=P+totalTopupsMade+(interestToBody?totalNetCapitalized:0);
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
@@ -1991,7 +1987,10 @@ function calcLive(depId){
 
   const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
   const dGone=Math.round(yEl*365.25);
-  setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days'));
+  // registeredDate = when user added deposit to app
+  const regDate=dep?.registeredDate?new Date(dep.registeredDate):start;
+  const dMonitoring=Math.max(0,Math.round((now-regDate)/(1000*60*60*24)));
+  setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days')+' · Моніторинг: '+dMonitoring+' дн.');
   setText('liveInterest_'+depId,'+'+fmtLive(totalGrossInterest)+' ('+completedMonths+' міс)');
   setText('liveTaxLive_'+depId,'−'+fmtLive(totalTaxPaid)+' ('+Math.round(tax*100)+'%)');
   setText('liveNet_'+depId,'+'+fmtLive(totalNetCapitalized));
@@ -2004,22 +2003,79 @@ function calcLive(depId){
   setText('liveDateStart_'+depId,fmt2(start));
   setText('liveDatePct_'+depId,Math.round(progress*100)+'%');
   setText('liveDateEnd_'+depId,fmt2(end));
-  renderDailyLog(depId,totalPrincipal,rAnn,n,tax,tf,start,now,currentBalance);
+  renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep);
 }
-function renderDailyLog(depId,totalPrincipal,rAnn,n,tax,tf,start,now,currentBalance){
+function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   const el=$('dailyLog_'+depId); if(!el)return;
-  const daysGone=Math.round((now-start)/(1000*60*60*24));
-  const count=Math.min(daysGone,30);
-  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">—</div>';return;}
-  // Show last N days of simple daily income on current balance
-  const dailyGross=currentBalance*rAnn/365;
-  const dailyNet=dailyGross*(1-tax);
+  const monitorStart=regDate||start;
+  const daysMonitored=Math.max(0,Math.round((now-monitorStart)/(1000*60*60*24)));
+  const count=Math.min(daysMonitored,30);
+  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Моніторинг почнеться завтра</div>';return;}
+
+  // Helper: date to YYYY-MM-DD string (avoids timezone issues)
+  const toStr=d=>{const dd=new Date(d);return dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');};
+
+  // Build topup effective dates as strings
+  const topups=(dep?.topups||[]).map(tp=>{
+    const d=new Date(tp.date);
+    d.setDate(d.getDate()+1);
+    return {effStr:toStr(d), amount:tp.amount};
+  }).sort((a,b)=>a.effStr.localeCompare(b.effStr));
+
+  // Capitalization dates
+  const startDay=start.getDate();
+  const interestToBody=dep?(dep.interestTo!=='separate'):true;
+  const capDateStrs=[];
+  let cd=new Date(start);
+  while(true){
+    cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
+    if(cd>now)break;
+    capDateStrs.push(toStr(cd));
+  }
+
   let rows='';
   for(let d=count-1;d>=0;d--){
     const date=new Date(now);
     date.setDate(date.getDate()-d);
-    // Check if this day was a capitalization day (1st of month matching start)
-    const isCap=(date.getDate()===start.getDate()&&d>0);
+    const dayStr=toStr(date);
+
+    // Balance for this day: P + topups effective on or before this day
+    let dayBalance=P;
+    topups.forEach(tp=>{
+      if(tp.effStr<=dayStr) dayBalance+=tp.amount;
+    });
+
+    // Add completed capitalizations before this day
+    if(interestToBody && capDateStrs.length){
+      let simBal=P;
+      let simStartDate=new Date(start);
+      for(const capStr of capDateStrs){
+        if(capStr>dayStr)break;
+        const capDate=new Date(capStr+'T00:00:00');
+        // Balance during this period: simBal + topups effective in this period
+        let periodBal=simBal;
+        const simStartStr=toStr(simStartDate);
+        topups.forEach(tp=>{
+          if(tp.effStr>simStartStr&&tp.effStr<=capStr) periodBal+=tp.amount;
+        });
+        const days=Math.round((capDate-simStartDate)/(1000*60*60*24));
+        const gross=periodBal*rAnn*days/365;
+        const net=gross*(1-tax);
+        simBal=periodBal+net;
+        simStartDate=capDate;
+      }
+      dayBalance=simBal;
+      // Add topups after last cap but before this day
+      const lastCapStr=capDateStrs[capDateStrs.length-1]||toStr(start);
+      topups.forEach(tp=>{
+        if(tp.effStr>lastCapStr&&tp.effStr<=dayStr) dayBalance+=tp.amount;
+      });
+    }
+
+    const dailyGross=dayBalance*rAnn/365;
+    const dailyNet=dailyGross*(1-tax);
+    const isCap=capDateStrs.includes(dayStr);
+
     rows+=`<div class="daily-row">
       <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}${isCap?' 💰':''}</span>
       <span class="daily-income" style="color:var(--green2)">+${dailyNet.toFixed(2)} ₴/${t('days')}</span>
@@ -2287,9 +2343,49 @@ async function claudeGetStockData(tickers){
 }
 
 async function fetchUsdUahRate(){
+  if(!navigator.onLine){window._rateSource='Офлайн';return;}
   let success=false;
+  let rateSource='';
+
+  // ISO 4217 numeric code → string code mapping
+  const ISO_CODES={840:'USD',978:'EUR',826:'GBP',985:'PLN',643:'RUB',156:'CNY',
+    756:'CHF',392:'JPY',203:'CZK',949:'TRY',124:'CAD',36:'AUD',980:'UAH',
+    784:'AED',818:'EGP',348:'HUF',946:'RON',941:'RSD',975:'BGN',208:'DKK',
+    578:'NOK',752:'SEK',191:'HRK',414:'KWD',634:'QAR',682:'SAR',376:'ILS',
+    404:'KES',710:'ZAR',764:'THB',704:'VND',410:'KRW',702:'SGD',344:'HKD',
+    986:'BRL',484:'MXN',356:'INR',586:'PKR',50:'BDT',51:'AMD',398:'KZT',
+    417:'KGS',860:'UZS',981:'GEL',944:'AZN',933:'BYN',498:'MDL',934:'TMT',972:'TJS'};
+
+  // Source 0: Monobank API (free, no token, updates every 5 min)
+  try{
+    const r=await fetch('https://api.monobank.ua/bank/currency');
+    if(r.ok){
+      const data=await r.json();
+      if(Array.isArray(data)){
+        data.forEach(item=>{
+          const codeA=ISO_CODES[item.currencyCodeA];
+          const codeB=ISO_CODES[item.currencyCodeB];
+          if(!codeA||codeB!=='UAH')return; // we only need X/UAH pairs
+          // rateBuy = bank buys currency from you (lower)
+          // rateSell = bank sells currency to you (higher)
+          // rateCross = cross-rate (when no buy/sell)
+          // Use mid-rate (average of buy and sell) for most accurate display
+          const rate=item.rateCross||(item.rateBuy&&item.rateSell?((item.rateBuy+item.rateSell)/2):item.rateSell||item.rateBuy);
+          if(rate&&rate>0) liveRates[codeA]=rate;
+        });
+        if(liveRates.USD&&liveRates.USD>10){
+          liveRates.UAH=1;
+          usdUahRate=liveRates.USD;
+          ratesLastFetched=Date.now();
+          rateSource='Monobank';
+          success=true;
+        }
+      }
+    }
+  }catch(e){}
 
   // Source 1: exchangerate-api.com (free, no key for v6 open endpoint)
+  if(!success){
   try{
     const r=await fetch('https://open.er-api.com/v6/latest/UAH');
     if(r.ok){
@@ -2303,10 +2399,12 @@ async function fetchUsdUahRate(){
         liveRates.UAH=1;
         usdUahRate=liveRates.USD||41;
         ratesLastFetched=Date.now();
+        rateSource=rateSource||'ExchangeRate API';
         success=true;
       }
     }
   }catch(e){}
+  } // end Source 1
 
   // Source 2: frankfurter.app (ECB) — no RUB, but good for USD/EUR/CNY
   if(!success){
@@ -2347,6 +2445,8 @@ async function fetchUsdUahRate(){
   }
 
   if(success&&displayCurrency!=='uah') updateAll();
+  // Store source name globally
+  window._rateSource=rateSource||'Fallback';
 
   // Source 4: Worker fallback for rates
   if(!success&&WORKER_URL){
@@ -2373,6 +2473,7 @@ async function fetchUsdUahRate(){
 }
 
 async function fetchStockPrice(ticker){
+  if(!navigator.onLine)return null;
   ticker=ticker.toUpperCase().trim();
   if(!ticker)return null;
   const cached=stockPriceCache[ticker];
@@ -2440,6 +2541,7 @@ function saveWorkerUrl(secId){
 }
 
 async function fetchTickerForInput(secId){
+  try{
   const tickerInput=$('secName_'+secId);
   const ticker=(tickerInput?.value||'').trim().toUpperCase();
   if(!ticker)return;
@@ -2484,9 +2586,11 @@ async function fetchTickerForInput(secId){
       ${data.divYield>0?`<div class="spi-div">💰 Дивіденди: ${data.divYield.toFixed(2)}% річних · ≈${fmtD(divYieldAbs,2)} ₴/акція/рік</div>`:'<div class="spi-div" style="color:var(--muted)">— Дивіденди не виплачуються</div>'}
     `;
   }
+  }catch(e){console.error('fetchTicker:',e);const info=$('stockInfo_'+secId);if(info)info.innerHTML='<div style="color:var(--red);font-size:10px">❌ Помилка</div>';}
 }
 
 async function refreshAllStockPrices(secId){
+  try{
   const sec=securitiesSections.find(s=>s.id===secId);
   if(!sec||!sec.items.length)return;
   const btn=$('refreshAllBtn_'+secId);
@@ -2515,6 +2619,7 @@ async function refreshAllStockPrices(secId){
   if(btn)btn.textContent='⟳ Оновити';
   const st=$('refreshStatus_'+secId);
   if(st)st.textContent=updated?`Оновл. ${sec.lastRefresh}`:'Помилка оновлення';
+  }catch(e){console.error('refreshAll:',e);const btn=$('refreshAllBtn_'+secId);if(btn)btn.textContent='⟳ Оновити';}
 }
 
 let autoRefreshInterval=null;
@@ -2855,7 +2960,13 @@ function getCashVal(){
 }
 function getOtherVal(){return val('otherAmount');}
 
+let _updateTimer=null;
 function updateAll(){
+  if(_updateTimer)return; // throttle: max once per 100ms
+  _updateTimer=setTimeout(()=>{_updateTimer=null;},100);
+  _updateAllNow();
+}
+function _updateAllNow(){
   const dep=hiddenCards['deposit']?0:getAllDepositsTotal();
   const crypto=hiddenCards['crypto']?0:getCryptoVal();
   const usd=hiddenCards['usd']?0:getUsdVal();
@@ -3210,7 +3321,14 @@ function restoreOrder(){
 }
 
 // ── PERSIST ───────────────────────────────────
+let _saveTimer=null;
 function saveData(){
+  // Debounce: wait 400ms before actually saving (prevents lag on fast typing)
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(_saveDataNow, 400);
+}
+function saveDataNow(){_saveDataNow();} // force immediate save when needed
+function _saveDataNow(){
   try{
     localStorage.setItem('kapital_v6',JSON.stringify({
       deposits,
@@ -3222,7 +3340,15 @@ function saveData(){
       hiddenCards,currentLang,liabilities,metalsSections,
       trialStartDate:localStorage.getItem('trial_start')||''
     }));
-  }catch(e){}
+  }catch(e){
+    if(e.name==='QuotaExceededError'||e.code===22){
+      console.error('localStorage full');
+      if(!window._storageFull){
+        window._storageFull=true;
+        setTimeout(()=>{alert('⚠️ Пам\'ять заповнена. Дані можуть не зберегтися.');window._storageFull=false;},100);
+      }
+    }
+  }
 }
 
 function loadData(){
@@ -3231,6 +3357,9 @@ function loadData(){
     if(!d)return;
     const sv=(id,v)=>{if(v!==undefined&&$(id))$(id).value=v;};
     if(Array.isArray(d.deposits)&&d.deposits.length)deposits=d.deposits;
+    // Ensure all deposits have registeredDate (for existing data without it)
+    const todayStr=new Date().toISOString().split('T')[0];
+    deposits.forEach(dep=>{if(!dep.registeredDate)dep.registeredDate=todayStr;});
     sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('cryptoCost',d.cryptoCost);
     sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
     sv('cashAmount',d.cashAmount);sv('cashNote',d.cashNote);
@@ -3278,6 +3407,8 @@ if(activeLangBtn)activeLangBtn.classList.add('active');
 Object.keys(hiddenCards).forEach(name=>{
   if(hiddenCards[name]){const c=$('card-'+name);if(c)c.style.display='none';}
 });
+// USD card is removed from UI — ensure it's excluded from totals
+hiddenCards['usd']=true;
 
 // Create default sections on first load
 if(!securitiesSections.length) addDefaultSecuritiesCard();
@@ -3304,7 +3435,7 @@ setTimeout(()=>{
 // Fetch live exchange rates on startup
 fetchUsdUahRate();
 // Refresh rates every 6 hours
-setInterval(fetchUsdUahRate, 15*60*1000); // refresh every 15 min
+let _rateInterval=setInterval(fetchUsdUahRate, 15*60*1000); // refresh every 15 min
 startAutoRefresh();
 // ── FREEMIUM ─────────────────────────────────────────────────
 // isPro, FREE_LIMITS and openPaywall declared at top of script
@@ -3416,7 +3547,8 @@ function fillCurrencyFields(){
   if(srcEl){
     if(ratesLastFetched){
       const updated=new Date(ratesLastFetched).toLocaleTimeString();
-      srcEl.innerHTML='<span style="color:var(--green2)">● Онлайн</span> · Оновлено: '+updated;
+      const src=window._rateSource||'API';
+      srcEl.innerHTML='<span style="color:var(--green2)">● Онлайн</span> · '+src+' · '+updated;
     } else {
       srcEl.innerHTML='<span style="color:var(--orange2)">● Офлайн</span> · Курси за замовчуванням';
     }
@@ -4014,6 +4146,9 @@ function openTopUpModal(depId){
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('topup_date_input').value=today;
   document.getElementById('topup_date_input').max=today;
+  // Set min date to deposit start date
+  const dep=deposits.find(d=>d.id===depId);
+  if(dep&&dep.startDate)document.getElementById('topup_date_input').min=dep.startDate;
   document.getElementById('topup_amount_input').value='';
   // Translate labels
   document.getElementById('topup_title').textContent=t('topupTitle');
@@ -4038,6 +4173,11 @@ function confirmTopUp(){
   if(date>today){alert('Не можна вказати майбутню дату поповнення');return;}
   const idx=deposits.findIndex(d=>d.id===depId);
   if(idx<0)return;
+  // Block dates before deposit start
+  if(deposits[idx].startDate && date<deposits[idx].startDate){
+    alert('Дата поповнення не може бути раніше дати відкриття депозиту ('+deposits[idx].startDate+')');
+    return;
+  }
   if(!deposits[idx].topups) deposits[idx].topups=[];
   // Insert sorted by date
   deposits[idx].topups.push({amount,date});
@@ -4074,34 +4214,60 @@ function getDepositMonthlyAccruedWithTopups(d){
   if(now<start||end<=start)return 0;
   const rAnn=(parseFloat(d.rate)||16)/100;
   const tax=(parseFloat(d.tax)||0)/100;
-  const topups=(d.topups||[]).reduce((s,tp)=>s+tp.amount,0);
-  const totalP=P+topups;
-
-  // Count completed months
-  const startDay=start.getDate();
-  let cm=0,chk=new Date(start);
-  while(true){
-    chk=new Date(chk.getFullYear(),chk.getMonth()+1,startDay);
-    if(chk>now||chk>end)break;
-    cm++;
-  }
-
-  // Simulate month-by-month: capitalize NET interest (after tax)
   const capitalize=d.interestTo!=='separate';
-  let bal=totalP;
-  let totalNetInterest=0;
-  for(let mo=0;mo<cm;mo++){
-    const ms=new Date(start.getFullYear(),start.getMonth()+mo,startDay);
-    const me=new Date(start.getFullYear(),start.getMonth()+mo+1,startDay);
-    const dim=Math.round((me-ms)/(1000*60*60*24));
-    const gm=bal*rAnn*dim/365;
-    const nm=gm*(1-tax);
-    totalNetInterest+=nm;
-    if(capitalize) bal+=nm;
+  if(!capitalize)return 0;
+  
+  const startDay=start.getDate();
+  
+  // Deep copy topups
+  const topups=(d.topups||[])
+    .map(tp=>({amount:tp.amount, date:tp.date}))
+    .filter(tp=>new Date(tp.date)<=now)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+  
+  // Cap dates
+  const capDates=[];
+  let cd=new Date(start);
+  while(true){
+    cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
+    if(cd>now||cd>end)break;
+    capDates.push(new Date(cd));
   }
-
-  // Only return completed monthly capitalizations, NOT fractional month accrual
-  return capitalize?(bal-totalP):0;
+  
+  // Event timeline
+  const events=[];
+  topups.forEach(tp=>{
+    events.push({date:new Date(tp.effectiveDate), type:'topup', amount:tp.amount});
+  });
+  capDates.forEach(cd=>events.push({date:new Date(cd), type:'cap', amount:0}));
+  events.sort((a,b)=>a.date-b.date||(a.type==='topup'?-1:1));
+  
+  // Simulate
+  let balance=P;
+  let periodStart=new Date(start);
+  let periodWeightedSum=0;
+  let totalCapitalized=0;
+  
+  for(const ev of events){
+    if(ev.date<=periodStart)continue;
+    if(ev.date>now)break; // don't process future events
+    const daysBetween=Math.round((ev.date-periodStart)/(1000*60*60*24));
+    if(daysBetween>0){
+      periodWeightedSum+=balance*daysBetween;
+      periodStart=new Date(ev.date);
+    }
+    if(ev.type==='topup'){
+      balance+=ev.amount;
+    } else if(ev.type==='cap'){
+      const grossMonth=periodWeightedSum*rAnn/365;
+      const netMonth=grossMonth*(1-tax);
+      totalCapitalized+=netMonth;
+      balance+=netMonth;
+      periodWeightedSum=0;
+    }
+  }
+  
+  return totalCapitalized;
 }
 
 function validateDepDate(depId, input){
@@ -5115,6 +5281,7 @@ async function fetchCryptoPrice(coinName){
 }
 
 async function refreshCryptoPrices(){
+  try{
   if(!coins.length)return;
   // Freemium check
   if(!isPro && coins.length > 3)return;
@@ -5136,6 +5303,7 @@ async function refreshCryptoPrices(){
     renderCoins();
     saveData();
   }
+  }catch(e){console.error('refreshCrypto:',e);}
 }
 
 // Auto-refresh crypto on load and every 5 min
@@ -5360,6 +5528,7 @@ function devUpdateStatus(){
 
 // ── CRYPTO: FETCH COIN PRICE (like "Отримати ціну" in stocks) ──
 async function fetchCoinPrice(){
+  try{
   const nameEl=$('newCoinName');
   if(!nameEl)return;
   const name=nameEl.value.trim().toUpperCase();
@@ -5391,6 +5560,7 @@ async function fetchCoinPrice(){
         <div style="font-size:9px;color:var(--muted);margin-top:4px;">Джерело: CoinGecko · ${new Date().toLocaleTimeString()}</div>
       </div>`;
   }
+  }catch(e){console.error('fetchCoinPrice:',e);const p=$('cryptoLivePreview');if(p)p.innerHTML='<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--red)">❌ Помилка завантаження</div>';}
 }
 
 // Re-render after all overrides are established
@@ -5398,6 +5568,15 @@ if(customSections.some(s=>s.sectionType==='startup')){
   renderCustomCards();
   updateAll();
 }
+// ── PWA SERVICE WORKER ────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+// Save data before app closes
+window.addEventListener('beforeunload',()=>{_saveDataNow();});
+window.addEventListener('pagehide',()=>{_saveDataNow();});
+// Auto-refresh rates when coming back online
+window.addEventListener('online',()=>{fetchUsdUahRate();refreshCryptoPrices();});
 
 </script>
 </body>
