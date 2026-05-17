@@ -513,6 +513,33 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .crypto-coin-name{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);font-weight:500;}
 .crypto-coin-price{font-family:'DM Mono',monospace;font-size:11px;color:var(--purple2);}
 .crypto-coin-change{font-family:'DM Mono',monospace;font-size:10px;}
+
+/* ── STOCK TICKER CARDS ── */
+.ticker-cards{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.ticker-card{flex:1;min-width:calc(50% - 4px);background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;transition:border-color .15s;}
+.ticker-card:active{border-color:var(--green);}
+.ticker-card-head{display:flex;justify-content:space-between;align-items:center;}
+.ticker-card-sym{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--green2);}
+.ticker-card-qty{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:var(--bg);padding:2px 6px;border-radius:8px;}
+.ticker-card-name{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ticker-card-price{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;margin-top:6px;}
+.ticker-card-pnl{font-family:'DM Mono',monospace;font-size:10px;margin-top:2px;}
+.ticker-card-div{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;}
+
+/* ── STOCK DETAIL MODAL ── */
+.stock-detail-overlay{position:fixed;inset:0;background:#000000cc;z-index:520;display:none;align-items:flex-end;}
+.stock-detail-overlay.open{display:flex;}
+.stock-detail-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.stock-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.stock-detail-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
+.stock-detail-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);}
+.stock-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.stock-detail-stat{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+.stock-detail-stat-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;}
+.stock-detail-stat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);text-transform:uppercase;margin-top:2px;letter-spacing:0.05em;}
+.stock-detail-trades{margin-top:12px;}
+.stock-detail-trade{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.stock-detail-trade:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -1249,6 +1276,17 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
 
 <!-- DIAGNOSTICS POPUP -->
+
+<!-- STOCK DETAIL MODAL -->
+<div class="stock-detail-overlay" id="stockDetailOverlay" onclick="if(event.target===this)closeStockDetail()">
+  <div class="stock-detail-box">
+    <div class="stock-detail-header">
+      <div class="stock-detail-title" id="stockDetailTitle">—</div>
+      <button class="stock-detail-close" onclick="closeStockDetail()">✕</button>
+    </div>
+    <div id="stockDetailContent"></div>
+  </div>
+</div>
 <div class="diag-overlay" id="diagOverlay" onclick="diagCloseOutside(event)">
   <div class="diag-box">
     <div class="diag-header">
@@ -2722,72 +2760,36 @@ function getSecCardHtml(s,idx){
   }).filter(g=>g.totalQty>0&&g.totalBuyCost>0);
 
   const rows=s.items.length>0?(
-    '<div style="overflow-x:auto"><table class="sec-table"><tr>'+
-    '<th>'+lang.secName+'</th><th>'+lang.secQty+'</th>'+
-    '<th>Ціна</th><th>Дивіденди</th><th>'+lang.secTotal+'</th><th>P&L</th><th></th></tr>'+
+    '<div class="ticker-cards">'+
     Object.entries(tickerGroups).map(([key,g])=>{
       const totalQty=g.trades.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
       const totalBuyCost=g.trades.reduce((s,t)=>{const q=parseFloat(t.qty)||0;const bp=parseFloat(t.buyPrice)||parseFloat(t.price)||0;return s+q*bp;},0);
       const hasBuyPrice=totalBuyCost>0;
       const curVal=totalQty*g.curPrice;
+      const avgBuy=hasBuyPrice&&totalQty>0?totalBuyCost/totalQty:0;
       const pnl=hasBuyPrice?curVal-totalBuyCost:null;
-      const pnlClass=pnl===null?'':pnl>=0?'pnl-positive':'pnl-negative';
-      const changeClass=g.liveChange==null?'':(g.liveChange>=0?'price-up':'price-down');
-      const isGrouped=g.trades.length>1;
-      const trId='tr_'+s.id+'_'+key.replace(/[^a-z0-9]/gi,'_');
-      const tickerBadge=g.ticker?'<span style="font-family:\'DM Mono\',monospace;font-size:10px;background:#4ecb8d15;padding:1px 5px;border-radius:6px">'+g.ticker+'</span> ':'';
-      const avgBuyPrice=hasBuyPrice&&totalQty>0?totalBuyCost/totalQty:0;
-      const avgBuyHint=avgBuyPrice>0?' <span style="font-size:8px;color:var(--muted);display:block;">Ø '+fmtN(Math.round(avgBuyPrice))+' ₴</span>':'';
-
-      const subRows=isGrouped?g.trades.map(t=>{
-        const qty=parseFloat(t.qty)||0, bp=parseFloat(t.buyPrice)||0, cp=parseFloat(t.price)||0;
-        const isSell=qty<0||(t.tradeType==='sell');
-        const tv=Math.abs(qty)*cp, tpnl=bp>0?tv-Math.abs(qty)*bp:null;
-        const tpnlCol=tpnl===null?'var(--muted)':tpnl>=0?'var(--green2)':'var(--red)';
-        const tradeLabel=isSell?'<span style="color:var(--red)">📉 </span>':'';
-        return '<tr style="background:var(--bg3);display:none" class="sub_'+trId+'">'+
-          '<td style="padding-left:20px;font-size:10px;color:'+(isSell?'var(--red)':'var(--muted2)')+'">'+tradeLabel+'↳ '+Math.abs(qty)+' шт'+(isSell?' (продаж)':'')+'</td>'+
-          '<td style="font-size:10px;color:var(--muted2)">'+(bp>0?fmtN(Math.round(bp))+'₴':'—')+'</td>'+
-          '<td style="font-size:10px">'+fmtN(Math.round(cp))+'₴</td><td></td>'+
-          '<td style="font-size:10px">'+fmtN(Math.round(tv))+'</td>'+
-          '<td style="font-size:10px;color:'+tpnlCol+'">'+(tpnl!==null?(tpnl>=0?'+':'')+fmtN(Math.round(tpnl)):'—')+'</td>'+
-          '<td><button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+t.origIdx+')">×</button></td></tr>';
-      }).join(''):'';
-
-      const expandHint=isGrouped?' <span style="font-size:9px;color:var(--muted)">▼ '+g.trades.length+'</span>':'';
-      return '<tr'+(isGrouped?' onclick="toggleSecTrades(\''+trId+'\',this)" style="cursor:pointer"':'')+'>'+
-        '<td class="td-name">'+tickerBadge+g.name+expandHint+avgBuyHint+'</td>'+
-        '<td>'+totalQty+'</td>'+
-        '<td class="td-live-price"><span class="'+changeClass+'">'+fmtN(Math.round(g.curPrice))+'</span>'+(g.liveChange!=null?'<span style="font-size:9px;color:'+(g.liveChange>=0?'var(--green2)':'var(--red)')+'">'+(g.liveChange>=0?'▲':'▼')+Math.abs(g.liveChange).toFixed(1)+'%</span>':'')+'</td>'+
-        '<td class="td-div">'+g.divYield.toFixed(1)+'%</td>'+
-        '<td>'+fmtN(Math.round(curVal))+'</td>'+
-        '<td class="td-pnl">'+(pnl!==null?'<span class="'+pnlClass+'">'+(pnl>=0?'+':'')+fmtN(Math.round(pnl))+'</span>':'—')+'</td>'+
-        '<td>'+(isGrouped?'':'<button class="rm-btn" onclick="removeSecItem(\''+s.id+'\','+g.trades[0].origIdx+')">×</button>')+'</td></tr>'+
-        subRows;
+      const pnlPct=totalBuyCost>0?((curVal/totalBuyCost-1)*100):0;
+      const pnlCol=pnl===null?'var(--muted)':pnl>=0?'var(--green2)':'var(--red)';
+      const divAnn=totalQty*g.curPrice*(g.divYield/100);
+      const divMonth=Math.round(divAnn/12);
+      return `<div class="ticker-card" onclick="openStockDetail('${s.id}','${key.replace(/'/g,"\\'")}')">
+        <div class="ticker-card-head">
+          <span class="ticker-card-sym">${g.ticker||'—'}</span>
+          <span class="ticker-card-qty">${totalQty} шт</span>
+        </div>
+        <div class="ticker-card-name">${g.name}</div>
+        <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(Math.round(curVal))} ₴</div>
+        <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'')+fmtN(Math.round(pnl))+' ₴ ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
+        ${avgBuy>0?`<div class="ticker-card-div">Ø ${fmtN(Math.round(avgBuy))} ₴</div>`:''}
+        ${divMonth>0?`<div class="ticker-card-div">💰 ~${fmtN(divMonth)} ₴/міс</div>`:''}
+      </div>`;
     }).join('')+
-    '</table></div>'+
+    '</div>'+
     '<div class="sec-summary-divs"><div class="sd-label">'+t('divIncome')+'</div>'+
     '<div class="sd-row"><span class="sd-key">'+t('divAnnual')+'</span><span class="sd-val">+'+fmtN(Math.round(totalDiv))+' ₴'+t('perYear')+'</span></div>'+
     (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+fmtN(Math.round(totalDivAbs))+' ₴'+t('perYear')+'</span></div>':'')+
     '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+fmtN(Math.round(totalDiv/12))+' ₴</span></div>'+
     '</div>'+
-    // ── Average Purchase Price Stats ──
-    (function(){
-      if(!avgPriceData.length)return '';
-      const avgRows=avgPriceData.map(g=>{
-        const avg=g.totalBuyCost/g.totalQty;
-        const cur=g.curPrice;
-        const diff=cur>0&&avg>0?(cur-avg):0;
-        const diffPct=avg>0?(diff/avg*100):0;
-        const col=diff>=0?'var(--green2)':'var(--red)';
-        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">'+
-          '<span style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2)">'+(g.ticker?'<span style="color:var(--green2)">'+g.ticker+'</span> ':'')+g.name+'</span>'+
-          '<span style="font-family:DM Mono,monospace;font-size:11px;font-weight:600">Ø '+fmtN(Math.round(avg))+' ₴'+
-          (cur>0?' → '+fmtN(Math.round(cur))+' ₴ <span style="font-size:9px;color:'+col+'">'+(diff>=0?'+':'')+diffPct.toFixed(1)+'%</span>':'')+
-          '</span></div>';
-      });
-      return '<div class="sec-summary-divs" style="margin-top:8px"><div class="sd-label">💹 Середня ціна покупки</div>'+avgRows.join('')+'</div>';
-    })()+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(Math.round(total))+' ₴</span></div>'+
     '</div>'+
@@ -3164,6 +3166,77 @@ function renderCoins(){
 // ── FOREX ─────────────────────────────────────
 const FFLAGS={EUR:'🇪🇺',GBP:'🇬🇧',PLN:'🇵🇱',CHF:'🇨🇭',CZK:'🇨🇿',RUB:'🇷🇺',KZT:'🇰🇿',OTHER:'🌐'};
 const FSYM  ={EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',OTHER:'?'};
+// ── STOCK DETAIL MODAL ────────────────────────
+function openStockDetail(secId, tickerKey){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  if(!sec)return;
+  const items=sec.items.map((it,j)=>({...it,origIdx:j}));
+  const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
+  if(!group.length)return;
+  const g=group[0];
+  const ticker=g.ticker||'—';
+  const name=g.liveName||g.name||ticker;
+  const totalQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
+  const totalBuyCost=group.reduce((s,t)=>{const q=parseFloat(t.qty)||0;const bp=parseFloat(t.buyPrice)||parseFloat(t.price)||0;return s+Math.abs(q)*bp;},0);
+  const curPrice=parseFloat(g.price)||0;
+  const curVal=Math.abs(totalQty)*curPrice;
+  const avgBuy=totalQty>0?totalBuyCost/totalQty:0;
+  const pnl=totalBuyCost>0?curVal-totalBuyCost:0;
+  const pnlPct=totalBuyCost>0?((curVal/totalBuyCost-1)*100):0;
+  const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
+  const divYield=parseFloat(g.divYield)||parseFloat(g.div)||0;
+  const divAnn=curVal*(divYield/100);
+  const divMonth=divAnn/12;
+  const sym=getCurrSym();
+
+  document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+ticker+'</span> '+name;
+  let html='<div class="stock-detail-grid">'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(Math.round(curVal))+'</div><div class="stock-detail-stat-lbl">Вартість</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+totalQty+' шт</div><div class="stock-detail-stat-lbl">Кількість</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(Math.round(curPrice))+'</div><div class="stock-detail-stat-lbl">Ціна</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(Math.round(avgBuy))+'</div><div class="stock-detail-stat-lbl">Ø Середня</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'')+sym+fmtN(Math.round(pnl))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(Math.round(divMonth))+'</div><div class="stock-detail-stat-lbl">Дивід./міс</div></div>'+
+    '</div>';
+
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 8px">📋 Угоди</div>';
+  group.forEach(t=>{
+    const qty=parseFloat(t.qty)||0;
+    const bp=parseFloat(t.buyPrice)||0;
+    const isSell=qty<0||(t.tradeType==='sell');
+    html+='<div class="stock-detail-trade"><div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?'📉 Продаж':'📈 Купівля')+' '+Math.abs(qty)+' шт</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+fmtN(Math.round(bp))+' ₴':'—')+'</div>'+
+      '</div><button class="rm-btn" onclick="removeSecItem(\''+secId+'\','+t.origIdx+');closeStockDetail()">×</button></div>';
+  });
+
+  html+='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
+    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📉 Продати</div>'+
+    '<div class="row2"><div class="field-group"><div class="field-label">Кількість</div>'+
+    '<input class="field-input" type="text" id="sellQty_detail" placeholder="'+totalQty+'" inputmode="decimal" value="'+totalQty+'"></div>'+
+    '<div class="field-group"><div class="field-label">Ціна (₴)</div>'+
+    '<input class="field-input" type="text" id="sellPrice_detail" placeholder="'+curPrice+'" inputmode="decimal" value="'+curPrice+'"></div></div>'+
+    '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">📉 Підтвердити продаж</button></div>';
+
+  document.getElementById('stockDetailContent').innerHTML=html;
+  document.getElementById('stockDetailOverlay').classList.add('open');
+}
+function closeStockDetail(){document.getElementById('stockDetailOverlay').classList.remove('open');}
+function sellStock(secId,tickerKey,refIdx){
+  const sec=securitiesSections.find(s=>s.id===secId);if(!sec)return;
+  const qty=parseFloat(document.getElementById('sellQty_detail')?.value)||0;
+  const price=parseFloat(document.getElementById('sellPrice_detail')?.value)||0;
+  if(!qty){alert('Вкажіть кількість');return;}
+  const ref=sec.items[refIdx];
+  sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency});
+  closeStockDetail();renderSecuritiesCards();updateAll();saveData();
+  const totalProfit=qty*price;
+  if(totalProfit>0&&confirm('Продано '+qty+' шт за '+fmtN(Math.round(totalProfit))+' ₴\n\nДодати до готівки?')){
+    const cashEl=document.getElementById('cashAmount');
+    if(cashEl){cashEl.value=String((parseFloat(cashEl.value)||0)+totalProfit);updateAll();saveData();}
+  }
+}
+
 function addForex(){
   const cur=sval('newForexCur');
   const amt=parseFloat($('newForexAmt')?.value)||0;
@@ -3174,10 +3247,28 @@ function addForex(){
     if(liveRate&&liveRate>0) rate=liveRate;
   }
   if(!amt)return;
-  if(!rate) rate=1; // fallback
-  forexItems.push({cur,amt,rate});
+  if(!rate) rate=1;
+  // Merge: if same currency exists, add to its amount
+  const existing=forexItems.find(f=>f.cur===cur);
+  if(existing){
+    existing.amt+=amt;
+    existing.rate=rate; // update rate to latest
+  } else {
+    forexItems.push({cur,amt,rate});
+  }
   if($('newForexAmt'))$('newForexAmt').value='';
   if($('newForexRate'))$('newForexRate').value='';
+  renderForex();updateAll();saveData();
+}
+function subtractForex(i){
+  const f=forexItems[i];
+  if(!f)return;
+  const amt=prompt('Скільки зняти з '+f.cur+'? (зараз: '+fmtD(f.amt)+')');
+  if(!amt)return;
+  const val=parseFloat(amt)||0;
+  if(val<=0)return;
+  f.amt=Math.max(0,f.amt-val);
+  if(f.amt<=0) forexItems.splice(i,1);
   renderForex();updateAll();saveData();
 }
 function removeForex(i){forexItems.splice(i,1);renderForex();updateAll();saveData();}
@@ -3199,6 +3290,7 @@ function renderForex(){
       <div class="list-sym" style="color:var(--orange2)">${FSYM[f.cur]||''} ${f.cur}</div>
       <div class="list-info">${fmtD(f.amt)} × ${liveRate.toFixed(2)} ₴ ${isLive?'<span style="color:var(--green2);font-size:8px">●</span>':''}</div>
       <div class="list-val">${fmtN(Math.round(f.amt*liveRate))} ₴</div>
+      <button class="rm-btn" style="font-size:14px;color:var(--orange2);margin-right:4px;" onclick="subtractForex(${i})" title="Зняти">−</button>
       <button class="rm-btn" onclick="removeForex(${i})">×</button>
     </div>`;
   }).join('');
