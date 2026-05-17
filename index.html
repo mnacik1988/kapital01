@@ -940,6 +940,11 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div class="picker-item-name">Стартап</div>
         <div class="picker-item-desc" id="picker_desc_startup">Вкладення в стартап</div>
       </div>
+      <div class="picker-item" onclick="pickerAdd('cash_custom')">
+        <div class="picker-item-icon">💵</div>
+        <div class="picker-item-name">Готівка</div>
+        <div class="picker-item-desc">Готівкові кошти у валюті</div>
+      </div>
       <div class="picker-item" onclick="pickerAdd('custom')">
         <div class="picker-item-icon">✏️</div>
         <div class="picker-item-name" data-i18n="addCustom">Власний розділ</div>
@@ -1009,6 +1014,20 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);">/ рік · $2.08/міс</div>
       </div>
     </div>
+    <div class="paywall-prices" style="display:flex;gap:10px;margin:16px 0;">
+      <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;">Місяць</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$1.99</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">/ місяць</div>
+      </div>
+      <div style="flex:1;background:linear-gradient(135deg,#4ecb8d10,#2dd4bf10);border:2px solid var(--green);border-radius:14px;padding:14px;text-align:center;position:relative;">
+        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--green);color:#0a0a0f;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;">ВИГІДНО</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;">Рік</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$14.99</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);">економія 37%</div>
+      </div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;margin-bottom:12px;">🎁 Перші 7 днів — безкоштовно</div>
     <button class="paywall-btn" id="pw_btn" onclick="activatePro()">✨ Підключити PRO</button>
     <button class="paywall-restore" id="pw_restore" onclick="restorePurchase()">Відновити покупку</button>
     <button class="paywall-close" id="pw_close" onclick="closePaywall()">Не зараз</button>
@@ -1806,10 +1825,7 @@ function _addDepositSlideCore(){
   renderDeposits(); goToSlide(deposits.length-1); saveData();
 }
 function addDepositSlide(){
-  if(!isPro && deposits.length >= FREE_LIMITS.deposits){
-    openPaywall('Більше 1 депозиту — тільки в PRO');
-    return;
-  }
+  /* all deposits free */
   _addDepositSlideCore();
 }
 function removeDeposit(idx){
@@ -2146,10 +2162,7 @@ function deleteBuiltinCard(name){
 const EMOJIS=['💰','📈','🏠','🚗','💎','🎯','🏆','💡','🔑','🌟','💼','📊','🏗','⚡','🌱','🛡','🎪','💫','🏅','🎁'];
 let selectedEmoji='💰';
 function openAddSection(){
-  if(!isPro && customSections.length >= FREE_LIMITS.customSections){
-    openPaywall('Більше 1 власного розділу — тільки в PRO');
-    return;
-  }
+  /* all custom sections free */
   selectedEmoji='💰'; $('modalName').value='';
   renderEmojiGrid(); $('modalOverlay').classList.add('open');
   setTimeout(()=>$('modalName').focus(),300);
@@ -2670,10 +2683,7 @@ function startAutoRefresh(){
 
 // ── SECURITIES (Stocks / Bonds / OVDP) ───────
 function addSimpleCard(type){
-  if(!isPro && customSections.length >= FREE_LIMITS.customSections){
-    openPaywall('Більше 1 додаткового розділу — тільки в PRO 👑');
-    return;
-  }
+  /* all custom sections free */
   const cfg={
     gold:{icon:'🥇',uk:'Золото',ru:'Золото',en:'Gold'},
     silver:{icon:'🥈',uk:'Срібло',ru:'Серебро',en:'Silver'},
@@ -2690,10 +2700,7 @@ function addSimpleCard(type){
 }
 
 function addSecuritiesCard(type){
-  if(!isPro && securitiesSections.length >= FREE_LIMITS.stockSections){
-    openPaywall('Більше 1 розділу акцій — тільки в PRO 👑');
-    return;
-  }
+  /* all stock sections free */
   const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
   const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
   const id='sec_'+type+'_'+Date.now();
@@ -2893,10 +2900,7 @@ function setSecTradeType(secId, type){
 
 function addSecItem(secId){
   const _secFreemium = securitiesSections.find(s=>s.id===secId);
-  if(!isPro && _secFreemium && _secFreemium.items.length >= FREE_LIMITS.stockItems){
-    openPaywall('Більше 3 акцій — тільки в PRO');
-    return;
-  }
+  /* all stock items free */
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
   const ticker=($('secName_'+secId)?.value||'').trim().toUpperCase();
   const qty=parseFloat($('secQty_'+secId)?.value)||0;
@@ -3199,7 +3203,8 @@ function openStockDetail(secId, tickerKey){
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(Math.round(divMonth))+'</div><div class="stock-detail-stat-lbl">Дивід./міс</div></div>'+
     '</div>';
 
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 8px">📋 Угоди</div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">📋 Угоди ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
+  html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=parseFloat(t.qty)||0;
     const bp=parseFloat(t.buyPrice)||0;
@@ -3210,13 +3215,16 @@ function openStockDetail(secId, tickerKey){
       '</div><button class="rm-btn" onclick="removeSecItem(\''+secId+'\','+t.origIdx+');closeStockDetail()">×</button></div>';
   });
 
+  html+='</div>'; // close collapsible trades
+
   html+='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
     '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📉 Продати</div>'+
     '<div class="row2"><div class="field-group"><div class="field-label">Кількість</div>'+
     '<input class="field-input" type="text" id="sellQty_detail" placeholder="'+totalQty+'" inputmode="decimal" value="'+totalQty+'"></div>'+
     '<div class="field-group"><div class="field-label">Ціна (₴)</div>'+
     '<input class="field-input" type="text" id="sellPrice_detail" placeholder="'+curPrice+'" inputmode="decimal" value="'+curPrice+'"></div></div>'+
-    '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">📉 Підтвердити продаж</button></div>';
+    '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">📉 Підтвердити продаж</button>'+
+    '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">Скасувати</button></div>';
 
   document.getElementById('stockDetailContent').innerHTML=html;
   document.getElementById('stockDetailOverlay').classList.add('open');
@@ -3226,15 +3234,39 @@ function sellStock(secId,tickerKey,refIdx){
   const sec=securitiesSections.find(s=>s.id===secId);if(!sec)return;
   const qty=parseFloat(document.getElementById('sellQty_detail')?.value)||0;
   const price=parseFloat(document.getElementById('sellPrice_detail')?.value)||0;
-  if(!qty){alert('Вкажіть кількість');return;}
+  if(!qty||qty<=0){alert('Вкажіть кількість для продажу');return;}
+  // Check can't sell more than owned
+  const items=sec.items.map((it,j)=>({...it,origIdx:j}));
+  const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
+  const ownedQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
+  if(qty>ownedQty){alert('Не можна продати більше ніж є: '+ownedQty+' шт');return;}
+  if(!confirm('Продати '+qty+' шт по '+fmtN(Math.round(price))+' ₴?'))return;
   const ref=sec.items[refIdx];
   sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency});
+  // Auto-remove if total qty becomes 0
+  cleanZeroStocks(sec);
   closeStockDetail();renderSecuritiesCards();updateAll();saveData();
   const totalProfit=qty*price;
   if(totalProfit>0&&confirm('Продано '+qty+' шт за '+fmtN(Math.round(totalProfit))+' ₴\n\nДодати до готівки?')){
     const cashEl=document.getElementById('cashAmount');
     if(cashEl){cashEl.value=String((parseFloat(cashEl.value)||0)+totalProfit);updateAll();saveData();}
   }
+}
+
+// Auto-remove stocks with 0 total qty
+function cleanZeroStocks(sec){
+  const tickerTotals={};
+  sec.items.forEach(it=>{
+    const key=it.ticker||it.name;
+    if(!tickerTotals[key])tickerTotals[key]=0;
+    tickerTotals[key]+=(parseFloat(it.qty)||0);
+  });
+  // Remove all items for tickers with 0 or negative total
+  Object.entries(tickerTotals).forEach(([key,total])=>{
+    if(total<=0){
+      sec.items=sec.items.filter(it=>(it.ticker||it.name)!==key);
+    }
+  });
 }
 
 function addForex(){
@@ -3260,16 +3292,53 @@ function addForex(){
   if($('newForexRate'))$('newForexRate').value='';
   renderForex();updateAll();saveData();
 }
+// ── CUSTOM DIALOG (replaces prompt/confirm to hide "file://" on Android) ──
+function customPrompt(msg, defVal, cb){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
+    <div style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">${msg}</div>
+    <input id="_cpInput" type="text" inputmode="decimal" value="${defVal||''}" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg3);color:#fff;font-family:DM Mono,monospace;font-size:14px;box-sizing:border-box;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
+      <button id="_cpOk" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  const inp=document.getElementById('_cpInput');inp.focus();inp.select();
+  document.getElementById('_cpOk').onclick=()=>{const v=inp.value;ov.remove();cb(v);};
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+}
+
+// Override native alert/confirm to remove "file://" on Android WebView
+const _nativeAlert=window.alert;
+window.alert=function(msg){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
+    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;">${msg}</div>
+    <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
+  </div>`;
+  document.body.appendChild(ov);
+};
+
+const _nativeConfirm=window.confirm;
+window.confirm=function(msg){
+  // For sync confirm, we still use native but it will show file://
+  // TODO: replace with async custom confirm where possible
+  return _nativeConfirm(msg);
+};
+
 function subtractForex(i){
   const f=forexItems[i];
   if(!f)return;
-  const amt=prompt('Скільки зняти з '+f.cur+'? (зараз: '+fmtD(f.amt)+')');
-  if(!amt)return;
-  const val=parseFloat(amt)||0;
-  if(val<=0)return;
-  f.amt=Math.max(0,f.amt-val);
-  if(f.amt<=0) forexItems.splice(i,1);
-  renderForex();updateAll();saveData();
+  customPrompt('Скільки зняти з '+f.cur+'? (зараз: '+fmtD(f.amt)+')', '', function(amt){
+    if(!amt)return;
+    const val=parseFloat(amt)||0;
+    if(val<=0)return;
+    f.amt=Math.max(0,f.amt-val);
+    if(f.amt<=0) forexItems.splice(i,1);
+    renderForex();updateAll();saveData();
+  });
 }
 function removeForex(i){forexItems.splice(i,1);renderForex();updateAll();saveData();}
 function renderForex(){
@@ -3589,29 +3658,15 @@ function updateProUI(){
 
 // addSecItem freemium check is built into the function directly
 
-// fetchTickerForInput — blocked when 3+ stocks already added (free version)
+// fetchTickerForInput — all free, just pass through
 const _origFetchTicker = fetchTickerForInput;
 fetchTickerForInput = async function(secId){
-  if(!isPro){
-    const totalItems = securitiesSections.reduce((sum,s)=>sum+s.items.length, 0);
-    if(totalItems >= FREE_LIMITS.stockItems){
-      openPaywall('Онлайн статистика акцій при 3+ акціях — тільки в PRO 👑');
-      return;
-    }
-  }
   await _origFetchTicker(secId);
 };
 
-// Override refreshAllStockPrices — allow up to 3 items with tickers for free
+// refreshAllStockPrices — all free, just pass through
 const _origRefreshAll = refreshAllStockPrices;
 refreshAllStockPrices = async function(secId){
-  if(!isPro){
-    const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(totalLive > FREE_LIMITS.stockItems){
-      openPaywall('Онлайн ціни для 4+ акцій — тільки в PRO 👑');
-      return;
-    }
-  }
   await _origRefreshAll(secId);
 };
 
@@ -3867,10 +3922,7 @@ const METAL_NAMES={uk:{gold:'Золото',silver:'Срібло',platinum:'Пл�
 const METAL_COLORS={gold:'#e8c97a',silver:'#a0aec0',platinum:'#b794f4'};
 
 function addMetalsCard(){
-  if(!isPro && metalsSections.length >= 1){
-    openPaywall('Більше 1 розділу металів — тільки в PRO 👑');
-    return;
-  }
+  /* all metals free */
   const id='metals_'+Date.now();
   metalsSections.push({id,items:[]});
   renderMetalsCards();
@@ -4887,7 +4939,7 @@ function getForexTotal(){return hiddenCards['forex']?0:getForexVal();}
 function getCashTotal(){return hiddenCards['cash']?0:getCashVal();}
 function getCurrentTotal(){return hiddenCards['other']?0:getOtherVal();}
 function exportPDF(){
-  if(!isPro){openPaywall('Експорт PDF — тільки в PRO 👑');return;}
+  /* PDF export free */
   const sym=getCurrSym();
   const now=new Date().toLocaleDateString('uk-UA',{day:'numeric',month:'long',year:'numeric'});
   let html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -5314,10 +5366,7 @@ checkTrial();
 // ── CRYPTO COIN LIMIT (FREE: 3 coins max) ───────────────
 const _origAddCoin=addCoin;
 addCoin=function(){
-  if(!isPro && coins.length >= 3){
-    openPaywall('Більше 3 монет — тільки в PRO 👑');
-    return;
-  }
+  /* all coins free */
   _origAddCoin();
 };
 
@@ -5376,7 +5425,7 @@ async function refreshCryptoPrices(){
   try{
   if(!coins.length)return;
   // Freemium check
-  if(!isPro && coins.length > 3)return;
+  /* crypto refresh free */
   
   const rate=val('usdtUah')||41;
   let anyUpdated=false;
@@ -5404,10 +5453,7 @@ setInterval(refreshCryptoPrices, 5*60*1000);
 
 // ── STARTUP INVESTMENT SECTION ───────────────────────────
 function addStartupCard(){
-  if(!isPro && customSections.length >= FREE_LIMITS.customSections){
-    openPaywall('Більше 1 додаткового розділу — тільки в PRO 👑');
-    return;
-  }
+  /* all custom sections free */
   const id='startup_'+Date.now();
   const section={
     id,
@@ -5433,6 +5479,13 @@ pickerAdd=function(type){
   if(type==='startup'){
     closeSectionPicker();
     addStartupCard();
+    return;
+  }
+  if(type==='cash_custom'){
+    closeSectionPicker();
+    const id='cash_'+Date.now();
+    customSections.push({id,name:'Готівка',icon:'💵',principal:'',currency:'UAH'});
+    renderCustomCards();updateAll();saveData();
     return;
   }
   _origPickerAdd(type);
