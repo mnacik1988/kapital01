@@ -675,14 +675,14 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="divider"></div>
       <!-- USDT BALANCE -->
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💵 USDT Баланс (цифровий долар)</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💵 USDT Баланс</div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label" data-i18n="totalUsdtInv">Сума USDT</div>
+            <div class="field-label">USDT ($)</div>
             <input class="field-input" type="text" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
           </div>
           <div class="field-group">
-            <div class="field-label" data-i18n="rateUsdtUah">Курс USDT / ₴</div>
+            <div class="field-label">Курс USDT/₴</div>
             <input class="field-input" type="text" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
           </div>
         </div>
@@ -997,19 +997,6 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="paywall-feature">
         <div class="paywall-feature-icon">📄</div>
         <div><div class="paywall-feature-text" id="pw_f5">Експорт PDF</div><div class="paywall-feature-sub" id="pw_f5sub">Повний звіт по всіх активах</div></div>
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:16px;">
-      <div onclick="selectPlan('monthly')" id="plan_monthly" style="flex:1;border:1.5px solid var(--gold);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;background:#e8c97a10;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px;">Щомісяця</div>
-        <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:900;color:var(--gold);">$2.99</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);">/ місяць</div>
-      </div>
-      <div onclick="selectPlan('yearly')" id="plan_yearly" style="flex:1;border:1.5px solid var(--border2);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;position:relative;">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--green);color:#0a0a0f;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;">-30% ВИГОДА</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px;">Щорічно</div>
-        <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:900;color:var(--text);">$24.99</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);">/ рік · $2.08/міс</div>
       </div>
     </div>
     <div class="paywall-prices" style="display:flex;gap:10px;margin:16px 0;">
@@ -2039,8 +2026,12 @@ function calcLive(depId){
 
   const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
   const dGone=Math.round(yEl*365.25);
-  // registeredDate = when user added deposit to app
-  const regDate=dep?.registeredDate?new Date(dep.registeredDate):start;
+  // registeredDate = when user added deposit to app (parse in local time, not UTC)
+  let regDate=start;
+  if(dep?.registeredDate){
+    const rp=dep.registeredDate.split('-');
+    regDate=new Date(parseInt(rp[0]),parseInt(rp[1])-1,parseInt(rp[2]));
+  }
   const dMonitoring=Math.max(0,Math.round((now-regDate)/(1000*60*60*24)));
   setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days')+' · Моніторинг: '+dMonitoring+' дн.');
   setText('liveInterest_'+depId,'+'+fmtLive(totalGrossInterest)+' ('+completedMonths+' міс)');
@@ -2060,7 +2051,10 @@ function calcLive(depId){
 function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   const el=$('dailyLog_'+depId); if(!el)return;
   const monitorStart=regDate||start;
-  const daysMonitored=Math.max(0,Math.round((now-monitorStart)/(1000*60*60*24)));
+  // Use midnight-to-midnight for accurate day counting
+  const msNorm=new Date(monitorStart.getFullYear(),monitorStart.getMonth(),monitorStart.getDate());
+  const nowNorm=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const daysMonitored=Math.max(0,Math.round((nowNorm-msNorm)/(1000*60*60*24)));
   const count=Math.min(daysMonitored,30);
   if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Моніторинг почнеться завтра</div>';return;}
 
@@ -3190,7 +3184,7 @@ function openCryptoDetail(coinKey){
 
   // Sell section
   html+='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
-    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📉 Продати '+coinKey+'</div>'+
+    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📉 Продати '+coinKey+' → USDT</div>'+
     '<div class="row2"><div class="field-group"><div class="field-label">Кількість</div>'+
     '<input class="field-input" type="text" id="cryptoSellQty" placeholder="'+totalQty+'" inputmode="decimal" value="'+totalQty+'"></div>'+
     '<div class="field-group"><div class="field-label">Ціна ($)</div>'+
@@ -3215,11 +3209,17 @@ function sellCrypto(coinKey){
   coins.forEach(c=>{const k=c.name.toUpperCase();totals[k]=(totals[k]||0)+(parseFloat(c.qty)||0);});
   Object.entries(totals).forEach(([k,t])=>{if(t<=0)coins=coins.filter(c=>c.name.toUpperCase()!==k);});
   closeStockDetail();renderCoins();updateAll();saveData();
-  const rate=val('usdtUah')||41;
-  const totalProfit=qty*price*rate;
-  if(totalProfit>0&&confirm('Продано '+qty+' '+coinKey+' за '+fmtN(Math.round(totalProfit))+' ₴\n\nДодати до готівки?')){
-    const cashEl=document.getElementById('cashAmount');
-    if(cashEl){cashEl.value=String((parseFloat(cashEl.value)||0)+totalProfit);updateAll();saveData();}
+  const totalProfitUsd=qty*price;
+  if(totalProfitUsd>0){
+    // Add sold amount to USDT balance in crypto section
+    const usdtEl=document.getElementById('cryptoUsdt');
+    if(usdtEl){
+      const currentUsdt=parseFloat(usdtEl.value)||0;
+      usdtEl.value=String(currentUsdt+totalProfitUsd);
+      updateAll();saveData();
+    }
+    const rate=val('usdtUah')||41;
+    alert('Продано '+qty+' '+coinKey+' за $'+fmtN(Math.round(totalProfitUsd))+' USDT\n\n💵 Додано до USDT балансу\n≈ '+fmtN(Math.round(totalProfitUsd*rate))+' ₴');
   }
 }
 
