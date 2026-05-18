@@ -1216,6 +1216,10 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <div class="liab-net-val" id="liabTotalDebtAmount" style="color:var(--red)">0 ₴</div>
     </div>
   </div>
+  <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;margin-top:12px;" onclick="openLiabModal()">
+    <span class="plus" style="color:var(--red)">+</span>
+    <span>Додати ще кредит / іпотеку</span>
+  </button>
 </div>
 
 <!-- ADD LIAB MODAL -->
@@ -3202,25 +3206,20 @@ function sellCrypto(coinKey){
   if(!qty||qty<=0){alert('Вкажіть кількість');return;}
   const owned=coins.filter(c=>c.name.toUpperCase()===coinKey).reduce((s,c)=>s+(parseFloat(c.qty)||0),0);
   if(qty>owned){alert('Не можна продати більше ніж є: '+owned);return;}
-  if(!confirm('Продати '+qty+' '+coinKey+' по $'+price+'?'))return;
-  coins.push({name:coinKey,qty:-Math.abs(qty),buyPrice:price,curPrice:price,change24h:0});
-  // Clean zero balances
-  const totals={};
-  coins.forEach(c=>{const k=c.name.toUpperCase();totals[k]=(totals[k]||0)+(parseFloat(c.qty)||0);});
-  Object.entries(totals).forEach(([k,t])=>{if(t<=0)coins=coins.filter(c=>c.name.toUpperCase()!==k);});
-  closeStockDetail();renderCoins();updateAll();saveData();
-  const totalProfitUsd=qty*price;
-  if(totalProfitUsd>0){
-    // Add sold amount to USDT balance in crypto section
-    const usdtEl=document.getElementById('cryptoUsdt');
-    if(usdtEl){
-      const currentUsdt=parseFloat(usdtEl.value)||0;
-      usdtEl.value=String(currentUsdt+totalProfitUsd);
-      updateAll();saveData();
+  customConfirm('Продати '+qty+' '+coinKey+' по $'+price+'?', function(){
+    coins.push({name:coinKey,qty:-Math.abs(qty),buyPrice:price,curPrice:price,change24h:0});
+    const totals={};
+    coins.forEach(c=>{const k=c.name.toUpperCase();totals[k]=(totals[k]||0)+(parseFloat(c.qty)||0);});
+    Object.entries(totals).forEach(([k,t])=>{if(t<=0)coins=coins.filter(c=>c.name.toUpperCase()!==k);});
+    closeStockDetail();renderCoins();updateAll();saveData();
+    const totalProfitUsd=qty*price;
+    if(totalProfitUsd>0){
+      const usdtEl=document.getElementById('cryptoUsdt');
+      if(usdtEl){usdtEl.value=String((parseFloat(usdtEl.value)||0)+totalProfitUsd);updateAll();saveData();}
+      const rate=val('usdtUah')||41;
+      alert('Продано '+qty+' '+coinKey+' за $'+fmtN(Math.round(totalProfitUsd))+' USDT\n\n💵 Додано до USDT балансу\n≈ '+fmtN(Math.round(totalProfitUsd*rate))+' ₴');
     }
-    const rate=val('usdtUah')||41;
-    alert('Продано '+qty+' '+coinKey+' за $'+fmtN(Math.round(totalProfitUsd))+' USDT\n\n💵 Додано до USDT балансу\n≈ '+fmtN(Math.round(totalProfitUsd*rate))+' ₴');
-  }
+  });
 }
 
 // ── FOREX ─────────────────────────────────────
@@ -3296,17 +3295,18 @@ function sellStock(secId,tickerKey,refIdx){
   const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
   const ownedQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
   if(qty>ownedQty){alert('Не можна продати більше ніж є: '+ownedQty+' шт');return;}
-  if(!confirm('Продати '+qty+' шт по '+fmtN(Math.round(price))+' ₴?'))return;
-  const ref=sec.items[refIdx];
-  sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency});
-  // Auto-remove if total qty becomes 0
-  cleanZeroStocks(sec);
-  closeStockDetail();renderSecuritiesCards();updateAll();saveData();
-  const totalProfit=qty*price;
-  if(totalProfit>0&&confirm('Продано '+qty+' шт за '+fmtN(Math.round(totalProfit))+' ₴\n\nДодати до готівки?')){
-    const cashEl=document.getElementById('cashAmount');
-    if(cashEl){cashEl.value=String((parseFloat(cashEl.value)||0)+totalProfit);updateAll();saveData();}
-  }
+  customConfirm('Продати '+qty+' шт по '+fmtN(Math.round(price))+' ₴?', function(){
+    const ref=sec.items[refIdx];
+    sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency});
+    cleanZeroStocks(sec);
+    closeStockDetail();renderSecuritiesCards();updateAll();saveData();
+    const totalProfit=qty*price;
+    if(totalProfit>0){
+      const cashEl=document.getElementById('cashAmount');
+      if(cashEl){cashEl.value=String((parseFloat(cashEl.value)||0)+totalProfit);updateAll();saveData();}
+      alert('📈 Продано '+qty+' шт за '+fmtN(Math.round(totalProfit))+' ₴\n\n💵 Суму додано до Готівки');
+    }
+  });
 }
 
 // Auto-remove stocks with 0 total qty
@@ -3371,7 +3371,7 @@ window.alert=function(msg){
   const ov=document.createElement('div');
   ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
   ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
-    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;">${msg}</div>
+    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
     <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
   </div>`;
   document.body.appendChild(ov);
@@ -3379,10 +3379,27 @@ window.alert=function(msg){
 
 const _nativeConfirm=window.confirm;
 window.confirm=function(msg){
-  // For sync confirm, we still use native but it will show file://
-  // TODO: replace with async custom confirm where possible
-  return _nativeConfirm(msg);
+  // Can't make async, but we override the WebChromeClient message
+  // The message itself doesn't contain file:// - Android WebView adds it as title
+  // So we prepend a clean title to push file:// out of view
+  return _nativeConfirm('\n'+msg);
 };
+
+// Async custom confirm for critical dialogs
+function customConfirm(msg, onYes, onNo){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
+    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
+    <div style="display:flex;gap:8px;">
+      <button id="_ccNo" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
+      <button id="_ccYes" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">Підтвердити</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_ccYes').onclick=()=>{ov.remove();if(onYes)onYes();};
+  document.getElementById('_ccNo').onclick=()=>{ov.remove();if(onNo)onNo();};
+  ov.onclick=e=>{if(e.target===ov){ov.remove();if(onNo)onNo();}};
+}
 
 function subtractForex(i){
   const f=forexItems[i];
