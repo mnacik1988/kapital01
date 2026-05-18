@@ -673,30 +673,28 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
-      <div class="field-group">
-        <div class="field-label" data-i18n="totalUsdtInv">Загальна сума вкладень в USDT</div>
-        <input class="field-input" type="text" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
-      </div>
-      <div class="row2">
-        <div class="field-group">
-          <div class="field-label" data-i18n="rateUsdtUah">Курс USDT / ₴</div>
-          <input class="field-input" type="text" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+      <!-- USDT BALANCE -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💵 USDT Баланс (цифровий долар)</div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label" data-i18n="totalUsdtInv">Сума USDT</div>
+            <input class="field-input" type="text" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
+          </div>
+          <div class="field-group">
+            <div class="field-label" data-i18n="rateUsdtUah">Курс USDT / ₴</div>
+            <input class="field-input" type="text" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
+          </div>
         </div>
-        <div class="field-group">
-          <div class="field-label" data-i18n="costPrice">Собівартість (₴)</div>
-          <input class="field-input" type="text" id="cryptoCost" placeholder="0" inputmode="decimal" oninput="updateAll()">
+        <div class="result-box" style="margin-top:8px;">
+          <div class="result-row"><span class="result-key" data-i18n="uahEquiv">Еквівалент у ₴</span><span class="result-val blue" id="cryptoUahVal">0 ₴</span></div>
         </div>
       </div>
-      <div class="result-box">
-        <div class="result-row"><span class="result-key" data-i18n="uahEquiv">Еквівалент у ₴</span><span class="result-val blue" id="cryptoUahVal">0 ₴</span></div>
-        <div class="result-row"><span class="result-key">P&amp;L</span><span class="result-val" id="cryptoPnl">—</span></div>
-        <div class="result-row"><span class="result-key">ROI</span><span class="result-val" id="cryptoRoi">—</span></div>
-      </div>
-      <!-- COINS LIST -->
-      <div id="cryptoRows" style="margin-top:12px"></div>
+      <!-- COINS AS TICKER CARDS -->
+      <div id="cryptoRows" style="margin-top:4px"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
         <span class="crypto-live-badge" id="cryptoRefreshStatus"><span class="live-dot" style="width:5px;height:5px;"></span> Онлайн ціни</span>
-        <button class="refresh-btn" onclick="refreshCryptoPrices()" id="cryptoRefreshBtn" style="font-family:'DM Mono',monospace;font-size:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;color:var(--purple2);cursor:pointer;">⟳ Оновити ціни</button>
+        <button class="refresh-btn" onclick="refreshCryptoPrices()" id="cryptoRefreshBtn" style="font-family:'DM Mono',monospace;font-size:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;color:var(--purple2);cursor:pointer;">⟳ Оновити</button>
       </div>
       <div style="margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
         <div class="calc-title" data-i18n="addCoinTitle">+ Додати монету</div>
@@ -1017,14 +1015,14 @@ select.field-input option{background:var(--bg3);color:var(--text);}
     <div class="paywall-prices" style="display:flex;gap:10px;margin:16px 0;">
       <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;">Місяць</div>
-        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$1.99</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$2.99</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">/ місяць</div>
       </div>
       <div style="flex:1;background:linear-gradient(135deg,#4ecb8d10,#2dd4bf10);border:2px solid var(--green);border-radius:14px;padding:14px;text-align:center;position:relative;">
         <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--green);color:#0a0a0f;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;">ВИГІДНО</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;">Рік</div>
-        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$14.99</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);">економія 37%</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$24.99</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);">економія 30%</div>
       </div>
     </div>
     <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;margin-bottom:12px;">🎁 Перші 7 днів — безкоштовно</div>
@@ -3094,77 +3092,135 @@ function renderCoins(){
   const el=$('cryptoRows'); if(!el)return;
   if(!coins.length){el.innerHTML='';return;}
   
-  // Group coins by name for average price
+  // Group coins by name
   const groups={};
   coins.forEach((c,i)=>{
-    if(!groups[c.name])groups[c.name]={trades:[],totalQty:0,totalCost:0,curPrice:0,change24h:0};
-    const g=groups[c.name];
-    g.trades.push({...c,idx:i});
-    g.totalQty+=(c.qty||0);
-    g.totalCost+=(c.qty||0)*(c.buyPrice||0);
-    g.curPrice=c.curPrice||g.curPrice;
-    g.change24h=c.change24h||g.change24h;
+    const key=c.name.toUpperCase();
+    if(!groups[key])groups[key]={trades:[],totalQty:0,totalCost:0,curPrice:0,change24h:0,name:key};
+    const g=groups[key];
+    const qty=parseFloat(c.qty)||0;
+    g.trades.push({...c,idx:i,qty});
+    g.totalQty+=qty;
+    g.totalCost+=Math.abs(qty)*(c.buyPrice||0);
+    if(c.curPrice)g.curPrice=c.curPrice;
+    if(c.change24h)g.change24h=c.change24h;
   });
   
-  let html='<div class="divider" style="margin:0 0 10px"></div>';
-  html+='<table class="sec-table"><tr><th>Монета</th><th>К-ть</th><th>Ø Покупка</th><th>Ціна</th><th>Вартість</th><th>P&L</th><th></th></tr>';
+  let html='<div class="ticker-cards">';
+  let totalVal=0,totalCost=0;
   
-  Object.entries(groups).forEach(([name,g])=>{
-    const avgBuy=g.totalQty>0?g.totalCost/g.totalQty:0;
+  Object.entries(groups).forEach(([key,g])=>{
+    if(g.totalQty<=0)return; // skip sold-out coins
+    const avgBuy=g.totalQty>0&&g.totalCost>0?g.totalCost/g.totalQty:0;
     const value=g.totalQty*g.curPrice;
-    const pnl=value-g.totalCost;
-    const pnlPct=g.totalCost>0?(pnl/g.totalCost*100):0;
-    const pnlUah=pnl*rate;
+    const cost=g.totalQty*avgBuy;
+    const pnl=cost>0?value-cost:0;
+    const pnlPct=cost>0?((value/cost-1)*100):0;
+    const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
     const valUah=value*rate;
-    const pnlClass=pnl>=0?'green':'red';
+    const pnlUah=pnl*rate;
     const ch=g.change24h;
-    const chStr=ch?`<div style="font-size:8px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</div>`:'';
-    const expanded=g.trades.length>1?` <span style="font-size:9px;color:var(--muted)">×${g.trades.length}</span>`:'';
+    totalVal+=value;totalCost+=cost;
     
-    html+=`<tr>
-      <td class="td-name" style="color:var(--purple2);font-weight:600;">${name}${expanded}</td>
-      <td>${g.totalQty}</td>
-      <td>$${fmtD(avgBuy,0)}</td>
-      <td>$${fmtD(g.curPrice,0)}${chStr}</td>
-      <td>${fmtN(Math.round(valUah))} ₴</td>
-      <td class="${pnlClass}">${pnl>=0?'+':''}${fmtN(Math.round(pnlUah))} ₴<div style="font-size:8px">${pnl>=0?'+':''}${pnlPct.toFixed(1)}%</div></td>
-      <td></td>
-    </tr>`;
-    
-    // Show individual trades if multiple
-    if(g.trades.length>1){
-      g.trades.forEach(tr=>{
-        html+=`<tr style="font-size:10px;color:var(--muted);">
-          <td style="padding-left:16px;">↳ ${tr.qty}</td>
-          <td></td>
-          <td>$${fmtD(tr.buyPrice,0)}</td>
-          <td>$${fmtD(tr.curPrice||g.curPrice,0)}</td>
-          <td></td>
-          <td></td>
-          <td><button class="rm-btn" onclick="removeCoin(${tr.idx})">×</button></td>
-        </tr>`;
-      });
-    } else {
-      // Single trade - add remove button
-      html=html.replace(/<td><\/td>\s*<\/tr>$/,'<td><button class="rm-btn" onclick="removeCoin('+g.trades[0].idx+')">×</button></td></tr>');
-    }
+    html+=`<div class="ticker-card" style="border-top:2px solid var(--purple)" onclick="openCryptoDetail('${key}')">
+      <div class="ticker-card-head">
+        <span class="ticker-card-sym" style="color:var(--purple2)">${key}</span>
+        <span class="ticker-card-qty">${g.totalQty}</span>
+      </div>
+      <div class="ticker-card-name">$${g.curPrice>0?fmtD(g.curPrice,2):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
+      <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(Math.round(valUah))} ₴</div>
+      <div class="ticker-card-pnl" style="color:${pnlCol}">${cost>0?(pnl>=0?'+':'')+fmtN(Math.round(pnlUah))+' ₴ ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
+      ${avgBuy>0?`<div class="ticker-card-div">Ø $${fmtD(avgBuy,2)}</div>`:''}
+    </div>`;
   });
   
-  html+='</table>';
+  html+='</div>';
   
-  // Summary
-  const totalVal=coins.reduce((s,c)=>s+(c.qty||0)*(c.curPrice||0),0);
-  const totalCost=coins.reduce((s,c)=>s+(c.qty||0)*(c.buyPrice||0),0);
+  // Portfolio summary
   const totalPnl=totalVal-totalCost;
-  const totalPnlPct=totalCost>0?(totalPnl/totalCost*100):0;
+  const totalPnlPct=totalCost>0?((totalVal/totalCost-1)*100):0;
   if(totalVal>0){
-    html+=`<div class="result-box" style="margin-top:8px;">
+    html+=`<div class="result-box" style="margin-top:10px">
       <div class="result-row"><span class="result-key">💰 Портфель (монети)</span><span class="result-val" style="color:var(--purple2)">$${fmtN(Math.round(totalVal))} ≈ ${fmtN(Math.round(totalVal*rate))} ₴</span></div>
       <div class="result-row"><span class="result-key">📊 P&L</span><span class="result-val" style="color:${totalPnl>=0?'var(--green2)':'var(--red)'}">${totalPnl>=0?'+':''}$${fmtN(Math.round(totalPnl))} (${totalPnl>=0?'+':''}${totalPnlPct.toFixed(1)}%)</span></div>
     </div>`;
   }
   
   el.innerHTML=html;
+}
+
+// ── CRYPTO DETAIL MODAL ──
+function openCryptoDetail(coinKey){
+  const rate=val('usdtUah')||41;
+  const group=coins.map((c,i)=>({...c,idx:i})).filter(c=>c.name.toUpperCase()===coinKey);
+  if(!group.length)return;
+  const totalQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
+  const totalCost=group.reduce((s,t)=>s+Math.abs(parseFloat(t.qty)||0)*(t.buyPrice||0),0);
+  const curPrice=group.find(c=>c.curPrice)?.curPrice||0;
+  const avgBuy=totalQty>0&&totalCost>0?totalCost/totalQty:0;
+  const curVal=totalQty*curPrice;
+  const pnl=totalCost>0?curVal-totalCost:0;
+  const pnlPct=totalCost>0?((curVal/totalCost-1)*100):0;
+  const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
+  const ch=group[0].change24h||0;
+  const sym=getCurrSym();
+
+  document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--purple2)">'+coinKey+'</span> Криптовалюта';
+  let html='<div class="stock-detail-grid">'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--purple2)">$'+fmtD(curPrice,2)+'</div><div class="stock-detail-stat-lbl">Ціна</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+totalQty+'</div><div class="stock-detail-stat-lbl">Кількість</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+fmtN(Math.round(curVal*rate))+' ₴</div><div class="stock-detail-stat-lbl">Вартість</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">$'+fmtD(avgBuy,2)+'</div><div class="stock-detail-stat-lbl">Ø Середня</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'')+'$'+fmtN(Math.round(pnl))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+(ch>=0?'var(--green2)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</div><div class="stock-detail-stat-lbl">24h зміна</div></div>'+
+    '</div>';
+
+  // Collapsible trades
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">📋 Угоди ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
+  html+='<div style="display:none">';
+  group.forEach(t=>{
+    const qty=parseFloat(t.qty)||0;
+    const isSell=qty<0;
+    html+='<div class="stock-detail-trade"><div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?'📉 Продаж':'📈 Купівля')+' '+Math.abs(qty)+'</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">по $'+(t.buyPrice||0)+'</div>'+
+      '</div><button class="rm-btn" onclick="removeCoin('+t.idx+');closeStockDetail()">×</button></div>';
+  });
+  html+='</div>';
+
+  // Sell section
+  html+='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
+    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📉 Продати '+coinKey+'</div>'+
+    '<div class="row2"><div class="field-group"><div class="field-label">Кількість</div>'+
+    '<input class="field-input" type="text" id="cryptoSellQty" placeholder="'+totalQty+'" inputmode="decimal" value="'+totalQty+'"></div>'+
+    '<div class="field-group"><div class="field-label">Ціна ($)</div>'+
+    '<input class="field-input" type="text" id="cryptoSellPrice" placeholder="'+curPrice+'" inputmode="decimal" value="'+curPrice+'"></div></div>'+
+    '<button onclick="sellCrypto(\''+coinKey+'\')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">📉 Підтвердити продаж</button>'+
+    '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">Скасувати</button></div>';
+
+  document.getElementById('stockDetailContent').innerHTML=html;
+  document.getElementById('stockDetailOverlay').classList.add('open');
+}
+
+function sellCrypto(coinKey){
+  const qty=parseFloat(document.getElementById('cryptoSellQty')?.value)||0;
+  const price=parseFloat(document.getElementById('cryptoSellPrice')?.value)||0;
+  if(!qty||qty<=0){alert('Вкажіть кількість');return;}
+  const owned=coins.filter(c=>c.name.toUpperCase()===coinKey).reduce((s,c)=>s+(parseFloat(c.qty)||0),0);
+  if(qty>owned){alert('Не можна продати більше ніж є: '+owned);return;}
+  if(!confirm('Продати '+qty+' '+coinKey+' по $'+price+'?'))return;
+  coins.push({name:coinKey,qty:-Math.abs(qty),buyPrice:price,curPrice:price,change24h:0});
+  // Clean zero balances
+  const totals={};
+  coins.forEach(c=>{const k=c.name.toUpperCase();totals[k]=(totals[k]||0)+(parseFloat(c.qty)||0);});
+  Object.entries(totals).forEach(([k,t])=>{if(t<=0)coins=coins.filter(c=>c.name.toUpperCase()!==k);});
+  closeStockDetail();renderCoins();updateAll();saveData();
+  const rate=val('usdtUah')||41;
+  const totalProfit=qty*price*rate;
+  if(totalProfit>0&&confirm('Продано '+qty+' '+coinKey+' за '+fmtN(Math.round(totalProfit))+' ₴\n\nДодати до готівки?')){
+    const cashEl=document.getElementById('cashAmount');
+    if(cashEl){cashEl.value=String((parseFloat(cashEl.value)||0)+totalProfit);updateAll();saveData();}
+  }
 }
 
 // ── FOREX ─────────────────────────────────────
@@ -5388,8 +5444,38 @@ async function fetchCryptoPrice(coinName){
     'FTM':'fantom','ALGO':'algorand','APT':'aptos','ARB':'arbitrum',
     'OP':'optimism','SUI':'sui','TON':'the-open-network','TRX':'tron',
     'SHIB':'shiba-inu','PEPE':'pepe','WIF':'dogwifcoin',
+    'USDT':'tether','USDC':'usd-coin','DAI':'dai','BUSD':'binance-usd',
+    'MNT':'mantle','AAVE':'aave','CRV':'curve-dao-token','SAND':'the-sandbox',
+    'MANA':'decentraland','AXS':'axie-infinity','GALA':'gala',
+    'ENJ':'enjincoin','CHZ':'chiliz','THETA':'theta-token','VET':'vechain',
+    'FIL':'filecoin','ICP':'internet-computer','HBAR':'hedera-hashgraph',
+    'EOS':'eos','XLM':'stellar','XMR':'monero','CAKE':'pancakeswap-token',
+    'COMP':'compound-governance-token','MKR':'maker','SNX':'havven',
+    'GRT':'the-graph','1INCH':'1inch','SUSHI':'sushi','YFI':'yearn-finance',
+    'BAT':'basic-attention-token','ZRX':'0x','KCS':'kucoin-shares',
+    'RUNE':'thorchain','INJ':'injective-protocol','SEI':'sei-network',
+    'TIA':'celestia','JUP':'jupiter-exchange-solana','BONK':'bonk',
+    'RENDER':'render-token','FET':'fetch-ai','AGIX':'singularitynet',
+    'WLD':'worldcoin-wld','PYTH':'pyth-network','JTO':'jito-governance-token',
+    'NOT':'notcoin','FLOKI':'floki','ONDO':'ondo-finance',
+    'POL':'polygon-ecosystem-token','PENDLE':'pendle',
+    'W':'wormhole','STRK':'starknet','ZK':'zksync','BLAST':'blast',
+    'ENA':'ethena','EIGEN':'eigenlayer','MOVE':'movement',
   };
-  const cgId=cgMap[coinName]||coinName.toLowerCase();
+  let cgId=cgMap[coinName];
+  
+  // If not in map, try CoinGecko search API
+  if(!cgId){
+    try{
+      const sr=await fetch('https://api.coingecko.com/api/v3/search?query='+encodeURIComponent(coinName));
+      if(sr.ok){
+        const sd=await sr.json();
+        const match=sd.coins?.find(c=>c.symbol?.toUpperCase()===coinName);
+        if(match) cgId=match.id;
+      }
+    }catch(e){}
+  }
+  if(!cgId) cgId=coinName.toLowerCase();
   
   try{
     const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cgId+'&vs_currencies=usd&include_24hr_change=true');
