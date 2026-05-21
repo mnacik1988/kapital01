@@ -1166,6 +1166,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <button onclick="devResetTrial()" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border2);background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);cursor:pointer;">↺ Скинути тріал</button>
         <button onclick="devResetAll()" style="flex:1;padding:8px;border-radius:10px;border:1px solid #f8717140;background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;">🗑 Скинути все дані</button>
       </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💾 Резервне копіювання</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="exportBackup()" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--green);background:#4ecb8d10;font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">📤 Експорт даних</button>
+          <label style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--blue);background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;text-align:center;">📥 Імпорт даних
+            <input type="file" accept=".json" onchange="importBackup(event)" style="display:none;">
+          </label>
+        </div>
+      </div>
+      </div>
       <div id="devTrialInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
     </div>
   </div>
@@ -1345,6 +1355,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <script>
+// ── GLOBAL ERROR HANDLER (shows crash reason on screen) ──
+window.onerror=function(msg,src,line,col,err){
+  try{
+    var d=document.createElement('div');
+    d.style.cssText='position:fixed;top:0;left:0;right:0;padding:20px;background:red;color:white;font-size:12px;z-index:9999;font-family:monospace;white-space:pre-wrap;';
+    d.textContent='ERROR: '+msg+'\nLine: '+line+'\nSource: '+(src||'').replace(/.*\//,'')+'\n'+(err&&err.stack?err.stack:'');
+    document.body?document.body.prepend(d):document.addEventListener('DOMContentLoaded',function(){document.body.prepend(d);});
+  }catch(e){}
+  return false;
+};
 
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
@@ -1818,11 +1838,12 @@ function addDepositSlide(){
   _addDepositSlideCore();
 }
 function removeDeposit(idx){
-  if(!confirm(t('deleteDep')))return;
-  if(liveIntervals[deposits[idx].id])clearInterval(liveIntervals[deposits[idx].id]);
-  deposits.splice(idx,1);
-  if(currentDepSlide>=deposits.length)currentDepSlide=deposits.length-1;
-  renderDeposits(); updateAll(); saveData();
+  customConfirm(t('deleteDep'), function(){
+    if(liveIntervals[deposits[idx].id])clearInterval(liveIntervals[deposits[idx].id]);
+    deposits.splice(idx,1);
+    if(currentDepSlide>=deposits.length)currentDepSlide=deposits.length-1;
+    renderDeposits(); updateAll(); saveData();
+  });
 }
 
 // Swipe
@@ -2147,11 +2168,12 @@ function toggleDepCalc(depId){
 
 // ── DELETE BUILTIN CARDS ─────────────────────
 function deleteBuiltinCard(name){
-  if(!confirm(t('confirmDeleteCard')))return;
-  hiddenCards[name]=true;
-  const card=$('card-'+name);
-  if(card)card.style.display='none';
-  saveData(); updateAll();
+  customConfirm(t('confirmDeleteCard'), function(){
+    hiddenCards[name]=true;
+    const card=$('card-'+name);
+    if(card)card.style.display='none';
+    saveData(); updateAll();
+  });
 }
 
 // ── CUSTOM SECTIONS ──────────────────────────
@@ -2323,9 +2345,10 @@ function calcCustomSection(id){
   setText('cust-eff_'+id,      eff.toFixed(2)+'%');
 }
 function removeCustomSection(id){
-  if(!confirm(t('confirmDelete')))return;
-  customSections=customSections.filter(s=>s.id!==id);
-  renderCustomCards(); updateAll(); saveData();
+  customConfirm(t('confirmDelete'), function(){
+    customSections=customSections.filter(s=>s.id!==id);
+    renderCustomCards(); updateAll(); saveData();
+  });
 }
 function getCustomTotal(){
   return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
@@ -2516,6 +2539,13 @@ async function fetchUsdUahRate(){
   // Auto-update calculator fields if open
   if(typeof fillCurrencyFields==='function'){
     try{fillCurrencyFields();}catch(e){}
+  }
+  // Auto-update USDT/UAH rate from live rates
+  if(liveRates.USD && liveRates.USD>10){
+    const usdtField=document.getElementById('usdtUah');
+    if(usdtField && (!usdtField.value || usdtField.value==='41')){
+      usdtField.value=liveRates.USD.toFixed(2);
+    }
   }
 }
 
@@ -2932,9 +2962,10 @@ function removeSecItem(secId,itemIdx){
   renderSecuritiesCards(); updateAll(); saveData();
 }
 function removeSecCard(secId){
-  if(!confirm(t('confirmDelete')))return;
-  securitiesSections=securitiesSections.filter(s=>s.id!==secId);
-  renderSecuritiesCards(); updateAll(); saveData();
+  customConfirm(t('confirmDelete'), function(){
+    securitiesSections=securitiesSections.filter(s=>s.id!==secId);
+    renderSecuritiesCards(); updateAll(); saveData();
+  });
 }
 function getSecuritiesTotal(){
   return securitiesSections.reduce((sum,s)=>
@@ -3350,55 +3381,64 @@ function addForex(){
 }
 // ── CUSTOM DIALOG (replaces prompt/confirm to hide "file://" on Android) ──
 function customPrompt(msg, defVal, cb){
-  const ov=document.createElement('div');
+  try{
+  if(!document.body){var r=prompt(msg,defVal);if(cb)cb(r);return;}
+  var ov=document.createElement('div');
   ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
-    <div style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">${msg}</div>
-    <input id="_cpInput" type="text" inputmode="decimal" value="${defVal||''}" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg3);color:#fff;font-family:DM Mono,monospace;font-size:14px;box-sizing:border-box;margin-bottom:12px;">
-    <div style="display:flex;gap:8px;">
-      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
-      <button id="_cpOk" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
-    </div></div>`;
+  ov.innerHTML='<div style="background:#1a1a2e;border:1px solid #333;border-radius:18px;padding:24px;width:100%;max-width:340px;">'+
+    '<div style="font-family:monospace;font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">'+msg+'</div>'+
+    '<input id="_cpInput" type="text" inputmode="decimal" value="'+(defVal||'')+'" style="width:100%;padding:12px;border-radius:12px;border:1px solid #444;background:#111;color:#fff;font-family:monospace;font-size:14px;box-sizing:border-box;margin-bottom:12px;">'+
+    '<div style="display:flex;gap:8px;">'+
+    '<button id="_cpCancel" style="flex:1;padding:10px;border-radius:12px;border:1px solid #444;background:transparent;font-family:monospace;font-size:12px;color:#999;cursor:pointer;">Скасувати</button>'+
+    '<button id="_cpOk" style="flex:1;padding:10px;border-radius:12px;border:none;background:#4ecb8d;font-family:monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>'+
+    '</div></div>';
   document.body.appendChild(ov);
-  const inp=document.getElementById('_cpInput');inp.focus();inp.select();
-  document.getElementById('_cpOk').onclick=()=>{const v=inp.value;ov.remove();cb(v);};
-  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  var inp=document.getElementById('_cpInput');if(inp)inp.focus();
+  document.getElementById('_cpOk').onclick=function(){var v=inp.value;ov.remove();if(cb)cb(v);};
+  document.getElementById('_cpCancel').onclick=function(){ov.remove();};
+  ov.onclick=function(e){if(e.target===ov)ov.remove();};
+  }catch(e){var r=prompt(msg,defVal);if(cb)cb(r);}
 }
 
 // Override native alert/confirm to remove "file://" on Android WebView
-const _nativeAlert=window.alert;
+// Wrapped in try-catch to prevent crash if DOM not ready
+var _nativeAlert=window.alert;
 window.alert=function(msg){
-  const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
-    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
-    <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
-  </div>`;
-  document.body.appendChild(ov);
+  try{
+    if(!document.body){_nativeAlert(msg);return;}
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+    ov.innerHTML='<div style="background:#1a1a2e;border:1px solid #333;border-radius:18px;padding:24px;width:100%;max-width:340px;">' +
+      '<div style="font-family:monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">' + msg + '</div>' +
+      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:#4ecb8d;font-family:monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>' +
+    '</div>';
+    document.body.appendChild(ov);
+  }catch(e){_nativeAlert(msg);}
 };
 
-const _nativeConfirm=window.confirm;
+var _nativeConfirm=window.confirm;
 window.confirm=function(msg){
-  // Can't make async, but we override the WebChromeClient message
-  // The message itself doesn't contain file:// - Android WebView adds it as title
-  // So we prepend a clean title to push file:// out of view
-  return _nativeConfirm('\n'+msg);
+  // Sync confirm can't be replaced with async, but Android WebChromeClient handles "file://"
+  return _nativeConfirm(msg);
 };
 
 // Async custom confirm for critical dialogs
 function customConfirm(msg, onYes, onNo){
-  const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
-    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
-    <div style="display:flex;gap:8px;">
-      <button id="_ccNo" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
-      <button id="_ccYes" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">Підтвердити</button>
-    </div></div>`;
-  document.body.appendChild(ov);
-  document.getElementById('_ccYes').onclick=()=>{ov.remove();if(onYes)onYes();};
-  document.getElementById('_ccNo').onclick=()=>{ov.remove();if(onNo)onNo();};
-  ov.onclick=e=>{if(e.target===ov){ov.remove();if(onNo)onNo();}};
+  try{
+    if(!document.body){if(_nativeConfirm(msg)&&onYes)onYes();else if(onNo)onNo();return;}
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+    ov.innerHTML='<div style="background:#1a1a2e;border:1px solid #333;border-radius:18px;padding:24px;width:100%;max-width:340px;">' +
+      '<div style="font-family:monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">' + msg + '</div>' +
+      '<div style="display:flex;gap:8px;">' +
+      '<button id="_ccNo" style="flex:1;padding:10px;border-radius:12px;border:1px solid #444;background:transparent;font-family:monospace;font-size:12px;color:#999;cursor:pointer;">Скасувати</button>' +
+      '<button id="_ccYes" style="flex:1;padding:10px;border-radius:12px;border:none;background:#4ecb8d;font-family:monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">Підтвердити</button>' +
+      '</div></div>';
+    document.body.appendChild(ov);
+    document.getElementById('_ccYes').onclick=function(){ov.remove();if(onYes)onYes();};
+    document.getElementById('_ccNo').onclick=function(){ov.remove();if(onNo)onNo();};
+    ov.onclick=function(e){if(e.target===ov){ov.remove();if(onNo)onNo();}};
+  }catch(e){if(_nativeConfirm(msg)&&onYes)onYes();else if(onNo)onNo();}
 }
 
 function subtractForex(i){
@@ -4026,9 +4066,10 @@ function removeMetalItem(secId,itemIdx){
 }
 
 function removeMetalsCard(secId){
-  if(!confirm(t('confirmDelete')))return;
-  metalsSections=metalsSections.filter(s=>s.id!==secId);
-  renderMetalsCards(); updateAll(); saveData();
+  customConfirm(t('confirmDelete'), function(){
+    metalsSections=metalsSections.filter(s=>s.id!==secId);
+    renderMetalsCards(); updateAll(); saveData();
+  });
 }
 
 function getMetalPriceUah(type){
@@ -4578,11 +4619,12 @@ function confirmAddLiab(){
 }
 
 function removeLiab(id){
-  if(!confirm(t('confirmDelete')))return;
-  liabilities=liabilities.filter(l=>l.id!==id);
-  renderLiabilities();
-  updateAll();
-  saveData();
+  customConfirm(t('confirmDelete'), function(){
+    liabilities=liabilities.filter(l=>l.id!==id);
+    renderLiabilities();
+    updateAll();
+    saveData();
+  });
 }
 
 function toggleNetCapital(btn){
@@ -5731,10 +5773,12 @@ function devResetTrial(){
 }
 
 function devResetAll(){
-  if(!confirm('⚠️ Видалити ВСІ дані? Це незворотна дія!'))return;
-  if(!confirm('Точно видалити? Всі депозити, акції, налаштування будуть втрачені.'))return;
-  localStorage.clear();
-  location.reload();
+  customConfirm('⚠️ Видалити ВСІ дані? Це незворотна дія!', function(){
+    customConfirm('Точно видалити? Всі депозити, акції, налаштування будуть втрачені.', function(){
+      localStorage.clear();
+      location.reload();
+    });
+  });
 }
 
 function devUpdateStatus(){
@@ -5816,9 +5860,54 @@ if(customSections.some(s=>s.sectionType==='startup')){
   renderCustomCards();
   updateAll();
 }
+// ── BACKUP EXPORT/IMPORT ──────────────────────
+function exportBackup(){
+  try{
+    var data=localStorage.getItem('kapital_v6');
+    var history=localStorage.getItem('cap_history');
+    var backup=JSON.stringify({
+      version:'10.15',
+      date:new Date().toISOString(),
+      data:data?JSON.parse(data):null,
+      history:history?JSON.parse(history):null
+    },null,2);
+    var blob=new Blob([backup],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='InveStory_backup_'+new Date().toISOString().split('T')[0]+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    alert('✅ Бекап збережено!');
+  }catch(e){alert('❌ Помилка експорту: '+e.message);}
+}
+
+function importBackup(event){
+  var file=event.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var backup=JSON.parse(e.target.result);
+      if(!backup.data){alert('❌ Невірний файл бекапу');return;}
+      customConfirm('Імпортувати дані з '+backup.date?.split('T')[0]+'?\n\nПоточні дані будуть замінені!', function(){
+        localStorage.setItem('kapital_v6',JSON.stringify(backup.data));
+        if(backup.history)localStorage.setItem('cap_history',JSON.stringify(backup.history));
+        alert('✅ Дані імпортовано! Перезавантаження...');
+        setTimeout(function(){location.reload();},500);
+      });
+    }catch(err){alert('❌ Помилка імпорту: '+err.message);}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
 // ── PWA SERVICE WORKER ────────────────────────
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+// Only register SW on https (not file:// which is used in Android WebView)
+if('serviceWorker' in navigator && location.protocol==='https:'){
+  navigator.serviceWorker.register('sw.js').catch(function(){});
 }
 // Save data before app closes
 window.addEventListener('beforeunload',()=>{_saveDataNow();});
