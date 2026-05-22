@@ -1166,15 +1166,13 @@ select.field-input option{background:var(--bg3);color:var(--text);}
         <button onclick="devResetTrial()" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border2);background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);cursor:pointer;">↺ Скинути тріал</button>
         <button onclick="devResetAll()" style="flex:1;padding:8px;border-radius:10px;border:1px solid #f8717140;background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;">🗑 Скинути все дані</button>
       </div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💾 Резервне копіювання</div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="exportBackup()" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--green);background:#4ecb8d10;font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">📤 Експорт даних</button>
-          <label style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--blue);background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;text-align:center;">📥 Імпорт даних
-            <input type="file" accept=".json" onchange="importBackup(event)" style="display:none;">
-          </label>
-        </div>
+      <div class="divider"></div>
+      <div class="settings-group-title">💾 РЕЗЕРВНЕ КОПІЮВАННЯ</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="backupExport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #4ecb8d40;background:#4ecb8d10;font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">📤 Експорт даних</button>
+        <button onclick="backupImport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #5b9cf640;background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;">📥 Імпорт даних</button>
       </div>
+      <input type="file" id="backupFileInput" accept=".json" style="display:none" onchange="handleBackupFile(this)">
       </div>
       <div id="devTrialInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
     </div>
@@ -1355,16 +1353,6 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 </div>
 
 <script>
-// ── GLOBAL ERROR HANDLER (shows crash reason on screen) ──
-window.onerror=function(msg,src,line,col,err){
-  try{
-    var d=document.createElement('div');
-    d.style.cssText='position:fixed;top:0;left:0;right:0;padding:20px;background:red;color:white;font-size:12px;z-index:9999;font-family:monospace;white-space:pre-wrap;';
-    d.textContent='ERROR: '+msg+'\nLine: '+line+'\nSource: '+(src||'').replace(/.*\//,'')+'\n'+(err&&err.stack?err.stack:'');
-    document.body?document.body.prepend(d):document.addEventListener('DOMContentLoaded',function(){document.body.prepend(d);});
-  }catch(e){}
-  return false;
-};
 
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
@@ -1431,7 +1419,7 @@ const LANGS={
     topupBtn:'+ Поповнити',topupTitle:'Поповнення депозиту',topupAmount:'Сума поповнення',topupDate:'Дата поповнення',topupAdd:'Додати поповнення',topupHistory:'Історія поповнень',topupTotal:'Загалом поповнено',topupDelete:'Видалити',depSettings:'⚙ Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depEnd:'Дата закінчення',
     compCalc:'⚡ Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
-    taxPct:'Податок на прибуток (%)',taxFree:'Неоподатк. мінімум',
+    taxPct:'Податок (%)',taxFree:'Без податку (₴)',
     finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',
     incomeDays:'📊 Дохід по днях (перші 30 днів)',yield:'⚡ Дохідність',
     secName:'Назва',secQty:'Кількість',secPrice:'Ціна (₴)',secDiv:'Дивіденди (%)',secTotal:'Вартість',secActions:'Дія',
@@ -1472,7 +1460,7 @@ const LANGS={
     topupBtn:'+ Пополнить',topupTitle:'Пополнение депозита',topupAmount:'Сумма пополнения',topupDate:'Дата пополнения',topupAdd:'Добавить пополнение',topupHistory:'История пополнений',topupTotal:'Итого пополнено',topupDelete:'Удалить',depSettings:'⚙ Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depEnd:'Дата окончания',
     compCalc:'⚡ Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
-    taxPct:'Налог на прибыль (%)',taxFree:'Необлаг. минимум',
+    taxPct:'Налог (%)',taxFree:'Без налога (₴)',
     finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',
     incomeDays:'📊 Доход по дням (первые 30 дней)',yield:'⚡ Доходность',
     secName:'Название',secQty:'Количество',secPrice:'Цена (₴)',secDiv:'Дивиденды (%)',secTotal:'Стоимость',secActions:'Действие',
@@ -1761,13 +1749,13 @@ function getDepositHtml(dep,idx){
           <div class="field-group">
             <div class="field-label">${lang.annualRate}</div>
             <input class="field-input" type="text" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
-              oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+              oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}');saveData()">
           </div>
           <div class="row2">
             <div class="field-group">
               <div class="field-label">${lang.termMon}</div>
               <input class="field-input" type="text" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
-                oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}')">
+                oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}');saveData()">
             </div>
             <div class="field-group">
               <div class="field-label">${lang.capitaliz}</div>
@@ -1784,12 +1772,12 @@ function getDepositHtml(dep,idx){
             <div class="field-group">
               <div class="field-label">${lang.taxPct}</div>
               <input class="field-input" type="text" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
-                oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+                oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}');saveData()">
             </div>
             <div class="field-group">
               <div class="field-label">${lang.taxFree}</div>
               <input class="field-input" type="text" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
-                oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+                oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}');saveData()">
             </div>
           </div>
           <div class="result-box">
@@ -2369,17 +2357,22 @@ let WORKER_URL = localStorage.getItem('worker_url') || 'https://plain-bread-df6d
 
 // ── Source 1: Власний Cloudflare Worker (працює скрізь) ───────
 async function workerGetStock(tickers){
+  try{
   if(!WORKER_URL) throw new Error('Worker URL not configured');
+  // Don't retry if worker failed recently (5 min cooldown)
+  if(window._workerFailedAt && Date.now()-window._workerFailedAt < 5*60*1000) throw new Error('Worker cooldown');
   const url = WORKER_URL.replace(/\/$/,'') + '/multi?tickers=' + tickers.map(encodeURIComponent).join(',');
   const r = await fetch(url);
   if(!r.ok) throw new Error('Worker HTTP ' + r.status);
   const d = await r.json();
   if(d.error) throw new Error('Worker: ' + d.error);
   return d; // { usdUah, stocks: { AAPL: {...} } }
+  }catch(e){window._workerFailedAt=Date.now();console.error('workerGetStock:',e.message);throw e;}
 }
 
 // ── Source 2: Anthropic Claude API (працює в Claude.ai) ───────
 async function claudeGetStockData(tickers){
+  try{
   const tickerList=tickers.map(t=>t.toUpperCase()).join(', ');
   const resp=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -2410,6 +2403,7 @@ async function claudeGetStockData(tickers){
   const parsed=JSON.parse(jsonStr);
   if(parsed.stocks){const n={};Object.entries(parsed.stocks).forEach(([k,v])=>n[k.toUpperCase()]=v);parsed.stocks=n;}
   return parsed;
+  }catch(e){console.error('claudeGetStock:',e);throw e;}
 }
 
 async function fetchUsdUahRate(){
@@ -2540,11 +2534,11 @@ async function fetchUsdUahRate(){
   if(typeof fillCurrencyFields==='function'){
     try{fillCurrencyFields();}catch(e){}
   }
-  // Auto-update USDT/UAH rate from live rates
-  if(liveRates.USD && liveRates.USD>10){
-    const usdtField=document.getElementById('usdtUah');
-    if(usdtField && (!usdtField.value || usdtField.value==='41')){
-      usdtField.value=liveRates.USD.toFixed(2);
+  // Auto-update USDT rate field in crypto section
+  if(liveRates.USD && liveRates.USD > 10){
+    const usdtEl=document.getElementById('usdtUah');
+    if(usdtEl && (!usdtEl.value || usdtEl.value==='41')){
+      usdtEl.value=liveRates.USD.toFixed(2);
     }
   }
 }
@@ -3381,64 +3375,55 @@ function addForex(){
 }
 // ── CUSTOM DIALOG (replaces prompt/confirm to hide "file://" on Android) ──
 function customPrompt(msg, defVal, cb){
-  try{
-  if(!document.body){var r=prompt(msg,defVal);if(cb)cb(r);return;}
-  var ov=document.createElement('div');
+  const ov=document.createElement('div');
   ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML='<div style="background:#1a1a2e;border:1px solid #333;border-radius:18px;padding:24px;width:100%;max-width:340px;">'+
-    '<div style="font-family:monospace;font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">'+msg+'</div>'+
-    '<input id="_cpInput" type="text" inputmode="decimal" value="'+(defVal||'')+'" style="width:100%;padding:12px;border-radius:12px;border:1px solid #444;background:#111;color:#fff;font-family:monospace;font-size:14px;box-sizing:border-box;margin-bottom:12px;">'+
-    '<div style="display:flex;gap:8px;">'+
-    '<button id="_cpCancel" style="flex:1;padding:10px;border-radius:12px;border:1px solid #444;background:transparent;font-family:monospace;font-size:12px;color:#999;cursor:pointer;">Скасувати</button>'+
-    '<button id="_cpOk" style="flex:1;padding:10px;border-radius:12px;border:none;background:#4ecb8d;font-family:monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>'+
-    '</div></div>';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
+    <div style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">${msg}</div>
+    <input id="_cpInput" type="text" inputmode="decimal" value="${defVal||''}" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg3);color:#fff;font-family:DM Mono,monospace;font-size:14px;box-sizing:border-box;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
+      <button id="_cpOk" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
+    </div></div>`;
   document.body.appendChild(ov);
-  var inp=document.getElementById('_cpInput');if(inp)inp.focus();
-  document.getElementById('_cpOk').onclick=function(){var v=inp.value;ov.remove();if(cb)cb(v);};
-  document.getElementById('_cpCancel').onclick=function(){ov.remove();};
-  ov.onclick=function(e){if(e.target===ov)ov.remove();};
-  }catch(e){var r=prompt(msg,defVal);if(cb)cb(r);}
+  const inp=document.getElementById('_cpInput');inp.focus();inp.select();
+  document.getElementById('_cpOk').onclick=()=>{const v=inp.value;ov.remove();cb(v);};
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
 }
 
 // Override native alert/confirm to remove "file://" on Android WebView
-// Wrapped in try-catch to prevent crash if DOM not ready
-var _nativeAlert=window.alert;
+const _nativeAlert=window.alert;
 window.alert=function(msg){
-  try{
-    if(!document.body){_nativeAlert(msg);return;}
-    var ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-    ov.innerHTML='<div style="background:#1a1a2e;border:1px solid #333;border-radius:18px;padding:24px;width:100%;max-width:340px;">' +
-      '<div style="font-family:monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">' + msg + '</div>' +
-      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:#4ecb8d;font-family:monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>' +
-    '</div>';
-    document.body.appendChild(ov);
-  }catch(e){_nativeAlert(msg);}
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
+    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
+    <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
+  </div>`;
+  document.body.appendChild(ov);
 };
 
-var _nativeConfirm=window.confirm;
+const _nativeConfirm=window.confirm;
 window.confirm=function(msg){
-  // Sync confirm can't be replaced with async, but Android WebChromeClient handles "file://"
-  return _nativeConfirm(msg);
+  // Can't make async, but we override the WebChromeClient message
+  // The message itself doesn't contain file:// - Android WebView adds it as title
+  // So we prepend a clean title to push file:// out of view
+  return _nativeConfirm('\n'+msg);
 };
 
 // Async custom confirm for critical dialogs
 function customConfirm(msg, onYes, onNo){
-  try{
-    if(!document.body){if(_nativeConfirm(msg)&&onYes)onYes();else if(onNo)onNo();return;}
-    var ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-    ov.innerHTML='<div style="background:#1a1a2e;border:1px solid #333;border-radius:18px;padding:24px;width:100%;max-width:340px;">' +
-      '<div style="font-family:monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">' + msg + '</div>' +
-      '<div style="display:flex;gap:8px;">' +
-      '<button id="_ccNo" style="flex:1;padding:10px;border-radius:12px;border:1px solid #444;background:transparent;font-family:monospace;font-size:12px;color:#999;cursor:pointer;">Скасувати</button>' +
-      '<button id="_ccYes" style="flex:1;padding:10px;border-radius:12px;border:none;background:#4ecb8d;font-family:monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">Підтвердити</button>' +
-      '</div></div>';
-    document.body.appendChild(ov);
-    document.getElementById('_ccYes').onclick=function(){ov.remove();if(onYes)onYes();};
-    document.getElementById('_ccNo').onclick=function(){ov.remove();if(onNo)onNo();};
-    ov.onclick=function(e){if(e.target===ov){ov.remove();if(onNo)onNo();}};
-  }catch(e){if(_nativeConfirm(msg)&&onYes)onYes();else if(onNo)onNo();}
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
+    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
+    <div style="display:flex;gap:8px;">
+      <button id="_ccNo" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
+      <button id="_ccYes" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">Підтвердити</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_ccYes').onclick=()=>{ov.remove();if(onYes)onYes();};
+  document.getElementById('_ccNo').onclick=()=>{ov.remove();if(onNo)onNo();};
+  ov.onclick=e=>{if(e.target===ov){ov.remove();if(onNo)onNo();}};
 }
 
 function subtractForex(i){
@@ -5772,6 +5757,47 @@ function devResetTrial(){
   alert('Тріал скинуто. Перезавантажте сторінку щоб побачити вікно тріалу.');
 }
 
+// ── BACKUP EXPORT / IMPORT ────────────────────
+function backupExport(){
+  try{
+    const data=localStorage.getItem('kapital_v6');
+    if(!data){alert('Немає даних для експорту');return;}
+    const blob=new Blob([data],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='InveStory_backup_'+new Date().toISOString().split('T')[0]+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    alert('✅ Бекап збережено!\n\nФайл: '+a.download);
+  }catch(e){alert('❌ Помилка експорту: '+e.message);}
+}
+function backupImport(){
+  document.getElementById('backupFileInput').click();
+}
+function handleBackupFile(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.deposits && !data.coins && !data.forexItems){
+        alert('❌ Невірний формат файлу');return;
+      }
+      customConfirm('Імпортувати дані з бекапу?\n\n⚠️ Поточні дані будуть замінені!', function(){
+        localStorage.setItem('kapital_v6',JSON.stringify(data));
+        alert('✅ Дані імпортовано! Перезавантаження...');
+        setTimeout(function(){location.reload();},500);
+      });
+    }catch(err){alert('❌ Помилка читання файлу: '+err.message);}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
 function devResetAll(){
   customConfirm('⚠️ Видалити ВСІ дані? Це незворотна дія!', function(){
     customConfirm('Точно видалити? Всі депозити, акції, налаштування будуть втрачені.', function(){
@@ -5860,54 +5886,9 @@ if(customSections.some(s=>s.sectionType==='startup')){
   renderCustomCards();
   updateAll();
 }
-// ── BACKUP EXPORT/IMPORT ──────────────────────
-function exportBackup(){
-  try{
-    var data=localStorage.getItem('kapital_v6');
-    var history=localStorage.getItem('cap_history');
-    var backup=JSON.stringify({
-      version:'10.15',
-      date:new Date().toISOString(),
-      data:data?JSON.parse(data):null,
-      history:history?JSON.parse(history):null
-    },null,2);
-    var blob=new Blob([backup],{type:'application/json'});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=url;
-    a.download='InveStory_backup_'+new Date().toISOString().split('T')[0]+'.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    alert('✅ Бекап збережено!');
-  }catch(e){alert('❌ Помилка експорту: '+e.message);}
-}
-
-function importBackup(event){
-  var file=event.target.files[0];
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var backup=JSON.parse(e.target.result);
-      if(!backup.data){alert('❌ Невірний файл бекапу');return;}
-      customConfirm('Імпортувати дані з '+backup.date?.split('T')[0]+'?\n\nПоточні дані будуть замінені!', function(){
-        localStorage.setItem('kapital_v6',JSON.stringify(backup.data));
-        if(backup.history)localStorage.setItem('cap_history',JSON.stringify(backup.history));
-        alert('✅ Дані імпортовано! Перезавантаження...');
-        setTimeout(function(){location.reload();},500);
-      });
-    }catch(err){alert('❌ Помилка імпорту: '+err.message);}
-  };
-  reader.readAsText(file);
-  event.target.value='';
-}
-
 // ── PWA SERVICE WORKER ────────────────────────
-// Only register SW on https (not file:// which is used in Android WebView)
-if('serviceWorker' in navigator && location.protocol==='https:'){
-  navigator.serviceWorker.register('sw.js').catch(function(){});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 // Save data before app closes
 window.addEventListener('beforeunload',()=>{_saveDataNow();});
