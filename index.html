@@ -1820,13 +1820,12 @@ function goToSlide(idx){
       log.style.display='none';
       if(arrow) arrow.style.transform='rotate(-90deg)';
     }
-    // Collapse settings (sync with open class)
+    // Collapse settings (only remove class, never set inline display)
+    var calcToggle=document.getElementById('depCalcToggle_'+depId);
     var calcBody=document.getElementById('depCalcBody_'+depId);
-    if(calcBody && (calcBody.classList.contains('open') || calcBody.style.display==='block')){
+    if(calcToggle && calcBody){
+      calcToggle.classList.remove('open');
       calcBody.classList.remove('open');
-      calcBody.style.display='none';
-      var calcIcon=document.querySelector('#depCalcToggle_'+depId+' .dep-calc-toggle-icon');
-      if(calcIcon) calcIcon.style.transform='rotate(0deg)';
     }
   }
   currentDepSlide=Math.max(0,Math.min(idx,deposits.length-1));
