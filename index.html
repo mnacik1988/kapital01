@@ -1808,6 +1808,27 @@ function renderDepDots(){
   dots.innerHTML=deposits.map((d,i)=>`<div class="dep-dot${i===currentDepSlide?' active':''}" onclick="goToSlide(${i})"></div>`).join('');
 }
 function goToSlide(idx){
+  // Auto-collapse current deposit before switching to another
+  if(deposits[currentDepSlide]){
+    var depId=deposits[currentDepSlide].id;
+    // Collapse daily log (sync with toggle class)
+    var dailyToggle=document.getElementById('dailyToggle_'+depId);
+    var log=document.getElementById('dailyLog_'+depId);
+    var arrow=document.getElementById('dailyArrow_'+depId);
+    if(dailyToggle && log && !dailyToggle.classList.contains('collapsed')){
+      dailyToggle.classList.add('collapsed');
+      log.style.display='none';
+      if(arrow) arrow.style.transform='rotate(-90deg)';
+    }
+    // Collapse settings (sync with open class)
+    var calcBody=document.getElementById('depCalcBody_'+depId);
+    if(calcBody && (calcBody.classList.contains('open') || calcBody.style.display==='block')){
+      calcBody.classList.remove('open');
+      calcBody.style.display='none';
+      var calcIcon=document.querySelector('#depCalcToggle_'+depId+' .dep-calc-toggle-icon');
+      if(calcIcon) calcIcon.style.transform='rotate(0deg)';
+    }
+  }
   currentDepSlide=Math.max(0,Math.min(idx,deposits.length-1));
   updateSlidePosition(); renderDepDots();
 }
