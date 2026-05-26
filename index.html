@@ -2068,17 +2068,18 @@ function getDepositHtml(dep,idx){
       <div class="dep-calc-body" id="depCalcBody_${dep.id}">
         <div style="padding-top:14px;">
         <div class="field-group">
-          <div class="field-label">${lang.depPrincipalLbl}</div>
+          <div class="field-label">${getDepositFieldLabel(lang.depPrincipalLbl,dep)}</div>
           <div style="display:flex;gap:6px;">
             <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}" style="flex:1;"
               oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
             <select class="field-input" id="depCurrency_${dep.id}" style="width:72px;padding:10px 4px;"
-              onchange="deposits[${idx}].depCurrency=this.value;updateAll();startLiveTicker('${dep.id}')">
+              onchange="deposits[${idx}].depCurrency=this.value;renderDeposits();updateAll();startLiveTicker('${dep.id}');saveData()">
               <option value="UAH" ${dep.depCurrency==='UAH'||!dep.depCurrency?'selected':''}>₴</option>
               <option value="USD" ${dep.depCurrency==='USD'?'selected':''}>$</option>
               <option value="EUR" ${dep.depCurrency==='EUR'?'selected':''}>€</option>
               <option value="GBP" ${dep.depCurrency==='GBP'?'selected':''}>£</option>
               <option value="RUB" ${dep.depCurrency==='RUB'?'selected':''}>₽</option>
+              <option value="CNY" ${dep.depCurrency==='CNY'?'selected':''}>¥</option>
             </select>
           </div>
         </div>
@@ -2114,12 +2115,12 @@ function getDepositHtml(dep,idx){
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:4px;">
             ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
               <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${new Date(tp.date).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'})}</span>
-              <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600;">+${fmtN(tp.amount)} ₴</span>
+              <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600;">+${fmtN(parseInputNumber(tp.amount))} ${getDepositCurrencySymbol(dep)}</span>
               <button class="rm-btn" onclick="removeTopUp('${dep.id}',${ti})">×</button>
             </div>`).join('')}
             <div style="display:flex;justify-content:space-between;padding:6px 0 2px;font-family:'DM Mono',monospace;font-size:10px;margin-top:4px;">
               <span style="color:var(--muted)">${t('topupTotal')||'Загалом'}</span>
-              <span style="color:var(--blue2);font-weight:700;">+${fmtN(dep.topups.reduce((s,tp)=>s+tp.amount,0))} ₴</span>
+              <span style="color:var(--blue2);font-weight:700;">+${fmtN(getDepositTopupsNative(dep))} ${getDepositCurrencySymbol(dep)}</span>
             </div>
           </div>
         </div>`:''}
@@ -2239,20 +2240,46 @@ document.addEventListener('touchend',e=>{
 window.addEventListener('resize',()=>setTimeout(syncDepositSliderHeight,80));
 
 // ── DEPOSIT CALC ─────────────────────────────
-function getDepositPrincipalUah(d){
-  const principal=parseFloat(d.principal)||0;
-  const cur=d.depCurrency||'UAH';
-  if(cur==='UAH')return principal;
-  const rate=liveRates[cur]||usdUahRate||41;
-  return principal*rate;
+function getDepositCurrency(d){
+  return (d?.depCurrency||'UAH').toUpperCase();
 }
-function getDepositMonthlyAccrued(d){
-  const P=getDepositPrincipalUah(d);
+function getCurrencySymbolByCode(cur){
+  return {UAH:'₴',USD:'$',EUR:'€',GBP:'£',RUB:'₽',CNY:'¥',PLN:'zł'}[(cur||'UAH').toUpperCase()]||cur||'₴';
+}
+function getDepositCurrencySymbol(d){
+  return getCurrencySymbolByCode(getDepositCurrency(d));
+}
+function getDepositCurrencyRate(d){
+  const cur=getDepositCurrency(d);
+  if(cur==='UAH')return 1;
+  if(liveRates[cur]&&liveRates[cur]>0)return liveRates[cur];
+  if(cur==='USD')return usdUahRate||41;
+  return 1;
+}
+function getDepositPrincipalNative(d){
+  return parseInputNumber(d?.principal);
+}
+function getDepositTopupsNative(d){
+  return (d?.topups||[]).reduce((s,tp)=>s+parseInputNumber(tp.amount),0);
+}
+function getDepositAmountUah(d,amountNative){
+  return parseInputNumber(amountNative)*getDepositCurrencyRate(d);
+}
+function getDepositFieldLabel(label,d){
+  const sym=getDepositCurrencySymbol(d);
+  const text=String(label||t('depPrincipalLbl')||'Сума депозиту');
+  return /\([^)]*\)/.test(text)?text.replace(/\([^)]*\)/,'('+sym+')'):text+' ('+sym+')';
+}
+function getDepositPrincipalUah(d){
+  return getDepositAmountUah(d,getDepositPrincipalNative(d));
+}
+function getDepositMonthlyAccruedNative(d){
+  const P=getDepositPrincipalNative(d);
   if(!P||!d.startDate||!d.endDate)return 0;
   const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
   if(now<start||end<=start)return 0;
-  const rAnn=(parseFloat(d.rate)||16)/100;
-  const n=parseFloat(d.freq)||12;
+  const rAnn=(parseInputNumber(d.rate)||16)/100;
+  const n=parseInputNumber(d.freq)||12;
   const startDay=start.getDate();
   let completedMonths=0;
   let checkDate=new Date(start);
@@ -2265,16 +2292,21 @@ function getDepositMonthlyAccrued(d){
   const yMonthly=completedMonths/12;
   return P*Math.pow(1+rAnn/n,n*yMonthly)-P;
 }
+function getDepositMonthlyAccrued(d){
+  return getDepositAmountUah(d,getDepositMonthlyAccruedNative(d));
+}
 function getAllDepositsTotal(){
   return deposits.reduce((sum,d)=>sum+getDepositTotalWithTopups(d)+getDepositMonthlyAccruedWithTopups(d),0);
 }
 function calcDeposit(depId){
-  const P=parseFloat($('depPrincipal_'+depId)?.value)||0;
+  const dep=deposits.find(d=>d.id===depId)||{};
+  const depSym=getDepositCurrencySymbol(dep);
+  const P=parseInputNumber($('depPrincipal_'+depId)?.value);
   if(!P){['r-total','r-interest','r-taxbase','r-tax','r-net','r-eff'].forEach(k=>setText(k+'_'+depId,'—'));return;}
-  const r=parseFloat($('depRate_'+depId)?.value||16)/100;
-  const months=parseFloat($('depMonths_'+depId)?.value||12);
-  const tax=parseFloat($('depTax_'+depId)?.value||0)/100;
-  const tf=parseFloat($('depTaxFree_'+depId)?.value||0);
+  const r=(parseInputNumber($('depRate_'+depId)?.value)||16)/100;
+  const months=parseInputNumber($('depMonths_'+depId)?.value)||12;
+  const tax=parseInputNumber($('depTax_'+depId)?.value)/100;
+  const tf=parseInputNumber($('depTaxFree_'+depId)?.value);
   // Monobank formula: monthly capitalization of NET interest
   let bal=P;
   let totalGross=0;
@@ -2289,30 +2321,31 @@ function calcDeposit(depId){
   const taxAmt=interest*tax;
   const net=interest-taxAmt;
   const eff=P&&months?(net/P/(months/12)*100):0;
-  setText('r-total_'+depId,   fmtN(Math.round(bal))+' ₴');
-  setText('r-interest_'+depId,'+'+fmtN(Math.round(interest))+' ₴');
-  setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' ₴');
-  setText('r-tax_'+depId,     '−'+fmtN(Math.round(taxAmt))+' ₴');
-  setText('r-net_'+depId,     '+'+fmtN(Math.round(net))+' ₴');
+  setText('r-total_'+depId,   fmtN(Math.round(bal))+' '+depSym);
+  setText('r-interest_'+depId,'+'+fmtN(Math.round(interest))+' '+depSym);
+  setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' '+depSym);
+  setText('r-tax_'+depId,     '−'+fmtN(Math.round(taxAmt))+' '+depSym);
+  setText('r-net_'+depId,     '+'+fmtN(Math.round(net))+' '+depSym);
   setText('r-eff_'+depId,     eff.toFixed(2)+'% '+t('yearly'));
 }
 
 // ── LIVE TICKER ──────────────────────────────
-function fmtLive(n){
+function fmtLive(n,sym='₴'){
   const a=Math.abs(n);
-  if(a>=1e6)return (n/1e6).toFixed(4)+'M ₴';
-  if(a>=1e3)return fmtD(n,2)+' ₴';
-  return n.toFixed(2)+' ₴';
+  if(a>=1e6)return (n/1e6).toFixed(4)+'M '+sym;
+  if(a>=1e3)return fmtD(n,2)+' '+sym;
+  return n.toFixed(2)+' '+sym;
 }
 function calcLive(depId){
   const dep=deposits.find(d=>d.id===depId);
-  const P=getDepositPrincipalUah(dep||{})||parseFloat($('depPrincipal_'+depId)?.value)||0;
-  const topupsTotal=(dep?.topups||[]).reduce((s,tp)=>s+tp.amount,0);
+  const depSym=getDepositCurrencySymbol(dep||{});
+  const P=getDepositPrincipalNative(dep||{})||parseInputNumber($('depPrincipal_'+depId)?.value);
+  const topupsTotal=getDepositTopupsNative(dep||{});
   const totalPrincipal=P+topupsTotal;
-  const rAnn=parseFloat($('depRate_'+depId)?.value||16)/100;
-  const n=parseFloat($('depFreq_'+depId)?.value||12);
-  const tax=parseFloat($('depTax_'+depId)?.value||0)/100; // e.g. 0.23 for 23%
-  const tf=parseFloat($('depTaxFree_'+depId)?.value||0);
+  const rAnn=(parseInputNumber($('depRate_'+depId)?.value)||16)/100;
+  const n=parseInputNumber($('depFreq_'+depId)?.value)||12;
+  const tax=parseInputNumber($('depTax_'+depId)?.value)/100; // e.g. 0.23 for 23%
+  const tf=parseInputNumber($('depTaxFree_'+depId)?.value);
   const sStr=$('depStartDate_'+depId)?.value;
   const eStr=$('depEndDate_'+depId)?.value;
   if(!P||!rAnn||!sStr||!eStr){
@@ -2342,7 +2375,7 @@ function calcLive(depId){
     .map(tp=>{
       const parts=tp.date.split('-');
       const eff=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
-      return {date:tp.date, effectiveDate:eff, amount:tp.amount};
+      return {date:tp.date, effectiveDate:eff, amount:parseInputNumber(tp.amount)};
     })
     .filter(tp=>tp.effectiveDate<=now)
     .sort((a,b)=>a.effectiveDate-b.effectiveDate);
@@ -2426,7 +2459,7 @@ function calcLive(depId){
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
-  if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' ₴</span>';
+   if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' '+depSym+'</span>';
 
   const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
   const dGone=Math.round(yEl*365.25);
@@ -2438,12 +2471,12 @@ function calcLive(depId){
   }
   const dMonitoring=Math.max(0,Math.round((now-regDate)/(1000*60*60*24)));
   setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days')+' · Моніторинг: '+dMonitoring+' дн.');
-  setText('liveInterest_'+depId,'+'+fmtLive(totalGrossInterest)+' ('+completedMonths+' міс)');
-  setText('liveTaxLive_'+depId,'−'+fmtLive(totalTaxPaid)+' ('+Math.round(tax*100)+'%)');
-  setText('liveNet_'+depId,'+'+fmtLive(totalNetCapitalized));
-  setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' ₴/с');
-  setText('livePerDay_'+depId,'+'+fmtLive(perDay));
-  setText('livePerMonth_'+depId,'+'+fmtLive(perMonth));
+  setText('liveInterest_'+depId,'+'+fmtLive(totalGrossInterest,depSym)+' ('+completedMonths+' міс)');
+  setText('liveTaxLive_'+depId,'−'+fmtLive(totalTaxPaid,depSym)+' ('+Math.round(tax*100)+'%)');
+  setText('liveNet_'+depId,'+'+fmtLive(totalNetCapitalized,depSym));
+  setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' '+depSym+'/с');
+  setText('livePerDay_'+depId,'+'+fmtLive(perDay,depSym));
+  setText('livePerMonth_'+depId,'+'+fmtLive(perMonth,depSym));
   const lb=$('liveBar_'+depId);
   if(lb)lb.style.width=Math.round(progress*100)+'%';
   const fmt2=d=>d.toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'});
@@ -2454,6 +2487,7 @@ function calcLive(depId){
 }
 function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   const el=$('dailyLog_'+depId); if(!el)return;
+  const depSym=getDepositCurrencySymbol(dep||{});
   const monitorStart=regDate||start;
   // Use midnight-to-midnight for accurate day counting
   const msNorm=new Date(monitorStart.getFullYear(),monitorStart.getMonth(),monitorStart.getDate());
@@ -2469,7 +2503,7 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   const topups=(dep?.topups||[]).map(tp=>{
     const d=new Date(tp.date);
     d.setDate(d.getDate()+1);
-    return {effStr:toStr(d), amount:tp.amount};
+    return {effStr:toStr(d), amount:parseInputNumber(tp.amount)};
   }).sort((a,b)=>a.effStr.localeCompare(b.effStr));
 
   // Capitalization dates
@@ -2528,7 +2562,7 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
 
     rows+=`<div class="daily-row">
       <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}${isCap?' 💰':''}</span>
-      <span class="daily-income" style="color:var(--green2)">+${dailyNet.toFixed(2)} ₴/${t('days')}</span>
+      <span class="daily-income" style="color:var(--green2)">+${dailyNet.toFixed(2)} ${depSym}/${t('days')}</span>
       <span class="daily-total" style="color:var(--muted);font-size:9px">${dailyGross.toFixed(2)} − ${(dailyGross*tax).toFixed(2)} подат.</span>
     </div>`;
   }
@@ -3482,10 +3516,16 @@ function _updateAllNow(){
     setText('depositDisplay', fmtN(toDisplayCurr(dep))+' '+sym);
     setText('depositPct', pct(dep,total)+' '+t('pctOfCapital'));
     const sl=$('depositSummaryList');
-    if(sl)sl.innerHTML=deposits.map(d=>`<div class="result-row">
-      <span class="result-key">${d.name||t('deposit')}</span>
-      <span class="result-val blue">${fmtN(toDisplayCurr(parseFloat(d.principal)||0))} ${sym}</span>
-    </div>`).join('');
+    if(sl)sl.innerHTML=deposits.map(d=>{
+      const nativeTotal=getDepositPrincipalNative(d)+getDepositTopupsNative(d)+getDepositMonthlyAccruedNativeWithTopups(d);
+      const uahTotal=getDepositTotalWithTopups(d)+getDepositMonthlyAccruedWithTopups(d);
+      const depSym=getDepositCurrencySymbol(d);
+      const converted=getDepositCurrency(d)===displayCurrency.toUpperCase()?'':' · '+fmtN(toDisplayCurr(uahTotal))+' '+sym;
+      return `<div class="result-row">
+        <span class="result-key">${d.name||t('deposit')}</span>
+        <span class="result-val blue">${fmtN(nativeTotal)} ${depSym}${converted}</span>
+      </div>`;
+    }).join('');
   }
   if(!hiddenCards['crypto']){
     setText('cryptoDisplay', fmtN(toDisplayCurr(crypto))+' '+sym);
@@ -4867,7 +4907,8 @@ function openTopUpModal(depId){
   document.getElementById('topup_amount_input').value='';
   // Translate labels
   document.getElementById('topup_title').textContent=t('topupTitle');
-  document.getElementById('topup_amount_label').textContent=t('topupAmount');
+  const depSym=getDepositCurrencySymbol(dep||{});
+  document.getElementById('topup_amount_label').textContent=(t('topupAmount')||'Сума поповнення')+' ('+depSym+')';
   document.getElementById('topup_date_label').textContent=t('topupDate');
   document.getElementById('topup_add_btn').textContent=t('topupAdd');
   document.getElementById('topupOverlay').classList.add('open');
@@ -4880,7 +4921,7 @@ function topupCloseOutside(e){
 }
 function confirmTopUp(){
   const depId=document.getElementById('topup_dep_id').value;
-  const amount=parseFloat(document.getElementById('topup_amount_input').value)||0;
+  const amount=parseInputNumber(document.getElementById('topup_amount_input').value);
   const date=document.getElementById('topup_date_input').value;
   if(!amount||!date){alert('Вкажіть суму і дату');return;}
   // Block future dates
@@ -4915,20 +4956,16 @@ function removeTopUp(depId,topupIdx){
 
 // ── UPDATED DEPOSIT CALCULATIONS WITH TOP-UPS ────────────
 function getDepositTotalWithTopups(d){
-  // Base principal in UAH
-  const base=getDepositPrincipalUah(d);
-  // Sum of all top-ups in UAH
-  const topupsTotal=(d.topups||[]).reduce((s,tp)=>s+tp.amount,0);
-  return base+topupsTotal;
+  return getDepositAmountUah(d,getDepositPrincipalNative(d)+getDepositTopupsNative(d));
 }
 
-function getDepositMonthlyAccruedWithTopups(d){
-  const P=getDepositPrincipalUah(d);
+function getDepositMonthlyAccruedNativeWithTopups(d){
+  const P=getDepositPrincipalNative(d);
   if(!P||!d.startDate||!d.endDate)return 0;
   const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
   if(now<start||end<=start)return 0;
-  const rAnn=(parseFloat(d.rate)||16)/100;
-  const tax=(parseFloat(d.tax)||0)/100;
+  const rAnn=(parseInputNumber(d.rate)||16)/100;
+  const tax=parseInputNumber(d.tax)/100;
   const capitalize=d.interestTo!=='separate';
   if(!capitalize)return 0;
   
@@ -4939,7 +4976,7 @@ function getDepositMonthlyAccruedWithTopups(d){
     .map(tp=>{
       const parts=tp.date.split('-');
       const effectiveDate=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
-      return {amount:tp.amount, date:tp.date, effectiveDate};
+      return {amount:parseInputNumber(tp.amount), date:tp.date, effectiveDate};
     })
     .filter(tp=>tp.effectiveDate<=now)
     .sort((a,b)=>a.effectiveDate-b.effectiveDate);
@@ -4987,6 +5024,10 @@ function getDepositMonthlyAccruedWithTopups(d){
   }
   
   return totalCapitalized;
+}
+
+function getDepositMonthlyAccruedWithTopups(d){
+  return getDepositAmountUah(d,getDepositMonthlyAccruedNativeWithTopups(d));
 }
 
 function validateDepDate(depId, input){
@@ -5814,7 +5855,7 @@ function renderDiagnostics(){
   deposits.forEach(d=>{
     if(!d.startDate||!d.endDate||!d.principal)return;
     const P=getDepositPrincipalUah(d);
-    const topups=(d.topups||[]).reduce((s,tp)=>s+tp.amount,0);
+    const topups=getDepositAmountUah(d,getDepositTopupsNative(d));
     const totalP=P+topups;
     const rAnn=(parseFloat(d.rate)||16)/100;
     const n=parseFloat(d.freq)||12;
