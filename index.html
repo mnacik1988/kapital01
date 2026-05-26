@@ -170,9 +170,9 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .dep-nav-btn:active{background:var(--bg2);color:var(--blue);}
 .dep-add-btn{background:var(--bg3);border:1px dashed var(--border2);border-radius:8px;height:28px;padding:0 10px;display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--blue);font-family:'DM Mono',monospace;white-space:nowrap;}
 .dep-add-btn:active{background:var(--bg2);}
-.deposits-slider{overflow:hidden;border-radius:20px;}
-.deposits-track{display:flex;transition:transform .35s cubic-bezier(0.4,0,0.2,1);}
-.deposit-slide{min-width:100%;width:100%;}
+.deposits-slider{overflow:hidden;border-radius:20px;transition:height .35s cubic-bezier(0.4,0,0.2,1);}
+.deposits-track{display:flex;align-items:flex-start;transition:transform .35s cubic-bezier(0.4,0,0.2,1);}
+.deposit-slide{min-width:100%;width:100%;flex:0 0 100%;}
 .live-wrap{background:linear-gradient(135deg,#0d1a2e,#0a1220);border:1px solid #5b9cf630;border-radius:20px;padding:18px 20px;position:relative;overflow:hidden;}
 .live-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,#5b9cf60a 0%,transparent 60%);pointer-events:none;}
 .live-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--blue);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
@@ -2180,6 +2180,7 @@ function renderDeposits(){
   renderDepDots();
   updateSlidePosition();
   deposits.forEach(d=>{ startLiveTicker(d.id); calcDeposit(d.id); });
+  syncDepositSliderHeight();
 }
 
 function renderDepDots(){
@@ -2189,10 +2190,22 @@ function renderDepDots(){
 function goToSlide(idx){
   currentDepSlide=Math.max(0,Math.min(idx,deposits.length-1));
   updateSlidePosition(); renderDepDots();
+  syncDepositSliderHeight();
 }
 function slideDeposit(dir){goToSlide(currentDepSlide+dir);}
 function updateSlidePosition(){
   $('depositsTrack').style.transform=`translateX(-${currentDepSlide*100}%)`;
+  syncDepositSliderHeight();
+}
+function syncDepositSliderHeight(){
+  requestAnimationFrame(()=>{
+    const slider=document.querySelector('.deposits-slider');
+    const track=$('depositsTrack');
+    if(!slider||!track)return;
+    const slide=track.children[currentDepSlide];
+    if(!slide)return;
+    slider.style.height=slide.scrollHeight+'px';
+  });
 }
 function _addDepositSlideCore(){
   if(deposits.length>=3){alert(t('maxDep'));return;}
@@ -2223,6 +2236,7 @@ document.addEventListener('touchend',e=>{
   const dx=e.changedTouches[0].clientX-touchStartX;
   if(Math.abs(dx)>50)slideDeposit(dx<0?1:-1);
 },{passive:true});
+window.addEventListener('resize',()=>setTimeout(syncDepositSliderHeight,80));
 
 // ── DEPOSIT CALC ─────────────────────────────
 function getDepositPrincipalUah(d){
@@ -2529,6 +2543,8 @@ function toggleDepCalc(depId){
   const toggle=$('depCalcToggle_'+depId), body=$('depCalcBody_'+depId);
   if(!toggle||!body)return;
   toggle.classList.toggle('open'); body.classList.toggle('open');
+  setTimeout(syncDepositSliderHeight,0);
+  setTimeout(syncDepositSliderHeight,420);
 }
 
 // ── DELETE BUILTIN CARDS ─────────────────────
@@ -5697,6 +5713,7 @@ function toggleDailyLog(depId){
   const collapsed=toggle.classList.toggle('collapsed');
   if(arrow)arrow.style.transform=collapsed?'rotate(-90deg)':'';
   log.style.display=collapsed?'none':'block';
+  setTimeout(syncDepositSliderHeight,0);
 }
 
 // ── DIAGNOSTICS POPUP ────────────────────────────────────
