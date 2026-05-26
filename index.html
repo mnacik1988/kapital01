@@ -311,6 +311,16 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .paywall-feature-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
 .paywall-price{text-align:center;font-family:'DM Mono',monospace;font-size:13px;color:var(--muted2);margin-bottom:16px;}
 .paywall-price strong{font-size:28px;font-weight:900;color:var(--gold);font-family:'Inter',sans-serif;}
+.price-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 14px;}
+.price-card{position:relative;min-height:108px;padding:16px 12px 14px;border-radius:18px;background:linear-gradient(180deg,#20202c,#15151f);border:1px solid var(--border2);text-align:center;box-shadow:0 14px 34px #00000030;}
+.price-card.featured{background:linear-gradient(160deg,#4ecb8d22,#2dd4bf12 55%,#171721);border:2px solid var(--green);box-shadow:0 0 0 1px #4ecb8d22,0 18px 44px #4ecb8d16;}
+.price-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--green);color:#07110d;font-family:'DM Mono',monospace;font-size:8px;font-weight:800;letter-spacing:.08em;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+.price-period{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.price-value{font-family:'Inter',sans-serif;font-size:30px;line-height:1;font-weight:800;letter-spacing:0;color:#fff;margin:7px 0 6px;text-shadow:0 0 14px #ffffff14;}
+.price-card.featured .price-value{color:var(--green2);text-shadow:0 0 22px #4ecb8d35;}
+.price-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.price-card.featured .price-sub{color:var(--green2);}
+.price-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);text-align:center;margin:-2px 0 14px;}
 .paywall-btn{width:100%;background:linear-gradient(135deg,var(--gold),#c9a84c);border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;margin-bottom:10px;}
 .paywall-restore{width:100%;background:transparent;border:1px solid var(--border2);border-radius:14px;padding:12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);cursor:pointer;}
 .paywall-close{width:100%;background:transparent;border:none;padding:10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;}
@@ -371,6 +381,10 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .settings-currency-row{display:flex;gap:8px;}
 .settings-curr-btn{flex:1;font-family:'DM Mono',monospace;font-size:11px;padding:10px 8px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;text-align:center;transition:all .15s;}
 .settings-curr-btn.active{background:var(--blue2);border-color:var(--blue2);color:#fff;font-weight:700;}
+.app-version-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:12px;}
+.settings-section .app-version-card{margin-top:14px;}
+.app-version-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;}
+.app-version-value{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--green2);white-space:nowrap;}
 
 
 /* METALS */
@@ -479,6 +493,17 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .diag-row:last-child{border-bottom:none;}
 .diag-row-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
 .diag-row-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;}
+.diag-history-btn{width:100%;height:100%;min-height:78px;background:linear-gradient(135deg,#5b9cf616,#4ecb8d10);border:1px dashed #5b9cf660;border-radius:14px;padding:12px;text-align:center;cursor:pointer;color:var(--text);}
+.diag-history-btn:active{opacity:.75;}
+.diag-history-btn .diag-stat-val{color:var(--blue2);font-size:18px;}
+.history-overlay{position:fixed;inset:0;background:#000000cc;z-index:620;display:none;align-items:flex-end;}
+.history-overlay.open{display:flex;}
+.history-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.history-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.history-row:last-child{border-bottom:none;}
+.history-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
+.history-total{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--text);text-align:right;}
+.history-delta{font-family:'DM Mono',monospace;font-size:10px;text-align:right;margin-top:2px;}
 
 /* ── COLLAPSIBLE DAILY LOG ── */
 .daily-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:6px 0;user-select:none;}
@@ -540,6 +565,99 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .stock-detail-trades{margin-top:12px;}
 .stock-detail-trade{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
 .stock-detail-trade:last-child{border-bottom:none;}
+
+/* MOBILE LAYOUT */
+@media (max-width:430px){
+  .app{padding-bottom:calc(42px + env(safe-area-inset-bottom));}
+  .header{padding:calc(42px + env(safe-area-inset-top)) 16px 16px;}
+  .header-top-row{gap:10px;}
+  .header-label{font-size:9px;letter-spacing:.16em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .total-wrap{gap:6px;}
+  .total-amount{font-size:clamp(32px,13vw,48px);letter-spacing:-1px;max-width:100%;overflow-wrap:anywhere;}
+  .total-currency{font-size:18px;}
+  .badge{font-size:10px;padding:3px 8px;}
+  .section-label{padding:14px 16px 8px;font-size:8px;letter-spacing:.18em;line-height:1.5;}
+  .cards,.chart-section,.liab-section,.add-section-wrap{padding-left:12px;padding-right:12px;}
+  .deposits-swipe-wrap{margin-left:12px;margin-right:12px;}
+  .card{border-radius:16px;}
+  .card-header{padding:14px 14px 12px;gap:10px;}
+  .card-icon{width:36px;height:36px;border-radius:11px;font-size:16px;}
+  .card-name{font-size:10px;letter-spacing:.06em;line-height:1.35;}
+  .card-value{font-size:18px;overflow-wrap:anywhere;}
+  .card-inner{padding:0 14px 16px;}
+  .row2,.row3,.row4{grid-template-columns:1fr;gap:0;}
+  .field-group{margin-bottom:12px;}
+  .field-label{font-size:9px;letter-spacing:.1em;line-height:1.35;}
+  .field-input{font-size:16px;padding:11px 12px;}
+  .result-row,.diag-row,.liab-breakdown-row{gap:10px;align-items:flex-start;}
+  .result-key,.diag-row-key,.liab-breakdown-key{min-width:0;line-height:1.35;}
+  .result-val,.diag-row-val,.liab-breakdown-val{flex-shrink:0;text-align:right;max-width:48%;overflow-wrap:anywhere;}
+  .list-row{align-items:flex-start;gap:7px;}
+  .list-sym{min-width:42px;}
+  .list-info{min-width:0;line-height:1.35;overflow-wrap:anywhere;}
+  .list-val{max-width:38%;text-align:right;overflow-wrap:anywhere;}
+  .ticker-search-row{display:grid;grid-template-columns:1fr;gap:8px;}
+  .ticker-fetch-btn{width:100%;justify-content:center;}
+  .ticker-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .ticker-card{min-width:0;width:100%;padding:10px;}
+  .ticker-card-head{gap:6px;}
+  .ticker-card-sym,.ticker-card-qty{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ticker-card-price{font-size:13px;overflow-wrap:anywhere;}
+  .ticker-card-pnl,.ticker-card-div{line-height:1.3;overflow-wrap:anywhere;}
+  .chart-card{padding:14px;}
+  .chart-header{align-items:flex-start;gap:10px;}
+  .chart-period-tabs{flex-wrap:wrap;justify-content:flex-end;}
+  .chart-total{font-size:12px;overflow-wrap:anywhere;}
+  .chart-stats{gap:6px;}
+  .chart-stat-val{font-size:11px;overflow-wrap:anywhere;}
+  .modal-box,.picker-box,.calc-box,.settings-box,.paywall-box,.diag-box,.history-box,.stock-detail-box{
+    max-height:calc(100dvh - env(safe-area-inset-top) - 10px);
+    padding-left:16px;
+    padding-right:16px;
+    padding-bottom:calc(28px + env(safe-area-inset-bottom));
+    border-radius:20px 20px 0 0;
+  }
+  .paywall-box{padding-top:22px;}
+  .paywall-title{font-size:20px;}
+  .paywall-sub{font-size:10px;line-height:1.55;}
+  .paywall-feature{padding:10px 12px;}
+  .paywall-feature-text{font-size:12px;line-height:1.35;}
+  .paywall-feature-sub{font-size:9px;line-height:1.35;}
+  .price-cards{grid-template-columns:1fr 1fr;gap:8px;}
+  .price-amount{font-size:23px;}
+  .price-label{font-size:8px;}
+  .price-note{font-size:8px;}
+  .settings-currency-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .settings-curr-btn{min-height:38px;}
+  .picker-grid{gap:8px;}
+  .picker-item{padding:12px 8px;}
+  .picker-item-name{font-size:12px;}
+  .picker-item-desc{font-size:8px;line-height:1.35;}
+  .emoji-grid{grid-template-columns:repeat(6,1fr);}
+  .diag-stat-grid{gap:8px;}
+  .diag-stat{padding:12px 8px;min-width:0;}
+  .diag-stat-val{font-size:15px;overflow-wrap:anywhere;}
+  .diag-stat-lbl{font-size:8px;letter-spacing:.06em;line-height:1.35;}
+  .diag-history-btn{min-height:70px;padding:10px;}
+  .liab-card-header{padding:13px 14px;gap:10px;}
+  .liab-stats-grid,.startup-stat-grid,.stock-detail-grid{grid-template-columns:1fr 1fr;gap:7px;}
+  .liab-stat-box,.stock-detail-stat{padding:10px 8px;min-width:0;}
+  .stock-detail-title{font-size:16px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .stock-detail-stat-val{font-size:13px;overflow-wrap:anywhere;}
+  .trial-overlay{padding:calc(18px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom));}
+  .trial-days{font-size:44px;}
+}
+
+@media (max-width:360px){
+  .cards,.chart-section,.liab-section,.add-section-wrap{padding-left:10px;padding-right:10px;}
+  .deposits-swipe-wrap{margin-left:10px;margin-right:10px;}
+  .card-header{padding-left:12px;padding-right:12px;}
+  .card-inner{padding-left:12px;padding-right:12px;}
+  .ticker-cards{grid-template-columns:1fr;}
+  .price-cards{grid-template-columns:1fr;}
+  .diag-stat-grid,.liab-stats-grid,.startup-stat-grid,.stock-detail-grid{grid-template-columns:1fr;}
+  .settings-currency-row{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -975,47 +1093,39 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <div class="paywall-overlay" id="paywallOverlay" onclick="closePaywallIfOutside(event)">
   <div class="paywall-box">
     <div class="paywall-crown">👑</div>
-    <div class="paywall-title" id="pw_title">Капітал PRO</div>
-    <div class="paywall-sub" id="pw_sub">Розблокуйте всі можливості</div>
+    <div class="paywall-title" id="pw_title">30 днів безкоштовно</div>
+    <div class="paywall-sub" id="pw_sub">Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.</div>
     <div class="paywall-features">
       <div class="paywall-feature">
-        <div class="paywall-feature-icon">📈</div>
-        <div><div class="paywall-feature-text" id="pw_f1">Онлайн статистика акцій</div><div class="paywall-feature-sub" id="pw_f1sub">Живі ціни, дивіденди, P&L в реальному часі</div></div>
-      </div>
-      <div class="paywall-feature">
-        <div class="paywall-feature-icon">🏦</div>
-        <div><div class="paywall-feature-text" id="pw_f2">До 3 депозитів</div><div class="paywall-feature-sub" id="pw_f2sub">Відстежуйте всі вклади</div></div>
+        <div class="paywall-feature-icon">🎁</div>
+        <div><div class="paywall-feature-text" id="pw_b1">30 днів безкоштовної версії</div><div class="paywall-feature-sub" id="pw_b1sub">Без обмежень під час пробного періоду</div></div>
       </div>
       <div class="paywall-feature">
         <div class="paywall-feature-icon">📊</div>
-        <div><div class="paywall-feature-text" id="pw_f3">Необмежені розділи</div><div class="paywall-feature-sub" id="pw_f3sub">Власні категорії активів</div></div>
+        <div><div class="paywall-feature-text" id="pw_b2">Контроль усіх активів в одному місці</div><div class="paywall-feature-sub" id="pw_b2sub">Депозити, валюта, крипто, акції, кредити та метали</div></div>
       </div>
       <div class="paywall-feature">
-        <div class="paywall-feature-icon">📉</div>
-        <div><div class="paywall-feature-text" id="pw_f4">Графік динаміки капіталу</div><div class="paywall-feature-sub" id="pw_f4sub">Щоденна історія зростання активів</div></div>
-      </div>
-      <div class="paywall-feature">
-        <div class="paywall-feature-icon">📄</div>
-        <div><div class="paywall-feature-text" id="pw_f5">Експорт PDF</div><div class="paywall-feature-sub" id="pw_f5sub">Повний звіт по всіх активах</div></div>
+        <div class="paywall-feature-icon">🔒</div>
+        <div><div class="paywall-feature-text" id="pw_b3">Локальне збереження даних</div><div class="paywall-feature-sub" id="pw_b3sub">Ваші фінансові дані залишаються на пристрої</div></div>
       </div>
     </div>
-    <div class="paywall-prices" style="display:flex;gap:10px;margin:16px 0;">
-      <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;">Місяць</div>
-        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$2.99</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">/ місяць</div>
+    <div class="price-cards">
+      <div class="price-card">
+        <div class="price-period">Місяць</div>
+        <div class="price-value">$2.99</div>
+        <div class="price-sub">на місяць</div>
       </div>
-      <div style="flex:1;background:linear-gradient(135deg,#4ecb8d10,#2dd4bf10);border:2px solid var(--green);border-radius:14px;padding:14px;text-align:center;position:relative;">
-        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--green);color:#0a0a0f;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;">ВИГІДНО</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;">Рік</div>
-        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0;">$24.99</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);">економія 30%</div>
+      <div class="price-card featured">
+        <div class="price-badge">ВИГІДНО</div>
+        <div class="price-period">Рік</div>
+        <div class="price-value">$24.99</div>
+        <div class="price-sub">на рік · економія 30%</div>
       </div>
     </div>
-    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;margin-bottom:12px;">🎁 Перші 7 днів — безкоштовно</div>
-    <button class="paywall-btn" id="pw_btn" onclick="activatePro()">✨ Підключити PRO</button>
+    <div class="price-note">Після 30 днів можна обрати зручний тариф</div>
+    <button class="paywall-btn" id="pw_btn" onclick="activatePro()">Почати 30 днів безкоштовно</button>
     <button class="paywall-restore" id="pw_restore" onclick="restorePurchase()">Відновити покупку</button>
-    <button class="paywall-close" id="pw_close" onclick="closePaywall()">Не зараз</button>
+    <button class="paywall-close" id="pw_close" onclick="closePaywall()">Продовжити без підписки</button>
   </div>
 </div>
 
@@ -1175,6 +1285,10 @@ select.field-input option{background:var(--bg3);color:var(--text);}
       <input type="file" id="backupFileInput" accept=".json" style="display:none" onchange="handleBackupFile(this)">
       </div>
       <div id="devTrialInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
+      <div class="app-version-card">
+        <span class="app-version-label" id="appVersionLabel">Версія застосунку</span>
+        <span class="app-version-value" id="appVersionValue">v0.0.21</span>
+      </div>
     </div>
   </div>
 </div>
@@ -1289,7 +1403,7 @@ select.field-input option{background:var(--bg3);color:var(--text);}
   </div>
 </div>
 
-<div class="footer" data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</div>
+<div class="footer"><span data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</span><span id="footerVersion"> · v0.0.21</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -1317,45 +1431,54 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 <div class="trial-overlay" id="trialOverlay" style="display:none;">
   <div class="trial-box">
     <div class="trial-badge">✦ БЕЗКОШТОВНИЙ ДОСТУП</div>
-    <div class="trial-days">7</div>
-    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;">днів PRO безкоштовно</div>
-    <div class="trial-text">Спробуйте всі можливості Капітал PRO<br>без обмежень протягом 7 днів</div>
+    <div class="trial-days">30</div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;">днів безкоштовно</div>
+    <div class="trial-text">Усі функції доступні без обмежень протягом 30 днів.</div>
+    <div class="price-cards">
+      <div class="price-card">
+        <div class="price-period">Місяць</div>
+        <div class="price-value">$2.99</div>
+        <div class="price-sub">на місяць</div>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">ВИГІДНО</div>
+        <div class="price-period">Рік</div>
+        <div class="price-value">$24.99</div>
+        <div class="price-sub">на рік · економія 30%</div>
+      </div>
+    </div>
+    <div class="price-note">Після 30 днів можна обрати зручний тариф</div>
     <div class="trial-features">
       <div class="trial-feature">
-        <div class="trial-feature-icon" style="background:#4ecb8d18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">📈</div>
-        <div class="trial-feature-text">Онлайн ціни акцій без ліміту</div>
+        <div class="trial-feature-icon" style="background:#4ecb8d18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">📊</div>
+        <div class="trial-feature-text">Контроль усіх активів в одному місці</div>
       </div>
       <div class="trial-feature">
-        <div class="trial-feature-icon" style="background:#60a5fa18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">🏦</div>
-        <div class="trial-feature-text">До 3 депозитів одночасно</div>
+        <div class="trial-feature-icon" style="background:#60a5fa18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">⚡</div>
+        <div class="trial-feature-text">Швидка аналітика доходів, боргів і динаміки капіталу</div>
       </div>
       <div class="trial-feature">
-        <div class="trial-feature-icon" style="background:#a78bfa18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">🪙</div>
-        <div class="trial-feature-text">Онлайн моніторинг криптовалют</div>
-      </div>
-      <div class="trial-feature">
-        <div class="trial-feature-icon" style="background:#2dd4bf18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">🚀</div>
-        <div class="trial-feature-text">Моніторинг стартапів</div>
-      </div>
-      <div class="trial-feature">
-        <div class="trial-feature-icon" style="background:#f59e0b18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">📄</div>
-        <div class="trial-feature-text">Експорт PDF звітів</div>
+        <div class="trial-feature-icon" style="background:#a78bfa18;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;">🔒</div>
+        <div class="trial-feature-text">Дані зберігаються локально на вашому пристрої</div>
       </div>
     </div>
     <button onclick="startTrial()" style="width:100%;background:linear-gradient(135deg,var(--green),var(--teal));border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;">
-      Почати пробний період →
+      Почати 30 днів безкоштовно →
     </button>
     <button onclick="skipTrial()" style="width:100%;background:transparent;border:none;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;">
-      Продовжити з обмеженнями
+      Продовжити без підписки
     </button>
   </div>
-</div>
 </div>
 
 <script>
 
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
+const APP_VERSION = 'v0.0.21';
+const APP_BUILD_DATE = '2026-05-26';
+const TRIAL_DAYS = 30;
+const FREE_LIMITS = { deposits:Infinity, stockItems:Infinity, customSections:Infinity, stockSections:Infinity };
 let isPro = localStorage.getItem('kapital_pro') === 'true';
 // Early trial check — must run before any rendering
 (function earlyTrialCheck(){
@@ -1363,19 +1486,18 @@ let isPro = localStorage.getItem('kapital_pro') === 'true';
     const trialStart=localStorage.getItem('trial_start');
     if(trialStart){
       const elapsed=Date.now()-parseInt(trialStart);
-      const daysLeft=Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+      const daysLeft=Math.max(0, TRIAL_DAYS - Math.floor(elapsed/(1000*60*60*24)));
       if(daysLeft<=0){isPro=false;localStorage.removeItem('kapital_pro');}
     }
   } else {
     const trialStart=localStorage.getItem('trial_start');
     if(trialStart){
       const elapsed=Date.now()-parseInt(trialStart);
-      const daysLeft=Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+      const daysLeft=Math.max(0, TRIAL_DAYS - Math.floor(elapsed/(1000*60*60*24)));
       if(daysLeft>0){isPro=true;}
     }
   }
 })();
-const FREE_LIMITS = { deposits:1, stockItems:3, customSections:1, stockSections:1 };
 let displayCurrency = localStorage.getItem('display_currency') || 'uah';
 let liabilities = [];
 let showNetCapital = true;
@@ -1429,7 +1551,7 @@ const LANGS={
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'Капітал PRO',pwSub:'Розблокуйте всі можливості',pwF1:'Онлайн статистика акцій',pwF1sub:'Живі ціни, дивіденди, P&L в реальному часі',pwF2:'До 3 депозитів',pwF2sub:'Відстежуйте всі вклади',pwF3:'Необмежені розділи',pwF3sub:'Власні категорії активів',pwF4:'Графік динаміки капіталу',pwF4sub:'Щоденна історія зростання активів',pwF5:'Експорт PDF',pwF5sub:'Повний звіт по всіх активах',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'✨ Підключити PRO',pwRestore:'Відновити покупку',pwClose:'Не зараз',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Ваші фінансові дані залишаються на пристрої',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',pwClose:'Продовжити без підписки',
     secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'💰 Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
@@ -1470,7 +1592,7 @@ const LANGS={
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'Капитал PRO',pwSub:'Разблокируйте все возможности',pwF1:'Онлайн статистика акций',pwF1sub:'Живые цены, дивиденды, P&L в реальном времени',pwF2:'До 3 депозитов',pwF2sub:'Отслеживайте все вклады',pwF3:'Неограниченные разделы',pwF3sub:'Собственные категории активов',pwF4:'График динамики капитала',pwF4sub:'Ежедневная история роста активов',pwF5:'Экспорт PDF',pwF5sub:'Полный отчёт по всем активам',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'✨ Подключить PRO',pwRestore:'Восстановить покупку',pwClose:'Не сейчас',
+    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Ваши финансовые данные остаются на устройстве',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',pwClose:'Продолжить без подписки',
     secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'💰 Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
@@ -1511,7 +1633,7 @@ const LANGS={
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'Capital PRO',pwSub:'Unlock all features',pwF1:'Live stock statistics',pwF1sub:'Real-time prices, dividends & P&L',pwF2:'Up to 3 deposits',pwF2sub:'Track all your deposits',pwF3:'Unlimited sections',pwF3sub:'Custom asset categories',pwF4:'Capital growth chart',pwF4sub:'Daily asset growth history',pwF5:'PDF Export',pwF5sub:'Full report on all assets',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'✨ Subscribe PRO',pwRestore:'Restore purchase',pwClose:'Not now',
+    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your financial data stays on your device',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',pwClose:'Continue without subscription',
     secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'💰 Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
@@ -1519,7 +1641,7 @@ const LANGS={
     liveCnt:'Live-Zähler',addDeposit:'+ Einlage',deleteDep:'Einlage löschen?',maxDep:'Max. 3 Einlagen',
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
-    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'Kapital PRO',pwSub:'Alle Funktionen freischalten',pwF1:'Live-Aktienstatistiken',pwF1sub:'Echtzeit-Preise, Dividenden & P&L',pwF2:'Bis zu 3 Einlagen',pwF2sub:'Alle Einlagen verwalten',pwF3:'Unbegrenzte Abschnitte',pwF3sub:'Eigene Asset-Kategorien',pwF4:'Kapitalwachstumsdiagramm',pwF4sub:'Tägliche Vermögenswachstumsgeschichte',pwF5:'PDF-Export',pwF5sub:'Vollständiger Vermögensbericht',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'✨ PRO abonnieren',pwRestore:'Kauf wiederherstellen',pwClose:'Nicht jetzt',
+    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfügbar. Wählen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschränkungen während der Testphase',pwB2:'Alle Vermögenswerte an einem Ort',pwB2sub:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerät',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',pwClose:'Ohne Abo fortfahren',
     secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
     cryptoName:'Krypto · USDT',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
@@ -1540,7 +1662,7 @@ const LANGS={
     liabTotalDebt:'Gesamtschuld',liabExtraPayment:'Bei Zahlung +X/Monat',liabSaveMonths:'Monate gespart',
     liabAddBtn:'Hinzufügen',liabDeleteBtn:'Kredit löschen',
     topupBtn:'+ Einzahlen',topupTitle:'Einlagenaufstockung',topupAmount:'Aufstockungsbetrag',topupDate:'Aufstockungsdatum',topupAdd:'Aufstockung hinzufügen',topupHistory:'Aufstockungsverlauf',topupTotal:'Gesamt aufgestockt',topupDelete:'Löschen',depSettings:'⚙ Einlageneinstellungen',depPrincipalLbl:'Einlagenbetrag (₴)',depStart:'Eröffnungsdatum',depEnd:'Enddatum',
-    rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
+    rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxPct:'Steuer (%)',taxFree:'Steuerfrei (€)',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
     monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
     compCalc:'⚡ Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
     finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',
@@ -1560,7 +1682,7 @@ const LANGS={
     liveCnt:'实时计数器',addDeposit:'+ 存款',deleteDep:'删除存款?',maxDep:'最多3个存款',
     deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
     stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
-    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'资本 PRO',pwSub:'解锁所有功能',pwF1:'实时股票统计',pwF1sub:'实时价格、股息和P&L',pwF2:'最多3个存款',pwF2sub:'跟踪所有存款',pwF3:'无限部分',pwF3sub:'自定义资产类别',pwF4:'资本增长图表',pwF4sub:'每日资产增长历史',pwF5:'PDF导出',pwF5sub:'完整资产报告',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'✨ 订阅 PRO',pwRestore:'恢复购买',pwClose:'暂不',
+    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'免费使用 30 天',pwSub:'从第一天起即可使用全部功能。试用期结束后，选择适合您的方案。',pwB1:'30 天免费版',pwB1sub:'试用期间不受限制',pwB2:'在一个地方管理所有资产',pwB2sub:'存款、货币、加密货币、股票、贷款和贵金属',pwB3:'本地数据存储',pwB3sub:'您的财务数据保留在设备上',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'开始 30 天免费使用',pwRestore:'恢复购买',pwClose:'不订阅继续使用',
     secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
     cryptoName:'加密货币 · USDT',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
@@ -1581,7 +1703,7 @@ const LANGS={
     liabTotalDebt:'总债务',liabExtraPayment:'若每月多付+X',liabSaveMonths:'节省月数',
     liabAddBtn:'添加',liabDeleteBtn:'删除贷款',
     topupBtn:'+ 追加',topupTitle:'追加存款',topupAmount:'追加金额',topupDate:'追加日期',topupAdd:'添加追加',topupHistory:'追加历史',topupTotal:'共追加',topupDelete:'删除',depSettings:'⚙ 存款设置',depPrincipalLbl:'存款金额 (₴)',depStart:'开始日期',depEnd:'结束日期',
-    rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
+    rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxPct:'税率 (%)',taxFree:'免税额 (¥)',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
     monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
     compCalc:'⚡ 复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
     finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',
@@ -1597,8 +1719,252 @@ const LANGS={
     confirmDeleteCard:'删除此区块？数据将丢失。',yield:'⚡ 收益',
   },
 };
+
+// ── AUTO I18N FOR STATIC / DYNAMIC UI TEXT ─────────────────
+const EXTRA_I18N={
+      'Історія графіка':{uk:'Історія графіка',ru:'История графика',en:'Chart history',de:'Diagrammverlauf',zh:'图表历史'},
+  'записів':{uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'},
+'на місяць':{uk:'на місяць',ru:'в месяц',en:'per month',de:'pro Monat',zh:'每月'},
+  'на рік · економія 30%':{uk:'на рік · економія 30%',ru:'в год · экономия 30%',en:'per year · save 30%',de:'pro Jahr · 30% sparen',zh:'每年 · 节省 30%'},
+  'Після 30 днів можна обрати зручний тариф':{uk:'Після 30 днів можна обрати зручний тариф',ru:'После 30 дней можно выбрать удобный тариф',en:'After 30 days, choose the plan that suits you',de:'Nach 30 Tagen wählen Sie den passenden Tarif',zh:'30 天后可选择适合您的方案'},
+'Капітал':{uk:'Капітал',ru:'Капитал',en:'Capital',de:'Kapital',zh:'资本'},
+  '📉 ДИНАМІКА КАПІТАЛУ':{uk:'📉 ДИНАМІКА КАПІТАЛУ',ru:'📉 ДИНАМИКА КАПИТАЛА',en:'📉 CAPITAL DYNAMICS',de:'📉 KAPITALENTWICKLUNG',zh:'📉 资本动态'},
+  'Мін':{uk:'Мін',ru:'Мин',en:'Min',de:'Min.',zh:'最低'},
+  'Макс':{uk:'Макс',ru:'Макс',en:'Max',de:'Max.',zh:'最高'},
+  'Зміна':{uk:'Зміна',ru:'Изменение',en:'Change',de:'Änderung',zh:'变化'},
+  'Зростання':{uk:'Зростання',ru:'Рост',en:'Growth',de:'Wachstum',zh:'增长'},
+  'Онлайн ціни':{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
+  '⟳ Оновити':{uk:'⟳ Оновити',ru:'⟳ Обновить',en:'⟳ Refresh',de:'⟳ Aktualisieren',zh:'⟳ 刷新'},
+  '⟳ Оновити курси онлайн':{uk:'⟳ Оновити курси онлайн',ru:'⟳ Обновить курсы онлайн',en:'⟳ Refresh online rates',de:'⟳ Online-Kurse aktualisieren',zh:'⟳ 刷新在线汇率'},
+  '🔍 Отримати ціну':{uk:'🔍 Отримати ціну',ru:'🔍 Получить цену',en:'🔍 Get price',de:'🔍 Preis abrufen',zh:'🔍 获取价格'},
+  '➕ Новий розділ':{uk:'➕ Новий розділ',ru:'➕ Новый раздел',en:'➕ New section',de:'➕ Neuer Bereich',zh:'➕ 新建分区'},
+  'Стартап':{uk:'Стартап',ru:'Стартап',en:'Startup',de:'Startup',zh:'初创项目'},
+  'Вкладення в стартап':{uk:'Вкладення в стартап',ru:'Вложения в стартап',en:'Startup investment',de:'Startup-Investition',zh:'初创项目投资'},
+  'Готівка':{uk:'Готівка',ru:'Наличные',en:'Cash',de:'Bargeld',zh:'现金'},
+  'Готівкові кошти у валюті':{uk:'Готівкові кошти у валюті',ru:'Наличные средства в валюте',en:'Cash in foreign currency',de:'Bargeld in Fremdwährung',zh:'外币现金'},
+  'Місяць':{uk:'Місяць',ru:'Месяц',en:'Month',de:'Monat',zh:'月'},
+  'Рік':{uk:'Рік',ru:'Год',en:'Year',de:'Jahr',zh:'年'},
+  '/ місяць':{uk:'/ місяць',ru:'/ месяц',en:'/ month',de:'/ Monat',zh:'/ 月'},
+  'економія 30%':{uk:'економія 30%',ru:'экономия 30%',en:'save 30%',de:'30% sparen',zh:'节省 30%'},
+  'ВИГІДНО':{uk:'ВИГІДНО',ru:'ВЫГОДНО',en:'BEST VALUE',de:'GÜNSTIG',zh:'划算'},
+  'Після 30 днів: $2.99/місяць або $24.99/рік':{uk:'Після 30 днів: $2.99/місяць або $24.99/рік',ru:'После 30 дней: $2.99/месяц или $24.99/год',en:'After 30 days: $2.99/month or $24.99/year',de:'Nach 30 Tagen: $2.99/Monat oder $24.99/Jahr',zh:'30 天后：$2.99/月或 $24.99/年'},
+  'днів безкоштовно':{uk:'днів безкоштовно',ru:'дней бесплатно',en:'days free',de:'Tage kostenlos',zh:'天免费'},
+  'Усі функції доступні без обмежень протягом 30 днів.':{uk:'Усі функції доступні без обмежень протягом 30 днів.',ru:'Все функции доступны без ограничений в течение 30 дней.',en:'All features are available without limits for 30 days.',de:'Alle Funktionen sind 30 Tage lang ohne Einschränkungen verfügbar.',zh:'所有功能可无限制使用 30 天。'},
+  'Після пробного періоду: $2.99/місяць або $24.99/рік.':{uk:'Після пробного періоду: $2.99/місяць або $24.99/рік.',ru:'После пробного периода: $2.99/месяц или $24.99/год.',en:'After the trial: $2.99/month or $24.99/year.',de:'Nach der Testphase: $2.99/Monat oder $24.99/Jahr.',zh:'试用期后：$2.99/月或 $24.99/年。'},
+  'Контроль усіх активів в одному місці':{uk:'Контроль усіх активів в одному місці',ru:'Контроль всех активов в одном месте',en:'All assets in one place',de:'Alle Vermögenswerte an einem Ort',zh:'在一个地方管理所有资产'},
+  'Депозити, валюта, крипто, акції, кредити та метали':{uk:'Депозити, валюта, крипто, акції, кредити та метали',ru:'Депозиты, валюта, крипто, акции, кредиты и металлы',en:'Deposits, currency, crypto, stocks, loans and metals',de:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',zh:'存款、货币、加密货币、股票、贷款和贵金属'},
+  'Локальне збереження даних':{uk:'Локальне збереження даних',ru:'Локальное хранение данных',en:'Local data storage',de:'Lokale Datenspeicherung',zh:'本地数据存储'},
+  'Ваші фінансові дані залишаються на пристрої':{uk:'Ваші фінансові дані залишаються на пристрої',ru:'Ваши финансовые данные остаются на устройстве',en:'Your financial data stays on your device',de:'Ihre Finanzdaten bleiben auf Ihrem Gerät',zh:'您的财务数据保留在设备上'},
+  'Швидка аналітика доходів, боргів і динаміки капіталу':{uk:'Швидка аналітика доходів, боргів і динаміки капіталу',ru:'Быстрая аналитика доходов, долгов и динамики капитала',en:'Fast analytics for income, debt and capital dynamics',de:'Schnelle Analyse von Einnahmen, Schulden und Kapitalentwicklung',zh:'快速分析收入、债务和资本变化'},
+  'Дані зберігаються локально на вашому пристрої':{uk:'Дані зберігаються локально на вашому пристрої',ru:'Данные хранятся локально на вашем устройстве',en:'Data is stored locally on your device',de:'Daten werden lokal auf Ihrem Gerät gespeichert',zh:'数据本地保存在您的设备上'},
+  'Почати 30 днів безкоштовно →':{uk:'Почати 30 днів безкоштовно →',ru:'Начать 30 дней бесплатно →',en:'Start 30 days free →',de:'30 Tage kostenlos starten →',zh:'开始 30 天免费使用 →'},
+  'Продовжити без підписки':{uk:'Продовжити без підписки',ru:'Продолжить без подписки',en:'Continue without subscription',de:'Ohne Abo fortfahren',zh:'不订阅继续使用'},
+'Мова / Language':{uk:'Мова / Language',ru:'Язык / Language',en:'Language',de:'Sprache / Language',zh:'语言 / Language'},
+  'Відображення суми':{uk:'Відображення суми',ru:'Отображение суммы',en:'Display currency',de:'Anzeigewährung',zh:'显示货币'},
+  '🛠 Розробник':{uk:'🛠 Розробник',ru:'🛠 Разработчик',en:'🛠 Developer',de:'🛠 Entwickler',zh:'🛠 开发者'},
+  'Статус:':{uk:'Статус:',ru:'Статус:',en:'Status:',de:'Status:',zh:'状态：'},
+  '👑 PRO ON':{uk:'👑 PRO ON',ru:'👑 PRO ВКЛ',en:'👑 PRO ON',de:'👑 PRO AN',zh:'👑 PRO 开'},
+  '🔒 FREE':{uk:'🔒 FREE',ru:'🔒 FREE',en:'🔒 FREE',de:'🔒 FREE',zh:'🔒 免费'},
+  '↺ Скинути тріал':{uk:'↺ Скинути тріал',ru:'↺ Сбросить триал',en:'↺ Reset trial',de:'↺ Testversion zurücksetzen',zh:'↺ 重置试用'},
+  '🗑 Скинути все дані':{uk:'🗑 Скинути все дані',ru:'🗑 Сбросить все данные',en:'🗑 Reset all data',de:'🗑 Alle Daten löschen',zh:'🗑 重置所有数据'},
+  '💾 РЕЗЕРВНЕ КОПІЮВАННЯ':{uk:'💾 РЕЗЕРВНЕ КОПІЮВАННЯ',ru:'💾 РЕЗЕРВНОЕ КОПИРОВАНИЕ',en:'💾 BACKUP',de:'💾 SICHERUNG',zh:'💾 备份'},
+  '📤 Експорт даних':{uk:'📤 Експорт даних',ru:'📤 Экспорт данных',en:'📤 Export data',de:'📤 Daten exportieren',zh:'📤 导出数据'},
+  '📥 Імпорт даних':{uk:'📥 Імпорт даних',ru:'📥 Импорт данных',en:'📥 Import data',de:'📥 Daten importieren',zh:'📥 导入数据'},
+  '+ Поповнити депозит':{uk:'+ Поповнити депозит',ru:'+ Пополнить депозит',en:'+ Add deposit top-up',de:'+ Einzahlung hinzufügen',zh:'+ 添加存款补充'},
+  'Сума поповнення (₴)':{uk:'Сума поповнення (₴)',ru:'Сумма пополнения (₴)',en:'Top-up amount (₴)',de:'Einzahlungsbetrag (₴)',zh:'补充金额 (₴)'},
+  'Дата поповнення':{uk:'Дата поповнення',ru:'Дата пополнения',en:'Top-up date',de:'Einzahlungsdatum',zh:'补充日期'},
+  'Додати поповнення':{uk:'Додати поповнення',ru:'Добавить пополнение',en:'Add top-up',de:'Einzahlung hinzufügen',zh:'添加补充'},
+  "Зобов'язання / Кредит":{uk:"Зобов'язання / Кредит",ru:'Обязательство / Кредит',en:'Liability / Loan',de:'Verbindlichkeit / Kredit',zh:'负债 / 贷款'},
+  "⚠️ ЗОБОВ'ЯЗАННЯ":{uk:"⚠️ ЗОБОВ'ЯЗАННЯ",ru:'⚠️ ОБЯЗАТЕЛЬСТВА',en:'⚠️ LIABILITIES',de:'⚠️ VERBINDLICHKEITEN',zh:'⚠️ 负债'},
+  'Нетто':{uk:'Нетто',ru:'Нетто',en:'Net',de:'Netto',zh:'净值'},
+  '+ Кредит':{uk:'+ Кредит',ru:'+ Кредит',en:'+ Loan',de:'+ Kredit',zh:'+ 贷款'},
+  'НЕТТО-КАПІТАЛ':{uk:'НЕТТО-КАПІТАЛ',ru:'НЕТТО-КАПИТАЛ',en:'NET CAPITAL',de:'NETTOKAPITAL',zh:'净资本'},
+  'ЗАГАЛЬНИЙ БОРГ':{uk:'ЗАГАЛЬНИЙ БОРГ',ru:'ОБЩИЙ ДОЛГ',en:'TOTAL DEBT',de:'GESAMTSCHULD',zh:'总债务'},
+  'Додати ще кредит / іпотеку':{uk:'Додати ще кредит / іпотеку',ru:'Добавить ещё кредит / ипотеку',en:'Add another loan / mortgage',de:'Weiteren Kredit / Hypothek hinzufügen',zh:'添加贷款 / 按揭'},
+  '➕ Новий кредит':{uk:'➕ Новий кредит',ru:'➕ Новый кредит',en:'➕ New loan',de:'➕ Neuer Kredit',zh:'➕ 新贷款'},
+  'Сума боргу (₴)':{uk:'Сума боргу (₴)',ru:'Сумма долга (₴)',en:'Debt amount (₴)',de:'Schuldbetrag (₴)',zh:'债务金额 (₴)'},
+  'Ставка (%/рік)':{uk:'Ставка (%/рік)',ru:'Ставка (%/год)',en:'Rate (%/year)',de:'Zins (%/Jahr)',zh:'利率 (%/年)'},
+  'Термін (місяців)':{uk:'Термін (місяців)',ru:'Срок (месяцев)',en:'Term (months)',de:'Laufzeit (Monate)',zh:'期限（月）'},
+  'Дата відкриття':{uk:'Дата відкриття',ru:'Дата открытия',en:'Start date',de:'Startdatum',zh:'开始日期'},
+  'Додати':{uk:'Додати',ru:'Добавить',en:'Add',de:'Hinzufügen',zh:'添加'},
+  '💳 Часткове погашення':{uk:'💳 Часткове погашення',ru:'💳 Частичное погашение',en:'💳 Partial repayment',de:'💳 Teilrückzahlung',zh:'💳 部分还款'},
+  'Сума платежу (₴)':{uk:'Сума платежу (₴)',ru:'Сумма платежа (₴)',en:'Payment amount (₴)',de:'Zahlungsbetrag (₴)',zh:'付款金额 (₴)'},
+  'Дата':{uk:'Дата',ru:'Дата',en:'Date',de:'Datum',zh:'日期'},
+  'Погасити':{uk:'Погасити',ru:'Погасить',en:'Repay',de:'Tilgen',zh:'还款'},
+  '📊 Діагностика капіталу':{uk:'📊 Діагностика капіталу',ru:'📊 Диагностика капитала',en:'📊 Capital diagnostics',de:'📊 Kapitaldiagnose',zh:'📊 资本诊断'},
+  '✦ БЕЗКОШТОВНИЙ ДОСТУП':{uk:'✦ БЕЗКОШТОВНИЙ ДОСТУП',ru:'✦ БЕСПЛАТНЫЙ ДОСТУП',en:'✦ FREE ACCESS',de:'✦ KOSTENLOSER ZUGANG',zh:'✦ 免费访问'},
+  '📅 Прогноз/місяць':{uk:'📅 Прогноз/місяць',ru:'📅 Прогноз/месяц',en:'📅 Forecast/month',de:'📅 Prognose/Monat',zh:'📅 预测/月'},
+  '💰 Проценти':{uk:'💰 Проценти',ru:'💰 Проценты',en:'💰 Interest',de:'💰 Zinsen',zh:'💰 利息'},
+  '⚠ Невірна дата':{uk:'⚠ Невірна дата',ru:'⚠ Неверная дата',en:'⚠ Invalid date',de:'⚠ Ungültiges Datum',zh:'⚠ 日期无效'},
+  '💰 Виплата процентів':{uk:'💰 Виплата процентів',ru:'💰 Выплата процентов',en:'💰 Interest payout',de:'💰 Zinsauszahlung',zh:'💰 利息支付'},
+  '→ Капіталізація (на тіло)':{uk:'→ Капіталізація (на тіло)',ru:'→ Капитализация (в тело)',en:'→ Capitalize into principal',de:'→ Zum Kapital hinzufügen',zh:'→ 计入本金'},
+  '→ На окремий рахунок':{uk:'→ На окремий рахунок',ru:'→ На отдельный счёт',en:'→ To separate account',de:'→ Auf separates Konto',zh:'→ 到单独账户'},
+  'Моніторинг почнеться завтра':{uk:'Моніторинг почнеться завтра',ru:'Мониторинг начнётся завтра',en:'Monitoring starts tomorrow',de:'Überwachung startet morgen',zh:'监控明天开始'},
+  'Ввести вручну':{uk:'Ввести вручну',ru:'Ввести вручную',en:'Enter manually',de:'Manuell eingeben',zh:'手动输入'},
+  '— Дивіденди не виплачуються':{uk:'— Дивіденди не виплачуються',ru:'— Дивиденды не выплачиваются',en:'— No dividends paid',de:'— Keine Dividenden',zh:'— 不支付股息'},
+  '❌ Помилка':{uk:'❌ Помилка',ru:'❌ Ошибка',en:'❌ Error',de:'❌ Fehler',zh:'❌ 错误'},
+  '📈 Купівля':{uk:'📈 Купівля',ru:'📈 Покупка',en:'📈 Buy',de:'📈 Kauf',zh:'📈 买入'},
+  '📉 Продаж':{uk:'📉 Продаж',ru:'📉 Продажа',en:'📉 Sell',de:'📉 Verkauf',zh:'📉 卖出'},
+  'Ціна купівлі (₴)':{uk:'Ціна купівлі (₴)',ru:'Цена покупки (₴)',en:'Buy price (₴)',de:'Kaufpreis (₴)',zh:'买入价 (₴)'},
+  'Ціна':{uk:'Ціна',ru:'Цена',en:'Price',de:'Preis',zh:'价格'},
+  'Кількість':{uk:'Кількість',ru:'Количество',en:'Quantity',de:'Menge',zh:'数量'},
+  'Вартість':{uk:'Вартість',ru:'Стоимость',en:'Value',de:'Wert',zh:'价值'},
+  'Ø Середня':{uk:'Ø Середня',ru:'Ø Средняя',en:'Ø Average',de:'Ø Durchschnitt',zh:'Ø 平均'},
+  '24h зміна':{uk:'24h зміна',ru:'Изменение 24ч',en:'24h change',de:'24h-Änderung',zh:'24小时变化'},
+  '📉 Підтвердити продаж':{uk:'📉 Підтвердити продаж',ru:'📉 Подтвердить продажу',en:'📉 Confirm sale',de:'📉 Verkauf bestätigen',zh:'📉 确认卖出'},
+  'Підтвердити':{uk:'Підтвердити',ru:'Подтвердить',en:'Confirm',de:'Bestätigen',zh:'确认'},
+  '● Онлайн':{uk:'● Онлайн',ru:'● Онлайн',en:'● Online',de:'● Online',zh:'● 在线'},
+  '● Офлайн':{uk:'● Офлайн',ru:'● Офлайн',en:'● Offline',de:'● Offline',zh:'● 离线'},
+  'Куплено за':{uk:'Куплено за',ru:'Куплено за',en:'Bought for',de:'Gekauft für',zh:'买入成本'},
+  '+ Додати':{uk:'+ Додати',ru:'+ Добавить',en:'+ Add',de:'+ Hinzufügen',zh:'+ 添加'},
+  'Сума боргу':{uk:'Сума боргу',ru:'Сумма долга',en:'Debt amount',de:'Schuldbetrag',zh:'债务金额'},
+  'Вс…':{uk:'Вс…',ru:'Вс…',en:'All…',de:'Alle…',zh:'全部…'},
+  'Без податку':{uk:'Без податку',ru:'Без налога',en:'Tax-free',de:'Steuerfrei',zh:'免税'},
+  '👑 PRO активовано':{uk:'👑 PRO активовано',ru:'👑 PRO активирован',en:'👑 PRO activated',de:'👑 PRO aktiviert',zh:'👑 PRO 已激活'},
+  '🔒 FREE режим':{uk:'🔒 FREE режим',ru:'🔒 FREE режим',en:'🔒 FREE mode',de:'🔒 FREE-Modus',zh:'🔒 免费模式'},
+  'Тріал скинуто. Перезавантажте сторінку щоб побачити вікно тріалу.':{uk:'Тріал скинуто. Перезавантажте сторінку щоб побачити вікно тріалу.',ru:'Триал сброшен. Перезагрузите страницу, чтобы увидеть окно триала.',en:'Trial reset. Reload the page to see the trial window.',de:'Testversion zurückgesetzt. Lade die Seite neu, um das Testfenster zu sehen.',zh:'试用已重置。请刷新页面查看试用窗口。'},
+  'Немає даних для експорту':{uk:'Немає даних для експорту',ru:'Нет данных для экспорта',en:'No data to export',de:'Keine Daten zum Exportieren',zh:'没有可导出的数据'},
+  '❌ Невірний формат файлу':{uk:'❌ Невірний формат файлу',ru:'❌ Неверный формат файла',en:'❌ Invalid file format',de:'❌ Ungültiges Dateiformat',zh:'❌ 文件格式无效'},
+  '✅ Дані імпортовано! Перезавантаження...':{uk:'✅ Дані імпортовано! Перезавантаження...',ru:'✅ Данные импортированы! Перезагрузка...',en:'✅ Data imported! Reloading...',de:'✅ Daten importiert! Neu laden...',zh:'✅ 数据已导入！正在重新加载...'},
+  '⚠️ Видалити ВСІ дані? Це незворотна дія!':{uk:'⚠️ Видалити ВСІ дані? Це незворотна дія!',ru:'⚠️ Удалить ВСЕ данные? Это необратимо!',en:'⚠️ Delete ALL data? This cannot be undone!',de:'⚠️ ALLE Daten löschen? Das kann nicht rückgängig gemacht werden!',zh:'⚠️ 删除所有数据？此操作无法撤销！'},
+  'Тріал: не розпочато':{uk:'Тріал: не розпочато',ru:'Триал: не начат',en:'Trial: not started',de:'Testversion: nicht gestartet',zh:'试用：未开始'},
+  'Депозитів:':{uk:'Депозитів:',ru:'Депозитов:',en:'Deposits:',de:'Einlagen:',zh:'存款：'},
+  'Акцій:':{uk:'Акцій:',ru:'Акций:',en:'Stocks:',de:'Aktien:',zh:'股票：'},
+  'Монет:':{uk:'Монет:',ru:'Монет:',en:'Coins:',de:'Coins:',zh:'币种：'},
+  'Введіть символ монети (BTC, ETH, SOL...)':{uk:'Введіть символ монети (BTC, ETH, SOL...)',ru:'Введите символ монеты (BTC, ETH, SOL...)',en:'Enter coin symbol (BTC, ETH, SOL...)',de:'Coin-Symbol eingeben (BTC, ETH, SOL...)',zh:'输入币种代码 (BTC, ETH, SOL...)'},
+  '⏳ Завантаження...':{uk:'⏳ Завантаження...',ru:'⏳ Загрузка...',en:'⏳ Loading...',de:'⏳ Laden...',zh:'⏳ 加载中...'},
+  '❌ Монету не знайдено':{uk:'❌ Монету не знайдено',ru:'❌ Монета не найдена',en:'❌ Coin not found',de:'❌ Coin nicht gefunden',zh:'❌ 未找到币种'},
+  '❌ Помилка завантаження':{uk:'❌ Помилка завантаження',ru:'❌ Ошибка загрузки',en:'❌ Loading error',de:'❌ Ladefehler',zh:'❌ 加载错误'}
+};
+
+let _autoI18nTextNodes=new WeakMap();
+let _autoI18nObserver=null;
+
+Object.assign(EXTRA_I18N,{
+  'Брутто-капітал':{uk:'Брутто-капітал',ru:'Брутто-капитал',en:'Gross capital',de:'Bruttokapital',zh:'总资产'},
+  'Нетто-капітал':{uk:'Нетто-капітал',ru:'Нетто-капитал',en:'Net capital',de:'Nettokapital',zh:'净资本'},
+  'Борги':{uk:'Борги',ru:'Долги',en:'Debts',de:'Schulden',zh:'债务'},
+  'Дохід/день (деп. після податку)':{uk:'Дохід/день (деп. після податку)',ru:'Доход/день (деп. после налога)',en:'Income/day (deposit after tax)',de:'Einkommen/Tag (Einlage nach Steuer)',zh:'每日收入（存款税后）'},
+  'до податку:':{uk:'до податку:',ru:'до налога:',en:'before tax:',de:'vor Steuer:',zh:'税前：'},
+  'Дивіденди акцій/місяць':{uk:'Дивіденди акцій/місяць',ru:'Дивиденды акций/месяц',en:'Stock dividends/month',de:'Aktiendividenden/Monat',zh:'股票股息/月'},
+  'Загальний пасивний дохід (деп. + дивіденди)':{uk:'Загальний пасивний дохід (деп. + дивіденди)',ru:'Общий пассивный доход (деп. + дивиденды)',en:'Total passive income (deposits + dividends)',de:'Gesamtes passives Einkommen (Einlagen + Dividenden)',zh:'总被动收入（存款 + 股息）'},
+  'Деп:':{uk:'Деп:',ru:'Деп:',en:'Dep:',de:'Einl.:',zh:'存款：'},
+  'Дивід:':{uk:'Дивід:',ru:'Див:',en:'Div:',de:'Div.:',zh:'股息：'},
+  '📅 Статистика за період':{uk:'📅 Статистика за період',ru:'📅 Статистика за период',en:'📅 Period statistics',de:'📅 Zeitraumstatistik',zh:'📅 周期统计'},
+  'Сьогодні':{uk:'Сьогодні',ru:'Сегодня',en:'Today',de:'Heute',zh:'今天'},
+  'За 7 днів':{uk:'За 7 днів',ru:'За 7 дней',en:'Last 7 days',de:'Letzte 7 Tage',zh:'过去 7 天'},
+  'За 30 днів':{uk:'За 30 днів',ru:'За 30 дней',en:'Last 30 days',de:'Letzte 30 Tage',zh:'过去 30 天'},
+  '📊 Розподіл активів':{uk:'📊 Розподіл активів',ru:'📊 Распределение активов',en:'📊 Asset allocation',de:'📊 Vermögensverteilung',zh:'📊 资产分布'},
+  'Депозити':{uk:'Депозити',ru:'Депозиты',en:'Deposits',de:'Einlagen',zh:'存款'},
+  'Крипто':{uk:'Крипто',ru:'Крипто',en:'Crypto',de:'Krypto',zh:'加密资产'},
+  'Валюта':{uk:'Валюта',ru:'Валюта',en:'Currency',de:'Währung',zh:'货币'},
+  'Рахунок':{uk:'Рахунок',ru:'Счёт',en:'Account',de:'Konto',zh:'账户'},
+  'Акції':{uk:'Акції',ru:'Акции',en:'Stocks',de:'Aktien',zh:'股票'},
+  'Метали':{uk:'Метали',ru:'Металлы',en:'Metals',de:'Metalle',zh:'贵金属'},
+  'Інше':{uk:'Інше',ru:'Другое',en:'Other',de:'Sonstiges',zh:'其他'},
+  '📈 Акції — P&L':{uk:'📈 Акції — P&L',ru:'📈 Акции — P&L',en:'📈 Stocks — P&L',de:'📈 Aktien — P&L',zh:'📈 股票 — 盈亏'},
+  'Вартість портфелю':{uk:'Вартість портфелю',ru:'Стоимость портфеля',en:'Portfolio value',de:'Portfoliowert',zh:'投资组合价值'},
+  'Вартість покупки':{uk:'Вартість покупки',ru:'Стоимость покупки',en:'Purchase cost',de:'Kaufwert',zh:'买入成本'},
+  'Прибуток / Збиток':{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'盈利 / 亏损'},
+  '💹 Середня ціна покупки':{uk:'💹 Середня ціна покупки',ru:'💹 Средняя цена покупки',en:'💹 Average purchase price',de:'💹 Durchschnittlicher Kaufpreis',zh:'💹 平均买入价'},
+  '🏛 Податки (депозити)':{uk:'🏛 Податки (депозити)',ru:'🏛 Налоги (депозиты)',en:'🏛 Taxes (deposits)',de:'🏛 Steuern (Einlagen)',zh:'🏛 税费（存款）'},
+  'Депозит':{uk:'Депозит',ru:'Депозит',en:'Deposit',de:'Einlage',zh:'存款'},
+  'Без податку':{uk:'Без податку',ru:'Без налога',en:'Tax-free',de:'Steuerfrei',zh:'免税'},
+  '💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.':{uk:'💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.',ru:'💡 В Украине налог на депозиты: 18% + 1.5% военный сбор = 19.5%. Укажите в настройках депозита.',en:'💡 In Ukraine, deposit tax is 18% + 1.5% military levy = 19.5%. Set it in deposit settings.',de:'💡 In der Ukraine beträgt die Steuer auf Einlagen 18% + 1,5% Militärabgabe = 19,5%. In den Einlageneinstellungen festlegen.',zh:'💡 在乌克兰，存款税为 18% + 1.5% 军费 = 19.5%。请在存款设置中填写。'}
+});
+
+function getAutoI18nMap(){
+  const map={...EXTRA_I18N};
+  Object.entries(LANGS.uk||{}).forEach(([key,ukVal])=>{
+    if(typeof ukVal!=='string'||!ukVal.trim())return;
+    if(map[ukVal])return;
+    const rec={};
+    Object.keys(LANGS).forEach(lang=>rec[lang]=(LANGS[lang]&&LANGS[lang][key])||ukVal);
+    map[ukVal]=rec;
+  });
+  return map;
+}
+function translateAutoValue(src){
+  const map=getAutoI18nMap();
+  const rec=map[src];
+  return rec?(rec[currentLang]||rec.uk||src):null;
+}
+function findAutoSource(value, stored){
+  if(stored)return stored;
+  const map=getAutoI18nMap();
+  if(map[value])return value;
+  const hit=Object.entries(map).find(([,rec])=>Object.values(rec).includes(value));
+  return hit?hit[0]:null;
+}
+function applyAutoTranslations(root=document.body){
+  if(!root)return;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+    acceptNode(node){
+      const p=node.parentElement;
+      if(!p||['SCRIPT','STYLE','TEXTAREA'].includes(p.tagName))return NodeFilter.FILTER_REJECT;
+      if(p.closest('[data-no-auto-i18n]'))return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const textNodes=[];
+  while(walker.nextNode())textNodes.push(walker.currentNode);
+  textNodes.forEach(node=>{
+    const raw=node.nodeValue;
+    const trimmed=raw.trim();
+    if(!trimmed)return;
+    const src=findAutoSource(trimmed,_autoI18nTextNodes.get(node));
+    if(!src)return;
+    const translated=translateAutoValue(src);
+    if(!translated)return;
+    _autoI18nTextNodes.set(node,src);
+    node.nodeValue=raw.replace(trimmed,translated);
+  });
+  const attrs=['placeholder','title','aria-label','value'];
+  const els=(root.nodeType===1?[root,...root.querySelectorAll('*')]:[...document.querySelectorAll('*')]);
+  els.forEach(el=>{
+    if(el.closest&&el.closest('[data-no-auto-i18n]'))return;
+    attrs.forEach(attr=>{
+      if(!el.hasAttribute||!el.hasAttribute(attr))return;
+      if(attr==='value'&&!(el.tagName==='BUTTON'||el.type==='button'||el.type==='submit'))return;
+      const val=el.getAttribute(attr);
+      const dataAttr='autoI18n'+attr.replace(/-([a-z])/g,(_,c)=>c.toUpperCase());
+      const src=findAutoSource((val||'').trim(),el.dataset&&el.dataset[dataAttr]);
+      if(!src)return;
+      const translated=translateAutoValue(src);
+      if(!translated)return;
+      if(el.dataset)el.dataset[dataAttr]=src;
+      el.setAttribute(attr,translated);
+    });
+  });
+}
+function startAutoI18nObserver(){
+  if(_autoI18nObserver||!document.body)return;
+  _autoI18nObserver=new MutationObserver(muts=>{
+    const roots=[];
+    muts.forEach(m=>m.addedNodes&&m.addedNodes.forEach(n=>{if(n.nodeType===1)roots.push(n);}));
+    if(!roots.length)return;
+    requestAnimationFrame(()=>roots.forEach(r=>applyAutoTranslations(r)));
+  });
+  _autoI18nObserver.observe(document.body,{childList:true,subtree:true});
+}
+
 let currentLang='uk';
 function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LANGS['uk'][key]||key;}
+const APP_VERSION_I18N={
+  uk:'Версія застосунку',
+  ru:'Версия приложения',
+  en:'App version',
+  de:'App-Version',
+  zh:'应用版本'
+};
+function updateAppVersionUI(){
+  const label=document.getElementById('appVersionLabel');
+  if(label)label.textContent=APP_VERSION_I18N[currentLang]||APP_VERSION_I18N.uk;
+  const value=document.getElementById('appVersionValue');
+  if(value)value.textContent=APP_VERSION+' · '+APP_BUILD_DATE;
+  const footer=document.getElementById('footerVersion');
+  if(footer)footer.textContent=' · '+APP_VERSION;
+}
 function setLang(lang){
   currentLang=lang;
   // Update old lang-btn if exists (backward compat)
@@ -1622,13 +1988,26 @@ function applyTranslations(){
   renderSecuritiesCards();
   if(typeof renderMetalsCards==='function')renderMetalsCards();
   translateDynamicUI();
+  applyAutoTranslations();
+  updateAppVersionUI();
+  startAutoI18nObserver();
   updateAll();
 }
 
 // ── HELPERS ─────────────────────────────────
 const $=id=>document.getElementById(id);
 const setText=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
-const val=id=>{const e=$(id);return e?parseFloat(e.value)||0:0;};
+const escHtml=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const escAttr=escHtml;
+function parseInputNumber(v){
+  if(typeof v==='number')return Number.isFinite(v)?v:0;
+  const raw=String(v??'').trim().replace(/\s+/g,'').replace(/[^0-9,.-]/g,'');
+  if(!raw)return 0;
+  const normalized=raw.includes(',')&&!raw.includes('.')?raw.replace(',','.') : raw.replace(/,/g,'');
+  const n=parseFloat(normalized);
+  return Number.isFinite(n)?n:0;
+}
+const val=id=>{const e=$(id);return e?parseInputNumber(e.value):0;};
 const sval=id=>{const e=$(id);return e?e.value:'';};
 const fmtN=n=>Math.round(n).toLocaleString('uk-UA');
 const fmtD=(n,d=2)=>n.toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1654,7 +2033,7 @@ function getDepositHtml(dep,idx){
         <div class="live-label-left">
           <span class="live-dot"></span>
           <input class="dep-name-input" style="background:transparent;border:none;padding:0;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;width:130px;"
-            value="${dep.name||''}" placeholder="${lang.depPlaceholder} ${idx+1}"
+            value="${escAttr(dep.name||'')}" placeholder="${escAttr(lang.depPlaceholder)} ${idx+1}"
             oninput="deposits[${idx}].name=this.value;renderDepDots();saveData()" />
         </div>
         ${deposits.length>1?`<button class="dep-delete-btn" onclick="removeDeposit(${idx})">✕</button>`:''}
@@ -1734,7 +2113,7 @@ function getDepositHtml(dep,idx){
           </div>
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:4px;">
             ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
-              <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${new Date(tp.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'})}</span>
+              <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${new Date(tp.date).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'})}</span>
               <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600;">+${fmtN(tp.amount)} ₴</span>
               <button class="rm-btn" onclick="removeTopUp('${dep.id}',${ti})">×</button>
             </div>`).join('')}
@@ -1808,26 +2187,6 @@ function renderDepDots(){
   dots.innerHTML=deposits.map((d,i)=>`<div class="dep-dot${i===currentDepSlide?' active':''}" onclick="goToSlide(${i})"></div>`).join('');
 }
 function goToSlide(idx){
-  // Auto-collapse current deposit before switching to another
-  if(deposits[currentDepSlide]){
-    var depId=deposits[currentDepSlide].id;
-    // Collapse daily log (sync with toggle class)
-    var dailyToggle=document.getElementById('dailyToggle_'+depId);
-    var log=document.getElementById('dailyLog_'+depId);
-    var arrow=document.getElementById('dailyArrow_'+depId);
-    if(dailyToggle && log && !dailyToggle.classList.contains('collapsed')){
-      dailyToggle.classList.add('collapsed');
-      log.style.display='none';
-      if(arrow) arrow.style.transform='rotate(-90deg)';
-    }
-    // Collapse settings (only remove class, never set inline display)
-    var calcToggle=document.getElementById('depCalcToggle_'+depId);
-    var calcBody=document.getElementById('depCalcBody_'+depId);
-    if(calcToggle && calcBody){
-      calcToggle.classList.remove('open');
-      calcBody.classList.remove('open');
-    }
-  }
   currentDepSlide=Math.max(0,Math.min(idx,deposits.length-1));
   updateSlidePosition(); renderDepDots();
 }
@@ -1969,7 +2328,7 @@ function calcLive(depId){
     .map(tp=>{
       const parts=tp.date.split('-');
       const eff=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
-      return {effectiveDate:eff, amount:tp.amount};
+      return {date:tp.date, effectiveDate:eff, amount:tp.amount};
     })
     .filter(tp=>tp.effectiveDate<=now)
     .sort((a,b)=>a.effectiveDate-b.effectiveDate);
@@ -1988,9 +2347,7 @@ function calcLive(depId){
   // Events: 'topup' (effective next day) and 'cap' (capitalization)
   const events=[];
   topups.forEach(tp=>{
-    const effDate=new Date(new Date(tp.date));
-    effDate.setDate(effDate.getDate()+1); // topup effective NEXT day
-    events.push({date:effDate, type:'topup', amount:tp.amount});
+    events.push({date:new Date(tp.effectiveDate), type:'topup', amount:tp.amount});
   });
   capDates.forEach(cd=>{
     events.push({date:new Date(cd), type:'cap', amount:0});
@@ -2075,7 +2432,7 @@ function calcLive(depId){
   setText('livePerMonth_'+depId,'+'+fmtLive(perMonth));
   const lb=$('liveBar_'+depId);
   if(lb)lb.style.width=Math.round(progress*100)+'%';
-  const fmt2=d=>d.toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'});
+  const fmt2=d=>d.toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'});
   setText('liveDateStart_'+depId,fmt2(start));
   setText('liveDatePct_'+depId,Math.round(progress*100)+'%');
   setText('liveDateEnd_'+depId,fmt2(end));
@@ -2224,7 +2581,7 @@ function getCustomCardHtml(s,idx){
       <div class="drag-handle">⠿</div>
       <div class="card-icon">${s.icon}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
-        <div class="card-name">${s.name}</div>
+        <div class="card-name">${escHtml(s.name)}</div>
         <div class="card-value" id="customDisplay_${s.id}">0 ₴</div>
         <div class="card-pct" id="customPct_${s.id}">0% ${lang.pctOfCapital}</div>
       </div>
@@ -2393,10 +2750,12 @@ async function workerGetStock(tickers){
 // ── Source 2: Anthropic Claude API (працює в Claude.ai) ───────
 async function claudeGetStockData(tickers){
   try{
+  const apiKey=window.ANTHROPIC_API_KEY||'';
+  if(!apiKey) throw new Error('Claude API key not configured; use Worker URL');
   const tickerList=tickers.map(t=>t.toUpperCase()).join(', ');
   const resp=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
+    headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
     body:JSON.stringify({
       model:'claude-sonnet-4-20250514',
       max_tokens:1500,
@@ -2577,10 +2936,14 @@ async function fetchStockPrice(ticker){
     result=await workerGetStock([ticker]);
   }catch(e1){errors.push('Worker: '+e1.message);}
 
-  // 2. Claude API (fallback для Claude.ai без Worker)
+  // 2. Claude API fallback only works when the host page provides a key.
   if(!result){
-    try{result=await claudeGetStockData([ticker]);}
-    catch(e2){errors.push('Claude: '+e2.message);}
+    if(window.ANTHROPIC_API_KEY){
+      try{result=await claudeGetStockData([ticker]);}
+      catch(e2){errors.push('Claude: '+e2.message);}
+    } else {
+      errors.push('Claude: API key not configured; use Worker URL');
+    }
   }
 
   if(!result){
@@ -2655,8 +3018,8 @@ async function fetchTickerForInput(secId){
       </div>`;}
     return;
   }
-  const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
-  const divYieldAbs=(data.divAbs||0)*(data.currency==='USD'?usdUahRate:1);
+  const priceUah=data.currency==='UAH'?data.price:(data.price*getStockCurrencyRate(data.currency));
+  const divYieldAbs=(data.divAbs||0)*getStockCurrencyRate(data.currency);
   const priceField=$('secPrice_'+secId);
   if(priceField)priceField.value=priceUah.toFixed(2);
   const divField=$('secDiv_'+secId);
@@ -2667,7 +3030,7 @@ async function fetchTickerForInput(secId){
     const ch=data.change||0, chp=data.changePct||0;
     info.className='stock-price-info visible';
     info.innerHTML=`
-      <div class="spi-name">${data.name} <span style="color:var(--muted);font-size:10px">${ticker} · ${data.currency}</span></div>
+      <div class="spi-name">${escHtml(data.name)} <span style="color:var(--muted);font-size:10px">${escHtml(ticker)} · ${escHtml(data.currency)}</span></div>
       <div>
         <span class="spi-price">${data.currency==='USD'?'$'+data.price.toFixed(2):fmtN(Math.round(priceUah))+' ₴'}</span>
         ${data.currency==='USD'?`<span style="color:var(--muted);font-size:10px"> ≈ ${fmtN(Math.round(priceUah))} ₴</span>`:''}
@@ -2696,7 +3059,7 @@ async function refreshAllStockPrices(secId){
     if(!it.ticker)continue;
     const data=stocks[it.ticker]||stockPriceCache[it.ticker];
     if(data){
-      const priceUah=data.currency==='UAH'?data.price:(data.price*usdUahRate);
+      const priceUah=data.currency==='UAH'?data.price:(data.price*getStockCurrencyRate(data.currency));
       it.price=priceUah;it.livePrice=priceUah;
       it.divYield=data.divYield>0?data.divYield:it.divYield||0;
       it.liveName=data.name;it.liveChange=data.changePct;
@@ -2749,6 +3112,83 @@ function addSecuritiesCard(type){
   saveData(); updateAll();
 }
 
+
+function stockNum(v){return parseInputNumber(v);}
+function getStockCurrencyRate(cur){
+  cur=(cur||'UAH').toUpperCase();
+  if(cur==='UAH')return 1;
+  if(liveRates[cur]&&liveRates[cur]>0)return liveRates[cur];
+  if(cur==='USD')return usdUahRate||41;
+  return 1;
+}
+function getStockSectionStats(section){
+  const groups={};
+  (section.items||[]).forEach((it,j)=>{
+    const key=it.ticker||('__'+j);
+    if(!groups[key])groups[key]={
+      ticker:it.ticker||null,
+      name:it.liveName||it.name||it.ticker||'—',
+      liveChange:it.liveChange,
+      curPrice:0,
+      divYield:0,
+      divAbs:0,
+      liveCurrency:it.liveCurrency||'UAH',
+      trades:[],
+      totalQty:0,
+      buyQty:0,
+      buyCost:0,
+      avgBuy:0,
+      remainingCost:0,
+      currentValue:0,
+      pnl:0,
+      pnlPct:0,
+      divAnnualPct:0,
+      divAnnualAbs:0,
+      divAnnual:0
+    };
+    const g=groups[key];
+    const qty=stockNum(it.qty);
+    const price=stockNum(it.price);
+    const buyPrice=stockNum(it.buyPrice)||price;
+    const isSell=qty<0||it.tradeType==='sell';
+    g.trades.push({...it,origIdx:j,qty,buyPrice,price});
+    g.totalQty+=qty;
+    if(!isSell&&qty>0){
+      g.buyQty+=qty;
+      g.buyCost+=qty*buyPrice;
+    }
+    if(it.liveName)g.name=it.liveName;
+    if(it.liveChange!=null)g.liveChange=it.liveChange;
+    if(price>0)g.curPrice=price;
+    const divYield=stockNum(it.divYield)||stockNum(it.div);
+    if(divYield>0)g.divYield=divYield;
+    const divAbs=stockNum(it.divAbs);
+    if(divAbs>0)g.divAbs=divAbs;
+    if(it.liveCurrency)g.liveCurrency=it.liveCurrency;
+  });
+  Object.values(groups).forEach(g=>{
+    g.totalQty=Math.max(0,g.totalQty);
+    g.avgBuy=g.buyQty>0?g.buyCost/g.buyQty:0;
+    g.remainingCost=g.avgBuy*g.totalQty;
+    g.currentValue=g.totalQty*g.curPrice;
+    g.pnl=g.remainingCost>0?g.currentValue-g.remainingCost:0;
+    g.pnlPct=g.remainingCost>0?((g.currentValue/g.remainingCost-1)*100):0;
+    g.divAnnualPct=g.currentValue*(g.divYield/100);
+    g.divAnnualAbs=g.divAbs>0?g.totalQty*g.divAbs*getStockCurrencyRate(g.liveCurrency):0;
+    g.divAnnual=g.divAnnualPct+g.divAnnualAbs;
+  });
+  const visibleGroups=Object.fromEntries(Object.entries(groups).filter(([,g])=>g.totalQty>0));
+  const vals=Object.values(visibleGroups);
+  return {
+    groups:visibleGroups,
+    total:vals.reduce((sum,g)=>sum+g.currentValue,0),
+    totalDivPct:vals.reduce((sum,g)=>sum+g.divAnnualPct,0),
+    totalDivAbs:vals.reduce((sum,g)=>sum+g.divAnnualAbs,0),
+    totalDiv:vals.reduce((sum,g)=>sum+g.divAnnual,0)
+  };
+}
+function getSecuritiesSectionTotal(section){return getStockSectionStats(section).total;}
+
 function renderSecuritiesCards(){
   const container=$('securitiesContainer');
   if(!container)return;
@@ -2769,76 +3209,55 @@ function renderSecuritiesCards(){
 
 function getSecCardHtml(s,idx){
   const lang=LANGS[currentLang];
-  const total=s.items.reduce((sum,it)=>sum+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0);
-  const totalDiv=s.items.reduce((sum,it)=>{
-    const v=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
-    return sum+v*(parseFloat(it.divYield)||parseFloat(it.div)||0)/100;
-  },0);
-  const totalDivAbs=s.items.reduce((sum,it)=>{
-    return sum+(parseFloat(it.qty)||0)*(parseFloat(it.divAbs)||0)*(parseFloat(it.liveCurrency)==='USD'?usdUahRate:1);
-  },0);
+  const sym=getCurrSym();
+  const stats=getStockSectionStats(s);
+  const total=stats.total;
+  const totalDiv=stats.totalDiv;
+  const totalDivAbs=stats.totalDivAbs;
   const hasTickers=s.items.some(it=>it.ticker);
   const themeClass='card-'+s.type;
 
   // Group items by ticker symbol
-  const tickerGroups={};
-  s.items.forEach((it,j)=>{
-    const key=it.ticker||('__'+j);
-    if(!tickerGroups[key]) tickerGroups[key]={
-      ticker:it.ticker||null, name:it.liveName||it.name||it.ticker||'—',
-      liveChange:it.liveChange, curPrice:parseFloat(it.price)||0,
-      divYield:parseFloat(it.divYield)||parseFloat(it.div)||0, trades:[]
-    };
-    tickerGroups[key].trades.push({...it,origIdx:j});
-    if(it.liveName) tickerGroups[key].name=it.liveName;
-    if(it.liveChange!=null) tickerGroups[key].liveChange=it.liveChange;
-    if(parseFloat(it.price)>0) tickerGroups[key].curPrice=parseFloat(it.price);
-  });
+  const tickerGroups=stats.groups;
 
   // Pre-compute avg price data for stats section
   const avgPriceData=Object.entries(tickerGroups).map(([key,g])=>{
-    const tq=g.trades.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
-    const tc=g.trades.reduce((s,t)=>{
-      const q=parseFloat(t.qty)||0;
-      const bp=parseFloat(t.buyPrice)||parseFloat(t.price)||0;
-      return s+q*bp;
-    },0);
-    return {name:g.name,ticker:g.ticker,totalQty:tq,totalBuyCost:tc,curPrice:g.curPrice};
+    return {name:g.name,ticker:g.ticker,totalQty:g.totalQty,totalBuyCost:g.remainingCost,curPrice:g.curPrice};
   }).filter(g=>g.totalQty>0&&g.totalBuyCost>0);
 
   const rows=s.items.length>0?(
     '<div class="ticker-cards">'+
     Object.entries(tickerGroups).map(([key,g])=>{
-      const totalQty=g.trades.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
-      const totalBuyCost=g.trades.reduce((s,t)=>{const q=parseFloat(t.qty)||0;const bp=parseFloat(t.buyPrice)||parseFloat(t.price)||0;return s+q*bp;},0);
+      const totalQty=g.totalQty;
+      const totalBuyCost=g.remainingCost;
       const hasBuyPrice=totalBuyCost>0;
-      const curVal=totalQty*g.curPrice;
-      const avgBuy=hasBuyPrice&&totalQty>0?totalBuyCost/totalQty:0;
-      const pnl=hasBuyPrice?curVal-totalBuyCost:null;
-      const pnlPct=totalBuyCost>0?((curVal/totalBuyCost-1)*100):0;
+      const curVal=g.currentValue;
+      const avgBuy=g.avgBuy;
+      const pnl=hasBuyPrice?g.pnl:null;
+      const pnlPct=g.pnlPct;
       const pnlCol=pnl===null?'var(--muted)':pnl>=0?'var(--green2)':'var(--red)';
-      const divAnn=totalQty*g.curPrice*(g.divYield/100);
-      const divMonth=Math.round(divAnn/12);
+      const divAnn=g.divAnnual;
+      const divMonth=divAnn/12;
       return `<div class="ticker-card" onclick="openStockDetail('${s.id}','${key.replace(/'/g,"\\'")}')">
         <div class="ticker-card-head">
           <span class="ticker-card-sym">${g.ticker||'—'}</span>
           <span class="ticker-card-qty">${totalQty} шт</span>
         </div>
         <div class="ticker-card-name">${g.name}</div>
-        <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(Math.round(curVal))} ₴</div>
-        <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'')+fmtN(Math.round(pnl))+' ₴ ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
-        ${avgBuy>0?`<div class="ticker-card-div">Ø ${fmtN(Math.round(avgBuy))} ₴</div>`:''}
-        ${divMonth>0?`<div class="ticker-card-div">💰 ~${fmtN(divMonth)} ₴/міс</div>`:''}
+        <div class="ticker-card-price" style="color:${pnlCol}">${sym}${fmtN(toDisplayCurr(curVal))}</div>
+        <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
+        ${avgBuy>0?`<div class="ticker-card-div">Ø ${sym}${fmtN(toDisplayCurr(avgBuy))}</div>`:''}
+        ${divMonth>0?`<div class="ticker-card-div">💰 ~${sym}${fmtN(toDisplayCurr(divMonth))}/міс</div>`:''}
       </div>`;
     }).join('')+
     '</div>'+
     '<div class="sec-summary-divs"><div class="sd-label">'+t('divIncome')+'</div>'+
-    '<div class="sd-row"><span class="sd-key">'+t('divAnnual')+'</span><span class="sd-val">+'+fmtN(Math.round(totalDiv))+' ₴'+t('perYear')+'</span></div>'+
-    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+fmtN(Math.round(totalDivAbs))+' ₴'+t('perYear')+'</span></div>':'')+
-    '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+fmtN(Math.round(totalDiv/12))+' ₴</span></div>'+
+    '<div class="sd-row"><span class="sd-key">'+t('divAnnual')+'</span><span class="sd-val">+'+sym+fmtN(toDisplayCurr(totalDiv))+' '+t('perYear')+'</span></div>'+
+    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+sym+fmtN(toDisplayCurr(totalDivAbs))+' '+t('perYear')+'</span></div>':'')+
+    '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+sym+fmtN(toDisplayCurr(totalDiv/12))+'</span></div>'+
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
-    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(Math.round(total))+' ₴</span></div>'+
+    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(total))+'</span></div>'+
     '</div>'+
     (hasTickers?`<div class="auto-refresh-bar">
       <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
@@ -2852,7 +3271,7 @@ function getSecCardHtml(s,idx){
       <div class="card-icon">${s.icon}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
-        <div class="card-value" id="secDisplay_${s.id}">${fmtN(Math.round(total))} ₴</div>
+        <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(total))}</div>
         <div class="card-pct" id="secPct_${s.id}">—</div>
       </div>
       <div class="card-actions">
@@ -2943,10 +3362,10 @@ function addSecItem(secId){
   /* all stock items free */
   const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
   const ticker=($('secName_'+secId)?.value||'').trim().toUpperCase();
-  const qty=parseFloat($('secQty_'+secId)?.value)||0;
-  const price=parseFloat($('secPrice_'+secId)?.value)||0;
-  const divYield=parseFloat($('secDiv_'+secId)?.value)||0;
-  const buyPrice=parseFloat($('secBuyPrice_'+secId)?.value)||price||0;
+  const qty=parseInputNumber($('secQty_'+secId)?.value);
+  const price=parseInputNumber($('secPrice_'+secId)?.value);
+  const divYield=parseInputNumber($('secDiv_'+secId)?.value);
+  const buyPrice=parseInputNumber($('secBuyPrice_'+secId)?.value)||price||0;
   const tradeType=$('secTradeType_'+secId)?.value||'buy';
   if(!ticker&&!qty&&!price)return;
   // For sell trades, store negative qty
@@ -2967,7 +3386,7 @@ function addSecItem(secId){
   // Auto-refresh only for PRO or first ticker (free demo)
   if(ticker){
     const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
-    if(isPro || totalLive <= FREE_LIMITS.stockItems) refreshAllStockPrices(secId);
+    refreshAllStockPrices(secId);
   }
 }
 function removeSecItem(secId,itemIdx){
@@ -2982,8 +3401,7 @@ function removeSecCard(secId){
   });
 }
 function getSecuritiesTotal(){
-  return securitiesSections.reduce((sum,s)=>
-    sum+s.items.reduce((ss,it)=>ss+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0),0);
+  return securitiesSections.reduce((sum,s)=>sum+getSecuritiesSectionTotal(s),0);
 }
 
 // ── TOTALS ────────────────────────────────────
@@ -3022,8 +3440,9 @@ function _updateAllNow(){
   const other=hiddenCards['other']?0:getOtherVal();
   const custom=getCustomTotal();
   const securities=getSecuritiesTotal();
-  const total=dep+crypto+usd+forex+cash+other+custom+securities;
-  const nonZero=[dep,crypto,usd,forex,cash,other,custom,securities].filter(v=>v>0).length;
+  const metals=getMetalsTotalUah();
+  const total=dep+crypto+usd+forex+cash+other+custom+securities+metals;
+  const nonZero=[dep,crypto,usd,forex,cash,other,custom,securities,metals].filter(v=>v>0).length;
 
   // Display in selected currency
   const sym=getCurrSym();
@@ -3087,8 +3506,8 @@ function _updateAllNow(){
 
   // Update securities display
   securitiesSections.forEach(s=>{
-    const v=s.items.reduce((sum,it)=>sum+((parseFloat(it.qty)||0)*(parseFloat(it.price)||0)),0);
-    setText('secDisplay_'+s.id, fmtN(toDisplayCurr(Math.round(v)))+' '+sym);
+    const v=getSecuritiesSectionTotal(s);
+    setText('secDisplay_'+s.id, sym+fmtN(toDisplayCurr(v)));
     setText('secPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
   });
 
@@ -3098,7 +3517,7 @@ function _updateAllNow(){
 
   // Update metals display
   metalsSections.forEach(s=>{
-    const v=s.items.reduce((ss,it)=>ss+(getMetalPriceUah(it.type)>0?it.grams*getMetalPriceUah(it.type):it.grams*it.price),0);
+    const v=getMetalsSectionTotalUah(s);
     const el=document.getElementById('card-'+s.id+' .card-value');
     const valEl=document.querySelector('#card-'+s.id+' .card-value');
     if(valEl)valEl.textContent=sym+fmtN(toDisplayCurr(v));
@@ -3260,7 +3679,7 @@ function sellCrypto(coinKey){
     const totalProfitUsd=qty*price;
     if(totalProfitUsd>0){
       const usdtEl=document.getElementById('cryptoUsdt');
-      if(usdtEl){usdtEl.value=String((parseFloat(usdtEl.value)||0)+totalProfitUsd);updateAll();saveData();}
+      if(usdtEl){usdtEl.value=String(parseInputNumber(usdtEl.value)+totalProfitUsd);updateAll();saveData();}
       const rate=val('usdtUah')||41;
       alert('Продано '+qty+' '+coinKey+' за $'+fmtN(Math.round(totalProfitUsd))+' USDT\n\n💵 Додано до USDT балансу\n≈ '+fmtN(Math.round(totalProfitUsd*rate))+' ₴');
     }
@@ -3280,38 +3699,39 @@ function openStockDetail(secId, tickerKey){
   const g=group[0];
   const ticker=g.ticker||'—';
   const name=g.liveName||g.name||ticker;
-  const totalQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
-  const totalBuyCost=group.reduce((s,t)=>{const q=parseFloat(t.qty)||0;const bp=parseFloat(t.buyPrice)||parseFloat(t.price)||0;return s+Math.abs(q)*bp;},0);
-  const curPrice=parseFloat(g.price)||0;
-  const curVal=Math.abs(totalQty)*curPrice;
-  const avgBuy=totalQty>0?totalBuyCost/totalQty:0;
-  const pnl=totalBuyCost>0?curVal-totalBuyCost:0;
-  const pnlPct=totalBuyCost>0?((curVal/totalBuyCost-1)*100):0;
+  const stockStats=getStockSectionStats(sec);
+  const stockGroup=stockStats.groups[tickerKey];
+  const totalQty=stockGroup?stockGroup.totalQty:group.reduce((s,t)=>s+stockNum(t.qty),0);
+  const totalBuyCost=stockGroup?stockGroup.remainingCost:0;
+  const curPrice=stockGroup?stockGroup.curPrice:stockNum(g.price);
+  const curVal=stockGroup?stockGroup.currentValue:Math.max(0,totalQty)*curPrice;
+  const avgBuy=stockGroup?stockGroup.avgBuy:(totalQty>0?totalBuyCost/totalQty:0);
+  const pnl=stockGroup?stockGroup.pnl:(totalBuyCost>0?curVal-totalBuyCost:0);
+  const pnlPct=stockGroup?stockGroup.pnlPct:(totalBuyCost>0?((curVal/totalBuyCost-1)*100):0);
   const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
-  const divYield=parseFloat(g.divYield)||parseFloat(g.div)||0;
-  const divAnn=curVal*(divYield/100);
+  const divAnn=stockGroup?stockGroup.divAnnual:0;
   const divMonth=divAnn/12;
   const sym=getCurrSym();
 
   document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+ticker+'</span> '+name;
   let html='<div class="stock-detail-grid">'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(Math.round(curVal))+'</div><div class="stock-detail-stat-lbl">Вартість</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal))+'</div><div class="stock-detail-stat-lbl">Вартість</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+totalQty+' шт</div><div class="stock-detail-stat-lbl">Кількість</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(Math.round(curPrice))+'</div><div class="stock-detail-stat-lbl">Ціна</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(Math.round(avgBuy))+'</div><div class="stock-detail-stat-lbl">Ø Середня</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'')+sym+fmtN(Math.round(pnl))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(Math.round(divMonth))+'</div><div class="stock-detail-stat-lbl">Дивід./міс</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(curPrice))+'</div><div class="stock-detail-stat-lbl">Ціна</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(avgBuy))+'</div><div class="stock-detail-stat-lbl">Ø Середня</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">Дивід./міс</div></div>'+
     '</div>';
 
   html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">📋 Угоди ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
-    const qty=parseFloat(t.qty)||0;
-    const bp=parseFloat(t.buyPrice)||0;
+    const qty=stockNum(t.qty);
+    const bp=stockNum(t.buyPrice);
     const isSell=qty<0||(t.tradeType==='sell');
     html+='<div class="stock-detail-trade"><div>'+
       '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?'📉 Продаж':'📈 Купівля')+' '+Math.abs(qty)+' шт</div>'+
-      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+fmtN(Math.round(bp))+' ₴':'—')+'</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+sym+fmtN(toDisplayCurr(bp)):'—')+'</div>'+
       '</div><button class="rm-btn" onclick="removeSecItem(\''+secId+'\','+t.origIdx+');closeStockDetail()">×</button></div>';
   });
 
@@ -3332,23 +3752,23 @@ function openStockDetail(secId, tickerKey){
 function closeStockDetail(){document.getElementById('stockDetailOverlay').classList.remove('open');}
 function sellStock(secId,tickerKey,refIdx){
   const sec=securitiesSections.find(s=>s.id===secId);if(!sec)return;
-  const qty=parseFloat(document.getElementById('sellQty_detail')?.value)||0;
-  const price=parseFloat(document.getElementById('sellPrice_detail')?.value)||0;
+  const qty=parseInputNumber(document.getElementById('sellQty_detail')?.value);
+  const price=parseInputNumber(document.getElementById('sellPrice_detail')?.value);
   if(!qty||qty<=0){alert('Вкажіть кількість для продажу');return;}
   // Check can't sell more than owned
   const items=sec.items.map((it,j)=>({...it,origIdx:j}));
   const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
-  const ownedQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
+  const ownedQty=group.reduce((s,t)=>s+stockNum(t.qty),0);
   if(qty>ownedQty){alert('Не можна продати більше ніж є: '+ownedQty+' шт');return;}
   customConfirm('Продати '+qty+' шт по '+fmtN(Math.round(price))+' ₴?', function(){
     const ref=sec.items[refIdx];
-    sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency});
+    sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency,liveOrigPrice:ref?.liveOrigPrice,divYield:ref?.divYield,div:ref?.div,divAbs:ref?.divAbs||0});
     cleanZeroStocks(sec);
     closeStockDetail();renderSecuritiesCards();updateAll();saveData();
     const totalProfit=qty*price;
     if(totalProfit>0){
       const cashEl=document.getElementById('cashAmount');
-      if(cashEl){cashEl.value=String((parseFloat(cashEl.value)||0)+totalProfit);updateAll();saveData();}
+      if(cashEl){cashEl.value=String(parseInputNumber(cashEl.value)+totalProfit);updateAll();saveData();}
       alert('📈 Продано '+qty+' шт за '+fmtN(Math.round(totalProfit))+' ₴\n\n💵 Суму додано до Готівки');
     }
   });
@@ -3360,7 +3780,7 @@ function cleanZeroStocks(sec){
   sec.items.forEach(it=>{
     const key=it.ticker||it.name;
     if(!tickerTotals[key])tickerTotals[key]=0;
-    tickerTotals[key]+=(parseFloat(it.qty)||0);
+    tickerTotals[key]+=stockNum(it.qty);
   });
   // Remove all items for tickers with 0 or negative total
   Object.entries(tickerTotals).forEach(([key,total])=>{
@@ -3372,9 +3792,9 @@ function cleanZeroStocks(sec){
 
 function addForex(){
   const cur=sval('newForexCur');
-  const amt=parseFloat($('newForexAmt')?.value)||0;
+  const amt=parseInputNumber($('newForexAmt')?.value);
   // Auto-fill rate from live rates if not manually entered
-  let rate=parseFloat($('newForexRate')?.value)||0;
+  let rate=parseInputNumber($('newForexRate')?.value);
   if(!rate){
     const liveRate=liveRates[cur?.toUpperCase()];
     if(liveRate&&liveRate>0) rate=liveRate;
@@ -3451,7 +3871,7 @@ function subtractForex(i){
   if(!f)return;
   customPrompt('Скільки зняти з '+f.cur+'? (зараз: '+fmtD(f.amt)+')', '', function(amt){
     if(!amt)return;
-    const val=parseFloat(amt)||0;
+    const val=parseInputNumber(amt);
     if(val<=0)return;
     f.amt=Math.max(0,f.amt-val);
     if(f.amt<=0) forexItems.splice(i,1);
@@ -3461,26 +3881,31 @@ function subtractForex(i){
 function removeForex(i){forexItems.splice(i,1);renderForex();updateAll();saveData();}
 function renderForex(){
   const el=$('forexRows');if(!el)return;
+  const sym=getCurrSym();
   const total=forexItems.reduce((s,f)=>{
     const cur=f.cur?.toUpperCase()||'EUR';
-    const rate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:(f.rate||0);
-    return s+f.amt*rate;
+    const amount=parseInputNumber(f.amt);
+    const rate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:parseInputNumber(f.rate);
+    return s+amount*rate;
   },0);
-  setText('forexTotal',fmtN(Math.round(total))+' ₴');
+  setText('forexTotal',sym+fmtN(toDisplayCurr(total)));
   if(!forexItems.length){el.innerHTML='';return;}
   el.innerHTML=forexItems.map((f,i)=>{
     const cur=f.cur?.toUpperCase()||'EUR';
-    const liveRate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:f.rate;
+    const amount=parseInputNumber(f.amt);
+    const liveRate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:parseInputNumber(f.rate);
+    const valueUah=amount*liveRate;
     const isLive=(liveRates[cur]&&liveRates[cur]>0);
     return `<div class="list-row">
       <span style="font-size:16px;flex-shrink:0">${FFLAGS[f.cur]||'🌐'}</span>
       <div class="list-sym" style="color:var(--orange2)">${FSYM[f.cur]||''} ${f.cur}</div>
-      <div class="list-info">${fmtD(f.amt)} × ${liveRate.toFixed(2)} ₴ ${isLive?'<span style="color:var(--green2);font-size:8px">●</span>':''}</div>
-      <div class="list-val">${fmtN(Math.round(f.amt*liveRate))} ₴</div>
+      <div class="list-info">${fmtD(amount)} × ${liveRate.toFixed(2)} ₴ ${isLive?'<span style="color:var(--green2);font-size:8px">●</span>':''}</div>
+      <div class="list-val">${sym}${fmtN(toDisplayCurr(valueUah))}</div>
       <button class="rm-btn" style="font-size:14px;color:var(--orange2);margin-right:4px;" onclick="subtractForex(${i})" title="Зняти">−</button>
       <button class="rm-btn" onclick="removeForex(${i})">×</button>
     </div>`;
   }).join('');
+  applyAutoTranslations(el);
 }
 
 // ── TOGGLE CARD ───────────────────────────────
@@ -3718,7 +4143,7 @@ let _rateInterval=setInterval(fetchUsdUahRate, 15*60*1000); // refresh every 15 
 startAutoRefresh();
 // ── FREEMIUM ─────────────────────────────────────────────────
 // isPro, FREE_LIMITS and openPaywall declared at top of script
-function checkPro(){ return isPro; }
+function checkPro(){ return true; }
 function closePaywall(){
   const el=document.getElementById('paywallOverlay');
   if(!el)return;
@@ -3752,6 +4177,18 @@ function showProToast(){
   setTimeout(()=>t.remove(), 3000);
 }
 
+function trialBadgeText(daysLeft){
+  const labels={
+    uk:['Тріал','дн.'],
+    ru:['Триал','дн.'],
+    en:['Trial','d'],
+    de:['Test','Tg.'],
+    zh:['试用','天']
+  };
+  const v=labels[currentLang]||labels.uk;
+  return '⏱ '+v[0]+': '+daysLeft+' '+v[1];
+}
+
 function updateProUI(){
   // Show/hide PRO badge in header
   const badge = document.getElementById('proBadge');
@@ -3760,10 +4197,12 @@ function updateProUI(){
   const trialBadge=document.getElementById('trialBadge');
   if(trialBadge){
     const daysLeft=getTrialDaysLeft();
-    if(daysLeft>0&&daysLeft<=7){
+    if(daysLeft>0){
       trialBadge.style.display='inline-block';
-      trialBadge.textContent='⏱ Тріал: '+daysLeft+' дн.';
-      if(daysLeft<=2){trialBadge.style.borderColor='#f8717140';trialBadge.style.color='var(--red)';trialBadge.style.background='#f8717115';}
+      trialBadge.textContent=trialBadgeText(daysLeft);
+      trialBadge.style.borderColor=daysLeft<=2?'#f8717140':'#4ecb8d40';
+      trialBadge.style.color=daysLeft<=2?'var(--red)':'var(--green2)';
+      trialBadge.style.background=daysLeft<=2?'#f8717115':'#4ecb8d15';
     } else {
       trialBadge.style.display='none';
     }
@@ -3980,6 +4419,7 @@ function openSettings(){
   if(langLblEl)langLblEl.textContent=si.langLbl;
   const currLblEl=document.getElementById('set_curr_label');
   if(currLblEl)currLblEl.textContent=si.currLbl;
+  updateAppVersionUI();
   document.querySelectorAll('.settings-lang-btn').forEach(b=>{
     b.classList.toggle('active', b.id==='slang-'+lang);
   });
@@ -4052,8 +4492,8 @@ function addMetalItem(secId){
   const gramsEl=document.getElementById('metal_grams_'+secId);
   const priceEl=document.getElementById('metal_price_'+secId);
   const type=typeEl?.value||'gold';
-  const grams=parseFloat(gramsEl?.value)||0;
-  const price=parseFloat(priceEl?.value)||0;
+  const grams=parseInputNumber(gramsEl?.value);
+  const price=parseInputNumber(priceEl?.value);
   if(!grams||!price)return;
   const idx=metalsSections.findIndex(s=>s.id===secId);
   if(idx<0)return;
@@ -4082,12 +4522,21 @@ function getMetalPriceUah(type){
   return usd*(usdUahRate||41);
 }
 
+function getMetalItemCurrentPriceUah(it){
+  const livePrice=getMetalPriceUah(it.type);
+  const buyPrice=parseInputNumber(it.price);
+  return livePrice>0?livePrice:buyPrice;
+}
+
+function getMetalsSectionTotalUah(section){
+  return (section.items||[]).reduce((sum,it)=>{
+    const grams=parseInputNumber(it.grams);
+    return sum+grams*getMetalItemCurrentPriceUah(it);
+  },0);
+}
+
 function getMetalsTotalUah(){
-  return metalsSections.reduce((sum,s)=>sum+s.items.reduce((ss,it)=>{
-    const curPrice=getMetalPriceUah(it.type);
-    // Use current price if available, else buy price
-    return ss+(curPrice>0?it.grams*curPrice:it.grams*it.price);
-  },0),0);
+  return metalsSections.reduce((sum,s)=>sum+getMetalsSectionTotalUah(s),0);
 }
 
 function renderMetalsCards(){
@@ -4097,6 +4546,7 @@ function renderMetalsCards(){
   const expanded=new Set();
   container.querySelectorAll('.card.expanded').forEach(el=>expanded.add(el.id));
   container.innerHTML=metalsSections.map(s=>getMetalsCardHtml(s)).join('');
+  applyAutoTranslations(container);
   container.querySelectorAll('.card').forEach(el=>{
     if(expanded.has(el.id))el.classList.add('expanded');
     el.setAttribute('draggable','true');
@@ -4115,10 +4565,12 @@ function getMetalsCardHtml(s){
     platinum:{grams:0,buyCost:0,currentVal:0}
   };
   s.items.forEach(it=>{
-    const curPriceUah=getMetalPriceUah(it.type); // live price per gram
-    const buyVal=it.grams*it.price;              // what you paid
-    const curVal=curPriceUah>0?it.grams*curPriceUah:buyVal; // current worth
-    byType[it.type].grams+=it.grams;
+    const grams=parseInputNumber(it.grams);
+    const buyPrice=parseInputNumber(it.price);
+    const curPriceUah=getMetalItemCurrentPriceUah(it); // live price per gram, fallback to buy price
+    const buyVal=grams*buyPrice;              // what you paid
+    const curVal=grams*curPriceUah; // current worth
+    byType[it.type].grams+=grams;
     byType[it.type].buyCost+=buyVal;
     byType[it.type].currentVal+=curVal;
   });
@@ -4146,19 +4598,20 @@ function getMetalsCardHtml(s){
       ${mpnl!==0?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:${mpnlColor};">${mpnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(mpnl)))}</div>`:''}
     </div>`;
   }).join('');
-
   // Items list with buy price and current value
   const itemRows=s.items.map((it,j)=>{
-    const curPriceUah=getMetalPriceUah(it.type);
-    const buyVal=it.grams*it.price;
-    const curVal=curPriceUah>0?it.grams*curPriceUah:buyVal;
+    const grams=parseInputNumber(it.grams);
+    const buyPrice=parseInputNumber(it.price);
+    const curPriceUah=getMetalItemCurrentPriceUah(it);
+    const buyVal=grams*buyPrice;
+    const curVal=grams*curPriceUah;
     const ipnl=curVal-buyVal;
     const ipnlSign=ipnl>=0?'+':'';
     const ipnlCol=ipnl>=0?'var(--green2)':'var(--red)';
     return `<div class="metal-item-row" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="metal-dot" style="background:${METAL_COLORS[it.type]};flex-shrink:0;"></div>
-        <div style="flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);">${names[it.type]} · ${it.grams}г</div>
+        <div style="flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);">${names[it.type]} · ${fmtD(grams)}г</div>
         <button class="rm-btn" onclick="removeMetalItem('${s.id}',${j})">×</button>
       </div>
       <div style="display:flex;justify-content:space-between;padding:0 16px;font-family:'DM Mono',monospace;font-size:10px;">
@@ -4168,7 +4621,6 @@ function getMetalsCardHtml(s){
       </div>
     </div>`;
   }).join('');
-
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
@@ -4237,22 +4689,7 @@ function getMetalsCardHtml(s){
 
 
 // ── SETTINGS & CURRENCY JS ────────────────────────────────
-function updateTotalDisplay(){
-  const totalEl=document.getElementById('totalAmount');
-  if(!totalEl)return;
-  const totalUah=parseFloat(totalEl.dataset.uah||0);
-  if(!totalUah)return;
-  if(displayCurrency==='uah'){
-    totalEl.textContent=fmtN(Math.round(totalUah));
-    return;
-  }
-  const rates={usd:usdUahRate||41,eur:(usdUahRate||41)*1.08,rub:(usdUahRate||41)*0.009,cny:(usdUahRate||41)*0.14};
-  const syms={usd:'$',eur:'€',rub:'₽',cny:'¥'};
-  const rate=rates[displayCurrency]||1;
-  totalEl.textContent=fmtN(Math.round(totalUah/rate));
-  const symEl=document.getElementById('totalCurrencySymbol');
-  if(symEl)symEl.textContent=syms[displayCurrency]||'₴';
-}
+function updateTotalDisplay(){ updateAll(); }
 
 // ── CALCULATOR: add RUB, CNY ──────────────────────────────
 function runCurrencyWithRates(){
@@ -4317,10 +4754,9 @@ function translateDynamicUI(){
     'calc_title':'calcTitle','calc_tab_simple':'calcSimple','calc_tab_compound':'calcCompound','calc_tab_currency':'calcCurrency',
     'picker_title':'pickerTitle',
     'pw_title':'pwTitle','pw_sub':'pwSub',
-    'pw_f1':'pwF1','pw_f1sub':'pwF1sub','pw_f2':'pwF2','pw_f2sub':'pwF2sub',
-    'pw_f3':'pwF3','pw_f3sub':'pwF3sub','pw_f4':'pwF4','pw_f4sub':'pwF4sub',
+    'pw_b1':'pwB1','pw_b1sub':'pwB1sub','pw_b2':'pwB2','pw_b2sub':'pwB2sub',
+    'pw_b3':'pwB3','pw_b3sub':'pwB3sub',
     'pw_btn':'pwBtn','pw_restore':'pwRestore','pw_close':'pwClose',
-    'pw_f5':'pwF5','pw_f5sub':'pwF5sub',
   };
   Object.entries(ids).forEach(([id,key])=>{
     const el=document.getElementById(id);
@@ -4484,9 +4920,13 @@ function getDepositMonthlyAccruedWithTopups(d){
   
   // Deep copy topups
   const topups=(d.topups||[])
-    .map(tp=>({amount:tp.amount, date:tp.date}))
-    .filter(tp=>new Date(tp.date)<=now)
-    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+    .map(tp=>{
+      const parts=tp.date.split('-');
+      const effectiveDate=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
+      return {amount:tp.amount, date:tp.date, effectiveDate};
+    })
+    .filter(tp=>tp.effectiveDate<=now)
+    .sort((a,b)=>a.effectiveDate-b.effectiveDate);
   
   // Cap dates
   const capDates=[];
@@ -4550,42 +4990,98 @@ function getLiabilitiesTotal(){
   return liabilities.reduce((sum,l)=>sum+getLiabRemaining(l),0);
 }
 
-function getLiabRemaining(l){
-  if(!l.amount||!l.months)return l.amount||0;
-  const r=(l.rate/100)/12;
-  const payment=calcAnnuity(l.amount,l.rate,l.months);
-  let bal=l.amount;
-  const now=new Date();
-
-  // Step 1: Apply all partial payments made up to today (regardless of monthly cycle)
-  const partials=(l.partialPayments||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
-  partials.forEach(pp=>{
-    const pd=new Date(pp.date);
-    if(pd<=now) bal=Math.max(0,bal-pp.amount);
-  });
-
-  // Step 2: Apply regular monthly payments (annuity) from start date up to today
-  if(l.startDate){
-    const start=new Date(l.startDate);
-    // First payment is due 1 month AFTER start date
-    let paymentDate=new Date(start.getFullYear(),start.getMonth()+1,start.getDate());
-    let month=0;
-    while(month<l.months&&paymentDate<=now&&bal>0){
-      const interest=bal*r;
-      const principal=Math.min(payment-interest,bal);
-      bal=Math.max(0,bal-principal);
-      paymentDate=new Date(paymentDate.getFullYear(),paymentDate.getMonth()+1,paymentDate.getDate());
-      month++;
-      if(bal<=0.01)break;
-    }
-  }
-  return Math.max(0,bal);
-}
-
 function calcAnnuity(P,annRate,months){
+  P=parseInputNumber(P); annRate=parseInputNumber(annRate); months=parseInt(months)||0;
+  if(!P||!months)return 0;
   const r=(annRate/100)/12;
   if(r===0)return P/months;
   return P*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1);
+}
+
+function addMonthsSafe(date, months){
+  const d=new Date(date);
+  const day=d.getDate();
+  const target=new Date(d.getFullYear(),d.getMonth()+months,1);
+  const last=new Date(target.getFullYear(),target.getMonth()+1,0).getDate();
+  target.setDate(Math.min(day,last));
+  return target;
+}
+
+function applyLiabRegularPayment(balance,payment,r){
+  const interest=Math.max(0,balance*r);
+  let paidInterest=Math.min(payment,interest);
+  let principal=payment-interest;
+  if(principal>=0){
+    principal=Math.min(principal,balance);
+    balance=Math.max(0,balance-principal);
+  }else{
+    balance=balance+Math.abs(principal);
+    principal=0;
+  }
+  return {balance,principal,interest:paidInterest};
+}
+
+function calcLiabSchedule(l, asOf=new Date()){
+  const amount=parseInputNumber(l.amount);
+  const months=parseInt(l.months)||0;
+  const rate=parseInputNumber(l.rate);
+  const r=(rate/100)/12;
+  const payment=calcAnnuity(amount,rate,months);
+  if(!amount||!months)return {amount,months,rate,payment:0,remaining:amount,paidPrincipal:0,paidInterest:0,projectedOverpay:0,projectedTotalPaid:amount,paymentsMade:0};
+
+  let balance=amount, paidPrincipal=0, paidInterest=0, paymentsMade=0;
+  const start=l.startDate?new Date(l.startDate):new Date();
+  const partials=(l.partialPayments||[])
+    .map(pp=>({date:new Date(pp.date),amount:parseInputNumber(pp.amount)}))
+    .filter(pp=>!isNaN(pp.date.getTime())&&pp.amount>0)
+    .sort((a,b)=>a.date-b.date);
+  let pi=0;
+  for(let m=1;m<=months&&balance>0.01;m++){
+    const due=addMonthsSafe(start,m);
+    while(pi<partials.length&&partials[pi].date<=due&&partials[pi].date<=asOf){
+      const principal=Math.min(partials[pi].amount,balance);
+      balance=Math.max(0,balance-principal);
+      paidPrincipal+=principal;
+      pi++;
+    }
+    if(due>asOf||balance<=0.01)break;
+    const paid=applyLiabRegularPayment(balance,payment,r);
+    balance=paid.balance;
+    paidPrincipal+=paid.principal;
+    paidInterest+=paid.interest;
+    paymentsMade++;
+  }
+  while(pi<partials.length&&partials[pi].date<=asOf&&balance>0.01){
+    const principal=Math.min(partials[pi].amount,balance);
+    balance=Math.max(0,balance-principal);
+    paidPrincipal+=principal;
+    pi++;
+  }
+
+  let futureBalance=balance, futureInterest=0, futurePayments=0, guard=0;
+  while(futureBalance>0.01&&guard<Math.max(months*3,months+120)){
+    const paid=applyLiabRegularPayment(futureBalance,payment,r);
+    futureBalance=paid.balance;
+    futureInterest+=paid.interest;
+    futurePayments++;
+    guard++;
+    if(payment<=futureBalance*r&&r>0)break;
+  }
+  const projectedOverpay=paidInterest+futureInterest;
+  return {
+    amount,months,rate,payment,
+    remaining:Math.max(0,balance),
+    paidPrincipal:Math.min(amount,paidPrincipal),
+    paidInterest,
+    projectedOverpay,
+    projectedTotalPaid:amount+projectedOverpay,
+    paymentsMade,
+    futurePayments
+  };
+}
+
+function getLiabRemaining(l){
+  return calcLiabSchedule(l).remaining;
 }
 
 function openLiabModal(editId){
@@ -4611,8 +5107,8 @@ function liabModalCloseOutside(e){if(e.target===document.getElementById('liabMod
 
 function confirmAddLiab(){
   const name=document.getElementById('liab_name_input').value.trim()||t('liabNamePh');
-  const amount=parseFloat(document.getElementById('liab_amount_input').value)||0;
-  const rate=parseFloat(document.getElementById('liab_rate_input').value)||0;
+  const amount=parseInputNumber(document.getElementById('liab_amount_input').value);
+  const rate=parseInputNumber(document.getElementById('liab_rate_input').value);
   const months=parseInt(document.getElementById('liab_months_input').value)||0;
   const startDate=document.getElementById('liab_start_input').value;
   if(!amount||!rate||!months){alert(t('enterData'));return;}
@@ -4637,6 +5133,22 @@ function toggleNetCapital(btn){
   btn.classList.toggle('active',showNetCapital);
   renderLiabilities();
   updateAll();
+}
+
+
+function liabMonthUnit(){return ({uk:'міс',ru:'мес',en:'mo',de:'Mon.',zh:'月'}[currentLang]||'міс');}
+function liabPerMonthUnit(){return ({uk:'/міс',ru:'/мес',en:'/mo',de:'/Mon.',zh:'/月'}[currentLang]||'/міс');}
+function liabPaymentWord(){return ({uk:'платіж',ru:'платёж',en:'payment',de:'Zahlung',zh:'还款'}[currentLang]||'платіж');}
+function liabDateLocale(){return ({uk:'uk-UA',ru:'ru-RU',en:'en-US',de:'de-DE',zh:'zh-CN'}[currentLang]||'uk-UA');}
+function liabCloseMonthsText(saved,m){
+  const label=t('liabSaveMonths');
+  return ({
+    uk:'✓ '+label+': '+saved+' міс → закриєте за '+m+' міс',
+    ru:'✓ '+label+': '+saved+' мес → закроете за '+m+' мес',
+    en:'✓ '+label+': '+saved+' mo saved → close in '+m+' mo',
+    de:'✓ '+label+': '+saved+' Mon. gespart → fertig in '+m+' Mon.',
+    zh:'✓ '+label+': 节省 '+saved+' 个月 → '+m+' 个月还清'
+  }[currentLang]||('✓ '+label+': '+saved+' міс → закриєте за '+m+' міс'));
 }
 
 function renderLiabilities(){
@@ -4669,18 +5181,19 @@ function renderLiabilities(){
   if(addBtn)addBtn.textContent='+ '+(t('liabName')||'Кредит');
 
   container.innerHTML=liabilities.map(l=>{
-    const payment=calcAnnuity(l.amount,l.rate,l.months);
-    const totalPay=payment*l.months;
-    const overpay=totalPay-l.amount;
-    const effRate=(overpay/l.amount/(l.months/12)*100);
-    const remaining=getLiabRemaining(l);
-    const paid=Math.max(0,l.amount-remaining+(totalPay-l.amount)*(1-remaining/l.amount));
-    const progress=Math.min(100,Math.max(0,(1-remaining/l.amount)*100));
+    const schedule=calcLiabSchedule(l);
+    const amount=schedule.amount;
+    const payment=schedule.payment;
+    const totalPay=schedule.projectedTotalPaid;
+    const overpay=schedule.projectedOverpay;
+    const effRate=amount&&schedule.months?(overpay/amount/(schedule.months/12)*100):0;
+    const remaining=schedule.remaining;
+    const progress=amount?Math.min(100,Math.max(0,(schedule.paidPrincipal/amount)*100)):0;
 
     // Monthly breakdown: principal vs interest for current payment
-    const r=(l.rate/100)/12;
+    const r=(schedule.rate/100)/12;
     const curInterest=remaining*r;
-    const curPrincipal=payment-curInterest;
+    const curPrincipal=Math.max(0,Math.min(payment-curInterest,remaining));
 
     // Extra payment calculator
     const extraId='extra_'+l.id;
@@ -4689,9 +5202,9 @@ function renderLiabilities(){
       <div class="liab-card-header" onclick="this.parentElement.classList.toggle('expanded')">
         <div class="liab-card-icon">🏦</div>
         <div class="liab-card-info">
-          <div class="liab-card-name">${l.name}</div>
+          <div class="liab-card-name">${escHtml(l.name)}</div>
           <div class="liab-card-amount">-${sym}${fmtN(toDisplayCurr(remaining))}</div>
-          <div class="liab-card-sub">${sym}${fmtN(toDisplayCurr(payment))}/міс · ${l.months} міс · ${l.rate}%</div>
+          <div class="liab-card-sub">${sym}${fmtN(toDisplayCurr(payment))}${liabPerMonthUnit()} · ${schedule.months} ${liabMonthUnit()} · ${schedule.rate}%</div>
         </div>
         <div class="liab-card-toggle">▼</div>
       </div>
@@ -4699,16 +5212,16 @@ function renderLiabilities(){
         <!-- PROGRESS BAR -->
         <div class="liab-progress-wrap">
           <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;margin-bottom:4px;">
-            <span style="color:var(--green2)">✓ ${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,l.amount-remaining)))}</span>
+            <span style="color:var(--green2)">✓ ${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,schedule.paidPrincipal)))}</span>
             <span style="color:var(--red)">⟳ ${t('liabLeft')}: ${sym}${fmtN(toDisplayCurr(remaining))}</span>
           </div>
           <div class="liab-progress-bar-bg">
             <div class="liab-progress-bar-fill" style="width:${progress.toFixed(1)}%"></div>
           </div>
           <div class="liab-progress-labels">
-            <span>${l.startDate?new Date(l.startDate).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'}):''}</span>
+            <span>${l.startDate?new Date(l.startDate).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'}):''}</span>
             <span style="color:var(--green2)">${progress.toFixed(0)}%</span>
-            <span>${l.startDate?new Date(new Date(l.startDate).setMonth(new Date(l.startDate).getMonth()+l.months)).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'}):''}</span>
+            <span>${l.startDate?new Date(new Date(l.startDate).setMonth(new Date(l.startDate).getMonth()+l.months)).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'}):''}</span>
           </div>
         </div>
 
@@ -4723,35 +5236,35 @@ function renderLiabilities(){
             <div class="liab-stat-val" style="color:var(--orange2)">${sym}${fmtN(toDisplayCurr(overpay))}</div>
           </div>
           <div class="liab-stat-box">
-            <div class="liab-stat-label">${t('liabBodyDebt')} / платіж</div>
+            <div class="liab-stat-label">${t('liabBodyDebt')} / ${liabPaymentWord()}</div>
             <div class="liab-stat-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(curPrincipal))}</div>
           </div>
           <div class="liab-stat-box">
-            <div class="liab-stat-label">${t('liabInterestPart')} / платіж</div>
+            <div class="liab-stat-label">${t('liabInterestPart')} / ${liabPaymentWord()}</div>
             <div class="liab-stat-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(curInterest))}</div>
           </div>
         </div>
 
         <!-- FULL BREAKDOWN -->
         <div class="liab-payment-breakdown">
-          <div class="liab-breakdown-row"><span class="liab-breakdown-key">Сума боргу</span><span class="liab-breakdown-val" style="color:var(--text)">${sym}${fmtN(toDisplayCurr(l.amount))}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabAmount')}</span><span class="liab-breakdown-val" style="color:var(--text)">${sym}${fmtN(toDisplayCurr(amount))}</span></div>
           <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabLeft')}</span><span class="liab-breakdown-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(remaining))}</span></div>
-          <div class="liab-breakdown-row"><span class="liab-breakdown-key">Всього виплат</span><span class="liab-breakdown-val">${sym}${fmtN(toDisplayCurr(totalPay))}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${translateAutoValue('Всього виплат')||'Всього виплат'}</span><span class="liab-breakdown-val">${sym}${fmtN(toDisplayCurr(totalPay))}</span></div>
           <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabOverpay')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">+${sym}${fmtN(toDisplayCurr(overpay))}</span></div>
           <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabEffRate')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">${effRate.toFixed(2)}%</span></div>
         </div>
 
         <!-- PARTIAL PAYMENTS HISTORY -->
         ${l.partialPayments&&l.partialPayments.length?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:8px 0;">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--blue2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">💳 Часткові погашення</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--blue2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${translateAutoValue('💳 Часткові погашення')||'💳 Часткові погашення'}</div>
           ${l.partialPayments.map((pp,pi)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;">
-            <span style="color:var(--muted2)">${new Date(pp.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'})}</span>
-            <span style="color:var(--blue2)">-${fmtN(pp.amount)} ₴</span>
+            <span style="color:var(--muted2)">${new Date(pp.date).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'})}</span>
+            <span style="color:var(--blue2)">-${sym}${fmtN(toDisplayCurr(parseInputNumber(pp.amount)))}</span>
             <button class="rm-btn" onclick="removePartialPay('${l.id}',${pi})">×</button>
           </div>`).join('')}
           <div style="font-family:'DM Mono',monospace;font-size:10px;padding-top:6px;display:flex;justify-content:space-between;">
-            <span style="color:var(--muted)">Разом погашено</span>
-            <span style="color:var(--blue2);font-weight:600;">-${fmtN(l.partialPayments.reduce((s,pp)=>s+pp.amount,0))} ₴</span>
+            <span style="color:var(--muted)">${translateAutoValue('Разом погашено')||'Разом погашено'}</span>
+            <span style="color:var(--blue2);font-weight:600;">-${sym}${fmtN(toDisplayCurr(l.partialPayments.reduce((s,pp)=>s+parseInputNumber(pp.amount),0)))}</span>
           </div>
         </div>`:''}
         <!-- EXTRA PAYMENT CALCULATOR -->
@@ -4759,7 +5272,7 @@ function renderLiabilities(){
           <div class="liab-extra-label">💡 ${t('liabExtraPayment')}</div>
           <div class="liab-extra-input-row">
             <input class="field-input" type="text" inputmode="decimal" id="${extraId}" placeholder="+500 ₴"
-              style="flex:1;" oninput="calcExtraPayment('${l.id}',this.value,${l.amount},${l.rate},${l.months},${remaining})">
+              style="flex:1;" oninput="calcExtraPayment('${l.id}',this.value,${amount},${schedule.rate},${schedule.months},${remaining})">
           </div>
           <div class="liab-extra-result" id="${extraId}_result"></div>
         </div>
@@ -4773,26 +5286,31 @@ function renderLiabilities(){
       </div>
     </div>`;
   }).join('');
+  applyAutoTranslations(container);
 }
 
-function calcExtraPayment(liabId,extraStr,amount,rate,months,remaining){
-  const extra=parseFloat(extraStr)||0;
-  if(!extra)return;
-  const r=(rate/100)/12;
-  const basePayment=calcAnnuity(amount,rate,months);
-  const totalPayment=basePayment+extra;
-  // Calculate how many months to pay off remaining balance with extra payment
+function monthsToCloseDebt(remaining,payment,r,maxMonths){
   let bal=remaining, m=0;
-  while(bal>0&&m<months*2){
-    bal=bal*(1+r)-totalPayment;
+  if(!payment||payment<=bal*r)return Infinity;
+  while(bal>0.01&&m<maxMonths){
+    const paid=applyLiabRegularPayment(bal,payment,r);
+    bal=paid.balance;
     m++;
   }
-  const baseMon=Math.ceil(remaining>0?Math.log(totalPayment/(totalPayment-remaining*r))/Math.log(1+r):0);
-  const saved=months-m;
+  return bal<=0.01?m:Infinity;
+}
+function calcExtraPayment(liabId,extraStr,amount,rate,months,remaining){
+  const extra=parseInputNumber(extraStr);
   const resultEl=document.getElementById('extra_'+liabId+'_result');
-  if(resultEl&&m>0){
-    resultEl.textContent=`✓ ${t('liabSaveMonths')}: ${Math.max(0,saved)} міс → закриєте за ${m} міс`;
-  }
+  if(!resultEl)return;
+  if(!extra){resultEl.textContent='';return;}
+  const r=(parseInputNumber(rate)/100)/12;
+  const basePayment=calcAnnuity(amount,rate,months);
+  const baseMon=monthsToCloseDebt(remaining,basePayment,r,Math.max(months*3,months+120));
+  const withExtra=monthsToCloseDebt(remaining,basePayment+extra,r,Math.max(months*3,months+120));
+  if(!Number.isFinite(withExtra)){resultEl.textContent='';return;}
+  const saved=Number.isFinite(baseMon)?baseMon-withExtra:0;
+  resultEl.textContent=liabCloseMonthsText(Math.max(0,saved),withExtra);
 }
 
 // Update updateAll to subtract liabilities in net mode
@@ -4859,7 +5377,7 @@ function partialPayCloseOutside(e){if(e.target===document.getElementById('partia
 
 function confirmPartialPay(){
   const id=document.getElementById('partial_pay_liab_id').value;
-  const amount=parseFloat(document.getElementById('partial_pay_amount').value)||0;
+  const amount=parseInputNumber(document.getElementById('partial_pay_amount').value);
   const date=document.getElementById('partial_pay_date').value;
   if(!amount||!date){alert(t('enterData'));return;}
   const idx=liabilities.findIndex(l=>l.id===id);
@@ -5123,7 +5641,7 @@ function exportPDF(){
     liabilities.forEach(l=>{
       const rem=getLiabRemaining(l);
       const pay=calcAnnuity(l.amount,l.rate,l.months);
-      html+=`<tr><td>${l.name}</td><td>${sym}${fmtN(toDisplayCurr(l.amount))}</td><td class="negative">${sym}${fmtN(toDisplayCurr(rem))}</td><td>${sym}${fmtN(toDisplayCurr(pay))}</td><td>${l.rate}%</td></tr>`;
+      html+=`<tr><td>${l.name}</td><td>${sym}${fmtN(toDisplayCurr(amount))}</td><td class="negative">${sym}${fmtN(toDisplayCurr(rem))}</td><td>${sym}${fmtN(toDisplayCurr(pay))}</td><td>${schedule.rate}%</td></tr>`;
     });
     html+=`</table></div>`;
   }
@@ -5195,6 +5713,45 @@ function diagCloseOutside(e){
   if(e.target===document.getElementById('diagOverlay'))closeDiagnostics();
 }
 
+
+function diagMonthUnit(){return ({uk:'/міс',ru:'/мес',en:'/mo',de:'/Mon.',zh:'/月'}[currentLang]||'/міс');}
+function diagMonthWord(){return ({uk:'/місяць',ru:'/месяц',en:'/month',de:'/Monat',zh:'/月'}[currentLang]||'/місяць');}
+function diagDepositShort(){return ({uk:'Деп:',ru:'Деп:',en:'Dep:',de:'Einl.:',zh:'存款：'}[currentLang]||'Деп:');}
+function diagDividendShort(){return ({uk:'Дивід:',ru:'Див:',en:'Div:',de:'Div.:',zh:'股息：'}[currentLang]||'Дивід:');}
+
+function historyTxt(key){
+  const dict={
+    title:{uk:'📈 Історія графіка',ru:'📈 История графика',en:'📈 Chart history',de:'📈 Diagrammverlauf',zh:'📈 图表历史'},
+    empty:{uk:'Історія поки порожня. Вона зʼявиться після щоденних перерахунків капіталу.',ru:'История пока пустая. Она появится после ежедневных пересчётов капитала.',en:'History is empty for now. It will appear after daily capital recalculations.',de:'Der Verlauf ist noch leer. Er erscheint nach täglichen Kapital-Neuberechnungen.',zh:'历史记录暂时为空。每日重新计算资本后会出现。'},
+    records:{uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'},
+    last:{uk:'останні',ru:'последние',en:'latest',de:'letzte',zh:'最近'},
+    close:{uk:'Закрити',ru:'Закрыть',en:'Close',de:'Schließen',zh:'关闭'}
+  };
+  return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
+}
+
+function openCapitalHistory(){
+  const sym=getCurrSym();
+  const sorted=[...capitalHistory]
+    .filter(h=>h&&h.date&&Number.isFinite(Number(h.total)))
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const rows=sorted.slice(-30).reverse().map(h=>{
+    const sourceIndex=sorted.findIndex(x=>x.date===h.date);
+    const prev=sorted[sourceIndex-1];
+    const delta=prev?Number(h.total)-Number(prev.total):0;
+    const deltaPct=prev&&Number(prev.total)>0?delta/Number(prev.total)*100:0;
+    const col=delta>=0?'var(--green2)':'var(--red)';
+    const sign=delta>=0?'+':'-';
+    const locale=currentLang==='en'?'en-US':currentLang==='de'?'de-DE':currentLang==='zh'?'zh-CN':currentLang==='ru'?'ru-RU':'uk-UA';
+    const date=new Date(h.date).toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'});
+    return '<div class="history-row"><div><div class="history-date">'+date+'</div><div class="history-delta" style="text-align:left;color:'+col+'">'+(prev?sign+sym+fmtN(toDisplayCurr(Math.abs(delta)))+' ('+sign+Math.abs(deltaPct).toFixed(1)+'%)':'—')+'</div></div><div class="history-total">'+sym+fmtN(toDisplayCurr(Number(h.total)))+'</div></div>';
+  }).join('');
+  const ov=document.createElement('div');
+  ov.className='history-overlay open';
+  ov.innerHTML='<div class="history-box"><div class="diag-header"><div class="diag-title">'+historyTxt('title')+'</div><button class="diag-close" onclick="this.closest(\'.history-overlay\').remove()">✕</button></div><div class="diag-section-title">'+historyTxt('last')+' '+Math.min(sorted.length,30)+' / '+sorted.length+' '+historyTxt('records')+'</div>'+(rows||'<div class="diag-section" style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--muted2);line-height:1.5;">'+historyTxt('empty')+'</div>')+'<button class="modal-cancel" onclick="this.closest(\'.history-overlay\').remove()">'+historyTxt('close')+'</button></div>';
+  document.body.appendChild(ov);
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+}
 function renderDiagnostics(){
   const container=document.getElementById('diagContent');
   if(!container)return;
@@ -5272,13 +5829,9 @@ function renderDiagnostics(){
   // Securities stats
   let totalSecVal=0, totalSecBuyCost=0;
   securitiesSections.forEach(sec=>{
-    sec.items.forEach(it=>{
-      const qty=parseFloat(it.qty)||0;
-      const price=parseFloat(it.price)||0;
-      const buyPrice=parseFloat(it.buyPrice)||0;
-      totalSecVal+=qty*price;
-      if(buyPrice>0)totalSecBuyCost+=qty*buyPrice;
-    });
+    const stats=getStockSectionStats(sec);
+    totalSecVal+=stats.total;
+    Object.values(stats.groups).forEach(g=>{totalSecBuyCost+=g.remainingCost;});
   });
   const secPnl=totalSecBuyCost>0?totalSecVal-totalSecBuyCost:0;
   const secPnlPct=totalSecBuyCost>0?(secPnl/totalSecBuyCost*100):0;
@@ -5286,14 +5839,7 @@ function renderDiagnostics(){
   // Stock dividend income (annual)
   let stockDivAnn=0;
   securitiesSections.forEach(sec=>{
-    sec.items.forEach(it=>{
-      const qty=parseFloat(it.qty)||0;
-      const price=parseFloat(it.price)||0;
-      const divYield=(parseFloat(it.divYield)||parseFloat(it.div)||0)/100;
-      const divAbs=parseFloat(it.divAbs)||0;
-      if(divAbs>0) stockDivAnn+=qty*divAbs;
-      else if(divYield>0) stockDivAnn+=qty*price*divYield;
-    });
+    stockDivAnn+=getStockSectionStats(sec).totalDiv;
   });
   const stockDivMonth=stockDivAnn/12;
   const depMonthIncome=dailyDepIncome*30.44;
@@ -5346,20 +5892,25 @@ function renderDiagnostics(){
         <div class="diag-stat-val" style="color:var(--red)">-${sym}${fmtN(toDisplayCurr(debt))}</div>
         <div class="diag-stat-lbl">Борги</div>
       </div>
+      <button class="diag-history-btn" onclick="openCapitalHistory()">
+        <div class="diag-stat-val">📈</div>
+        <div class="diag-stat-lbl">Історія графіка</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px;">${capitalHistory.length} записів</div>
+      </button>
+      <div class="diag-stat">
+        <div class="diag-stat-val" style="color:var(--green2)">+${sym}${fmtN(toDisplayCurr(stockDivMonth))}<span style="font-size:9px;color:var(--muted);font-weight:400;">${diagMonthUnit()}</span></div>
+        <div class="diag-stat-lbl">Дивіденди акцій/місяць</div>
+        <div style="font-size:9px;color:${secPnl>=0?'var(--green2)':'var(--red)'};margin-top:4px;font-family:'DM Mono',monospace;">P&L: ${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(secPnl))}</div>
+      </div>
       <div class="diag-stat">
         <div class="diag-stat-val" style="color:var(--blue2)">+${sym}${fmtN(toDisplayCurr(dailyDepIncome))}</div>
         <div class="diag-stat-lbl">Дохід/день (деп. після податку)</div>
         ${dailyDepIncomeGross!==dailyDepIncome?`<div style="font-size:8px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">до податку: +${sym}${fmtN(toDisplayCurr(dailyDepIncomeGross))}</div>`:''}
       </div>
-      <div class="diag-stat">
-        <div class="diag-stat-val" style="color:var(--green2)">+${sym}${fmtN(toDisplayCurr(stockDivMonth))}<span style="font-size:9px;color:var(--muted);font-weight:400;">/міс</span></div>
-        <div class="diag-stat-lbl">Дивіденди акцій/місяць</div>
-        <div style="font-size:9px;color:${secPnl>=0?'var(--green2)':'var(--red)'};margin-top:4px;font-family:'DM Mono',monospace;">P&L: ${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(secPnl))}</div>
-      </div>
       <div class="diag-stat" style="grid-column:1/-1;background:linear-gradient(135deg,var(--bg3),#1a1a2e);border:1px solid var(--gold)30;">
-        <div class="diag-stat-val" style="color:var(--gold2);font-size:20px;">+${sym}${fmtN(toDisplayCurr(combinedMonth))}<span style="font-size:11px;color:var(--muted);font-weight:400;"> /місяць</span></div>
+        <div class="diag-stat-val" style="color:var(--gold2);font-size:20px;">+${sym}${fmtN(toDisplayCurr(combinedMonth))}<span style="font-size:11px;color:var(--muted);font-weight:400;"> ${diagMonthWord()}</span></div>
         <div class="diag-stat-lbl">Загальний пасивний дохід (деп. + дивіденди)</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;">Деп: +${sym}${fmtN(toDisplayCurr(depMonthIncome))} · Дивід: +${sym}${fmtN(toDisplayCurr(stockDivMonth))}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;">${diagDepositShort()} +${sym}${fmtN(toDisplayCurr(depMonthIncome))} · ${diagDividendShort()} +${sym}${fmtN(toDisplayCurr(stockDivMonth))}</div>
       </div>
     </div>
 
@@ -5427,21 +5978,26 @@ function renderDiagnostics(){
   }
 
   container.innerHTML=html;
+  applyAutoTranslations(container);
 }
 
-// ── 7-DAY FREE TRIAL ─────────────────────────────────────
+// ── 30-DAY FREE TRIAL ─────────────────────────────────────
 function checkTrial(){
   if(isPro)return;
   const trialStart=localStorage.getItem('trial_start');
   if(trialStart){
     const elapsed=Date.now()-parseInt(trialStart);
-    const daysLeft=Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+    const daysLeft=Math.max(0, TRIAL_DAYS - Math.floor(elapsed/(1000*60*60*24)));
     if(daysLeft>0){
       isPro=true;
       return;
     }
     isPro=false;
     localStorage.removeItem('kapital_pro');
+    if(!localStorage.getItem('trial_expired_paywall_shown')){
+      localStorage.setItem('trial_expired_paywall_shown','1');
+      setTimeout(()=>openPaywall(), 900);
+    }
     return;
   }
   // No trial started — show trial offer on FIRST launch
@@ -5477,7 +6033,7 @@ function getTrialDaysLeft(){
   const trialStart=localStorage.getItem('trial_start');
   if(!trialStart)return -1;
   const elapsed=Date.now()-parseInt(trialStart);
-  return Math.max(0, 7 - Math.floor(elapsed/(1000*60*60*24)));
+  return Math.max(0, TRIAL_DAYS - Math.floor(elapsed/(1000*60*60*24)));
 }
 
 // Check trial on load
@@ -5778,21 +6334,102 @@ function devResetTrial(){
 }
 
 // ── BACKUP EXPORT / IMPORT ────────────────────
+const BACKUP_STORAGE_KEYS = [
+  'kapital_v6',
+  'cap_history',
+  'display_currency',
+  'chartExpanded',
+  'trial_start',
+  'trial_shown',
+  'onboarded',
+  'kapital_pro',
+  'trial_expired_paywall_shown',
+  'worker_url'
+];
+
+function backupTxt(key){
+  const dict={
+    noData:{uk:'Немає даних для експорту',ru:'Нет данных для экспорта',en:'No data to export',de:'Keine Daten zum Exportieren',zh:'没有可导出的数据'},
+    saved:{uk:'✅ Бекап збережено!',ru:'✅ Бэкап сохранён!',en:'✅ Backup saved!',de:'✅ Backup gespeichert!',zh:'✅ 备份已保存！'},
+    file:{uk:'Файл',ru:'Файл',en:'File',de:'Datei',zh:'文件'},
+    exportErr:{uk:'❌ Помилка експорту: ',ru:'❌ Ошибка экспорта: ',en:'❌ Export error: ',de:'❌ Exportfehler: ',zh:'❌ 导出错误：'},
+    badFormat:{uk:'❌ Невірний формат файлу',ru:'❌ Неверный формат файла',en:'❌ Invalid file format',de:'❌ Ungültiges Dateiformat',zh:'❌ 文件格式无效'},
+    importAsk:{uk:'Імпортувати дані з бекапу?',ru:'Импортировать данные из бэкапа?',en:'Import data from backup?',de:'Daten aus Backup importieren?',zh:'从备份导入数据？'},
+    created:{uk:'Створено',ru:'Создано',en:'Created',de:'Erstellt',zh:'创建时间'},
+    chartHistory:{uk:'Історія графіка',ru:'История графика',en:'Chart history',de:'Diagrammverlauf',zh:'图表历史'},
+    records:{uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'},
+    replaceWarn:{uk:'⚠️ Поточні дані будуть замінені!',ru:'⚠️ Текущие данные будут заменены!',en:'⚠️ Current data will be replaced!',de:'⚠️ Aktuelle Daten werden ersetzt!',zh:'⚠️ 当前数据将被替换！'},
+    imported:{uk:'✅ Дані імпортовано! Перезавантаження...',ru:'✅ Данные импортированы! Перезагрузка...',en:'✅ Data imported! Reloading...',de:'✅ Daten importiert! Wird neu geladen...',zh:'✅ 数据已导入！正在重新加载...'},
+    readErr:{uk:'❌ Помилка читання файлу: ',ru:'❌ Ошибка чтения файла: ',en:'❌ File read error: ',de:'❌ Fehler beim Lesen der Datei: ',zh:'❌ 文件读取错误：'}
+  };
+  return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
+}
+
+function collectBackupPayload(){
+  saveDataNow();
+  saveCapitalHistory();
+  const storage={};
+  BACKUP_STORAGE_KEYS.forEach(key=>{
+    const val=localStorage.getItem(key);
+    if(val!==null)storage[key]=val;
+  });
+  const main=storage.kapital_v6?JSON.parse(storage.kapital_v6):null;
+  return {
+    app:'Kapital',
+    appVersion:APP_VERSION,
+    buildDate:APP_BUILD_DATE,
+    backupVersion:2,
+    exportedAt:new Date().toISOString(),
+    storage,
+    data:main,
+    capitalHistory:storage.cap_history?JSON.parse(storage.cap_history):[]
+  };
+}
+
+function normalizeBackupPayload(raw){
+  if(raw&&raw.backupVersion&&raw.storage)return raw;
+  if(raw&&(raw.deposits||raw.coins||raw.forexItems||raw.customSections||raw.securitiesSections||raw.liabilities||raw.metalsSections)){
+    return {
+      app:'Kapital',
+      backupVersion:1,
+      importedLegacy:true,
+      storage:{kapital_v6:JSON.stringify(raw)},
+      data:raw,
+      capitalHistory:[]
+    };
+  }
+  return null;
+}
+
+function restoreBackupPayload(payload){
+  if(!payload||!payload.storage||!payload.storage.kapital_v6)return false;
+  BACKUP_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
+  Object.entries(payload.storage).forEach(([key,val])=>{
+    if(BACKUP_STORAGE_KEYS.includes(key)&&typeof val==='string')localStorage.setItem(key,val);
+  });
+  if(payload.capitalHistory&&!payload.storage.cap_history){
+    localStorage.setItem('cap_history',JSON.stringify(payload.capitalHistory));
+  }
+  return true;
+}
+
 function backupExport(){
   try{
-    const data=localStorage.getItem('kapital_v6');
-    if(!data){alert('Немає даних для експорту');return;}
-    const blob=new Blob([data],{type:'application/json'});
+    const payload=collectBackupPayload();
+    if(!payload.data){alert(backupTxt('noData'));return;}
+    const json=JSON.stringify(payload,null,2);
+    const blob=new Blob([json],{type:'application/json'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
+    const stamp=new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
     a.href=url;
-    a.download='InveStory_backup_'+new Date().toISOString().split('T')[0]+'.json';
+    a.download='Kapital_backup_'+stamp+'.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    alert('✅ Бекап збережено!\n\nФайл: '+a.download);
-  }catch(e){alert('❌ Помилка експорту: '+e.message);}
+    alert(backupTxt('saved')+'\n\n'+backupTxt('file')+': '+a.download);
+  }catch(e){alert(backupTxt('exportErr')+e.message);}
 }
 function backupImport(){
   document.getElementById('backupFileInput').click();
@@ -5803,16 +6440,21 @@ function handleBackupFile(input){
   const reader=new FileReader();
   reader.onload=function(e){
     try{
-      const data=JSON.parse(e.target.result);
-      if(!data.deposits && !data.coins && !data.forexItems){
-        alert('❌ Невірний формат файлу');return;
+      const raw=JSON.parse(e.target.result);
+      const payload=normalizeBackupPayload(raw);
+      if(!payload){
+        alert(backupTxt('badFormat'));return;
       }
-      customConfirm('Імпортувати дані з бекапу?\n\n⚠️ Поточні дані будуть замінені!', function(){
-        localStorage.setItem('kapital_v6',JSON.stringify(data));
-        alert('✅ Дані імпортовано! Перезавантаження...');
+      const historyCount=(payload.capitalHistory||[]).length;
+      const importedAt=payload.exportedAt?new Date(payload.exportedAt).toLocaleString():file.name;
+      customConfirm(backupTxt('importAsk')+'\n\n'+backupTxt('file')+': '+file.name+'\n'+backupTxt('created')+': '+importedAt+'\n'+backupTxt('chartHistory')+': '+historyCount+' '+backupTxt('records')+'\n\n'+backupTxt('replaceWarn'), function(){
+        if(!restoreBackupPayload(payload)){
+          alert(backupTxt('badFormat'));return;
+        }
+        alert(backupTxt('imported'));
         setTimeout(function(){location.reload();},500);
       });
-    }catch(err){alert('❌ Помилка читання файлу: '+err.message);}
+    }catch(err){alert(backupTxt('readErr')+err.message);}
   };
   reader.readAsText(file);
   input.value='';
@@ -5856,9 +6498,9 @@ function devUpdateStatus(){
     const parts=[];
     if(trialStart)parts.push('Тріал: '+(daysLeft>0?daysLeft+' дн.':'закінчився'));
     else parts.push('Тріал: не розпочато');
-    parts.push('Депозитів: '+deposits.length+'/'+FREE_LIMITS.deposits);
+    parts.push('Депозитів: '+deposits.length+' / без ліміту');
     const totalStocks=securitiesSections.reduce((s,sec)=>s+sec.items.length,0);
-    parts.push('Акцій: '+totalStocks+'/'+FREE_LIMITS.stockItems);
+    parts.push('Акцій: '+totalStocks+' / без ліміту');
     parts.push('Монет: '+coins.length+'/3');
     info.textContent=parts.join(' · ');
   }
