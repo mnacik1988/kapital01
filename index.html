@@ -3947,22 +3947,32 @@ function openCryptoDetail(coinKey){
 }
 
 function sellCrypto(coinKey){
-  const qty=parseFloat(document.getElementById('cryptoSellQty')?.value)||0;
-  const price=parseFloat(document.getElementById('cryptoSellPrice')?.value)||0;
+  const qty=parseInputNumber(document.getElementById('cryptoSellQty')?.value);
+  const price=parseInputNumber(document.getElementById('cryptoSellPrice')?.value);
   if(!qty||qty<=0){alert('Вкажіть кількість');return;}
-  const owned=coins.filter(c=>c.name.toUpperCase()===coinKey).reduce((s,c)=>s+(parseFloat(c.qty)||0),0);
+  const owned=coins.filter(c=>c.name.toUpperCase()===coinKey).reduce((s,c)=>s+parseInputNumber(c.qty),0);
   if(qty>owned){alert('Не можна продати більше ніж є: '+owned);return;}
   customConfirm('Продати '+qty+' '+coinKey+' по $'+price+'?', function(){
     coins.push({name:coinKey,qty:-Math.abs(qty),buyPrice:price,curPrice:price,change24h:0});
     const totals={};
-    coins.forEach(c=>{const k=c.name.toUpperCase();totals[k]=(totals[k]||0)+(parseFloat(c.qty)||0);});
+    coins.forEach(c=>{const k=c.name.toUpperCase();totals[k]=(totals[k]||0)+parseInputNumber(c.qty);});
     Object.entries(totals).forEach(([k,t])=>{if(t<=0)coins=coins.filter(c=>c.name.toUpperCase()!==k);});
-    closeStockDetail();renderCoins();updateAll();saveData();
     const totalProfitUsd=qty*price;
+    let addedToUsdt=false;
     if(totalProfitUsd>0){
       const usdtEl=document.getElementById('cryptoUsdt');
-      if(usdtEl){usdtEl.value=String(parseInputNumber(usdtEl.value)+totalProfitUsd);updateAll();saveData();}
-      const rate=val('usdtUah')||41;
+      if(usdtEl){
+        usdtEl.value=String(parseInputNumber(usdtEl.value)+totalProfitUsd);
+        addedToUsdt=true;
+      }
+    }
+    closeStockDetail();
+    renderCoins();
+    _updateTimer=null;
+    _updateAllNow();
+    saveData();
+    if(totalProfitUsd>0&&addedToUsdt){
+      const rate=getCryptoRate();
       alert('Продано '+qty+' '+coinKey+' за $'+fmtN(Math.round(totalProfitUsd))+' USDT\n\n💵 Додано до USDT балансу\n≈ '+fmtN(Math.round(totalProfitUsd*rate))+' ₴');
     }
   });
