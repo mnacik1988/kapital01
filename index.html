@@ -3642,7 +3642,43 @@ function getSecuritiesTotal(){
 }
 
 // ── TOTALS ────────────────────────────────────
-function getCryptoVal(){const u=val('cryptoUsdt'),r=val('usdtUah')||41;return u*r;}
+function cryptoNum(v){return parseInputNumber(v);}
+function getCryptoRate(){return val('usdtUah')||liveRates.USD||usdUahRate||41;}
+function getCryptoPortfolioStats(){
+  const groups={};
+  coins.forEach(c=>{
+    const key=String(c.name||'').trim().toUpperCase();
+    if(!key)return;
+    if(!groups[key])groups[key]={name:key,totalQty:0,buyQty:0,buyCost:0,curPrice:0,change24h:0};
+    const g=groups[key];
+    const qty=cryptoNum(c.qty);
+    const buyPrice=cryptoNum(c.buyPrice);
+    const curPrice=cryptoNum(c.curPrice);
+    g.totalQty+=qty;
+    if(qty>0){
+      g.buyQty+=qty;
+      g.buyCost+=qty*buyPrice;
+    }
+    if(curPrice>0)g.curPrice=curPrice;
+    if(c.change24h!==undefined)g.change24h=cryptoNum(c.change24h);
+  });
+  let portfolioUsd=0;
+  let remainingCostUsd=0;
+  Object.values(groups).forEach(g=>{
+    const netQty=Math.max(0,g.totalQty);
+    const avgBuy=g.buyQty>0?g.buyCost/g.buyQty:0;
+    g.currentUsd=netQty*g.curPrice;
+    g.remainingCostUsd=netQty*avgBuy;
+    portfolioUsd+=g.currentUsd;
+    remainingCostUsd+=g.remainingCostUsd;
+  });
+  return {groups,portfolioUsd,remainingCostUsd};
+}
+function getCryptoVal(){
+  const usdtUsd=val('cryptoUsdt');
+  const portfolioUsd=getCryptoPortfolioStats().portfolioUsd;
+  return (usdtUsd+portfolioUsd)*getCryptoRate();
+}
 function getUsdVal(){return val('usdAmount')*(val('usdUah')||41);}
 function getForexVal(){
   return forexItems.reduce((s,f)=>{
@@ -3717,7 +3753,7 @@ function _updateAllNow(){
   if(!hiddenCards['crypto']){
     setText('cryptoDisplay', fmtN(toDisplayCurr(crypto))+' '+sym);
     setText('cryptoPct', pct(crypto,total)+' '+t('pctOfCapital'));
-    setText('cryptoUahVal', fmtN(toDisplayCurr(crypto))+' '+sym);
+    setText('cryptoUahVal', fmtN(toDisplayCurr(val('cryptoUsdt')*getCryptoRate()))+' '+sym);
     updateCryptoPnl();
     renderCoins();
   }
@@ -3771,29 +3807,32 @@ function _updateAllNow(){
 
 // ── CRYPTO ────────────────────────────────────
 function updateCryptoPnl(){
-  const cur=getCryptoVal(), cost=val('cryptoCost');
+  const stats=getCryptoPortfolioStats();
+  const cur=getCryptoVal();
+  const cost=(val('cryptoUsdt')+stats.remainingCostUsd)*getCryptoRate();
   if(!cur||!cost){setText('cryptoPnl','—');setText('cryptoRoi','—');return;}
   const pnl=cur-cost,roi=pnl/cost*100;
   const pe=$('cryptoPnl'),re=$('cryptoRoi');
-  if(pe){pe.textContent=(pnl>=0?'+':'')+fmtN(Math.round(pnl))+' ₴';pe.className='result-val '+(pnl>=0?'green':'red');}
+  if(pe){pe.textContent=(pnl>=0?'+':'')+fmtN(toDisplayCurr(pnl))+' '+getCurrSym();pe.className='result-val '+(pnl>=0?'green':'red');}
   if(re){re.textContent=(roi>=0?'+':'')+roi.toFixed(2)+'%';re.className='result-val '+(roi>=0?'green':'red');}
 }
 function addCoin(){
   const name=($('newCoinName')?.value||'').trim().toUpperCase();
-  const qty=parseFloat($('newCoinQty')?.value)||0;
-  const buyPrice=parseFloat($('newCoinBuyPrice')?.value)||0;
-  const curPrice=parseFloat($('newCoinCurPrice')?.value)||0;
+  const qty=parseInputNumber($('newCoinQty')?.value);
+  const buyPrice=parseInputNumber($('newCoinBuyPrice')?.value);
+  const curPrice=parseInputNumber($('newCoinCurPrice')?.value);
   if(!name)return;
   coins.push({name,qty,buyPrice,curPrice});
   if($('newCoinName'))$('newCoinName').value='';
   if($('newCoinQty'))$('newCoinQty').value='';
   if($('newCoinBuyPrice'))$('newCoinBuyPrice').value='';
   if($('newCoinCurPrice'))$('newCoinCurPrice').value='';
-  renderCoins(); saveData();
+  renderCoins(); updateAll(); saveData();
 }
-function removeCoin(i){coins.splice(i,1);renderCoins();saveData();}
+function removeCoin(i){coins.splice(i,1);renderCoins();updateAll();saveData();}
 function renderCoins(){
-  const rate=val('usdtUah')||41;
+  const rate=getCryptoRate();
+  const sym=getCurrSym();
   const el=$('cryptoRows'); if(!el)return;
   if(!coins.length){el.innerHTML='';return;}
   
@@ -3833,8 +3872,8 @@ function renderCoins(){
         <span class="ticker-card-qty">${g.totalQty}</span>
       </div>
       <div class="ticker-card-name">$${g.curPrice>0?fmtD(g.curPrice,2):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
-      <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(Math.round(valUah))} ₴</div>
-      <div class="ticker-card-pnl" style="color:${pnlCol}">${cost>0?(pnl>=0?'+':'')+fmtN(Math.round(pnlUah))+' ₴ ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
+      <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(toDisplayCurr(valUah))} ${sym}</div>
+      <div class="ticker-card-pnl" style="color:${pnlCol}">${cost>0?(pnl>=0?'+':'')+fmtN(toDisplayCurr(pnlUah))+' '+sym+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
       ${avgBuy>0?`<div class="ticker-card-div">Ø $${fmtD(avgBuy,2)}</div>`:''}
     </div>`;
   });
@@ -3846,7 +3885,7 @@ function renderCoins(){
   const totalPnlPct=totalCost>0?((totalVal/totalCost-1)*100):0;
   if(totalVal>0){
     html+=`<div class="result-box" style="margin-top:10px">
-      <div class="result-row"><span class="result-key">💰 Портфель (монети)</span><span class="result-val" style="color:var(--purple2)">$${fmtN(Math.round(totalVal))} ≈ ${fmtN(Math.round(totalVal*rate))} ₴</span></div>
+      <div class="result-row"><span class="result-key">💰 Портфель (монети)</span><span class="result-val" style="color:var(--purple2)">$${fmtN(Math.round(totalVal))} ≈ ${fmtN(toDisplayCurr(totalVal*rate))} ${sym}</span></div>
       <div class="result-row"><span class="result-key">📊 P&L</span><span class="result-val" style="color:${totalPnl>=0?'var(--green2)':'var(--red)'}">${totalPnl>=0?'+':''}$${fmtN(Math.round(totalPnl))} (${totalPnl>=0?'+':''}${totalPnlPct.toFixed(1)}%)</span></div>
     </div>`;
   }
@@ -6898,6 +6937,7 @@ async function refreshCryptoPrices(){
   
   if(anyUpdated){
     renderCoins();
+    updateAll();
     saveData();
   }
   }catch(e){console.error('refreshCrypto:',e);}
