@@ -1586,7 +1586,7 @@ body.theme-light::before{opacity:.18;}
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 const APP_VERSION = 'v0.0.21';
 const APP_BUILD_DATE = '2026-05-26';
-const STORAGE_SCHEMA_VERSION = 4;
+const STORAGE_SCHEMA_VERSION = 5;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
 const STORAGE_ROLLBACK_KEY = 'kapital_import_rollback';
@@ -3344,7 +3344,8 @@ function addSecuritiesCard(type){
   const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
   const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
   const id='sec_'+type+'_'+Date.now();
-  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[],lastRefresh:null});
+  const stockCashCurrency=(displayCurrency||'uah').toUpperCase();
+  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency});
   renderSecuritiesCards();
   saveData(); updateAll();
 }
@@ -3357,6 +3358,50 @@ function getStockCurrencyRate(cur){
   if(liveRates[cur]&&liveRates[cur]>0)return liveRates[cur];
   if(cur==='USD')return usdUahRate||41;
   return 1;
+}
+const STOCK_CASH_CURRENCIES=['UAH','USD','EUR','GBP','PLN','CHF','CZK','RUB','CNY'];
+function getStockCashCurrency(section){
+  const cur=String(section?.stockCashCurrency||'UAH').toUpperCase();
+  return STOCK_CASH_CURRENCIES.includes(cur)?cur:'UAH';
+}
+function getStockCurrencySymbol(cur){
+  return {UAH:'₴',USD:'$',EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',CNY:'¥'}[String(cur||'UAH').toUpperCase()]||cur;
+}
+function getStockCashAmount(section){return stockNum(section?.stockCashAmount);}
+function getStockCashTotalUah(section){return getStockCashAmount(section)*getStockCurrencyRate(getStockCashCurrency(section));}
+function setSecCashAmount(secId,value){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  if(!sec)return;
+  sec.stockCashAmount=parseInputNumber(value);
+  updateAll();saveData();
+}
+function setSecCashCurrency(secId,value){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  if(!sec)return;
+  const nextCur=String(value||'UAH').toUpperCase();
+  if(!STOCK_CASH_CURRENCIES.includes(nextCur))return;
+  const prevCur=getStockCashCurrency(sec);
+  const prevAmount=getStockCashAmount(sec);
+  if(prevAmount>0&&prevCur!==nextCur){
+    sec.stockCashAmount=(prevAmount*getStockCurrencyRate(prevCur))/getStockCurrencyRate(nextCur);
+  }
+  sec.stockCashCurrency=nextCur;
+  renderSecuritiesCards();updateAll();saveData();
+}
+function addStockSaleCash(section,amount,currency){
+  const incoming=stockNum(amount);
+  if(!section||incoming<=0)return;
+  const nextCur=String(currency||getStockCashCurrency(section)||'UAH').toUpperCase();
+  const safeCur=STOCK_CASH_CURRENCIES.includes(nextCur)?nextCur:getStockCashCurrency(section);
+  const prevCur=getStockCashCurrency(section);
+  const prevAmount=getStockCashAmount(section);
+  if(prevAmount>0&&prevCur!==safeCur){
+    const totalUah=prevAmount*getStockCurrencyRate(prevCur)+incoming*getStockCurrencyRate(safeCur);
+    section.stockCashAmount=totalUah/getStockCurrencyRate(safeCur);
+  }else{
+    section.stockCashAmount=prevAmount+incoming;
+  }
+  section.stockCashCurrency=safeCur;
 }
 function getStockSectionStats(section){
   const groups={};
@@ -3396,7 +3441,7 @@ function getStockSectionStats(section){
     }
     if(it.liveName)g.name=it.liveName;
     if(it.liveChange!=null)g.liveChange=it.liveChange;
-    if(price>0)g.curPrice=price;
+    if(!isSell&&price>0)g.curPrice=price;
     const divYield=stockNum(it.divYield)||stockNum(it.div);
     if(divYield>0)g.divYield=divYield;
     const divAbs=stockNum(it.divAbs);
@@ -3416,9 +3461,13 @@ function getStockSectionStats(section){
   });
   const visibleGroups=Object.fromEntries(Object.entries(groups).filter(([,g])=>g.totalQty>0));
   const vals=Object.values(visibleGroups);
+  const holdingsTotal=vals.reduce((sum,g)=>sum+g.currentValue,0);
+  const cashTotal=getStockCashTotalUah(section);
   return {
     groups:visibleGroups,
-    total:vals.reduce((sum,g)=>sum+g.currentValue,0),
+    holdingsTotal,
+    cashTotal,
+    total:holdingsTotal+cashTotal,
     totalDivPct:vals.reduce((sum,g)=>sum+g.divAnnualPct,0),
     totalDivAbs:vals.reduce((sum,g)=>sum+g.divAnnualAbs,0),
     totalDiv:vals.reduce((sum,g)=>sum+g.divAnnual,0)
@@ -3449,6 +3498,10 @@ function getSecCardHtml(s,idx){
   const sym=getCurrSym();
   const stats=getStockSectionStats(s);
   const total=stats.total;
+  const holdingsTotal=stats.holdingsTotal;
+  const stockCashCur=getStockCashCurrency(s);
+  const stockCashAmount=getStockCashAmount(s);
+  const stockCashTotal=stats.cashTotal;
   const totalDiv=stats.totalDiv;
   const totalDivAbs=stats.totalDivAbs;
   const hasTickers=s.items.some(it=>it.ticker);
@@ -3494,7 +3547,8 @@ function getSecCardHtml(s,idx){
     '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+sym+fmtN(toDisplayCurr(totalDiv/12))+'</span></div>'+
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
-    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(total))+'</span></div>'+
+    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(holdingsTotal))+'</span></div>'+
+    (stockCashAmount>0?'<div class="result-row"><span class="result-key">💵 Кошти від продажів</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtN(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
     '</div>'+
     (hasTickers?`<div class="auto-refresh-bar">
       <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
@@ -3519,6 +3573,16 @@ function getSecCardHtml(s,idx){
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       ${rows}
+      <div style="background:linear-gradient(135deg,#4ecb8d12,#5b9cf610);border:1px solid #4ecb8d35;border-radius:14px;padding:14px;margin-top:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">💵 Кошти від продажів акцій</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?stockCashAmount:''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
+          <select class="field-input" id="secCashCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecCashCurrency('${s.id}',this.value)">
+            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${stockCashCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
+          </select>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):'Буде поповнюватися після продажу акцій'}</div>
+      </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
         <div class="ticker-search-row">
@@ -4004,6 +4068,8 @@ function openStockDetail(secId, tickerKey){
   const divAnn=stockGroup?stockGroup.divAnnual:0;
   const divMonth=divAnn/12;
   const sym=getCurrSym();
+  const saleCurrency=getStockCashCurrency(sec);
+  const saleCurrencyOptions=STOCK_CASH_CURRENCIES.map(cur=>'<option value="'+cur+'" '+(saleCurrency===cur?'selected':'')+'>'+getStockCurrencySymbol(cur)+' '+cur+'</option>').join('');
 
   document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+ticker+'</span> '+name;
   let html='<div class="stock-detail-grid">'+
@@ -4035,6 +4101,8 @@ function openStockDetail(secId, tickerKey){
     '<input class="field-input" type="text" id="sellQty_detail" placeholder="'+totalQty+'" inputmode="decimal" value="'+totalQty+'"></div>'+
     '<div class="field-group"><div class="field-label">Ціна (₴)</div>'+
     '<input class="field-input" type="text" id="sellPrice_detail" placeholder="'+curPrice+'" inputmode="decimal" value="'+curPrice+'"></div></div>'+
+    '<div class="field-group"><div class="field-label">Валюта продажу</div>'+
+    '<select class="field-input" id="sellCurrency_detail">'+saleCurrencyOptions+'</select></div>'+
     '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">📉 Підтвердити продаж</button>'+
     '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">Скасувати</button></div>';
 
@@ -4046,22 +4114,24 @@ function sellStock(secId,tickerKey,refIdx){
   const sec=securitiesSections.find(s=>s.id===secId);if(!sec)return;
   const qty=parseInputNumber(document.getElementById('sellQty_detail')?.value);
   const price=parseInputNumber(document.getElementById('sellPrice_detail')?.value);
+  const saleCurrency=String(document.getElementById('sellCurrency_detail')?.value||getStockCashCurrency(sec)).toUpperCase();
   if(!qty||qty<=0){alert('Вкажіть кількість для продажу');return;}
   // Check can't sell more than owned
   const items=sec.items.map((it,j)=>({...it,origIdx:j}));
   const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
   const ownedQty=group.reduce((s,t)=>s+stockNum(t.qty),0);
   if(qty>ownedQty){alert('Не можна продати більше ніж є: '+ownedQty+' шт');return;}
-  customConfirm('Продати '+qty+' шт по '+fmtN(Math.round(price))+' ₴?', function(){
+  customConfirm('Продати '+qty+' шт по '+getStockCurrencySymbol(saleCurrency)+fmtN(Math.round(price))+'?', function(){
     const ref=sec.items[refIdx];
     sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency,liveOrigPrice:ref?.liveOrigPrice,divYield:ref?.divYield,div:ref?.div,divAbs:ref?.divAbs||0});
     cleanZeroStocks(sec);
-    closeStockDetail();renderSecuritiesCards();updateAll();saveData();
     const totalProfit=qty*price;
     if(totalProfit>0){
-      const cashEl=document.getElementById('cashAmount');
-      if(cashEl){cashEl.value=String(parseInputNumber(cashEl.value)+totalProfit);updateAll();saveData();}
-      alert('📈 Продано '+qty+' шт за '+fmtN(Math.round(totalProfit))+' ₴\n\n💵 Суму додано до Готівки');
+      addStockSaleCash(sec,totalProfit,saleCurrency);
+    }
+    closeStockDetail();renderSecuritiesCards();updateAll();saveData();
+    if(totalProfit>0){
+      alert('📈 Продано '+qty+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtN(Math.round(totalProfit))+'\n\n💵 Суму додано до кешу акцій');
     }
   });
 }
@@ -4389,6 +4459,8 @@ function migrateSecuritySection(sec,index){
   if(!out.name)out.name=out.type==='bonds'?t('bondsBtn'):out.type==='ovdp'?t('ovdpBtn'):t('stocksBtn');
   if(!out.icon)out.icon=out.type==='bonds'?'📜':out.type==='ovdp'?'🇺🇦':'📈';
   out.items=ensureArray(out.items).map((it,j)=>({...ensureObject(it),id:it?.id||'sec_item_'+Date.now()+'_'+index+'_'+j}));
+  out.stockCashAmount=parseInputNumber(out.stockCashAmount);
+  out.stockCashCurrency=getStockCashCurrency(out);
   return out;
 }
 function migrateCustomSection(sec,index){
@@ -4425,6 +4497,11 @@ const DATA_MIGRATIONS=[
     d.customSections=ensureArray(d.customSections).map(migrateCustomSection);
     d.metalsSections=ensureArray(d.metalsSections).map((m,i)=>({...ensureObject(m),id:m?.id||'metal_'+Date.now()+'_'+i,type:m?.type||'gold',items:ensureArray(m?.items)}));
     d.liabilities=ensureArray(d.liabilities).map((l,i)=>({...ensureObject(l),id:l?.id||'liab_'+Date.now()+'_'+i}));
+    d.storageSchemaVersion=STORAGE_SCHEMA_VERSION;
+    d.lastMigratedAppVersion=APP_VERSION;
+  }},
+  {version:5,label:'Stock sale cash balances',run:d=>{
+    d.securitiesSections=ensureArray(d.securitiesSections).map(migrateSecuritySection);
     d.storageSchemaVersion=STORAGE_SCHEMA_VERSION;
     d.lastMigratedAppVersion=APP_VERSION;
   }}
@@ -5257,7 +5334,7 @@ function getTotalInCurrency(totalUah){
 
 // ── DEFAULT SECTION ON FIRST LOAD ────────────────────────
 function addDefaultSecuritiesCard(){
-  securitiesSections.push({id:'sec_stocks_default',type:'stocks',name:'Акції',icon:'📈',items:[],lastRefresh:null});
+  securitiesSections.push({id:'sec_stocks_default',type:'stocks',name:'Акції',icon:'📈',items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency:'UAH'});
 }
 
 // ── PRECIOUS METALS ───────────────────────────────────────
@@ -6621,7 +6698,7 @@ function renderDiagnostics(){
   let totalSecVal=0, totalSecBuyCost=0;
   securitiesSections.forEach(sec=>{
     const stats=getStockSectionStats(sec);
-    totalSecVal+=stats.total;
+    totalSecVal+=stats.holdingsTotal;
     Object.values(stats.groups).forEach(g=>{totalSecBuyCost+=g.remainingCost;});
   });
   const secPnl=totalSecBuyCost>0?totalSecVal-totalSecBuyCost:0;
