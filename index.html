@@ -5309,13 +5309,13 @@ function openSettings(){
   const qaLblEl=document.getElementById('set_qa_label');
   if(qaLblEl)qaLblEl.textContent=si.qaLbl;
   const checklistBtn=document.getElementById('testChecklistBtn');
-  if(checklistBtn)checklistBtn.querySelector('span').textContent=si.testChecklistBtn;
+  if(checklistBtn){const sp=checklistBtn.querySelector('span'); if(sp)sp.textContent=si.testChecklistBtn;}
   const legalLblEl=document.getElementById('set_legal_label');
   if(legalLblEl)legalLblEl.textContent=si.legalLbl;
   const privacyBtn=document.getElementById('privacyPolicyBtn');
-  if(privacyBtn)privacyBtn.querySelector('span').textContent=si.privacyBtn;
+  if(privacyBtn){const sp=privacyBtn.querySelector('span'); if(sp)sp.textContent=si.privacyBtn;}
   const termsBtn=document.getElementById('termsPolicyBtn');
-  if(termsBtn)termsBtn.querySelector('span').textContent=si.termsBtn;
+  if(termsBtn){const sp=termsBtn.querySelector('span'); if(sp)sp.textContent=si.termsBtn;}
   updateAppVersionUI();
   updateStorageHealthUI();
   document.querySelectorAll('.settings-lang-btn').forEach(b=>{
@@ -5325,10 +5325,11 @@ function openSettings(){
     b.classList.toggle('active', b.id==='scurr-'+displayCurrency);
   });
   applyAppTheme(appTheme);
-  document.getElementById('settingsOverlay').classList.add('open');
+  const settingsOverlay=document.getElementById('settingsOverlay');
+  if(settingsOverlay)settingsOverlay.classList.add('open');
   if(typeof devUpdateStatus==='function')devUpdateStatus();
 }
-function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
+function closeSettings(){const settingsOverlay=document.getElementById('settingsOverlay'); if(settingsOverlay)settingsOverlay.classList.remove('open');}
 function settingsCloseOutside(e){if(e.target===document.getElementById('settingsOverlay'))closeSettings();}
 
 function setLangFromSettings(lang){
@@ -5349,13 +5350,13 @@ function setLangFromSettings(lang){
   const qaLblEl=document.getElementById('set_qa_label');
   if(qaLblEl)qaLblEl.textContent=si.qaLbl;
   const checklistBtn=document.getElementById('testChecklistBtn');
-  if(checklistBtn)checklistBtn.querySelector('span').textContent=si.testChecklistBtn;
+  if(checklistBtn){const sp=checklistBtn.querySelector('span'); if(sp)sp.textContent=si.testChecklistBtn;}
   const legalLblEl=document.getElementById('set_legal_label');
   if(legalLblEl)legalLblEl.textContent=si.legalLbl;
   const privacyBtn=document.getElementById('privacyPolicyBtn');
-  if(privacyBtn)privacyBtn.querySelector('span').textContent=si.privacyBtn;
+  if(privacyBtn){const sp=privacyBtn.querySelector('span'); if(sp)sp.textContent=si.privacyBtn;}
   const termsBtn=document.getElementById('termsPolicyBtn');
-  if(termsBtn)termsBtn.querySelector('span').textContent=si.termsBtn;
+  if(termsBtn){const sp=termsBtn.querySelector('span'); if(sp)sp.textContent=si.termsBtn;}
   updateStorageHealthUI();
   document.querySelectorAll('.settings-lang-btn').forEach(b=>{
     b.classList.toggle('active', b.id==='slang-'+lang);
@@ -7642,16 +7643,19 @@ getCustomTotal=function(){
   },0);
 };
 
-// Re-render startup/business custom sections after startup overrides are available.
-// Initial app render happens earlier in the file, so this keeps totals alive after reload.
-if(Array.isArray(customSections)&&customSections.length){
-  renderCustomCards();
-  renderSecuritiesCards();
-  if(typeof renderMetalsCards==='function')renderMetalsCards();
-  updateAll();
-  restoreOrder();
-  refreshDrag();
-}
+// Re-render startup/business custom sections after all late extensions are available.
+// Initial app render happens earlier in the file; this keeps totals alive after reload.
+setTimeout(()=>{
+  try{
+    if(Array.isArray(customSections)&&customSections.length)renderCustomCards();
+    if(typeof renderSecuritiesCards==='function')renderSecuritiesCards();
+    if(typeof renderMetalsCards==='function')renderMetalsCards();
+    if(typeof renderLiabilities==='function')renderLiabilities();
+    if(typeof restoreOrder==='function')restoreOrder();
+    if(typeof updateAll==='function')updateAll();
+    if(typeof refreshDrag==='function')refreshDrag();
+  }catch(e){console.error('late startup refresh failed',e);}
+},0);
 
 // ── DEV TOOLS ─────────────────────────────────────────────
 function devSetPro(state){
