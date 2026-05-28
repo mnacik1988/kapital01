@@ -848,7 +848,7 @@ body.theme-light::before{opacity:.18;}
       <div class="divider"></div>
       <!-- USDT BALANCE -->
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💵 USDT Баланс</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💵 USDT баланс</div>
         <div class="row2">
           <div class="field-group">
             <div class="field-label">USDT ($)</div>
@@ -867,7 +867,7 @@ body.theme-light::before{opacity:.18;}
       <div id="cryptoRows" style="margin-top:4px"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
         <span class="crypto-live-badge" id="cryptoRefreshStatus"><span class="live-dot" style="width:5px;height:5px;"></span> Онлайн ціни</span>
-        <button class="refresh-btn" onclick="refreshCryptoPrices()" id="cryptoRefreshBtn" style="font-family:'DM Mono',monospace;font-size:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;color:var(--purple2);cursor:pointer;">⟳ Оновити</button>
+        <button class="refresh-btn" onclick="refreshCryptoPrices(true)" id="cryptoRefreshBtn" style="font-family:'DM Mono',monospace;font-size:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;color:var(--purple2);cursor:pointer;">⟳ Оновити</button>
       </div>
       <div style="margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
         <div class="calc-title" data-i18n="addCoinTitle">+ Додати монету</div>
@@ -1586,7 +1586,7 @@ body.theme-light::before{opacity:.18;}
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 const APP_VERSION = 'v0.0.21';
 const APP_BUILD_DATE = '2026-05-26';
-const STORAGE_SCHEMA_VERSION = 5;
+const STORAGE_SCHEMA_VERSION = 6;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
 const STORAGE_ROLLBACK_KEY = 'kapital_import_rollback';
@@ -1984,6 +1984,27 @@ Object.assign(EXTRA_I18N,{
   '💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.':{uk:'💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.',ru:'💡 В Украине налог на депозиты: 18% + 1.5% военный сбор = 19.5%. Укажите в настройках депозита.',en:'💡 In Ukraine, deposit tax is 18% + 1.5% military levy = 19.5%. Set it in deposit settings.',de:'💡 In der Ukraine beträgt die Steuer auf Einlagen 18% + 1,5% Militärabgabe = 19,5%. In den Einlageneinstellungen festlegen.',zh:'💡 在乌克兰，存款税为 18% + 1.5% 军费 = 19.5%。请在存款设置中填写。'}
 });
 
+Object.assign(EXTRA_I18N,{
+  '💵 USDT баланс':{uk:'💵 USDT баланс',ru:'💵 USDT баланс',en:'💵 USDT balance',de:'💵 USDT-Guthaben',zh:'💵 USDT 余额'},
+  'Курс USDT/₴':{uk:'Курс USDT/₴',ru:'Курс USDT/₴',en:'USDT/₴ rate',de:'USDT/₴ Kurs',zh:'USDT/₴ 汇率'},
+  'Еквівалент у ₴':{uk:'Еквівалент у ₴',ru:'Эквивалент в ₴',en:'₴ equivalent',de:'₴ Gegenwert',zh:'₴ 等值'},
+  'Онлайн ціни':{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
+  '⟳ Оновити':{uk:'⟳ Оновити',ru:'⟳ Обновить',en:'⟳ Refresh',de:'⟳ Aktualisieren',zh:'⟳ 刷新'},
+  'автоматично':{uk:'автоматично',ru:'автоматически',en:'automatic',de:'automatisch',zh:'自动'},
+  'авто':{uk:'авто',ru:'авто',en:'auto',de:'auto',zh:'自动'},
+  'Вдома, сейф...':{uk:'Вдома, сейф...',ru:'Дома, сейф...',en:'Home, safe...',de:'Zuhause, Safe...',zh:'家中、保险箱...'},
+  'Необл. мінімум ₴':{uk:'Неоподатк. мінімум ₴',ru:'Необл. минимум ₴',en:'Tax-free minimum ₴',de:'Steuerfreier Mindestbetrag ₴',zh:'免税最低额 ₴'},
+  'для P&L':{uk:'для P&L',ru:'для P&L',en:'for P&L',de:'für GuV',zh:'用于盈亏'},
+  '💰 Портфель (монети)':{uk:'💰 Портфель (монети)',ru:'💰 Портфель (монеты)',en:'💰 Portfolio (coins)',de:'💰 Portfolio (Coins)',zh:'💰 投资组合（币种）'},
+  '💵 Кошти від продажів акцій':{uk:'💵 Кошти від продажів акцій',ru:'💵 Деньги от продажи акций',en:'💵 Stock sale cash',de:'💵 Geld aus Aktienverkäufen',zh:'💵 股票卖出资金'},
+  'Буде поповнюватися після продажу акцій':{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
+  'Тріал':{uk:'Тріал',ru:'Триал',en:'Trial',de:'Test',zh:'试用'},
+  'дн.':{uk:'дн.',ru:'дн.',en:'d',de:'Tg.',zh:'天'},
+  'Моніторинг':{uk:'Моніторинг',ru:'Мониторинг',en:'Monitoring',de:'Überwachung',zh:'监控'},
+  'подат.':{uk:'подат.',ru:'налог',en:'tax',de:'Steuer',zh:'税'},
+  'на тіло':{uk:'на тіло',ru:'в тело',en:'to principal',de:'zum Kapital',zh:'计入本金'}
+});
+
 function getAutoI18nMap(){
   const map={...EXTRA_I18N};
   Object.entries(LANGS.uk||{}).forEach(([key,ukVal])=>{
@@ -2061,6 +2082,51 @@ function startAutoI18nObserver(){
 
 let currentLang='uk';
 function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LANGS['uk'][key]||key;}
+const UI_TEXT={
+  stockSaleCash:{uk:'💵 Кошти від продажів акцій',ru:'💵 Деньги от продажи акций',en:'💵 Stock sale cash',de:'💵 Geld aus Aktienverkäufen',zh:'💵 股票卖出资金'},
+  stockSaleCashShort:{uk:'💵 Кошти від продажів',ru:'💵 Деньги от продаж',en:'💵 Sale cash',de:'💵 Verkaufserlöse',zh:'💵 卖出资金'},
+  stockSaleCashHint:{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
+  bondCash:{uk:'💵 Кошти від продажу / погашення',ru:'💵 Деньги от продажи / погашения',en:'💵 Sale / redemption cash',de:'💵 Geld aus Verkauf / Rückzahlung',zh:'💵 卖出 / 赎回资金'},
+  bondCashShort:{uk:'💵 Продаж / погашення',ru:'💵 Продажа / погашение',en:'💵 Sale / redemption',de:'💵 Verkauf / Rückzahlung',zh:'💵 卖出 / 赎回'},
+  bondCashHint:{uk:'Можна вносити кошти після продажу або погашення облігацій',ru:'Можно вносить деньги после продажи или погашения облигаций',en:'Use for cash after bond sale or maturity redemption',de:'Für Erlöse nach Verkauf oder Rückzahlung von Anleihen',zh:'用于债券卖出或到期赎回后的资金'},
+  bondAddTitle:{uk:'📜 Додати облігацію',ru:'📜 Добавить облигацию',en:'📜 Add bond',de:'📜 Anleihe hinzufügen',zh:'📜 添加债券'},
+  bondName:{uk:'Назва / ISIN',ru:'Название / ISIN',en:'Name / ISIN',de:'Name / ISIN',zh:'名称 / ISIN'},
+  bondQty:{uk:'Кількість',ru:'Количество',en:'Quantity',de:'Anzahl',zh:'数量'},
+  bondCurrency:{uk:'Валюта',ru:'Валюта',en:'Currency',de:'Währung',zh:'货币'},
+  bondNominal:{uk:'Номінал',ru:'Номинал',en:'Face value',de:'Nennwert',zh:'面值'},
+  bondBuyPrice:{uk:'Ціна купівлі',ru:'Цена покупки',en:'Buy price',de:'Kaufpreis',zh:'买入价'},
+  bondCurrentPrice:{uk:'Поточна ціна',ru:'Текущая цена',en:'Current price',de:'Aktueller Preis',zh:'当前价'},
+  bondCoupon:{uk:'Купон % / рік',ru:'Купон % / год',en:'Coupon % / year',de:'Kupon % / Jahr',zh:'票息 % / 年'},
+  bondMaturity:{uk:'Дата погашення',ru:'Дата погашения',en:'Maturity date',de:'Fälligkeit',zh:'到期日'},
+  bondAddBtn:{uk:'+ Додати облігацію',ru:'+ Добавить облигацию',en:'+ Add bond',de:'+ Anleihe hinzufügen',zh:'+ 添加债券'},
+  bondMarketValue:{uk:'Ринкова вартість',ru:'Рыночная стоимость',en:'Market value',de:'Marktwert',zh:'市值'},
+  bondCouponIncome:{uk:'Купон / рік',ru:'Купон / год',en:'Coupon / year',de:'Kupon / Jahr',zh:'年票息'},
+  bondMaturityValue:{uk:'До погашення',ru:'К погашению',en:'At maturity',de:'Bei Fälligkeit',zh:'到期金额'},
+  bondManualMode:{uk:'Ручний режим · API Cbonds можна підключити пізніше',ru:'Ручной режим · API Cbonds можно подключить позже',en:'Manual mode · Cbonds API can be connected later',de:'Manueller Modus · Cbonds API kann später verbunden werden',zh:'手动模式 · 之后可连接 Cbonds API'},
+  buyPriceForPnl:{uk:'для P&L',ru:'для P&L',en:'for P&L',de:'für GuV',zh:'用于盈亏'},
+  autoFull:{uk:'автоматично',ru:'автоматически',en:'automatic',de:'automatisch',zh:'自动'},
+  cryptoPortfolio:{uk:'💰 Портфель (монети)',ru:'💰 Портфель (монеты)',en:'💰 Portfolio (coins)',de:'💰 Portfolio (Coins)',zh:'💰 投资组合（币种）'},
+  onlinePrices:{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
+  refresh:{uk:'⟳ Оновити',ru:'⟳ Обновить',en:'⟳ Refresh',de:'⟳ Aktualisieren',zh:'⟳ 刷新'},
+  refreshing:{uk:'⟳ ...',ru:'⟳ ...',en:'⟳ ...',de:'⟳ ...',zh:'⟳ ...'},
+  usdtBalance:{uk:'💵 USDT баланс',ru:'💵 USDT баланс',en:'💵 USDT balance',de:'💵 USDT-Guthaben',zh:'💵 USDT 余额'},
+  usdtRate:{uk:'Курс USDT/₴',ru:'Курс USDT/₴',en:'USDT/₴ rate',de:'USDT/₴ Kurs',zh:'USDT/₴ 汇率'},
+  uahEquivalent:{uk:'Еквівалент у ₴',ru:'Эквивалент в ₴',en:'₴ equivalent',de:'₴ Gegenwert',zh:'₴ 等值'},
+  noTaxMinimum:{uk:'Неоподатк. мінімум ₴',ru:'Необл. минимум ₴',en:'Tax-free minimum ₴',de:'Steuerfreier Mindestbetrag ₴',zh:'免税最低额 ₴'},
+  monitoring:{uk:'Моніторинг',ru:'Мониторинг',en:'Monitoring',de:'Überwachung',zh:'监控'},
+  daysShort:{uk:'дн.',ru:'дн.',en:'d',de:'Tg.',zh:'天'},
+  toPrincipal:{uk:'→ на тіло',ru:'→ в тело',en:'→ to principal',de:'→ zum Kapital',zh:'→ 计入本金'},
+  toSeparate:{uk:'→ окремий рахунок',ru:'→ отдельный счёт',en:'→ separate account',de:'→ separates Konto',zh:'→ 单独账户'},
+  perMonthForecast:{uk:'📅 Прогноз/місяць',ru:'📅 Прогноз/месяц',en:'📅 Forecast/month',de:'📅 Prognose/Monat',zh:'📅 预测/月'},
+  interestLabel:{uk:'💰 Проценти',ru:'💰 Проценты',en:'💰 Interest',de:'💰 Zinsen',zh:'💰 利息'},
+  taxShort:{uk:'подат.',ru:'налог',en:'tax',de:'Steuer',zh:'税'},
+  trialShort:{uk:'Тріал',ru:'Триал',en:'Trial',de:'Test',zh:'试用'},
+  netBtn:{uk:'Нетто',ru:'Нетто',en:'Net',de:'Netto',zh:'净值'}
+  ,workerLabel:{uk:'⚙️ Cloudflare Worker URL (для GitHub Pages / App)',ru:'⚙️ Cloudflare Worker URL (для GitHub Pages / App)',en:'⚙️ Cloudflare Worker URL (for GitHub Pages / App)',de:'⚙️ Cloudflare Worker URL (für GitHub Pages / App)',zh:'⚙️ Cloudflare Worker URL（用于 GitHub Pages / App）'}
+  ,workerHint:{uk:'Розгорніть stock-worker.js на workers.cloudflare.com та вставте URL нижче',ru:'Разверните stock-worker.js на workers.cloudflare.com и вставьте URL ниже',en:'Deploy stock-worker.js on workers.cloudflare.com and paste the URL below',de:'Stellen Sie stock-worker.js auf workers.cloudflare.com bereit und fügen Sie die URL unten ein',zh:'在 workers.cloudflare.com 部署 stock-worker.js，然后在下方粘贴 URL'}
+  ,save:{uk:'💾 Зберегти',ru:'💾 Сохранить',en:'💾 Save',de:'💾 Speichern',zh:'💾 保存'}
+};
+function uiText(key){const rec=UI_TEXT[key];return rec?(rec[currentLang]||rec.uk||key):key;}
 const APP_VERSION_I18N={
   uk:'Версія застосунку',
   ru:'Версия приложения',
@@ -2102,6 +2168,7 @@ function applyTranslations(){
   applyAutoTranslations();
   updateAppVersionUI();
   startAutoI18nObserver();
+  if(typeof updateProUI==='function')updateProUI();
   updateAll();
 }
 
@@ -2159,8 +2226,8 @@ function getDepositHtml(dep,idx){
           <div class="live-row"><span class="live-key">${lang.netProfitLabel}</span><span class="live-val g" id="liveNet_${dep.id}">—</span></div>
           <div class="live-row"><span class="live-key">${lang.perSec}</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
           <div class="live-row"><span class="live-key">${lang.perDay}</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">📅 Прогноз/місяць</span><span class="live-val g" id="livePerMonth_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">💰 Проценти</span><span class="live-val" id="liveInterestTo_${dep.id}" style="font-size:9px;color:var(--muted2)">${dep.interestTo==='separate'?'→ окремий рахунок':'→ на тіло'}</span></div>
+          <div class="live-row"><span class="live-key">${uiText('perMonthForecast')}</span><span class="live-val g" id="livePerMonth_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${uiText('interestLabel')}</span><span class="live-val" id="liveInterestTo_${dep.id}" style="font-size:9px;color:var(--muted2)">${dep.interestTo==='separate'?uiText('toSeparate'):uiText('toPrincipal')}</span></div>
         </div>
         <div class="live-bar-wrap"><div class="live-bar" id="liveBar_${dep.id}" style="width:0%"></div></div>
         <div class="live-dates"><span id="liveDateStart_${dep.id}">—</span><span id="liveDatePct_${dep.id}">0%</span><span id="liveDateEnd_${dep.id}">—</span></div>
@@ -2581,7 +2648,7 @@ function calcLive(depId){
     regDate=new Date(parseInt(rp[0]),parseInt(rp[1])-1,parseInt(rp[2]));
   }
   const dMonitoring=Math.max(0,Math.round((now-regDate)/(1000*60*60*24)));
-  setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days')+' · Моніторинг: '+dMonitoring+' дн.');
+  setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days')+' · '+uiText('monitoring')+': '+dMonitoring+' '+uiText('daysShort'));
   setText('liveInterest_'+depId,'+'+fmtLive(totalGrossInterest,depSym)+' ('+completedMonths+' міс)');
   setText('liveTaxLive_'+depId,'−'+fmtLive(totalTaxPaid,depSym)+' ('+Math.round(tax*100)+'%)');
   setText('liveNet_'+depId,'+'+fmtLive(totalNetCapitalized,depSym));
@@ -2605,7 +2672,7 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   const nowNorm=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const daysMonitored=Math.max(0,Math.round((nowNorm-msNorm)/(1000*60*60*24)));
   const count=Math.min(daysMonitored,30);
-  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">Моніторинг почнеться завтра</div>';return;}
+  if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">'+(translateAutoValue('Моніторинг почнеться завтра')||'Моніторинг почнеться завтра')+'</div>';return;}
 
   // Helper: date to YYYY-MM-DD string (avoids timezone issues)
   const toStr=d=>{const dd=new Date(d);return dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');};
@@ -2674,7 +2741,7 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
     rows+=`<div class="daily-row">
       <span class="daily-date">${date.toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}${isCap?' 💰':''}</span>
       <span class="daily-income" style="color:var(--green2)">+${dailyNet.toFixed(2)} ${depSym}/${t('days')}</span>
-      <span class="daily-total" style="color:var(--muted);font-size:9px">${dailyGross.toFixed(2)} − ${(dailyGross*tax).toFixed(2)} подат.</span>
+      <span class="daily-total" style="color:var(--muted);font-size:9px">${dailyGross.toFixed(2)} − ${(dailyGross*tax).toFixed(2)} ${uiText('taxShort')}</span>
     </div>`;
   }
   el.innerHTML=rows;
@@ -3369,6 +3436,33 @@ function getStockCurrencySymbol(cur){
 }
 function getStockCashAmount(section){return stockNum(section?.stockCashAmount);}
 function getStockCashTotalUah(section){return getStockCashAmount(section)*getStockCurrencyRate(getStockCashCurrency(section));}
+function isBondSection(section){return section&&(section.type==='bonds'||section.type==='ovdp');}
+function bondItemCurrency(it){const cur=String(it?.currency||'UAH').toUpperCase();return STOCK_CASH_CURRENCIES.includes(cur)?cur:'UAH';}
+function getBondItemStats(it){
+  const qty=Math.max(0,stockNum(it?.qty));
+  const cur=bondItemCurrency(it);
+  const rate=getStockCurrencyRate(cur);
+  const nominal=stockNum(it?.nominal)||1000;
+  const buyPrice=stockNum(it?.buyPrice)||nominal;
+  const currentPrice=stockNum(it?.price)||buyPrice||nominal;
+  const couponRate=stockNum(it?.couponRate);
+  const marketValueNative=qty*currentPrice;
+  const costNative=qty*buyPrice;
+  const maturityNative=qty*nominal;
+  const couponNative=qty*nominal*(couponRate/100);
+  const pnlNative=marketValueNative-costNative;
+  return {qty,cur,rate,nominal,buyPrice,currentPrice,couponRate,marketValueNative,costNative,maturityNative,couponNative,pnlNative,marketValue:marketValueNative*rate,cost:costNative*rate,maturityValue:maturityNative*rate,couponAnnual:couponNative*rate,pnl:pnlNative*rate};
+}
+function getBondSectionStats(section){
+  const items=ensureArray(section?.items);
+  const rows=items.map((it,idx)=>({it,idx,...getBondItemStats(it)}));
+  const holdingsTotal=rows.reduce((sum,r)=>sum+r.marketValue,0);
+  const cashTotal=getStockCashTotalUah(section);
+  const couponAnnual=rows.reduce((sum,r)=>sum+r.couponAnnual,0);
+  const maturityValue=rows.reduce((sum,r)=>sum+r.maturityValue,0);
+  const pnl=rows.reduce((sum,r)=>sum+r.pnl,0);
+  return {rows,holdingsTotal,cashTotal,total:holdingsTotal+cashTotal,couponAnnual,maturityValue,pnl};
+}
 function setSecCashAmount(secId,value){
   const sec=securitiesSections.find(s=>s.id===secId);
   if(!sec)return;
@@ -3473,7 +3567,7 @@ function getStockSectionStats(section){
     totalDiv:vals.reduce((sum,g)=>sum+g.divAnnual,0)
   };
 }
-function getSecuritiesSectionTotal(section){return getStockSectionStats(section).total;}
+function getSecuritiesSectionTotal(section){return isBondSection(section)?getBondSectionStats(section).total:getStockSectionStats(section).total;}
 
 function renderSecuritiesCards(){
   const container=$('securitiesContainer');
@@ -3494,6 +3588,7 @@ function renderSecuritiesCards(){
 }
 
 function getSecCardHtml(s,idx){
+  if(isBondSection(s))return getBondCardHtml(s,idx);
   const lang=LANGS[currentLang];
   const sym=getCurrSym();
   const stats=getStockSectionStats(s);
@@ -3548,7 +3643,7 @@ function getSecCardHtml(s,idx){
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(holdingsTotal))+'</span></div>'+
-    (stockCashAmount>0?'<div class="result-row"><span class="result-key">💵 Кошти від продажів</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtN(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
+    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockSaleCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtN(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
     '</div>'+
     (hasTickers?`<div class="auto-refresh-bar">
       <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
@@ -3574,14 +3669,14 @@ function getSecCardHtml(s,idx){
       <div class="divider"></div>
       ${rows}
       <div style="background:linear-gradient(135deg,#4ecb8d12,#5b9cf610);border:1px solid #4ecb8d35;border-radius:14px;padding:14px;margin-top:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">💵 Кошти від продажів акцій</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiText('stockSaleCash')}</div>
         <div style="display:flex;gap:8px;align-items:center;">
           <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?stockCashAmount:''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
           <select class="field-input" id="secCashCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecCashCurrency('${s.id}',this.value)">
             ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${stockCashCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
           </select>
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):'Буде поповнюватися після продажу акцій'}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('stockSaleCashHint')}</div>
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
@@ -3602,13 +3697,13 @@ function getSecCardHtml(s,idx){
           </div>
           <div class="field-group">
             <div class="field-label">Ціна купівлі (₴)</div>
-            <input class="field-input" type="text" id="secBuyPrice_${s.id}" placeholder="для P&L" inputmode="decimal">
+            <input class="field-input" type="text" id="secBuyPrice_${s.id}" placeholder="${uiText('buyPriceForPnl')}" inputmode="decimal">
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
             <div class="field-label">${t('secPriceCurrent')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
-            <input class="field-input" type="text" id="secPrice_${s.id}" placeholder="автоматично" inputmode="decimal">
+            <input class="field-input" type="text" id="secPrice_${s.id}" placeholder="${uiText('autoFull')}" inputmode="decimal">
           </div>
           <div class="field-group">
             <div class="field-label">${t('secDivPct')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
@@ -3618,18 +3713,16 @@ function getSecCardHtml(s,idx){
         <button class="add-btn" onclick="addSecItem('${s.id}')">${lang.addSecItem}</button>
       </div>
       <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--blue2);text-transform:uppercase;margin-bottom:6px;">
-          ⚙️ Cloudflare Worker URL <span style="color:var(--muted);font-size:8px">(для GitHub Pages / App)</span>
-        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--blue2);text-transform:uppercase;margin-bottom:6px;">${uiText('workerLabel')}</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:8px;">
-          Розгорніть <span style="color:var(--green2)">stock-worker.js</span> на workers.cloudflare.com та вставте URL нижче
+          ${uiText('workerHint')}
         </div>
         <div style="display:flex;gap:6px;">
           <input type="text" id="workerUrlInput_${s.id}" placeholder="https://your-worker.workers.dev" 
             style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);outline:none;"
             value="${WORKER_URL||''}">
           <button onclick="saveWorkerUrl('${s.id}')" style="background:#5b9cf620;border:1px solid #5b9cf640;border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;white-space:nowrap;">
-            💾 Зберегти
+            ${uiText('save')}
           </button>
         </div>
         <div id="workerUrlStatus_${s.id}" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;"></div>
@@ -3637,6 +3730,151 @@ function getSecCardHtml(s,idx){
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeSecCard('${s.id}')">${lang.removeSection}</button>
     </div></div>
   </div>`;
+}
+
+
+function getBondCardHtml(s,idx){
+  const lang=LANGS[currentLang];
+  const sym=getCurrSym();
+  const stats=getBondSectionStats(s);
+  const stockCashCur=getStockCashCurrency(s);
+  const stockCashAmount=getStockCashAmount(s);
+  const stockCashTotal=stats.cashTotal;
+  const themeClass='card-stocks';
+  const rows=stats.rows.length?(
+    '<div class="ticker-cards">'+
+    stats.rows.map(r=>{
+      const name=escapeHtml(r.it.name||r.it.isin||'—');
+      const isin=escapeHtml(r.it.isin||'');
+      const pnlCol=r.pnl>=0?'var(--green2)':'var(--red)';
+      const nativeSym=getStockCurrencySymbol(r.cur);
+      return `<div class="ticker-card">
+        <div class="ticker-card-head">
+          <span class="ticker-card-sym">${name}</span>
+          <span class="ticker-card-qty">${fmtN(r.qty)} шт</span>
+        </div>
+        ${isin?`<div class="ticker-card-name">${isin}</div>`:''}
+        <div class="ticker-card-price">${nativeSym}${fmtN(r.marketValueNative)} · ${sym}${fmtN(toDisplayCurr(r.marketValue))}</div>
+        <div class="ticker-card-pnl" style="color:${pnlCol}">${r.pnl>=0?'+':'-'}${sym}${fmtN(toDisplayCurr(Math.abs(r.pnl)))} P&L</div>
+        <div class="ticker-card-div">${uiText('bondCouponIncome')}: ~${sym}${fmtN(toDisplayCurr(r.couponAnnual))}</div>
+        ${r.it.maturityDate?`<div class="ticker-card-div">${uiText('bondMaturity')}: ${escapeHtml(r.it.maturityDate)}</div>`:''}
+        <button class="mini-del" onclick="removeSecItem('${s.id}',${r.idx})">×</button>
+      </div>`;
+    }).join('')+
+    '</div>'+
+    '<div class="sec-summary-divs"><div class="sd-label">📜 '+(s.type==='ovdp'?t('ovdpBtn'):t('bondsBtn'))+'</div>'+
+    '<div class="sd-row"><span class="sd-key">'+uiText('bondMarketValue')+'</span><span class="sd-val">'+sym+fmtN(toDisplayCurr(stats.holdingsTotal))+'</span></div>'+
+    '<div class="sd-row"><span class="sd-key">'+uiText('bondCouponIncome')+'</span><span class="sd-val">~'+sym+fmtN(toDisplayCurr(stats.couponAnnual))+'</span></div>'+
+    '<div class="sd-row"><span class="sd-key">'+uiText('bondMaturityValue')+'</span><span class="sd-val">'+sym+fmtN(toDisplayCurr(stats.maturityValue))+'</span></div>'+
+    '</div>'+
+    '<div class="result-box" style="margin-top:10px">'+
+    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(stats.holdingsTotal))+'</span></div>'+
+    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtN(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
+    '</div>'
+  ):'';
+
+  return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
+    <div class="card-header">
+      <div class="drag-handle">⠿</div>
+      <div class="card-icon">${s.icon||'📜'}</div>
+      <div class="card-info" onclick="toggleCard('${s.id}')">
+        <div class="card-name">${s.name}</div>
+        <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(stats.total))}</div>
+        <div class="card-pct" id="secPct_${s.id}">—</div>
+      </div>
+      <div class="card-actions">
+        <button class="card-del-btn" onclick="removeSecCard('${s.id}')">×</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+      </div>
+    </div>
+    <div class="card-body"><div class="card-inner">
+      <div class="divider"></div>
+      ${rows}
+      <div style="background:linear-gradient(135deg,#e8c97a12,#4ecb8d10);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiText('bondCash')}</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?stockCashAmount:''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
+          <select class="field-input" id="secCashCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecCashCurrency('${s.id}',this.value)">
+            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${stockCashCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
+          </select>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('bondCashHint')}</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+        <div class="calc-title">${uiText('bondAddTitle')}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:10px;">${uiText('bondManualMode')}</div>
+        <div class="field-group">
+          <div class="field-label">${uiText('bondName')}</div>
+          <input class="field-input" type="text" id="bondName_${s.id}" placeholder="${s.type==='ovdp'?'UA400022... / ОВДП':'ISIN / Bond name'}">
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${uiText('bondQty')}</div>
+            <input class="field-input" type="text" id="bondQty_${s.id}" placeholder="10" inputmode="decimal">
+          </div>
+          <div class="field-group">
+            <div class="field-label">${uiText('bondCurrency')}</div>
+            <select class="field-input" id="bondCurrency_${s.id}">
+              ${STOCK_CASH_CURRENCIES.slice(0,5).map(cur=>`<option value="${cur}">${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${uiText('bondNominal')}</div>
+            <input class="field-input" type="text" id="bondNominal_${s.id}" placeholder="1000" inputmode="decimal">
+          </div>
+          <div class="field-group">
+            <div class="field-label">${uiText('bondBuyPrice')}</div>
+            <input class="field-input" type="text" id="bondBuyPrice_${s.id}" placeholder="980" inputmode="decimal">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${uiText('bondCurrentPrice')}</div>
+            <input class="field-input" type="text" id="bondPrice_${s.id}" placeholder="1000" inputmode="decimal">
+          </div>
+          <div class="field-group">
+            <div class="field-label">${uiText('bondCoupon')}</div>
+            <input class="field-input" type="text" id="bondCoupon_${s.id}" placeholder="16" inputmode="decimal">
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">${uiText('bondMaturity')}</div>
+          <input class="field-input" type="date" id="bondMaturity_${s.id}">
+        </div>
+        <button class="add-btn" onclick="addBondItem('${s.id}')">${uiText('bondAddBtn')}</button>
+      </div>
+      <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeSecCard('${s.id}')">${lang.removeSection}</button>
+    </div></div>
+  </div>`;
+}
+
+function addBondItem(secId){
+  const idx=securitiesSections.findIndex(s=>s.id===secId); if(idx<0)return;
+  const name=($('bondName_'+secId)?.value||'').trim();
+  const qty=parseInputNumber($('bondQty_'+secId)?.value);
+  const currency=($('bondCurrency_'+secId)?.value||'UAH').toUpperCase();
+  const nominal=parseInputNumber($('bondNominal_'+secId)?.value)||1000;
+  const buyPrice=parseInputNumber($('bondBuyPrice_'+secId)?.value)||nominal;
+  const price=parseInputNumber($('bondPrice_'+secId)?.value)||buyPrice;
+  const couponRate=parseInputNumber($('bondCoupon_'+secId)?.value);
+  const maturityDate=$('bondMaturity_'+secId)?.value||'';
+  if(!name&&!qty&&!price)return;
+  securitiesSections[idx].items.push({
+    id:'bond_item_'+Date.now(),
+    type:'bond',
+    name:name||securitiesSections[idx].name,
+    isin:name,
+    qty:Math.abs(qty),
+    currency,
+    nominal,
+    buyPrice,
+    price,
+    couponRate,
+    maturityDate
+  });
+  renderSecuritiesCards(); updateAll(); saveData();
 }
 
 function setSecTradeType(secId, type){
@@ -3949,7 +4187,7 @@ function renderCoins(){
   const totalPnlPct=totalCost>0?((totalVal/totalCost-1)*100):0;
   if(totalVal>0){
     html+=`<div class="result-box" style="margin-top:10px">
-      <div class="result-row"><span class="result-key">💰 Портфель (монети)</span><span class="result-val" style="color:var(--purple2)">$${fmtN(Math.round(totalVal))} ≈ ${fmtN(toDisplayCurr(totalVal*rate))} ${sym}</span></div>
+      <div class="result-row"><span class="result-key">${uiText('cryptoPortfolio')}</span><span class="result-val" style="color:var(--purple2)">$${fmtN(Math.round(totalVal))} ≈ ${fmtN(toDisplayCurr(totalVal*rate))} ${sym}</span></div>
       <div class="result-row"><span class="result-key">📊 P&L</span><span class="result-val" style="color:${totalPnl>=0?'var(--green2)':'var(--red)'}">${totalPnl>=0?'+':''}$${fmtN(Math.round(totalPnl))} (${totalPnl>=0?'+':''}${totalPnlPct.toFixed(1)}%)</span></div>
     </div>`;
   }
@@ -4504,6 +4742,11 @@ const DATA_MIGRATIONS=[
     d.securitiesSections=ensureArray(d.securitiesSections).map(migrateSecuritySection);
     d.storageSchemaVersion=STORAGE_SCHEMA_VERSION;
     d.lastMigratedAppVersion=APP_VERSION;
+  }},
+  {version:6,label:'Bond section manual fields',run:d=>{
+    d.securitiesSections=ensureArray(d.securitiesSections).map(migrateSecuritySection);
+    d.storageSchemaVersion=STORAGE_SCHEMA_VERSION;
+    d.lastMigratedAppVersion=APP_VERSION;
   }}
 ];
 function migrateStoragePayload(d){
@@ -4714,15 +4957,7 @@ function showProToast(){
 }
 
 function trialBadgeText(daysLeft){
-  const labels={
-    uk:['Тріал','дн.'],
-    ru:['Триал','дн.'],
-    en:['Trial','d'],
-    de:['Test','Tg.'],
-    zh:['试用','天']
-  };
-  const v=labels[currentLang]||labels.uk;
-  return '⏱ '+v[0]+': '+daysLeft+' '+v[1];
+  return '⏱ '+uiText('trialShort')+': '+daysLeft+' '+uiText('daysShort');
 }
 
 function updateProUI(){
@@ -5639,6 +5874,10 @@ function translateDynamicUI(){
     const el=document.getElementById(id);
     if(el)el.textContent=t(key);
   });
+  const taxFreeInput=document.getElementById('cp_taxfree');
+  if(taxFreeInput)taxFreeInput.placeholder=uiText('noTaxMinimum');
+  const coinCurInput=document.getElementById('newCoinCurPrice');
+  if(coinCurInput)coinCurInput.placeholder=uiText('autoFull');
   // Select options
   const cpFreq=document.getElementById('cp_freq');
   if(cpFreq){
@@ -5658,7 +5897,10 @@ function translateDynamicUI(){
   const liabAddBtnTop=document.getElementById('liab_add_btn_top');
   if(liabAddBtnTop)liabAddBtnTop.textContent='+ '+(t('liabName')||'Кредит');
   const netToggle=document.getElementById('netCapitalToggle');
-  if(netToggle)netToggle.title=t('liabNetCapital')||'Нетто-капітал';
+  if(netToggle){
+    netToggle.title=t('liabNetCapital')||'Нетто-капітал';
+    netToggle.textContent=uiText('netBtn');
+  }
   const liabNetLabel=document.getElementById('liab_net_label');
   if(liabNetLabel)liabNetLabel.textContent=(t('liabNetCapital')||'НЕТТО-КАПІТАЛ').toUpperCase();
   const liabDebtLabel=document.getElementById('liab_debt_label');
@@ -6917,11 +7159,11 @@ addCoin=function(){
 // ── CRYPTO ONLINE PRICE MONITORING ───────────────────────
 let cryptoPriceCache={};
 
-async function fetchCryptoPrice(coinName){
+async function fetchCryptoPrice(coinName,forceFresh=false){
   coinName=coinName.toUpperCase().trim();
   if(!coinName)return null;
   const cached=cryptoPriceCache[coinName];
-  if(cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
+  if(!forceFresh&&cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
   if(isOffline()){
     updateNetworkStatusUI('offline');
     return cached||null;
@@ -6999,7 +7241,7 @@ async function fetchCryptoPrice(coinName){
   return null;
 }
 
-async function refreshCryptoPrices(){
+async function refreshCryptoPrices(forceFresh=false){
   try{
   if(!coins.length)return;
   if(isOffline()){
@@ -7011,10 +7253,15 @@ async function refreshCryptoPrices(){
   
   const rate=val('usdtUah')||41;
   let anyUpdated=false;
+  const btn=$('cryptoRefreshBtn');
+  if(btn){
+    btn.disabled=true;
+    btn.textContent=uiText('refreshing');
+  }
   
   for(const coin of coins){
     if(!coin.name)continue;
-    const data=await fetchCryptoPrice(coin.name);
+    const data=await fetchCryptoPrice(coin.name,forceFresh);
     if(data){
       coin.curPrice=data.price;
       coin.change24h=data.change24h;
@@ -7027,7 +7274,18 @@ async function refreshCryptoPrices(){
     updateAll();
     saveData();
   }
-  }catch(e){console.error('refreshCrypto:',e);}
+  if(btn){
+    btn.disabled=false;
+    btn.textContent=uiText('refresh');
+  }
+  }catch(e){
+    console.error('refreshCrypto:',e);
+    const btn=$('cryptoRefreshBtn');
+    if(btn){
+      btn.disabled=false;
+      btn.textContent=uiText('refresh');
+    }
+  }
 }
 
 // Auto-refresh crypto on load and every 5 min
