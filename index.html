@@ -1586,7 +1586,7 @@ body.theme-light::before{opacity:.18;}
 // ── FREEMIUM STATE (declared first so all functions can access) ──
 const APP_VERSION = 'v0.0.21';
 const APP_BUILD_DATE = '2026-05-26';
-const STORAGE_SCHEMA_VERSION = 6;
+const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
 const STORAGE_ROLLBACK_KEY = 'kapital_import_rollback';
@@ -2121,7 +2121,29 @@ const UI_TEXT={
   interestLabel:{uk:'💰 Проценти',ru:'💰 Проценты',en:'💰 Interest',de:'💰 Zinsen',zh:'💰 利息'},
   taxShort:{uk:'подат.',ru:'налог',en:'tax',de:'Steuer',zh:'税'},
   trialShort:{uk:'Тріал',ru:'Триал',en:'Trial',de:'Test',zh:'试用'},
-  netBtn:{uk:'Нетто',ru:'Нетто',en:'Net',de:'Netto',zh:'净值'}
+  netBtn:{uk:'Нетто',ru:'Нетто',en:'Net',de:'Netto',zh:'净值'},
+  startupNameLabel:{uk:'Назва стартапу',ru:'Название стартапа',en:'Startup name',de:'Startup-Name',zh:'初创项目名称'},
+  startupProjectPh:{uk:'Назва проекту',ru:'Название проекта',en:'Project name',de:'Projektname',zh:'项目名称'},
+  startupInvested:{uk:'Вкладено',ru:'Вложено',en:'Invested',de:'Investiert',zh:'已投入'},
+  startupCurrency:{uk:'Валюта',ru:'Валюта',en:'Currency',de:'Währung',zh:'货币'},
+  startupEquity:{uk:'Ваша частка (%)',ru:'Ваша доля (%)',en:'Your share (%)',de:'Ihr Anteil (%)',zh:'您的份额 (%)'},
+  startupValuation:{uk:'Оцінка стартапу',ru:'Оценка стартапа',en:'Startup valuation',de:'Startup-Bewertung',zh:'项目估值'},
+  startupValueMode:{uk:'Поточна вартість',ru:'Текущая стоимость',en:'Current value',de:'Aktueller Wert',zh:'当前价值'},
+  startupByValuation:{uk:'За оцінкою',ru:'По оценке',en:'By valuation',de:'Nach Bewertung',zh:'按估值'},
+  startupManual:{uk:'Вручну',ru:'Вручную',en:'Manual',de:'Manuell',zh:'手动'},
+  startupManualValue:{uk:'Вартість вашої частки',ru:'Стоимость вашей доли',en:'Your share value',de:'Wert Ihres Anteils',zh:'您的份额价值'},
+  startupStageLabel:{uk:'Стадія',ru:'Стадия',en:'Stage',de:'Phase',zh:'阶段'},
+  startupStatusLabel:{uk:'Статус',ru:'Статус',en:'Status',de:'Status',zh:'状态'},
+  startupStatusActive:{uk:'Активний',ru:'Активный',en:'Active',de:'Aktiv',zh:'活跃'},
+  startupStatusFrozen:{uk:'Заморожений',ru:'Заморожен',en:'Frozen',de:'Pausiert',zh:'暂停'},
+  startupStatusClosed:{uk:'Закритий',ru:'Закрыт',en:'Closed',de:'Geschlossen',zh:'已关闭'},
+  startupStatusExited:{uk:'Exit / продано',ru:'Exit / продано',en:'Exit / sold',de:'Exit / verkauft',zh:'退出 / 已售'},
+  startupExitCash:{uk:'💵 Гроші від exit / продажу',ru:'💵 Деньги от exit / продажи',en:'💵 Exit / sale cash',de:'💵 Geld aus Exit / Verkauf',zh:'💵 退出 / 卖出资金'},
+  startupExitCashHint:{uk:'Сума після продажу частки, дивідендів або exit',ru:'Сумма после продажи доли, дивидендов или exit',en:'Cash after selling a stake, dividends, or exit',de:'Betrag nach Anteilsverkauf, Dividenden oder Exit',zh:'出售份额、分红或退出后的资金'},
+  startupNoteLabel:{uk:'Нотатка',ru:'Заметка',en:'Note',de:'Notiz',zh:'备注'},
+  startupNotePh:{uk:'Опис, роль, умови...',ru:'Описание, роль, условия...',en:'Description, role, terms...',de:'Beschreibung, Rolle, Bedingungen...',zh:'描述、角色、条款...'},
+  startupCurrentShare:{uk:'Ваша частка',ru:'Ваша доля',en:'Your share',de:'Ihr Anteil',zh:'您的份额'},
+  startupTotalValue:{uk:'Загальна вартість',ru:'Общая стоимость',en:'Total value',de:'Gesamtwert',zh:'总价值'}
   ,workerLabel:{uk:'⚙️ Cloudflare Worker URL (для GitHub Pages / App)',ru:'⚙️ Cloudflare Worker URL (для GitHub Pages / App)',en:'⚙️ Cloudflare Worker URL (for GitHub Pages / App)',de:'⚙️ Cloudflare Worker URL (für GitHub Pages / App)',zh:'⚙️ Cloudflare Worker URL（用于 GitHub Pages / App）'}
   ,workerHint:{uk:'Розгорніть stock-worker.js на workers.cloudflare.com та вставте URL нижче',ru:'Разверните stock-worker.js на workers.cloudflare.com и вставьте URL ниже',en:'Deploy stock-worker.js on workers.cloudflare.com and paste the URL below',de:'Stellen Sie stock-worker.js auf workers.cloudflare.com bereit und fügen Sie die URL unten ein',zh:'在 workers.cloudflare.com 部署 stock-worker.js，然后在下方粘贴 URL'}
   ,save:{uk:'💾 Зберегти',ru:'💾 Сохранить',en:'💾 Save',de:'💾 Speichern',zh:'💾 保存'}
@@ -4079,6 +4101,17 @@ function _updateAllNow(){
   }
 
   customSections.forEach(s=>{
+    if(s.sectionType==='startup'){
+      const st=getStartupStats(s);
+      const pnlColor=st.pnl>=0?'var(--green2)':'var(--red)';
+      setText('customDisplay_'+s.id, sym+fmtN(toDisplayCurr(st.total)));
+      const pctEl=$('customPct_'+s.id);
+      if(pctEl){
+        pctEl.textContent=(st.pnl>=0?'+':'')+st.pnlPct.toFixed(1)+'%';
+        pctEl.style.color=pnlColor;
+      }
+      return;
+    }
     const v=parseFloat(s.principal)||0;
     setText('customDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
     setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
@@ -4709,6 +4742,14 @@ function migrateCustomSection(sec,index){
   if(!out.icon)out.icon='💼';
   if(out.sectionType==='startup'){
     out.startupStage=out.startupStage||'seed';
+    out.startupStatus=out.startupStatus||'active';
+    out.startupCurrency=String(out.startupCurrency||'UAH').toUpperCase();
+    if(!STOCK_CASH_CURRENCIES.includes(out.startupCurrency))out.startupCurrency='UAH';
+    out.startupValueMode=out.startupValueMode||'valuation';
+    out.startupManualValue=parseInputNumber(out.startupManualValue);
+    out.startupExitCash=parseInputNumber(out.startupExitCash);
+    out.startupExitCurrency=String(out.startupExitCurrency||out.startupCurrency||'UAH').toUpperCase();
+    if(!STOCK_CASH_CURRENCIES.includes(out.startupExitCurrency))out.startupExitCurrency=out.startupCurrency;
     out.color=out.color||'teal';
   }
   return out;
@@ -4745,6 +4786,11 @@ const DATA_MIGRATIONS=[
   }},
   {version:6,label:'Bond section manual fields',run:d=>{
     d.securitiesSections=ensureArray(d.securitiesSections).map(migrateSecuritySection);
+    d.storageSchemaVersion=STORAGE_SCHEMA_VERSION;
+    d.lastMigratedAppVersion=APP_VERSION;
+  }},
+  {version:7,label:'Startup currency and exit cash',run:d=>{
+    d.customSections=ensureArray(d.customSections).map(migrateCustomSection);
     d.storageSchemaVersion=STORAGE_SCHEMA_VERSION;
     d.lastMigratedAppVersion=APP_VERSION;
   }}
@@ -7292,9 +7338,10 @@ async function refreshCryptoPrices(forceFresh=false){
 setTimeout(()=>{if(!isOffline())refreshCryptoPrices();}, 2000);
 setInterval(()=>{if(!isOffline())refreshCryptoPrices();}, 5*60*1000);
 
+
 // ── STARTUP INVESTMENT SECTION ───────────────────────────
 function addStartupCard(){
-  /* all custom sections free */
+  // all custom sections free
   const id='startup_'+Date.now();
   const section={
     id,
@@ -7306,6 +7353,12 @@ function addStartupCard(){
     startupValuation:'',
     startupEquity:'',
     startupStage:'seed',
+    startupStatus:'active',
+    startupCurrency:(displayCurrency||'uah').toUpperCase(),
+    startupValueMode:'valuation',
+    startupManualValue:'',
+    startupExitCash:'',
+    startupExitCurrency:(displayCurrency||'uah').toUpperCase(),
     startupName:'',
     startupNote:'',
     color:'teal'
@@ -7332,81 +7385,196 @@ pickerAdd=function(type){
   _origPickerAdd(type);
 };
 
+function getStartupCurrency(s){
+  const cur=String(s?.startupCurrency||'UAH').toUpperCase();
+  return STOCK_CASH_CURRENCIES.includes(cur)?cur:'UAH';
+}
+function getStartupExitCurrency(s){
+  const cur=String(s?.startupExitCurrency||getStartupCurrency(s)).toUpperCase();
+  return STOCK_CASH_CURRENCIES.includes(cur)?cur:getStartupCurrency(s);
+}
+function getStartupStageOptions(selected){
+  const opts=[
+    ['idea','💡 Idea'],['mvp','🧪 MVP'],['sales','💳 Sales'],
+    ['pre-seed','🌱 Pre-seed'],['seed','🌿 Seed'],['series-a','🚀 Series A'],
+    ['series-b','📈 Series B+'],['profit','💰 Profitable']
+  ];
+  return opts.map(([v,l])=>`<option value="${v}" ${selected===v?'selected':''}>${l}</option>`).join('');
+}
+function getStartupStatusOptions(selected){
+  const opts=[
+    ['active',uiText('startupStatusActive')],
+    ['frozen',uiText('startupStatusFrozen')],
+    ['closed',uiText('startupStatusClosed')],
+    ['exited',uiText('startupStatusExited')]
+  ];
+  return opts.map(([v,l])=>`<option value="${v}" ${selected===v?'selected':''}>${l}</option>`).join('');
+}
+function getStartupStats(s){
+  const cur=getStartupCurrency(s);
+  const rate=getStockCurrencyRate(cur);
+  const investedNative=stockNum(s?.startupInvested);
+  const valuationNative=stockNum(s?.startupValuation);
+  const equity=stockNum(s?.startupEquity);
+  const byValuationNative=valuationNative*(equity/100);
+  const manualNative=stockNum(s?.startupManualValue);
+  const valueMode=s?.startupValueMode||'valuation';
+  const status=s?.startupStatus||'active';
+  const activeValueNative=status==='closed'?0:(valueMode==='manual'?manualNative:byValuationNative);
+  const exitCur=getStartupExitCurrency(s);
+  const exitCashNative=stockNum(s?.startupExitCash);
+  const currentValue=activeValueNative*rate;
+  const invested=investedNative*rate;
+  const exitCash=exitCashNative*getStockCurrencyRate(exitCur);
+  const total=currentValue+exitCash;
+  const pnl=total-invested;
+  const pnlPct=invested>0?(pnl/invested*100):0;
+  return {cur,rate,investedNative,valuationNative,equity,byValuationNative,manualNative,valueMode,status,activeValueNative,exitCur,exitCashNative,currentValue,invested,exitCash,total,pnl,pnlPct};
+}
+function setStartupField(idx,field,value,rerender=false){
+  if(!customSections[idx])return;
+  customSections[idx][field]=value;
+  customSections[idx].principal=getStartupValue(idx);
+  if(rerender)renderCustomCards();
+  updateAll();saveData();
+}
+function setStartupCurrency(idx,value){
+  const s=customSections[idx]; if(!s)return;
+  const next=String(value||'UAH').toUpperCase();
+  if(!STOCK_CASH_CURRENCIES.includes(next))return;
+  const prev=getStartupCurrency(s);
+  if(prev!==next){
+    const ratePrev=getStockCurrencyRate(prev);
+    const rateNext=getStockCurrencyRate(next);
+    ['startupInvested','startupValuation','startupManualValue'].forEach(field=>{
+      const amount=stockNum(s[field]);
+      if(amount>0)s[field]=amount*ratePrev/rateNext;
+    });
+  }
+  s.startupCurrency=next;
+  s.principal=getStartupValue(idx);
+  renderCustomCards();updateAll();saveData();
+}
+function setStartupExitCurrency(idx,value){
+  const s=customSections[idx]; if(!s)return;
+  const next=String(value||'UAH').toUpperCase();
+  if(!STOCK_CASH_CURRENCIES.includes(next))return;
+  const prev=getStartupExitCurrency(s);
+  if(prev!==next){
+    const amount=stockNum(s.startupExitCash);
+    if(amount>0)s.startupExitCash=amount*getStockCurrencyRate(prev)/getStockCurrencyRate(next);
+  }
+  s.startupExitCurrency=next;
+  s.principal=getStartupValue(idx);
+  renderCustomCards();updateAll();saveData();
+}
+
 // Override getCustomCardHtml to handle startup type
 const _origGetCustomCardHtml=getCustomCardHtml;
 getCustomCardHtml=function(s,idx){
   if(s.sectionType==='startup'){
-    const lang=LANGS[currentLang];
-    const invested=parseFloat(s.startupInvested)||0;
-    const valuation=parseFloat(s.startupValuation)||0;
-    const equity=parseFloat(s.startupEquity)||0;
-    const currentValue=valuation*(equity/100);
-    const pnl=currentValue-invested;
-    const pnlPct=invested>0?(pnl/invested*100):0;
-    const pnlColor=pnl>=0?'var(--green2)':'var(--red)';
+    const st=getStartupStats(s);
+    const pnlColor=st.pnl>=0?'var(--green2)':'var(--red)';
     const sym=getCurrSym();
+    const nativeSym=getStockCurrencySymbol(st.cur);
+    const exitSym=getStockCurrencySymbol(st.exitCur);
+    const startupTitle=s.startupName||uiText('startupProjectPh');
     
     return `<div class="card card-startup" id="card-${s.id}" draggable="true" data-card="${s.id}">
       <div class="card-header">
         <div class="drag-handle">⠿</div>
         <div class="card-icon">🚀</div>
         <div class="card-info" onclick="toggleCard('${s.id}')">
-          <div class="card-name">${s.startupName||'Стартап'}</div>
-          <div class="card-value" id="customDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(currentValue))}</div>
-          <div class="card-pct" id="customPct_${s.id}" style="color:${pnlColor}">${pnl>=0?'+':''}${pnlPct.toFixed(1)}%</div>
+          <div class="card-name">${escapeHtml(startupTitle)}</div>
+          <div class="card-value" id="customDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(st.total))}</div>
+          <div class="card-pct" id="customPct_${s.id}" style="color:${pnlColor}">${st.pnl>=0?'+':''}${st.pnlPct.toFixed(1)}%</div>
         </div>
         <div class="card-actions">
-          <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">✕</button>
+          <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">×</button>
           <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
         </div>
       </div>
       <div class="card-body"><div class="card-inner">
         <div class="divider"></div>
         <div class="field-group">
-          <div class="field-label">Назва стартапу</div>
-          <input class="field-input" type="text" id="startupName_${s.id}" value="${s.startupName||''}" placeholder="Назва проекту"
+          <div class="field-label">${uiText('startupNameLabel')}</div>
+          <input class="field-input" type="text" id="startupName_${s.id}" value="${escapeHtml(s.startupName||'')}" placeholder="${uiText('startupProjectPh')}"
             oninput="customSections[${idx}].startupName=this.value;saveData()">
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Вкладено (₴)</div>
+            <div class="field-label">${uiText('startupInvested')} (${nativeSym})</div>
             <input class="field-input" type="text" id="startupInvested_${s.id}" value="${s.startupInvested||''}" placeholder="50 000" inputmode="decimal"
-              oninput="customSections[${idx}].startupInvested=this.value;customSections[${idx}].principal=getStartupValue(${idx});updateAll()">
+              oninput="setStartupField(${idx},'startupInvested',this.value)">
           </div>
           <div class="field-group">
-            <div class="field-label">Ваша частка (%)</div>
-            <input class="field-input" type="text" id="startupEquity_${s.id}" value="${s.startupEquity||''}" placeholder="10" inputmode="decimal"
-              oninput="customSections[${idx}].startupEquity=this.value;customSections[${idx}].principal=getStartupValue(${idx});updateAll()">
+            <div class="field-label">${uiText('startupCurrency')}</div>
+            <select class="field-input" id="startupCurrency_${s.id}" onchange="setStartupCurrency(${idx},this.value)">
+              ${STOCK_CASH_CURRENCIES.slice(0,5).map(cur=>`<option value="${cur}" ${st.cur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
+            </select>
           </div>
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">Оцінка стартапу (₴)</div>
-            <input class="field-input" type="text" id="startupValuation_${s.id}" value="${s.startupValuation||''}" placeholder="1 000 000" inputmode="decimal"
-              oninput="customSections[${idx}].startupValuation=this.value;customSections[${idx}].principal=getStartupValue(${idx});updateAll()">
+            <div class="field-label">${uiText('startupEquity')}</div>
+            <input class="field-input" type="text" id="startupEquity_${s.id}" value="${s.startupEquity||''}" placeholder="10" inputmode="decimal"
+              oninput="setStartupField(${idx},'startupEquity',this.value)">
           </div>
           <div class="field-group">
-            <div class="field-label">Стадія</div>
-            <select class="field-input" id="startupStage_${s.id}" onchange="customSections[${idx}].startupStage=this.value;saveData()">
-              <option value="idea" ${s.startupStage==='idea'?'selected':''}>💡 Ідея</option>
-              <option value="pre-seed" ${s.startupStage==='pre-seed'?'selected':''}>🌱 Pre-seed</option>
-              <option value="seed" ${s.startupStage==='seed'?'selected':''}>🌿 Seed</option>
-              <option value="series-a" ${s.startupStage==='series-a'?'selected':''}>🚀 Series A</option>
-              <option value="series-b" ${s.startupStage==='series-b'?'selected':''}>📈 Series B+</option>
-              <option value="profit" ${s.startupStage==='profit'?'selected':''}>💰 Прибутковий</option>
+            <div class="field-label">${uiText('startupValuation')} (${nativeSym})</div>
+            <input class="field-input" type="text" id="startupValuation_${s.id}" value="${s.startupValuation||''}" placeholder="1 000 000" inputmode="decimal"
+              oninput="setStartupField(${idx},'startupValuation',this.value)">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${uiText('startupValueMode')}</div>
+            <select class="field-input" id="startupValueMode_${s.id}" onchange="setStartupField(${idx},'startupValueMode',this.value,true)">
+              <option value="valuation" ${st.valueMode==='valuation'?'selected':''}>${uiText('startupByValuation')}</option>
+              <option value="manual" ${st.valueMode==='manual'?'selected':''}>${uiText('startupManual')}</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">${uiText('startupManualValue')} (${nativeSym})</div>
+            <input class="field-input" type="text" id="startupManualValue_${s.id}" value="${s.startupManualValue||''}" placeholder="${fmtN(st.byValuationNative)}" inputmode="decimal"
+              oninput="setStartupField(${idx},'startupManualValue',this.value)">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field-group">
+            <div class="field-label">${uiText('startupStageLabel')}</div>
+            <select class="field-input" id="startupStage_${s.id}" onchange="setStartupField(${idx},'startupStage',this.value)">
+              ${getStartupStageOptions(s.startupStage||'seed')}
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">${uiText('startupStatusLabel')}</div>
+            <select class="field-input" id="startupStatus_${s.id}" onchange="setStartupField(${idx},'startupStatus',this.value,true)">
+              ${getStartupStatusOptions(st.status)}
             </select>
           </div>
         </div>
-        <div class="field-group">
-          <div class="field-label">Нотатка</div>
-          <input class="field-input" type="text" id="startupNote_${s.id}" value="${s.startupNote||''}" placeholder="Опис, роль..."
+        <div style="background:linear-gradient(135deg,#2dd4bf12,#5b9cf610);border:1px solid #2dd4bf35;border-radius:14px;padding:14px;margin-top:12px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--teal2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiText('startupExitCash')}</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input class="field-input" type="text" id="startupExitCash_${s.id}" value="${s.startupExitCash||''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setStartupField(${idx},'startupExitCash',this.value)">
+            <select class="field-input" id="startupExitCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setStartupExitCurrency(${idx},this.value)">
+              ${STOCK_CASH_CURRENCIES.slice(0,5).map(cur=>`<option value="${cur}" ${st.exitCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
+            </select>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${st.exitCashNative?('≈ '+sym+fmtN(toDisplayCurr(st.exitCash))):uiText('startupExitCashHint')}</div>
+        </div>
+        <div class="field-group" style="margin-top:12px;">
+          <div class="field-label">${uiText('startupNoteLabel')}</div>
+          <input class="field-input" type="text" id="startupNote_${s.id}" value="${escapeHtml(s.startupNote||'')}" placeholder="${uiText('startupNotePh')}"
             oninput="customSections[${idx}].startupNote=this.value;saveData()">
         </div>
         <div class="result-box" style="margin-top:12px;">
-          <div class="result-row"><span class="result-key">💰 Вкладено</span><span class="result-val">${sym}${fmtN(toDisplayCurr(invested))}</span></div>
-          <div class="result-row"><span class="result-key">📊 Ваша частка</span><span class="result-val" style="color:var(--teal2)">${equity}% = ${sym}${fmtN(toDisplayCurr(currentValue))}</span></div>
-          <div class="result-row"><span class="result-key">P&L</span><span class="result-val" style="color:${pnlColor}">${pnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(Math.abs(pnl)))} (${pnl>=0?'+':''}${pnlPct.toFixed(1)}%)</span></div>
-          <div class="result-row"><span class="result-key">ROI</span><span class="result-val" style="color:${pnlColor}">${invested>0?((currentValue/invested-1)*100).toFixed(1)+'x':'—'}</span></div>
+          <div class="result-row"><span class="result-key">💰 ${uiText('startupInvested')}</span><span class="result-val">${nativeSym}${fmtN(st.investedNative)} · ${sym}${fmtN(toDisplayCurr(st.invested))}</span></div>
+          <div class="result-row"><span class="result-key">📊 ${uiText('startupCurrentShare')}</span><span class="result-val" style="color:var(--teal2)">${st.equity}% = ${nativeSym}${fmtN(st.activeValueNative)} · ${sym}${fmtN(toDisplayCurr(st.currentValue))}</span></div>
+          ${st.exitCashNative?`<div class="result-row"><span class="result-key">${uiText('startupExitCash')}</span><span class="result-val green">${exitSym}${fmtN(st.exitCashNative)} · ${sym}${fmtN(toDisplayCurr(st.exitCash))}</span></div>`:''}
+          <div class="result-row"><span class="result-key">${uiText('startupTotalValue')}</span><span class="result-val blue">${sym}${fmtN(toDisplayCurr(st.total))}</span></div>
+          <div class="result-row"><span class="result-key">P&L</span><span class="result-val" style="color:${pnlColor}">${st.pnl>=0?'+':'-'}${sym}${fmtN(toDisplayCurr(Math.abs(st.pnl)))} (${st.pnl>=0?'+':''}${st.pnlPct.toFixed(1)}%)</span></div>
         </div>
         <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">${t('removeSection')}</button>
       </div></div>
@@ -7418,20 +7586,14 @@ getCustomCardHtml=function(s,idx){
 function getStartupValue(idx){
   const s=customSections[idx];
   if(!s)return 0;
-  const valuation=parseFloat(s.startupValuation)||0;
-  const equity=parseFloat(s.startupEquity)||0;
-  return valuation*(equity/100);
+  return getStartupStats(s).total;
 }
 
 // Override getCustomTotal to handle startup sections
 const _origGetCustomTotal=getCustomTotal;
 getCustomTotal=function(){
   return customSections.reduce((sum,s)=>{
-    if(s.sectionType==='startup'){
-      const v=parseFloat(s.startupValuation)||0;
-      const e=parseFloat(s.startupEquity)||0;
-      return sum+v*(e/100);
-    }
+    if(s.sectionType==='startup')return sum+getStartupStats(s).total;
     return sum+(parseFloat(s.principal)||0);
   },0);
 };
