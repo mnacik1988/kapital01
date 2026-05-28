@@ -4113,6 +4113,13 @@ function _updateAllNow(){
       }
       return;
     }
+    if(s.sectionType==='business'){
+      const v=parseFloat(s.amount)||0;
+      setText('customDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
+      setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
+      updateBizField(s.id,'__noop__',s.biz?.__noop__||0);
+      return;
+    }
     const v=parseFloat(s.principal)||0;
     setText('customDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
     setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
@@ -4552,84 +4559,116 @@ function toggleCard(name){
 
 function initDrag(){refreshDrag();}
 let _activeTouchDrag=null;
+
 function getDragContainers(){
   return ['cardsContainer','customCardsContainer','securitiesContainer','metalsContainer']
     .map(id=>$(id))
     .filter(Boolean);
 }
-function refreshDrag(){
-  const containers=getDragContainers();
-  const isTouchDevice='ontouchstart' in window;
-  containers.forEach(cont=>{
-    cont.querySelectorAll(':scope > .card').forEach(card=>{
-      if(card._dragBound)return;
-      card._dragBound=true;
-      card.setAttribute('draggable', isTouchDevice?'false':'true');
 
-      card.addEventListener('dragstart',e=>{
-        window._draggedCard=card;
-        setTimeout(()=>card.classList.add('dragging'),0);
-        if(e.dataTransfer)e.dataTransfer.effectAllowed='move';
-      });
-      card.addEventListener('dragend',()=>{
-        card.classList.remove('dragging');
-        document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
-        saveOrder();
-        window._draggedCard=null;
-      });
-      card.addEventListener('dragover',e=>{
-        e.preventDefault();
-        const dragged=window._draggedCard;
-        if(dragged&&card!==dragged&&card.parentNode===dragged.parentNode)card.classList.add('drag-over');
-      });
-      card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
-      card.addEventListener('drop',e=>{
-        e.preventDefault();
-        card.classList.remove('drag-over');
-        const dragged=window._draggedCard;
-        if(dragged&&card!==dragged&&dragged.parentNode===card.parentNode){
-          const all=[...card.parentNode.querySelectorAll(':scope > .card')];
-          if(all.indexOf(dragged)<all.indexOf(card))card.after(dragged);
-          else card.before(dragged);
-          saveOrder();
-        }
-      });
-
-      const handle=card.querySelector('.drag-handle');
-      if(!handle)return;
-      handle.addEventListener('touchstart',e=>{
-        if(_activeTouchDrag)return;
-        const t=e.touches[0];
-        _activeTouchDrag={
-          card,
-          startX:t.clientX,
-          startY:t.clientY,
-          isDrag:false,
-          clone:null,
-          timer:setTimeout(()=>{
-            const st=_activeTouchDrag;
-            if(!st||st.card!==card)return;
-            st.isDrag=true;
-            card.classList.add('dragging');
-            const rect=card.getBoundingClientRect();
-            st.clone=card.cloneNode(true);
-            Object.assign(st.clone.style,{
-              position:'fixed',
-              zIndex:999,
-              width:rect.width+'px',
-              left:rect.left+'px',
-              top:rect.top+'px',
-              opacity:'0.86',
-              pointerEvents:'none',
-              borderRadius:'20px',
-              boxShadow:'0 8px 32px #0008'
-            });
-            document.body.appendChild(st.clone);
-            if(navigator.vibrate)navigator.vibrate(25);
-          },320)
-        };
-      },{passive:true});
+function getAllOrderableCards(){
+  const seen=new Set();
+  const cards=[];
+  getDragContainers().forEach(cont=>{
+    cont.querySelectorAll(':scope > .card[data-card]').forEach(card=>{
+      const id=card.dataset.card;
+      if(!id||seen.has(id))return;
+      seen.add(id);
+      cards.push(card);
     });
+  });
+  return cards;
+}
+
+function getUnifiedRoot(){
+  return $('cardsContainer')||document.body;
+}
+
+function moveCardNearTarget(dragged,target){
+  if(!dragged||!target||dragged===target)return;
+  const root=getUnifiedRoot();
+  const all=getAllOrderableCards();
+  const draggedIdx=all.indexOf(dragged);
+  const targetIdx=all.indexOf(target);
+  if(targetIdx<0)return;
+  if(draggedIdx>=0&&draggedIdx<targetIdx)target.after(dragged);
+  else target.before(dragged);
+  if(dragged.parentNode!==root)root.appendChild(dragged);
+}
+
+function refreshDrag(){
+  const isTouchDevice='ontouchstart' in window;
+  getAllOrderableCards().forEach(card=>{
+    card.setAttribute('draggable', isTouchDevice?'false':'true');
+    if(card._dragBound)return;
+    card._dragBound=true;
+
+    card.addEventListener('dragstart',e=>{
+      window._draggedCard=card;
+      setTimeout(()=>card.classList.add('dragging'),0);
+      if(e.dataTransfer)e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend',()=>{
+      card.classList.remove('dragging');
+      document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      saveOrder();
+      restoreOrder();
+      window._draggedCard=null;
+    });
+    card.addEventListener('dragover',e=>{
+      e.preventDefault();
+      const dragged=window._draggedCard;
+      if(dragged&&card!==dragged)card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      const dragged=window._draggedCard;
+      if(dragged&&card!==dragged){
+        moveCardNearTarget(dragged,card);
+        saveOrder();
+        restoreOrder();
+        refreshDrag();
+      }
+    });
+
+    const handle=card.querySelector('.drag-handle');
+    if(!handle)return;
+    handle.addEventListener('touchstart',e=>{
+      if(_activeTouchDrag)return;
+      const t=e.touches[0];
+      _activeTouchDrag={
+        card,
+        startX:t.clientX,
+        startY:t.clientY,
+        isDrag:false,
+        clone:null,
+        lastX:t.clientX,
+        lastY:t.clientY,
+        timer:setTimeout(()=>{
+          const st=_activeTouchDrag;
+          if(!st||st.card!==card)return;
+          st.isDrag=true;
+          card.classList.add('dragging');
+          const rect=card.getBoundingClientRect();
+          st.clone=card.cloneNode(true);
+          Object.assign(st.clone.style,{
+            position:'fixed',
+            zIndex:999,
+            width:rect.width+'px',
+            left:rect.left+'px',
+            top:rect.top+'px',
+            opacity:'0.86',
+            pointerEvents:'none',
+            borderRadius:'20px',
+            boxShadow:'0 8px 32px #0008'
+          });
+          document.body.appendChild(st.clone);
+          if(navigator.vibrate)navigator.vibrate(25);
+        },320)
+      };
+    },{passive:true});
   });
 }
 
@@ -4637,6 +4676,8 @@ document.addEventListener('touchmove',e=>{
   const st=_activeTouchDrag;
   if(!st)return;
   const t=e.touches[0];
+  st.lastX=t.clientX;
+  st.lastY=t.clientY;
   if(!st.isDrag){
     if(Math.abs(t.clientY-st.startY)>10||Math.abs(t.clientX-st.startX)>10){
       clearTimeout(st.timer);
@@ -4647,8 +4688,8 @@ document.addEventListener('touchmove',e=>{
   e.preventDefault();
   if(st.clone)st.clone.style.top=(t.clientY-60)+'px';
   document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
-  const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
-  if(target&&target!==st.card&&target.parentNode===st.card.parentNode)target.classList.add('drag-over');
+  const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card[data-card]');
+  if(target&&target!==st.card)target.classList.add('drag-over');
 },{passive:false});
 
 document.addEventListener('touchend',e=>{
@@ -4660,48 +4701,48 @@ document.addEventListener('touchend',e=>{
   card.classList.remove('dragging');
   document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
   if(st.isDrag){
-    const t=e.changedTouches[0];
-    const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card');
-    if(target&&target!==card&&target.parentNode===card.parentNode){
-      const all=[...card.parentNode.querySelectorAll(':scope > .card')];
-      if(all.indexOf(card)<all.indexOf(target))target.after(card);
-      else target.before(card);
+    const t=e.changedTouches[0]||{clientX:st.lastX,clientY:st.lastY};
+    const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card[data-card]');
+    if(target&&target!==card){
+      moveCardNearTarget(card,target);
       saveOrder();
+      restoreOrder();
+      refreshDrag();
     }
   }
   _activeTouchDrag=null;
 });
 
-function reorderCollectionByDom(containerId,collection){
-  const cont=$(containerId);
-  if(!cont||!Array.isArray(collection)||!collection.length)return collection;
-  const ids=[...cont.querySelectorAll(':scope > .card')].map(c=>c.dataset.card).filter(Boolean);
-  if(!ids.length)return collection;
-  const map=new Map(collection.map(item=>[item.id,item]));
-  const ordered=ids.map(id=>map.get(id)).filter(Boolean);
-  const rest=collection.filter(item=>!ids.includes(item.id));
-  return ordered.concat(rest);
+function reorderCollectionByGlobalOrder(collection){
+  if(!Array.isArray(collection)||!collection.length||!Array.isArray(cardOrder)||!cardOrder.length)return collection;
+  const order=new Map(cardOrder.map((id,i)=>[id,i]));
+  return collection.slice().sort((a,b)=>(order.get(a.id)??99999)-(order.get(b.id)??99999));
 }
+
 function saveOrder(){
-  const cards=$('cardsContainer')?.querySelectorAll(':scope > .card')||[];
-  cardOrder=[...cards].map(c=>c.dataset.card).filter(Boolean);
-  customSections=reorderCollectionByDom('customCardsContainer',customSections);
-  securitiesSections=reorderCollectionByDom('securitiesContainer',securitiesSections);
-  metalsSections=reorderCollectionByDom('metalsContainer',metalsSections);
+  cardOrder=getAllOrderableCards().map(c=>c.dataset.card).filter(Boolean);
+  customSections=reorderCollectionByGlobalOrder(customSections);
+  securitiesSections=reorderCollectionByGlobalOrder(securitiesSections);
+  metalsSections=reorderCollectionByGlobalOrder(metalsSections);
   saveData();
 }
 
 function restoreOrder(){
-  if(!cardOrder||!cardOrder.length)return;
-  const container=$('cardsContainer');
-  if(!container)return;
-  cardOrder.forEach(cardId=>{
-    const el=container.querySelector(`:scope > [data-card="${cardId}"]`);
-    if(el)container.appendChild(el);
+  const root=getUnifiedRoot();
+  if(!root)return;
+  const cards=getAllOrderableCards();
+  if(!cards.length)return;
+  const map=new Map(cards.map(card=>[card.dataset.card,card]));
+  const ids=(Array.isArray(cardOrder)&&cardOrder.length?cardOrder:[])
+    .filter(id=>map.has(id));
+  cards.forEach(card=>{if(!ids.includes(card.dataset.card))ids.push(card.dataset.card);});
+  ids.forEach(id=>{
+    const el=map.get(id);
+    if(el)root.appendChild(el);
   });
 }
 
-// ── PERSIST ───────────────────────────────────
+// ── PERSIST// ── PERSIST ───────────────────────────────────
 let _saveTimer=null;
 function saveData(){
   // Debounce: wait 400ms before actually saving (prevents lag on fast typing)
@@ -4965,307 +5006,57 @@ metalsContainerEl.style.cssText='padding:0 16px;display:flex;flex-direction:colu
 secContainerEl.after(metalsContainerEl);
 
 // ── INIT ──────────────────────────────────────
-loadData();
 
-// Apply saved lang to buttons
-document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
-const activeLangBtn=$('lang-'+currentLang);
-if(activeLangBtn)activeLangBtn.classList.add('active');
+// в”Ђв”Ђ INIT в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+function bootstrapApp(){
+  if(window._kapitalBootstrapped)return;
+  window._kapitalBootstrapped=true;
+  try{
+    loadData();
 
-// Apply hidden cards
-Object.keys(hiddenCards).forEach(name=>{
-  if(hiddenCards[name]){const c=$('card-'+name);if(c)c.style.display='none';}
-});
-// USD card is removed from UI — ensure it's excluded from totals
-hiddenCards['usd']=true;
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+    const activeLangBtn=$('lang-'+currentLang);
+    if(activeLangBtn)activeLangBtn.classList.add('active');
 
-// Create default sections on first load
-if(!securitiesSections.length) addDefaultSecuritiesCard();
-renderDeposits();
-renderCustomCards();
-renderSecuritiesCards();
-renderMetalsCards();
-updateAll();
-renderLiabilities();
-restoreOrder();
-initDrag();
-applyTranslations();
-saveDataNow();
-updateStorageHealthUI();
+    Object.keys(hiddenCards).forEach(name=>{
+      if(hiddenCards[name]){const c=$('card-'+name);if(c)c.style.display='none';}
+    });
+    hiddenCards['usd']=true;
 
-// Load capital history and check onboarding
-loadCapitalHistory();
-setTimeout(checkOnboarding, 1500);
+    if(!securitiesSections.length)addDefaultSecuritiesCard();
+    renderDeposits();
+    renderCustomCards();
+    renderSecuritiesCards();
+    renderMetalsCards();
+    renderLiabilities();
+    applyTranslations();
+    restoreOrder();
+    initDrag();
+    updateAll();
+    saveDataNow();
+    updateStorageHealthUI();
 
-// Auto-refresh stock prices on startup if any tickers saved
-setTimeout(()=>{
-  securitiesSections.forEach(s=>{
-    if(s.items.some(it=>it.ticker))refreshAllStockPrices(s.id);
-  });
-},500);
-// Fetch live exchange rates on startup
-updateNetworkStatusUI();
-if(!isOffline())fetchUsdUahRate();
-else fillCurrencyFields();
-// Refresh rates every 6 hours
-let _rateInterval=setInterval(fetchUsdUahRate, 15*60*1000); // refresh every 15 min
-startAutoRefresh();
-// ── FREEMIUM ─────────────────────────────────────────────────
-// isPro, FREE_LIMITS and openPaywall declared at top of script
-function checkPro(){ return true; }
-function closePaywall(){
-  const el=document.getElementById('paywallOverlay');
-  if(!el)return;
-  el.classList.remove('open');
-  el.style.cssText=''; // clear any inline styles
-}
-function closePaywallIfOutside(e){
-  if(e.target===document.getElementById('paywallOverlay'))closePaywall();
-}
+    loadCapitalHistory();
+    setTimeout(checkOnboarding,1500);
 
-function activatePro(){
-  // In real app: trigger StoreKit / Google Play purchase flow
-  // For now: simulate activation
-  isPro = true;
-  localStorage.setItem('kapital_pro','true');
-  closePaywall();
-  updateProUI();
-  showProToast();
-}
+    setTimeout(()=>{
+      try{
+        securitiesSections.forEach(sec=>{
+          if((sec.items||[]).some(it=>it.ticker))refreshAllStockPrices(sec.id);
+        });
+      }catch(e){console.error('stock startup refresh failed',e);}
+    },500);
 
-function restorePurchase(){
-  // In real app: restore purchases via StoreKit
-  alert('У реальному додатку тут буде відновлення покупки через App Store');
-}
-
-function showProToast(){
-  const t = document.createElement('div');
-  t.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),#c9a84c);color:#0a0a0f;padding:10px 20px;border-radius:20px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;z-index:600;';
-  t.textContent='👑 PRO активовано!';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 3000);
-}
-
-function trialBadgeText(daysLeft){
-  return '⏱ '+uiText('trialShort')+': '+daysLeft+' '+uiText('daysShort');
-}
-
-function updateProUI(){
-  // Show/hide PRO badge in header
-  const badge = document.getElementById('proBadge');
-  if(badge) badge.style.display = isPro ? 'inline-flex' : 'none';
-  // Trial days badge
-  const trialBadge=document.getElementById('trialBadge');
-  if(trialBadge){
-    const daysLeft=getTrialDaysLeft();
-    if(daysLeft>0){
-      trialBadge.style.display='inline-block';
-      trialBadge.textContent=trialBadgeText(daysLeft);
-      trialBadge.style.borderColor=daysLeft<=2?'#f8717140':'#4ecb8d40';
-      trialBadge.style.color=daysLeft<=2?'var(--red)':'var(--green2)';
-      trialBadge.style.background=daysLeft<=2?'#f8717115':'#4ecb8d15';
-    } else {
-      trialBadge.style.display='none';
-    }
+    updateNetworkStatusUI();
+    if(!isOffline())fetchUsdUahRate();
+    else fillCurrencyFields();
+    if(window._rateInterval)clearInterval(window._rateInterval);
+    window._rateInterval=setInterval(fetchUsdUahRate,15*60*1000);
+  }catch(e){
+    console.error('bootstrapApp failed',e);
+    try{updateStorageHealthUI();}catch(_e){}
   }
 }
-
-// addDepositSlide freemium check is now built into the function directly
-
-// openAddSection freemium check is built into the function directly
-
-// addSecItem freemium check is built into the function directly
-
-// fetchTickerForInput — all free, just pass through
-const _origFetchTicker = fetchTickerForInput;
-fetchTickerForInput = async function(secId){
-  await _origFetchTicker(secId);
-};
-
-// refreshAllStockPrices — all free, just pass through
-const _origRefreshAll = refreshAllStockPrices;
-refreshAllStockPrices = async function(secId){
-  await _origRefreshAll(secId);
-};
-
-// Update UI after load
-setTimeout(updateProUI, 100);
-
-// ── CALCULATOR ────────────────────────────────────────────
-function openCalc(){
-  document.getElementById('calcOverlay').classList.add('open');
-  translateDynamicUI();
-  // Fetch fresh rates then fill fields
-  fillCurrencyFields();
-  if(!isOffline()&&(!ratesLastFetched || Date.now()-ratesLastFetched > 5*60*1000)){
-    fetchUsdUahRate().then(()=>fillCurrencyFields());
-  }
-  runCurrencyWithRates();
-}
-function fillCurrencyFields(){
-  const fields={cur_rate:liveRates.USD,cur_eur:liveRates.EUR,cur_rub:liveRates.RUB,cur_cny:liveRates.CNY};
-  Object.entries(fields).forEach(([id,rate])=>{
-    const el=document.getElementById(id);
-    if(el&&rate&&rate>0) el.value=rate.toFixed(2);
-  });
-  const srcEl=document.getElementById('cur_rate_source');
-  if(srcEl){
-    if(isOffline()){
-      const updated=ratesLastFetched?new Date(ratesLastFetched).toLocaleTimeString():'';
-      srcEl.innerHTML='<span style="color:var(--orange2)">● '+offlineTxt('ratesOffline')+'</span>'+(updated?' · '+updated:'');
-    } else if(ratesLastFetched){
-      const updated=new Date(ratesLastFetched).toLocaleTimeString();
-      const src=window._rateSource||'API';
-      srcEl.innerHTML='<span style="color:var(--green2)">● Онлайн</span> · '+src+' · '+updated;
-    } else {
-      srcEl.innerHTML='<span style="color:var(--orange2)">● '+offlineTxt('ratesFallback')+'</span>';
-    }
-  }
-  runCurrencyWithRates();
-}
-function closeCalc(){document.getElementById('calcOverlay').classList.remove('open');}
-function calcCloseOutside(e){if(e.target===document.getElementById('calcOverlay'))closeCalc();}
-function switchCalc(tab,btn){
-  document.querySelectorAll('.calc-tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.calc-panel').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('calcPanel_'+tab).classList.add('active');
-}
-
-// ── SIMPLE CALCULATOR ────────────────────────────────────
-let sc_expr='',sc_prev='',sc_op='',sc_newNum=true;
-function sc(v){
-  const disp=document.getElementById('sc_display');
-  if(v==='C'){sc_expr='';sc_prev='';sc_op='';sc_newNum=true;disp.textContent='0';return;}
-  if(v==='⌫'){
-    if(sc_newNum||disp.textContent==='0')return;
-    const s=disp.textContent.slice(0,-1);
-    disp.textContent=s===''||s==='-'?'0':s;
-    return;
-  }
-  if(v==='±'){const n=parseFloat(disp.textContent)||0;disp.textContent=String(-n);return;}
-  if(v==='%'){
-    const n=parseFloat(disp.textContent)||0;
-    if(sc_op&&sc_prev){
-      // 100 + 10% = 110, 100 - 10% = 90, 100 * 10% = 10, 100 / 10% = 1000
-      const a=parseFloat(sc_prev);
-      if(sc_op==='+'||sc_op==='-'){
-        disp.textContent=String(parseFloat((a*n/100).toFixed(8)));
-      } else {
-        disp.textContent=String(parseFloat((n/100).toFixed(8)));
-      }
-    } else {
-      disp.textContent=String(parseFloat((n/100).toFixed(8)));
-    }
-    return;
-  }
-  if(['+','-','*','/'].includes(v)){
-    sc_prev=disp.textContent;sc_op=v;sc_newNum=true;
-    disp.textContent=disp.textContent;return;
-  }
-  if(v==='='){
-    if(!sc_op||!sc_prev)return;
-    const a=parseFloat(sc_prev),b=parseFloat(disp.textContent);
-    let res=0;
-    if(sc_op==='+')res=a+b;
-    else if(sc_op==='-')res=a-b;
-    else if(sc_op==='*')res=a*b;
-    else if(sc_op==='/')res=b!==0?a/b:0;
-    disp.textContent=parseFloat(res.toFixed(8)).toString();
-    sc_op='';sc_newNum=true;return;
-  }
-  if(v==='.'&&disp.textContent.includes('.')&&!sc_newNum)return;
-  if(sc_newNum){disp.textContent=v==='.'?'0.':v;sc_newNum=false;}
-  else{disp.textContent=disp.textContent==='0'&&v!=='.'?v:disp.textContent+v;}
-  if(disp.textContent.length>14)disp.textContent=disp.textContent.slice(0,14);
-}
-
-// ── COMPOUND INTEREST ────────────────────────────────────
-function runCompound(){
-  const sum=parseFloat(document.getElementById('cp_sum')?.value)||0;
-  const rate=parseFloat(document.getElementById('cp_rate')?.value)||0;
-  const months=parseFloat(document.getElementById('cp_months')?.value)||0;
-  const freq=parseInt(document.getElementById('cp_freq')?.value)||12;
-  const taxPct=parseFloat(document.getElementById('cp_tax')?.value)||0;
-  const taxFree=parseFloat(document.getElementById('cp_taxfree')?.value)||0;
-  const box=document.getElementById('cp_result');
-  if(!sum||!rate||!months){box.style.display='none';return;}
-  let total;
-  if(freq===0){total=sum*(1+rate/100*months/12);}
-  else{const r=rate/100/freq;const n=freq*months/12;total=sum*Math.pow(1+r,n);}
-  const profit=total-sum;
-  const taxableProfit=Math.max(0,profit-taxFree);
-  const tax=taxableProfit*taxPct/100;
-  const net=profit-tax;
-  const fmt=n=>new Intl.NumberFormat('uk-UA',{maximumFractionDigits:0}).format(n);
-  box.style.display='block';
-  const taxLabel=taxPct>0?`Податок ${taxPct}%`:'Без податку';
-  box.innerHTML=[
-    ['Підсумкова сума',fmt(Math.round(total))+' ₴','var(--text)'],
-    ['Нараховано відсотків','+'+fmt(Math.round(profit))+' ₴','var(--green2)'],
-    [taxLabel,taxPct>0?'-'+fmt(Math.round(tax))+' ₴':'0 ₴',taxPct>0?'var(--red)':'var(--muted2)'],
-    ['Чистий прибуток','+'+fmt(Math.round(net))+' ₴','var(--green2)'],
-    ['В місяць',fmt(Math.round(net/months))+' ₴/міс','var(--muted2)'],
-    ['Ефективна ставка',(sum>0?((total/sum-1)*100).toFixed(2):'0')+'%','var(--muted2)'],
-  ].map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
-}
-
-// ── CURRENCY ─────────────────────────────────────────────
-function runCurrency(){
-  const sum=parseFloat(document.getElementById('cur_sum')?.value)||0;
-  const usd=parseFloat(document.getElementById('cur_rate')?.value)||usdUahRate||41;
-  const eur=parseFloat(document.getElementById('cur_eur')?.value)||usd*1.08;
-  const from=document.getElementById('cur_from')?.value||'uah';
-  const box=document.getElementById('cur_result');
-  if(!sum){box.style.display='none';return;}
-  const fmt=n=>new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(n);
-  let rows=[];
-  if(from==='uah'){
-    rows=[
-      ['₴ → $',fmt(sum/usd)+' $','var(--green2)'],
-      ['₴ → €',fmt(sum/eur)+' €','var(--blue2)'],
-      ['Курс USD',usd.toFixed(2)+' ₴','var(--muted2)'],
-      ['Курс EUR',eur.toFixed(2)+' ₴','var(--muted2)'],
-    ];
-  }else if(from==='usd'){
-    rows=[
-      ['$ → ₴',fmt(sum*usd)+' ₴','var(--green2)'],
-      ['$ → €',fmt(sum*usd/eur)+' €','var(--blue2)'],
-      ['Курс USD',usd.toFixed(2)+' ₴','var(--muted2)'],
-    ];
-  }else{
-    rows=[
-      ['€ → ₴',fmt(sum*eur)+' ₴','var(--green2)'],
-      ['€ → $',fmt(sum*eur/usd)+' $','var(--blue2)'],
-      ['Курс EUR',eur.toFixed(2)+' ₴','var(--muted2)'],
-    ];
-  }
-  box.style.display='block';
-  box.innerHTML=rows.map(r=>`<div class="calc-res-row"><span class="calc-res-key">${r[0]}</span><span class="calc-res-val" style="color:${r[2]}">${r[1]}</span></div>`).join('');
-}
-
-// Plan selection
-let selectedPlan='monthly';
-function selectPlan(plan){
-  selectedPlan=plan;
-  const monthly=document.getElementById('plan_monthly');
-  const yearly=document.getElementById('plan_yearly');
-  if(!monthly||!yearly)return;
-  if(plan==='monthly'){
-    monthly.style.border='1.5px solid var(--gold)';
-    monthly.style.background='#e8c97a10';
-    yearly.style.border='1.5px solid var(--border2)';
-    yearly.style.background='transparent';
-  }else{
-    yearly.style.border='1.5px solid var(--gold)';
-    yearly.style.background='#e8c97a10';
-    monthly.style.border='1.5px solid var(--border2)';
-    monthly.style.background='transparent';
-  }
-}
-
-// ── SETTINGS ─────────────────────────────────────────────
-const currencyRates={usd:0,eur:0,rub:0,cny:0};
 
 const SETTINGS_I18N={
   uk:{title:'⚙️ Налаштування',langLbl:'Мова / Language',currLbl:'Відображення суми',themeLbl:'Тема',themeDark:'🌙 Темна',themeLight:'☀ Світла',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовий чек-лист',legalLbl:'Правові документи',privacyBtn:'🔐 Політика конфіденційності',termsBtn:'⚖️ Умови та відмова від відповідальності'},
@@ -6545,22 +6336,19 @@ function updateBizField(secId,field,val){
   const idx=customSections.findIndex(s=>s.id===secId);
   if(idx<0)return;
   if(!customSections[idx].biz)customSections[idx].biz={};
-  customSections[idx].biz[field]=parseFloat(val)||0;
-  // Calculate net profit: profit - rent - salary - tax - expense
+  if(field&&field!=='__noop__')customSections[idx].biz[field]=parseInputNumber(val);
   const b=customSections[idx].biz;
-  const net=(b.profit||0)-(b.rent||0)-(b.salary||0)-(b.tax||0)-(b.expense||0);
+  const net=(parseInputNumber(b.profit))-(parseInputNumber(b.rent))-(parseInputNumber(b.salary))-(parseInputNumber(b.tax))-(parseInputNumber(b.expense));
   const netEl=document.getElementById('biz_net_'+secId);
   if(netEl){
-    netEl.textContent=(net>=0?'+':'')+fmtN(Math.round(net))+' ₴';
+    netEl.textContent=(net>=0?'+':'-')+fmtN(Math.abs(Math.round(net)))+' в‚ґ';
     netEl.style.color=net>=0?'var(--green2)':'var(--red)';
   }
-  // Set section amount to net profit for total capital
   customSections[idx].amount=Math.max(0,net);
-  updateAll();
-  saveData();
+  customSections[idx].principal=customSections[idx].amount;
+  if(field&&field!=='__noop__'){updateAll();saveData();}
 }
 
-// ── PARTIAL LOAN PAYMENT ─────────────────────────────────
 function openPartialPayModal(liabId,liabName,remaining){
   const el=document.getElementById('partial_pay_liab_id');
   if(!el)return;
@@ -7639,23 +7427,10 @@ const _origGetCustomTotal=getCustomTotal;
 getCustomTotal=function(){
   return customSections.reduce((sum,s)=>{
     if(s.sectionType==='startup')return sum+getStartupStats(s).total;
+    if(s.sectionType==='business')return sum+(parseFloat(s.amount)||parseFloat(s.principal)||0);
     return sum+(parseFloat(s.principal)||0);
   },0);
 };
-
-// Re-render startup/business custom sections after all late extensions are available.
-// Initial app render happens earlier in the file; this keeps totals alive after reload.
-setTimeout(()=>{
-  try{
-    if(Array.isArray(customSections)&&customSections.length)renderCustomCards();
-    if(typeof renderSecuritiesCards==='function')renderSecuritiesCards();
-    if(typeof renderMetalsCards==='function')renderMetalsCards();
-    if(typeof renderLiabilities==='function')renderLiabilities();
-    if(typeof restoreOrder==='function')restoreOrder();
-    if(typeof updateAll==='function')updateAll();
-    if(typeof refreshDrag==='function')refreshDrag();
-  }catch(e){console.error('late startup refresh failed',e);}
-},0);
 
 // ── DEV TOOLS ─────────────────────────────────────────────
 function devSetPro(state){
@@ -7926,12 +7701,40 @@ async function fetchCoinPrice(){
   }catch(e){console.error('fetchCoinPrice:',e);const p=$('cryptoLivePreview');if(p)p.innerHTML='<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--red)">❌ Помилка завантаження</div>';}
 }
 
-// Re-render after all overrides are established
-if(customSections.some(s=>s.sectionType==='startup')){
-  renderCustomCards();
-  updateAll();
-}
 // ── PWA SERVICE WORKER ────────────────────────
+
+// Unified visual order for built-in, custom, stocks, OVDP and metals cards.
+function removeExistingCardsByIds(ids){
+  (ids||[]).forEach(id=>{
+    const el=$('card-'+id);
+    if(el)el.remove();
+  });
+}
+const _renderCustomCardsUnified=renderCustomCards;
+renderCustomCards=function(){
+  removeExistingCardsByIds((customSections||[]).map(x=>x.id));
+  _renderCustomCardsUnified();
+  restoreOrder();
+  refreshDrag();
+};
+const _renderSecuritiesCardsUnified=renderSecuritiesCards;
+renderSecuritiesCards=function(){
+  removeExistingCardsByIds((securitiesSections||[]).map(x=>x.id));
+  _renderSecuritiesCardsUnified();
+  restoreOrder();
+  refreshDrag();
+};
+const _renderMetalsCardsUnified=renderMetalsCards;
+renderMetalsCards=function(){
+  removeExistingCardsByIds((metalsSections||[]).map(x=>x.id));
+  _renderMetalsCardsUnified();
+  restoreOrder();
+  refreshDrag();
+};
+
+// Final app start after every module/override is declared
+setTimeout(bootstrapApp,0);
+
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
@@ -7945,3 +7748,5 @@ window.addEventListener('offline',()=>{updateNetworkStatusUI('offline');fillCurr
 </script>
 </body>
 </html>
+
+
