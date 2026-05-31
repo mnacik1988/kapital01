@@ -5047,6 +5047,7 @@ function bootstrapApp(){
   window._kapitalBootstrapped=true;
   try{
     loadData();
+    loadCapitalHistory();
 
     document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
     const activeLangBtn=$('lang-'+currentLang);
@@ -5070,7 +5071,6 @@ function bootstrapApp(){
     saveDataNow();
     updateStorageHealthUI();
 
-    loadCapitalHistory();
     setTimeout(checkOnboarding,1500);
 
     setTimeout(()=>{
@@ -6513,9 +6513,17 @@ function updateFamilyField(secId,field,val){
 // ── DAILY CAPITAL SNAPSHOT ────────────────────────────────
 // capitalHistory and chartPeriod declared at top with other state vars
 
+let capitalHistoryLoaded=false;
 function loadCapitalHistory(){
-  const d=localStorage.getItem('cap_history');
-  if(d) capitalHistory=JSON.parse(d);
+  try{
+    const d=localStorage.getItem('cap_history');
+    capitalHistory=d?JSON.parse(d):[];
+    if(!Array.isArray(capitalHistory))capitalHistory=[];
+  }catch(e){
+    capitalHistory=[];
+  }
+  capitalHistoryLoaded=true;
+  normalizeCapitalHistory();
 }
 function saveCapitalHistory(){
   // Keep max 365 entries
@@ -6634,6 +6642,7 @@ function getSectionDayDelta(current,key){
 }
 
 function recordDailySnapshot(total){
+  if(!capitalHistoryLoaded)loadCapitalHistory();
   const today=getLocalDateKey();
   normalizeCapitalHistory();
   const existing=capitalHistory.findIndex(h=>h.date===today);
@@ -7123,7 +7132,7 @@ function renderDiagnostics(){
 
 
   const currentPerf=getSectionPerformanceSnapshot(total);
-  const sectionOrder=['stocks','crypto','bonds','ovdp','metals','deposits','forex','startups','business','custom','cash','debts'];
+  const sectionOrder=['stocks','crypto'];
   const fmtSmallChange=(stat)=>{
     if(!stat)return '<span style="color:var(--muted)">—</span>';
     const v=stat.change||0;
@@ -7215,8 +7224,8 @@ function renderDiagnostics(){
 
     <div class="diag-section">
       <div class="diag-section-title">📊 Динаміка по розділах</div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">Акції, крипто, ОВДП, облігації та метали показують зміну P&L, тобто рух ціни активів без простого поповнення.</div>
-      ${sectionDynamicsRows||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">Недостатньо історії або активів для порівняння.</div>'}
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">Акції та криптовалюта показують зміну P&L, тобто рух ціни активів без простого поповнення.</div>
+      ${sectionDynamicsRows||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">Недостатньо історії або активів в акціях/криптовалюті для порівняння.</div>'}
     </div>
 
     <div class="diag-section">
