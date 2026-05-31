@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'kapital-app-v0-0-21-unified-order-v1';
+const CACHE_NAME = 'kapital-app-v0-0-21-section-performance-v1';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
