@@ -772,6 +772,7 @@ body.theme-light::before{opacity:.18;}
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="chart-period-tabs" id="chartPeriodTabs" onclick="event.stopPropagation()">
+          <button class="chart-ptab" onclick="setChartPeriod('1d',this)" id="cpt_1d">1Д</button>
           <button class="chart-ptab active" onclick="setChartPeriod('7d',this)" id="cpt_7d">7Д</button>
           <button class="chart-ptab" onclick="setChartPeriod('30d',this)" id="cpt_30d">30Д</button>
           <button class="chart-ptab" onclick="setChartPeriod('90d',this)" id="cpt_90d">90Д</button>
@@ -801,6 +802,10 @@ body.theme-light::before{opacity:.18;}
         <div class="chart-stat">
           <div class="chart-stat-val" id="chartGrowth">—</div>
           <div class="chart-stat-lbl">Зростання</div>
+        </div>
+        <div class="chart-stat">
+          <div class="chart-stat-val" id="chartDayChange">—</div>
+          <div class="chart-stat-lbl">День</div>
         </div>
       </div>
     </div>
@@ -2300,7 +2305,7 @@ function getDepositHtml(dep,idx){
         <div class="field-group" style="margin-top:8px;">
           <div class="field-label">💰 Виплата процентів</div>
           <select class="field-input" id="depInterestTo_${dep.id}"
-            onchange="deposits[${idx}].interestTo=this.value;updateAll();startLiveTicker('${dep.id}');saveData()">
+            onchange="setDepositInterestTo('${dep.id}',${idx},this.value)">
             <option value="body" ${dep.interestTo!=='separate'?'selected':''}>→ Капіталізація (на тіло)</option>
             <option value="separate" ${dep.interestTo==='separate'?'selected':''}>→ На окремий рахунок</option>
           </select>
@@ -2441,6 +2446,152 @@ document.addEventListener('touchend',e=>{
 window.addEventListener('resize',()=>setTimeout(syncDepositSliderHeight,80));
 
 // ── DEPOSIT CALC ─────────────────────────────
+
+function depLocalDate(value){
+  if(value instanceof Date)return new Date(value.getFullYear(),value.getMonth(),value.getDate());
+  const str=String(value||'').slice(0,10);
+  const parts=str.split('-').map(n=>parseInt(n,10));
+  if(parts.length===3&&parts.every(Number.isFinite))return new Date(parts[0],parts[1]-1,parts[2]);
+  const d=new Date(value);
+  return isNaN(d.getTime())?new Date():new Date(d.getFullYear(),d.getMonth(),d.getDate());
+}
+function depDateKey(date){
+  const d=depLocalDate(date);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function depAddDays(date,days){
+  const d=depLocalDate(date);
+  d.setDate(d.getDate()+days);
+  return d;
+}
+function normalizeDepositMode(mode){
+  return mode==='separate'?'separate':'body';
+}
+function getDepositModeHistory(dep){
+  if(!dep)return [];
+  const hist=Array.isArray(dep.interestModeHistory)?dep.interestModeHistory:[];
+  return hist
+    .filter(h=>h&&h.date)
+    .map(h=>({date:depDateKey(h.date),mode:normalizeDepositMode(h.mode)}))
+    .sort((a,b)=>a.date.localeCompare(b.date));
+}
+function getDepositInterestModeAt(dep,date){
+  const hist=getDepositModeHistory(dep);
+  if(!hist.length)return normalizeDepositMode(dep?.interestTo);
+  const key=depDateKey(date);
+  let mode=normalizeDepositMode(dep?.interestTo);
+  for(const h of hist){
+    if(h.date<=key)mode=h.mode;
+    else break;
+  }
+  return mode;
+}
+function setDepositInterestTo(depId,idx,mode){
+  const dep=deposits[idx]||deposits.find(d=>d.id===depId);
+  if(!dep)return;
+  const next=normalizeDepositMode(mode);
+  const prev=getDepositInterestModeAt(dep,new Date());
+  const startKey=dep.startDate||depDateKey(new Date());
+  const effectiveKey=depDateKey(depAddDays(new Date(),1));
+  let hist=getDepositModeHistory(dep);
+  if(!hist.length)hist.push({date:startKey,mode:prev});
+  const existing=hist.find(h=>h.date===effectiveKey);
+  if(existing)existing.mode=next;
+  else hist.push({date:effectiveKey,mode:next});
+  dep.interestModeHistory=hist.sort((a,b)=>a.date.localeCompare(b.date));
+  dep.interestTo=next;
+  updateAll();
+  startLiveTicker(depId);
+  saveData();
+}
+function getDepositCapDates(start,end,startDay){
+  const dates=[];
+  let cd=new Date(start);
+  while(true){
+    cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
+    if(cd>end)break;
+    dates.push(new Date(cd));
+  }
+  return dates;
+}
+function simulateDeposit(dep,opts={}){
+  const P=getDepositPrincipalNative(dep);
+  const start=depLocalDate(opts.start||dep?.startDate||new Date());
+  const end=depLocalDate(opts.end||dep?.endDate||new Date());
+  const until=depLocalDate(opts.until||new Date());
+  const stop=new Date(Math.min(end.getTime(),until.getTime()));
+  const rAnn=(parseInputNumber(opts.rate??dep?.rate)||16)/100;
+  const taxRate=parseInputNumber(opts.tax??dep?.tax)/100;
+  let taxFreeLeft=parseInputNumber(opts.taxFree??dep?.taxFree);
+  const startDay=start.getDate();
+  const oneDay=1000*60*60*24;
+  if(!P||stop<=start||end<=start){
+    return {principal:P||0,bodyBalance:P||0,separateNet:0,totalValue:P||0,totalGross:0,totalTax:0,totalNet:0,capitalizedNet:0,completedCaps:0,currentMode:normalizeDepositMode(dep?.interestTo),dailyGross:0,dailyNet:0};
+  }
+  const events=[];
+  (dep?.topups||[]).forEach(tp=>{
+    const amount=parseInputNumber(tp.amount);
+    if(!amount||!tp.date)return;
+    events.push({date:depAddDays(tp.date,1),type:'topup',amount});
+  });
+  getDepositCapDates(start,stop,startDay).forEach(date=>events.push({date,type:'cap'}));
+  getDepositModeHistory(dep).forEach(h=>{
+    const d=depLocalDate(h.date);
+    if(d>start&&d<=stop)events.push({date:d,type:'mode',mode:h.mode});
+  });
+  events.sort((a,b)=>a.date-b.date||({topup:0,mode:1,cap:2}[a.type]-{topup:0,mode:1,cap:2}[b.type]));
+
+  let bodyBalance=P;
+  let separateNet=0;
+  let periodStart=new Date(start);
+  let currentMode=getDepositInterestModeAt(dep,start);
+  let weighted={body:0,separate:0};
+  let totalGross=0,totalTax=0,totalNet=0,capitalizedNet=0,completedCaps=0;
+
+  function addWeighted(toDate){
+    const days=Math.round((toDate-periodStart)/oneDay);
+    if(days>0){
+      weighted[currentMode]+=bodyBalance*days;
+      periodStart=new Date(toDate);
+    }
+  }
+  function settleCap(){
+    ['body','separate'].forEach(mode=>{
+      const gross=weighted[mode]*rAnn/365;
+      if(!gross)return;
+      const taxBase=Math.max(0,gross-taxFreeLeft);
+      const tax=taxBase*taxRate;
+      taxFreeLeft=Math.max(0,taxFreeLeft-gross);
+      const net=gross-tax;
+      totalGross+=gross;
+      totalTax+=tax;
+      totalNet+=net;
+      if(mode==='body'){
+        bodyBalance+=net;
+        capitalizedNet+=net;
+      }else{
+        separateNet+=net;
+      }
+    });
+    weighted={body:0,separate:0};
+    completedCaps++;
+  }
+
+  for(const ev of events){
+    if(ev.date<=periodStart)continue;
+    if(ev.date>stop)break;
+    addWeighted(ev.date);
+    if(ev.type==='topup')bodyBalance+=ev.amount;
+    else if(ev.type==='mode')currentMode=normalizeDepositMode(ev.mode);
+    else if(ev.type==='cap')settleCap();
+  }
+  addWeighted(stop);
+  const dailyGross=bodyBalance*rAnn/365;
+  const dailyTax=Math.max(0,dailyGross)*taxRate;
+  const dailyNet=dailyGross-dailyTax;
+  return {principal:P,bodyBalance,separateNet,totalValue:bodyBalance+separateNet,totalGross,totalTax,totalNet,capitalizedNet,completedCaps,currentMode,dailyGross,dailyNet};
+}
+
 function getDepositCurrency(d){
   return (d?.depCurrency||'UAH').toUpperCase();
 }
@@ -2475,23 +2626,7 @@ function getDepositPrincipalUah(d){
   return getDepositAmountUah(d,getDepositPrincipalNative(d));
 }
 function getDepositMonthlyAccruedNative(d){
-  const P=getDepositPrincipalNative(d);
-  if(!P||!d.startDate||!d.endDate)return 0;
-  const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
-  if(now<start||end<=start)return 0;
-  const rAnn=(parseInputNumber(d.rate)||16)/100;
-  const n=parseInputNumber(d.freq)||12;
-  const startDay=start.getDate();
-  let completedMonths=0;
-  let checkDate=new Date(start);
-  while(true){
-    checkDate=new Date(checkDate.getFullYear(),checkDate.getMonth()+1,startDay);
-    if(checkDate>now||checkDate>end)break;
-    completedMonths++;
-  }
-  if(completedMonths===0)return 0;
-  const yMonthly=completedMonths/12;
-  return P*Math.pow(1+rAnn/n,n*yMonthly)-P;
+  return simulateDeposit(d).totalNet;
 }
 function getDepositMonthlyAccrued(d){
   return getDepositAmountUah(d,getDepositMonthlyAccruedNative(d));
@@ -2504,33 +2639,27 @@ function calcDeposit(depId){
   const depSym=getDepositCurrencySymbol(dep);
   const P=parseInputNumber($('depPrincipal_'+depId)?.value);
   if(!P){['r-total','r-interest','r-taxbase','r-tax','r-net','r-eff'].forEach(k=>setText(k+'_'+depId,'—'));return;}
-  const r=(parseInputNumber($('depRate_'+depId)?.value)||16)/100;
-  const months=parseInputNumber($('depMonths_'+depId)?.value)||12;
-  const tax=parseInputNumber($('depTax_'+depId)?.value)/100;
-  const tf=parseInputNumber($('depTaxFree_'+depId)?.value);
-  // Monobank formula: monthly capitalization of NET interest
-  let bal=P;
-  let totalGross=0;
-  for(let mo=0;mo<months;mo++){
-    const gross=bal*r/12;
-    totalGross+=gross;
-    const net=gross*(1-tax);
-    bal+=net; // only NET gets capitalized
-  }
-  const interest=totalGross;
-  const taxBase=Math.max(0,interest-tf);
-  const taxAmt=interest*tax;
-  const net=interest-taxAmt;
-  const eff=P&&months?(net/P/(months/12)*100):0;
-  setText('r-total_'+depId,   fmtN(Math.round(bal))+' '+depSym);
-  setText('r-interest_'+depId,'+'+fmtN(Math.round(interest))+' '+depSym);
+  dep.principal=$('depPrincipal_'+depId)?.value||dep.principal;
+  dep.rate=$('depRate_'+depId)?.value||dep.rate;
+  dep.months=$('depMonths_'+depId)?.value||dep.months;
+  dep.tax=$('depTax_'+depId)?.value||dep.tax;
+  dep.taxFree=$('depTaxFree_'+depId)?.value||dep.taxFree;
+  const months=parseInputNumber(dep.months)||12;
+  const start=dep.startDate?depLocalDate(dep.startDate):depLocalDate(new Date());
+  const end=new Date(start);
+  end.setMonth(end.getMonth()+months);
+  const sim=simulateDeposit(dep,{start,end,until:end});
+  const taxBase=Math.max(0,sim.totalGross-parseInputNumber(dep.taxFree));
+  const eff=P&&months?((sim.totalNet/P)/(months/12)*100):0;
+  setText('r-total_'+depId,   fmtN(Math.round(sim.totalValue))+' '+depSym);
+  setText('r-interest_'+depId,'+'+fmtN(Math.round(sim.totalGross))+' '+depSym);
   setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' '+depSym);
-  setText('r-tax_'+depId,     '−'+fmtN(Math.round(taxAmt))+' '+depSym);
-  setText('r-net_'+depId,     '+'+fmtN(Math.round(net))+' '+depSym);
+  setText('r-tax_'+depId,     '−'+fmtN(Math.round(sim.totalTax))+' '+depSym);
+  setText('r-net_'+depId,     '+'+fmtN(Math.round(sim.totalNet))+' '+depSym);
   setText('r-eff_'+depId,     eff.toFixed(2)+'% '+t('yearly'));
 }
 
-// ── LIVE TICKER ──────────────────────────────
+// ── LIVE TICKER// ── LIVE TICKER ──────────────────────────────
 function fmtLive(n,sym='₴'){
   const a=Math.abs(n);
   if(a>=1e6)return (n/1e6).toFixed(4)+'M '+sym;
@@ -2541,19 +2670,15 @@ function calcLive(depId){
   const dep=deposits.find(d=>d.id===depId);
   const depSym=getDepositCurrencySymbol(dep||{});
   const P=getDepositPrincipalNative(dep||{})||parseInputNumber($('depPrincipal_'+depId)?.value);
-  const topupsTotal=getDepositTopupsNative(dep||{});
-  const totalPrincipal=P+topupsTotal;
   const rAnn=(parseInputNumber($('depRate_'+depId)?.value)||16)/100;
-  const n=parseInputNumber($('depFreq_'+depId)?.value)||12;
-  const tax=parseInputNumber($('depTax_'+depId)?.value)/100; // e.g. 0.23 for 23%
-  const tf=parseInputNumber($('depTaxFree_'+depId)?.value);
+  const tax=parseInputNumber($('depTax_'+depId)?.value)/100;
   const sStr=$('depStartDate_'+depId)?.value;
   const eStr=$('depEndDate_'+depId)?.value;
   if(!P||!rAnn||!sStr||!eStr){
     const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
     if(s)s.style.display='block'; if(m)m.style.display='none'; return;
   }
-  const start=new Date(sStr),end=new Date(eStr),now=new Date();
+  const start=depLocalDate(sStr),end=depLocalDate(eStr),now=new Date();
   if(now<start||end<=start){
     const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
     if(s)s.style.display='block'; if(m)m.style.display='none'; return;
@@ -2561,123 +2686,31 @@ function calcLive(depId){
   const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
   if(s)s.style.display='none'; if(m)m.style.display='block';
   const totalMs=end-start, elMs=Math.max(0,Math.min(now-start,totalMs));
-  const yEl=elMs/(1000*60*60*24*365.25), progress=elMs/totalMs;
-
-  // ═══ MONOBANK FORMULA (exact daily-weighted balance) ═══
-  // Interest = SUM(daily_balance × rate / 365) for each day in the month
-  // Topup affects balance from the NEXT day after deposit date
-  // Capitalization: net interest (after tax) added to body on cap date
-  
-  const startDay=start.getDate();
-  const interestToBody=dep?(dep.interestTo!=='separate'):true;
-  
-  // Deep copy topups, compute effective dates in LOCAL time (not UTC)
-  const topups=(dep?.topups||[])
-    .map(tp=>{
-      const parts=tp.date.split('-');
-      const eff=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
-      return {date:tp.date, effectiveDate:eff, amount:parseInputNumber(tp.amount)};
-    })
-    .filter(tp=>tp.effectiveDate<=now)
-    .sort((a,b)=>a.effectiveDate-b.effectiveDate);
-  
-  // Generate all monthly capitalization dates
-  const capDates=[];
-  let cd=new Date(start);
-  while(true){
-    cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
-    if(cd>now||cd>end)break;
-    capDates.push(new Date(cd));
-  }
-  const completedMonths=capDates.length;
-  
-  // Build sorted event timeline: [{date, type, amount}]
-  // Events: 'topup' (effective next day) and 'cap' (capitalization)
-  const events=[];
-  topups.forEach(tp=>{
-    events.push({date:new Date(tp.effectiveDate), type:'topup', amount:tp.amount});
-  });
-  capDates.forEach(cd=>{
-    events.push({date:new Date(cd), type:'cap', amount:0});
-  });
-  events.sort((a,b)=>a.date-b.date||(a.type==='topup'?-1:1)); // topups before cap on same day
-  
-  // Simulate day by day using events
-  let balance=P; // start with base principal only
-  let totalGrossInterest=0;
-  let totalTaxPaid=0;
-  let totalNetCapitalized=0;
-  let periodStart=new Date(start);
-  let periodWeightedSum=0;
-  let periodDays=0;
-  
-  // Process each event in chronological order
-  for(const ev of events){
-    if(ev.date<=periodStart)continue; // skip events before/at current period start
-    
-    // Accumulate days from periodStart to this event at current balance
-    const daysBetween=Math.round((ev.date-periodStart)/(1000*60*60*24));
-    if(daysBetween>0){
-      periodWeightedSum+=balance*daysBetween;
-      periodDays+=daysBetween;
-      periodStart=new Date(ev.date);
-    }
-    
-    if(ev.type==='topup'){
-      balance+=ev.amount;
-    } else if(ev.type==='cap'){
-      // End of month: calculate interest from weighted sum
-      const grossMonth=periodWeightedSum*rAnn/365;
-      const taxMonth=grossMonth*tax;
-      const netMonth=grossMonth-taxMonth;
-      totalGrossInterest+=grossMonth;
-      totalTaxPaid+=taxMonth;
-      totalNetCapitalized+=netMonth;
-      if(interestToBody) balance+=netMonth;
-      // Reset for next period
-      periodWeightedSum=0;
-      periodDays=0;
-    }
-  }
-  
-  // Accumulate remaining days from last event to now (current partial month)
-  const remainingDays=Math.round((now-periodStart)/(1000*60*60*24));
-  if(remainingDays>0){
-    periodWeightedSum+=balance*remainingDays;
-  }
-  
-  const currentBalance=balance;
-  const dailyGross=currentBalance*rAnn/365;
-  const dailyNet=dailyGross*(1-tax);
-  const perSec=dailyNet/86400;
-  const perDay=dailyNet;
-  const perMonth=dailyNet*30.44;
-
-  // Display: principal + all topups made to date + completed capitalizations
-  const todayStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-  const totalTopupsMade=(dep?.topups||[]).filter(tp=>tp.date<=todayStr).reduce((s,tp)=>s+tp.amount,0);
-  const displayA=P+totalTopupsMade+(interestToBody?totalNetCapitalized:0);
+  const progress=elMs/totalMs;
+  const sim=simulateDeposit(dep,{start,end,until:now});
+  const currentBalance=sim.bodyBalance;
+  const perSec=sim.dailyNet/86400;
+  const perDay=sim.dailyNet;
+  const perMonth=sim.dailyNet*30.44;
+  const displayA=sim.totalValue;
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
   const la=$('liveAmount_'+depId);
-   if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' '+depSym+'</span>';
+  if(la)la.innerHTML=intPart+'<span class="live-kopeck">'+decPart+' '+depSym+'</span>';
 
   const dLeft=Math.max(0,Math.round((end-now)/(1000*60*60*24)));
-  const dGone=Math.round(yEl*365.25);
-  // registeredDate = when user added deposit to app (parse in local time, not UTC)
+  const dGone=Math.max(0,Math.round((now-start)/(1000*60*60*24)));
   let regDate=start;
-  if(dep?.registeredDate){
-    const rp=dep.registeredDate.split('-');
-    regDate=new Date(parseInt(rp[0]),parseInt(rp[1])-1,parseInt(rp[2]));
-  }
+  if(dep?.registeredDate)regDate=depLocalDate(dep.registeredDate);
   const dMonitoring=Math.max(0,Math.round((now-regDate)/(1000*60*60*24)));
   setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days')+' · '+uiText('monitoring')+': '+dMonitoring+' '+uiText('daysShort'));
-  setText('liveInterest_'+depId,'+'+fmtLive(totalGrossInterest,depSym)+' ('+completedMonths+' міс)');
-  setText('liveTaxLive_'+depId,'−'+fmtLive(totalTaxPaid,depSym)+' ('+Math.round(tax*100)+'%)');
-  setText('liveNet_'+depId,'+'+fmtLive(totalNetCapitalized,depSym));
+  setText('liveInterest_'+depId,'+'+fmtLive(sim.totalGross,depSym)+' ('+sim.completedCaps+' міс)');
+  setText('liveTaxLive_'+depId,'−'+fmtLive(sim.totalTax,depSym)+' ('+Math.round(tax*100)+'%)');
+  setText('liveNet_'+depId,'+'+fmtLive(sim.totalNet,depSym));
   setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' '+depSym+'/с');
   setText('livePerDay_'+depId,'+'+fmtLive(perDay,depSym));
   setText('livePerMonth_'+depId,'+'+fmtLive(perMonth,depSym));
+  setText('liveInterestTo_'+depId,sim.currentMode==='separate'?uiText('toSeparate'):uiText('toPrincipal'));
   const lb=$('liveBar_'+depId);
   if(lb)lb.style.width=Math.round(progress*100)+'%';
   const fmt2=d=>d.toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'});
@@ -4804,7 +4837,8 @@ function migrateDeposit(dep,index){
   if(!out.depCurrency)out.depCurrency='UAH';
   out.depCurrency=String(out.depCurrency).toUpperCase();
   out.topups=ensureArray(out.topups).map(tp=>({amount:parseInputNumber(tp?.amount),date:tp?.date||new Date().toISOString().split('T')[0]}));
-  if(!out.interestTo)out.interestTo='body';
+  out.interestTo=normalizeDepositMode(out.interestTo);
+  out.interestModeHistory=getDepositModeHistory(out);
   if(!out.registeredDate)out.registeredDate=out.startDate||new Date().toISOString().split('T')[0];
   return out;
 }
@@ -5674,6 +5708,142 @@ function getMetalsCardHtml(s){
 // ── SETTINGS & CURRENCY JS ────────────────────────────────
 function updateTotalDisplay(){ updateAll(); }
 
+
+// ── CALCULATOR CORE ──────────────────────────────────────
+let scExpr='';
+
+function openCalc(){
+  const overlay=document.getElementById('calcOverlay');
+  if(!overlay)return;
+  overlay.classList.add('open');
+  translateDynamicUI();
+  fillCurrencyFields();
+}
+
+function closeCalc(){
+  const overlay=document.getElementById('calcOverlay');
+  if(overlay)overlay.classList.remove('open');
+}
+
+function calcCloseOutside(e){
+  if(e&&e.target===document.getElementById('calcOverlay'))closeCalc();
+}
+
+function switchCalc(mode,btn){
+  document.querySelectorAll('.calc-tab').forEach(el=>el.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.calc-panel').forEach(el=>el.classList.remove('active'));
+  const panel=document.getElementById('calcPanel_'+mode);
+  if(panel)panel.classList.add('active');
+  if(mode==='currency')fillCurrencyFields();
+  if(mode==='compound')runCompound();
+  if(mode==='currency')runCurrencyWithRates();
+}
+
+function updateSimpleCalcDisplay(){
+  const el=document.getElementById('sc_display');
+  if(el)el.textContent=scExpr||'0';
+}
+
+function sc(input){
+  try{
+    if(input==='C'){
+      scExpr='';
+      updateSimpleCalcDisplay();
+      return;
+    }
+    if(input==='⌫'){
+      scExpr=scExpr.slice(0,-1);
+      updateSimpleCalcDisplay();
+      return;
+    }
+    if(input==='%'){
+      const n=parseInputNumber(scExpr);
+      scExpr=String(n/100);
+      updateSimpleCalcDisplay();
+      return;
+    }
+    if(input==='='){
+      const safe=scExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+      if(!/^[0-9+\-*/().\s]+$/.test(safe))throw new Error('bad expression');
+      const res=Function('"use strict";return ('+safe+')')();
+      scExpr=Number.isFinite(res)?String(Math.round(res*100000000)/100000000):'';
+      updateSimpleCalcDisplay();
+      return;
+    }
+    scExpr+=String(input);
+    updateSimpleCalcDisplay();
+  }catch(e){
+    scExpr='';
+    const el=document.getElementById('sc_display');
+    if(el)el.textContent='Error';
+  }
+}
+
+function runCompound(){
+  const principal=parseInputNumber(document.getElementById('cp_sum')?.value);
+  const annualRate=parseInputNumber(document.getElementById('cp_rate')?.value);
+  const months=Math.max(0,parseInputNumber(document.getElementById('cp_months')?.value));
+  const freq=parseInt(document.getElementById('cp_freq')?.value||'12',10);
+  const taxPct=parseInputNumber(document.getElementById('cp_tax')?.value);
+  const taxFree=parseInputNumber(document.getElementById('cp_taxfree')?.value);
+  const box=document.getElementById('cp_result');
+  if(!box)return;
+  if(!principal||!months){
+    box.style.display='none';
+    return;
+  }
+
+  const annual=annualRate/100;
+  const years=months/12;
+  let grossInterest=0;
+  let finalAmount=principal;
+
+  if(freq>0&&annualRate){
+    finalAmount=principal*Math.pow(1+annual/freq,freq*years);
+    grossInterest=finalAmount-principal;
+  }else{
+    grossInterest=principal*annual*years;
+    finalAmount=principal+grossInterest;
+  }
+
+  const taxable=Math.max(0,grossInterest-taxFree);
+  const tax=taxable*(taxPct/100);
+  const netInterest=grossInterest-tax;
+  const netFinal=principal+netInterest;
+  const effective=principal>0&&years>0?(Math.pow(netFinal/principal,1/years)-1)*100:0;
+  const sym=getCurrSym();
+  const money=v=>sym+fmtN(toDisplayCurr(v));
+
+  box.style.display='block';
+  box.innerHTML=
+    '<div class="calc-res-row"><span class="calc-res-key">'+(t('finalAmount')||'Фінальна сума')+'</span><span class="calc-res-val blue">'+money(netFinal)+'</span></div>'+
+    '<div class="calc-res-row"><span class="calc-res-key">'+(t('interestLabel')||'Проценти')+'</span><span class="calc-res-val green">+'+money(netInterest)+'</span></div>'+
+    '<div class="calc-res-row"><span class="calc-res-key">'+(t('taxLabel')||'Податок')+'</span><span class="calc-res-val red">-'+money(tax)+'</span></div>'+
+    '<div class="calc-res-row"><span class="calc-res-key">'+(t('effectiveRate')||'Реальна ставка')+'</span><span class="calc-res-val">'+effective.toFixed(2)+'% '+(t('perYear')||'річних')+'</span></div>';
+}
+
+function fillCurrencyFields(){
+  const rateMap={
+    cur_rate:liveRates.USD||usdUahRate||41,
+    cur_eur:liveRates.EUR||45,
+    cur_rub:liveRates.RUB||0.59,
+    cur_cny:liveRates.CNY||5.6
+  };
+  Object.entries(rateMap).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el&&val&&(!el.value||el.value==='41'||el.value==='45'||el.value==='0.59'||el.value==='5.7'))el.value=Number(val).toFixed(id==='cur_rub'?4:2);
+  });
+  const srcEl=document.getElementById('cur_rate_source');
+  if(srcEl){
+    const source=window._rateSource||offlineTxt('ratesFallback');
+    const stamp=ratesLastFetched?new Date(ratesLastFetched).toLocaleTimeString():'';
+    srcEl.textContent=source+(stamp?' · '+stamp:'');
+  }
+  runCurrencyWithRates();
+}
+
+
 // ── CALCULATOR: add RUB, CNY ──────────────────────────────
 function runCurrencyWithRates(){
   const sum=parseFloat(document.getElementById('cur_sum')?.value)||0;
@@ -5894,72 +6064,8 @@ function getDepositTotalWithTopups(d){
 }
 
 function getDepositMonthlyAccruedNativeWithTopups(d){
-  const P=getDepositPrincipalNative(d);
-  if(!P||!d.startDate||!d.endDate)return 0;
-  const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
-  if(now<start||end<=start)return 0;
-  const rAnn=(parseInputNumber(d.rate)||16)/100;
-  const tax=parseInputNumber(d.tax)/100;
-  const capitalize=d.interestTo!=='separate';
-  if(!capitalize)return 0;
-  
-  const startDay=start.getDate();
-  
-  // Deep copy topups
-  const topups=(d.topups||[])
-    .map(tp=>{
-      const parts=tp.date.split('-');
-      const effectiveDate=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
-      return {amount:parseInputNumber(tp.amount), date:tp.date, effectiveDate};
-    })
-    .filter(tp=>tp.effectiveDate<=now)
-    .sort((a,b)=>a.effectiveDate-b.effectiveDate);
-  
-  // Cap dates
-  const capDates=[];
-  let cd=new Date(start);
-  while(true){
-    cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
-    if(cd>now||cd>end)break;
-    capDates.push(new Date(cd));
-  }
-  
-  // Event timeline
-  const events=[];
-  topups.forEach(tp=>{
-    events.push({date:new Date(tp.effectiveDate), type:'topup', amount:tp.amount});
-  });
-  capDates.forEach(cd=>events.push({date:new Date(cd), type:'cap', amount:0}));
-  events.sort((a,b)=>a.date-b.date||(a.type==='topup'?-1:1));
-  
-  // Simulate
-  let balance=P;
-  let periodStart=new Date(start);
-  let periodWeightedSum=0;
-  let totalCapitalized=0;
-  
-  for(const ev of events){
-    if(ev.date<=periodStart)continue;
-    if(ev.date>now)break; // don't process future events
-    const daysBetween=Math.round((ev.date-periodStart)/(1000*60*60*24));
-    if(daysBetween>0){
-      periodWeightedSum+=balance*daysBetween;
-      periodStart=new Date(ev.date);
-    }
-    if(ev.type==='topup'){
-      balance+=ev.amount;
-    } else if(ev.type==='cap'){
-      const grossMonth=periodWeightedSum*rAnn/365;
-      const netMonth=grossMonth*(1-tax);
-      totalCapitalized+=netMonth;
-      balance+=netMonth;
-      periodWeightedSum=0;
-    }
-  }
-  
-  return totalCapitalized;
+  return simulateDeposit(d).totalNet;
 }
-
 function getDepositMonthlyAccruedWithTopups(d){
   return getDepositAmountUah(d,getDepositMonthlyAccruedNativeWithTopups(d));
 }
@@ -6416,12 +6522,164 @@ function saveCapitalHistory(){
   if(capitalHistory.length>365) capitalHistory=capitalHistory.slice(-365);
   localStorage.setItem('cap_history',JSON.stringify(capitalHistory));
 }
+function getLocalDateKey(date=new Date()){
+  const d=new Date(date);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function addDaysKey(days,date=new Date()){
+  const d=new Date(date);
+  d.setDate(d.getDate()+days);
+  return getLocalDateKey(d);
+}
+function normalizeCapitalHistory(){
+  if(!Array.isArray(capitalHistory))capitalHistory=[];
+  const byDate=new Map();
+  capitalHistory.forEach(h=>{
+    if(!h||!h.date)return;
+    const total=Number(h.total)||0;
+    if(!byDate.has(h.date)||String(h.updatedAt||'')>String(byDate.get(h.date).updatedAt||'')){
+      const histSections=clonePerfSections(h.sections||{});
+      const histOpenSections=hasPerfSections(h.openSections)?clonePerfSections(h.openSections):(hasPerfSections(histSections)?clonePerfSections(histSections):{});
+      byDate.set(h.date,{date:h.date,total,openTotal:Number(h.openTotal)||total,minTotal:Number(h.minTotal)||total,maxTotal:Number(h.maxTotal)||total,sections:histSections,openSections:histOpenSections,updatedAt:h.updatedAt||''});
+    }
+  });
+  capitalHistory=[...byDate.values()].sort((a,b)=>a.date.localeCompare(b.date)).slice(-365);
+}
+
+function makePerfItem(label,icon,value,basis=null,pnl=null,mode='value'){
+  value=Number(value)||0;
+  if(basis===null||basis===undefined)basis=null; else basis=Number(basis)||0;
+  if(pnl===null||pnl===undefined)pnl=basis!==null?value-basis:value;
+  return {label,icon,value,basis,pnl:Number(pnl)||0,mode};
+}
+function getMetalsBasisUah(){
+  return metalsSections.reduce((sum,sec)=>sum+(sec.items||[]).reduce((s,it)=>s+parseInputNumber(it.grams)*parseInputNumber(it.price),0),0);
+}
+function getSectionPerformanceSnapshot(totalOverride=null){
+  const depValue=hiddenCards['deposit']?0:getAllDepositsTotal();
+  const depBasis=deposits.reduce((sum,d)=>sum+getDepositTotalWithTopups(d),0);
+  const cryptoStats=getCryptoPortfolioStats();
+  const cryptoRate=getCryptoRate();
+  const cryptoValue=cryptoStats.portfolioUsd*cryptoRate;
+  const cryptoBasis=cryptoStats.remainingCostUsd*cryptoRate;
+  const stockStats=securitiesSections.filter(s=>s.type==='stocks').reduce((acc,sec)=>{
+    const st=getStockSectionStats(sec);
+    acc.value+=st.holdingsTotal;
+    Object.values(st.groups).forEach(g=>acc.basis+=g.remainingCost);
+    return acc;
+  },{value:0,basis:0});
+  const bondStats=securitiesSections.filter(s=>s.type==='bonds').reduce((acc,sec)=>{
+    const st=getBondSectionStats(sec); acc.value+=st.holdingsTotal; acc.basis+=st.holdingsTotal-st.pnl; acc.pnl+=st.pnl; return acc;
+  },{value:0,basis:0,pnl:0});
+  const ovdpStats=securitiesSections.filter(s=>s.type==='ovdp').reduce((acc,sec)=>{
+    const st=getBondSectionStats(sec); acc.value+=st.holdingsTotal; acc.basis+=st.holdingsTotal-st.pnl; acc.pnl+=st.pnl; return acc;
+  },{value:0,basis:0,pnl:0});
+  const metalsValue=getMetalsTotalUah();
+  const metalsBasis=getMetalsBasisUah();
+  const startupStats=customSections.filter(s=>s.sectionType==='startup').reduce((acc,s)=>{
+    const st=getStartupStats(s); acc.value+=st.total; acc.basis+=st.invested; acc.pnl+=st.pnl; return acc;
+  },{value:0,basis:0,pnl:0});
+  const businessValue=customSections.filter(s=>s.sectionType==='business').reduce((sum,s)=>sum+(parseFloat(s.amount)||parseFloat(s.principal)||0),0);
+  const otherCustomValue=customSections.filter(s=>!['startup','business'].includes(s.sectionType)).reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
+  const forexValue=hiddenCards['forex']?0:getForexVal();
+  const cashValue=(hiddenCards['cash']?0:getCashVal())+(hiddenCards['other']?0:getOtherVal());
+  const debtValue=getLiabilitiesTotal();
+  const sections={
+    deposits:makePerfItem('Депозити','🏦',depValue,depBasis,depValue-depBasis,'pnl'),
+    stocks:makePerfItem('Акції','📈',stockStats.value,stockStats.basis,stockStats.value-stockStats.basis,'pnl'),
+    crypto:makePerfItem('Криптовалюта','₮',cryptoValue,cryptoBasis,cryptoValue-cryptoBasis,'pnl'),
+    bonds:makePerfItem('Облігації','📜',bondStats.value,bondStats.basis,bondStats.pnl,'pnl'),
+    ovdp:makePerfItem('ОВДП','🏛',ovdpStats.value,ovdpStats.basis,ovdpStats.pnl,'pnl'),
+    metals:makePerfItem('Метали','💎',metalsValue,metalsBasis,metalsValue-metalsBasis,'pnl'),
+    forex:makePerfItem('Валюта','🌐',forexValue,null,forexValue,'value'),
+    startups:makePerfItem('Стартапи','🚀',startupStats.value,startupStats.basis,startupStats.pnl,'pnl'),
+    business:makePerfItem('Бізнес','💼',businessValue,null,businessValue,'value'),
+    custom:makePerfItem('Інше','✏️',otherCustomValue,null,otherCustomValue,'value'),
+    cash:makePerfItem('Гроші / рахунки','💴',cashValue,null,cashValue,'value'),
+    debts:makePerfItem('Кредити','⚠️',debtValue,null,-debtValue,'debt')
+  };
+  const total=totalOverride!==null&&totalOverride!==undefined?Number(totalOverride)||0:Object.values(sections).reduce((sum,x)=>sum+(x.value||0),0);
+  return {total,sections};
+}
+function clonePerfSections(sections){
+  const out={};
+  Object.entries(sections||{}).forEach(([k,v])=>out[k]={...v});
+  return out;
+}
+function hasPerfSections(sections){
+  return sections&&Object.keys(sections).length>0;
+}
+function getSectionPeriodDelta(current,key,days){
+  const target=addDaysKey(-days);
+  const base=getHistoryEntryOnOrBefore(target);
+  const cur=current.sections[key];
+  const prev=base?.sections?.[key];
+  if(!cur||!prev)return null;
+  const metric=cur.mode==='pnl'?'pnl':'value';
+  const nowVal=Number(cur[metric])||0;
+  const oldVal=Number(prev[metric])||0;
+  const change=nowVal-oldVal;
+  const baseValue=Math.abs(Number(prev.value)||Number(prev.basis)||oldVal||0);
+  return {change,pct:baseValue>0?(change/baseValue*100):0};
+}
+function getSectionDayDelta(current,key){
+  const today=getHistoryEntryOnOrBefore(getLocalDateKey());
+  const open=today?.openSections?.[key];
+  const cur=current.sections[key];
+  if(!cur||!open)return null;
+  const metric=cur.mode==='pnl'?'pnl':'value';
+  const change=(Number(cur[metric])||0)-(Number(open[metric])||0);
+  const baseValue=Math.abs(Number(open.value)||Number(open.basis)||Number(open[metric])||0);
+  return {change,pct:baseValue>0?(change/baseValue*100):0};
+}
+
 function recordDailySnapshot(total){
-  const today=new Date().toISOString().split('T')[0];
+  const today=getLocalDateKey();
+  normalizeCapitalHistory();
   const existing=capitalHistory.findIndex(h=>h.date===today);
-  if(existing>=0) capitalHistory[existing].total=total;
-  else capitalHistory.push({date:today,total});
+  const cleanTotal=Number(total)||0;
+  const perf=getSectionPerformanceSnapshot(cleanTotal);
+  if(existing>=0){
+    const prev=capitalHistory[existing];
+    capitalHistory[existing]={
+      date:today,
+      total:cleanTotal,
+      openTotal:Number(prev.openTotal)||Number(prev.total)||cleanTotal,
+      minTotal:Math.min(Number(prev.minTotal)||Number(prev.total)||cleanTotal,cleanTotal),
+      maxTotal:Math.max(Number(prev.maxTotal)||Number(prev.total)||cleanTotal,cleanTotal),
+      sections:clonePerfSections(perf.sections),
+      openSections:hasPerfSections(prev.openSections)?clonePerfSections(prev.openSections):(hasPerfSections(prev.sections)?clonePerfSections(prev.sections):clonePerfSections(perf.sections)),
+      updatedAt:new Date().toISOString()
+    };
+  }else{
+    capitalHistory.push({date:today,total:cleanTotal,openTotal:cleanTotal,minTotal:cleanTotal,maxTotal:cleanTotal,sections:clonePerfSections(perf.sections),openSections:clonePerfSections(perf.sections),updatedAt:new Date().toISOString()});
+  }
   saveCapitalHistory();
+}
+function getHistoryEntryOnOrBefore(dateKey){
+  normalizeCapitalHistory();
+  let found=null;
+  for(const h of capitalHistory){
+    if(h.date<=dateKey)found=h;
+    else break;
+  }
+  return found;
+}
+function getHistoryEntryBefore(dateKey){
+  normalizeCapitalHistory();
+  let found=null;
+  for(const h of capitalHistory){
+    if(h.date<dateKey)found=h;
+    else break;
+  }
+  return found;
+}
+function getPeriodChangeStats(total,days){
+  const target=addDaysKey(-days);
+  const base=getHistoryEntryOnOrBefore(target);
+  if(!base||!base.total)return null;
+  const change=total-base.total;
+  return {change,pct:base.total>0?(change/base.total*100):0,base};
 }
 
 function setChartPeriod(p,btn){
@@ -6432,18 +6690,32 @@ function setChartPeriod(p,btn){
 }
 
 function renderChart(){
-  const days={
-    '7d':7,'30d':30,'90d':90,'1y':365
-  }[chartPeriod]||30;
-
-  // Get data points for period
+  normalizeCapitalHistory();
+  const todayKey=getLocalDateKey();
+  const todayEntry=capitalHistory.find(h=>h.date===todayKey);
   const now=new Date();
-  const points=[];
-  for(let i=days-1;i>=0;i--){
-    const d=new Date(now);d.setDate(d.getDate()-i);
-    const dateStr=d.toISOString().split('T')[0];
-    const entry=capitalHistory.find(h=>h.date===dateStr);
-    points.push({date:dateStr,val:entry?.total||null});
+  let points=[];
+  if(chartPeriod==='1d'){
+    const open=Number(todayEntry?.openTotal)||Number(todayEntry?.total)||0;
+    const current=Number(todayEntry?.total)||open;
+    const min=Number(todayEntry?.minTotal)||Math.min(open,current);
+    const max=Number(todayEntry?.maxTotal)||Math.max(open,current);
+    points=[
+      {date:todayKey+' 00:00',val:open},
+      {date:todayKey+' min',val:min},
+      {date:todayKey+' max',val:max},
+      {date:todayKey+' now',val:current}
+    ];
+  }else{
+    const days={
+      '7d':7,'30d':30,'90d':90,'1y':365
+    }[chartPeriod]||30;
+    for(let i=days-1;i>=0;i--){
+      const d=new Date(now);d.setDate(d.getDate()-i);
+      const dateStr=getLocalDateKey(d);
+      const entry=capitalHistory.find(h=>h.date===dateStr);
+      points.push({date:dateStr,val:entry?.total||null});
+    }
   }
 
   // Fill gaps with last known value
@@ -6491,9 +6763,13 @@ function renderChart(){
   if(labelEl){
     const step=Math.floor(filled.length/4);
     const labelPoints=[0,step,step*2,step*3,filled.length-1].map(i=>filled[Math.min(i,filled.length-1)]);
-    labelEl.innerHTML=labelPoints.map(p=>
-      `<span>${new Date(p.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>`
-    ).join('');
+    labelEl.innerHTML=labelPoints.map(p=>{
+      if(chartPeriod==='1d'){
+        const suffix=String(p.date).split(' ').pop();
+        return '<span>'+(suffix==='00:00'?'Старт':suffix==='now'?'Зараз':suffix==='min'?'Мін':suffix==='max'?'Макс':suffix)+'</span>';
+      }
+      return `<span>${new Date(p.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>`;
+    }).join('');
   }
 
   // Stats
@@ -6504,6 +6780,14 @@ function renderChart(){
   if(changeEl){changeEl.textContent=(change>=0?'+':'')+sym+fmtN(toDisplayCurr(Math.abs(change)));changeEl.style.color=change>=0?'var(--green2)':'var(--red)';}
   const growthEl=document.getElementById('chartGrowth');
   if(growthEl){growthEl.textContent=(changePct>=0?'+':'')+changePct.toFixed(1)+'%';growthEl.style.color=changePct>=0?'var(--green2)':'var(--red)';}
+  const dayEl=document.getElementById('chartDayChange');
+  if(dayEl){
+    const open=Number(todayEntry?.openTotal)||Number(todayEntry?.total)||currentTotal;
+    const dayChange=currentTotal-open;
+    const dayPct=open>0?(dayChange/open*100):0;
+    dayEl.textContent=(dayChange>=0?'+':'')+sym+fmtN(toDisplayCurr(Math.abs(dayChange)))+' ('+(dayPct>=0?'+':'')+dayPct.toFixed(1)+'%)';
+    dayEl.style.color=dayChange>=0?'var(--green2)':'var(--red)';
+  }
 }
 
 // ── ONBOARDING ────────────────────────────────────────────
@@ -6760,25 +7044,14 @@ function renderDiagnostics(){
   const debt=getLiabilitiesTotal();
   const net=total-debt;
 
-  // Today's stats
-  const today=new Date().toISOString().split('T')[0];
-  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
-  const todayEntry=capitalHistory.find(h=>h.date===today);
-  const yesterdayEntry=capitalHistory.find(h=>h.date===yesterday);
-  const dailyChange=todayEntry&&yesterdayEntry?(todayEntry.total-yesterdayEntry.total):0;
+  // Period stats use the nearest saved point on or before the target date.
+  recordDailySnapshot(total);
+  const today=getLocalDateKey();
+  const yesterdayEntry=getHistoryEntryBefore(today);
+  const dailyChange=yesterdayEntry?(total-yesterdayEntry.total):null;
   const dailyChangePct=yesterdayEntry&&yesterdayEntry.total>0?(dailyChange/yesterdayEntry.total*100):0;
-
-  // Weekly stats
-  const weekAgo=new Date(Date.now()-7*86400000).toISOString().split('T')[0];
-  const weekEntry=capitalHistory.find(h=>h.date===weekAgo);
-  const weekChange=weekEntry?(total-weekEntry.total):0;
-  const weekChangePct=weekEntry&&weekEntry.total>0?(weekChange/weekEntry.total*100):0;
-
-  // Monthly stats
-  const monthAgo=new Date(Date.now()-30*86400000).toISOString().split('T')[0];
-  const monthEntry=capitalHistory.find(h=>h.date===monthAgo);
-  const monthChange=monthEntry?(total-monthEntry.total):0;
-  const monthChangePct=monthEntry&&monthEntry.total>0?(monthChange/monthEntry.total*100):0;
+  const weekStats=getPeriodChangeStats(total,7);
+  const monthStats=getPeriodChangeStats(total,30);
 
   // Daily deposit income (Monobank formula: balance × rate / 365 × (1 - tax))
   let dailyDepIncome=0;
@@ -6848,6 +7121,33 @@ function renderDiagnostics(){
     });
   });
 
+
+  const currentPerf=getSectionPerformanceSnapshot(total);
+  const sectionOrder=['stocks','crypto','bonds','ovdp','metals','deposits','forex','startups','business','custom','cash','debts'];
+  const fmtSmallChange=(stat)=>{
+    if(!stat)return '<span style="color:var(--muted)">—</span>';
+    const v=stat.change||0;
+    const sign=v>=0?'+':'-';
+    const col=v>=0?'var(--green2)':'var(--red)';
+    return '<span style="color:'+col+'">'+sign+sym+fmtN(toDisplayCurr(Math.abs(v)))+' <span style="font-size:8px;color:var(--muted)">('+(stat.pct>=0?'+':'')+stat.pct.toFixed(1)+'%)</span></span>';
+  };
+  const sectionDynamicsRows=sectionOrder.map(key=>{
+    const item=currentPerf.sections[key];
+    if(!item||Math.abs(item.value)<0.01&&Math.abs(item.pnl)<0.01)return '';
+    const d1=getSectionDayDelta(currentPerf,key);
+    const d7=getSectionPeriodDelta(currentPerf,key,7);
+    const d30=getSectionPeriodDelta(currentPerf,key,30);
+    const basisNote=item.mode==='pnl'?'P&L':'сума';
+    return '<div class="diag-row" style="align-items:flex-start;gap:8px;">'+
+      '<span class="diag-row-key" style="min-width:84px;">'+item.icon+' '+item.label+'<br><span style="font-size:8px;color:var(--muted);">'+basisNote+'</span></span>'+
+      '<span class="diag-row-val" style="font-size:10px;display:grid;grid-template-columns:1fr;gap:3px;max-width:64%;width:64%;">'+
+        '<span>День: '+fmtSmallChange(d1)+'</span>'+
+        '<span>7д: '+fmtSmallChange(d7)+'</span>'+
+        '<span>30д: '+fmtSmallChange(d30)+'</span>'+
+      '</span>'+
+    '</div>';
+  }).join('');
+
   // Asset distribution
   const assets=[
     {name:'Депозити',val:dep,color:'var(--blue2)',icon:'🏦'},
@@ -6861,10 +7161,13 @@ function renderDiagnostics(){
     {name:'Інше',val:custom,color:'var(--purple2)',icon:'✏️'},
   ].filter(a=>a.val>0).sort((a,b)=>b.val-a.val);
 
-  const fmtChange=(v,p)=>{
+  const fmtChange=(stat,pMaybe)=>{
+    if(stat===null||stat===undefined)return '<span style="color:var(--muted2)">недостатньо історії</span>';
+    const v=typeof stat==='object'?stat.change:stat;
+    const p=typeof stat==='object'?stat.pct:(pMaybe||0);
     const sign=v>=0?'+':'';
     const col=v>=0?'var(--green2)':'var(--red)';
-    return `<span style="color:${col}">${sign}${sym}${fmtN(toDisplayCurr(Math.abs(v)))} (${sign}${p.toFixed(1)}%)</span>`;
+    return '<span style="color:'+col+'">'+sign+sym+fmtN(toDisplayCurr(Math.abs(v)))+' ('+sign+p.toFixed(1)+'%)</span>';
   };
 
   let html=`
@@ -6906,8 +7209,14 @@ function renderDiagnostics(){
     <div class="diag-section">
       <div class="diag-section-title">📅 Статистика за період</div>
       <div class="diag-row"><span class="diag-row-key">Сьогодні</span><span class="diag-row-val">${fmtChange(dailyChange,dailyChangePct)}</span></div>
-      <div class="diag-row"><span class="diag-row-key">За 7 днів</span><span class="diag-row-val">${fmtChange(weekChange,weekChangePct)}</span></div>
-      <div class="diag-row"><span class="diag-row-key">За 30 днів</span><span class="diag-row-val">${fmtChange(monthChange,monthChangePct)}</span></div>
+      <div class="diag-row"><span class="diag-row-key">За 7 днів</span><span class="diag-row-val">${fmtChange(weekStats)}</span></div>
+      <div class="diag-row"><span class="diag-row-key">За 30 днів</span><span class="diag-row-val">${fmtChange(monthStats)}</span></div>
+    </div>
+
+    <div class="diag-section">
+      <div class="diag-section-title">📊 Динаміка по розділах</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">Акції, крипто, ОВДП, облігації та метали показують зміну P&L, тобто рух ціни активів без простого поповнення.</div>
+      ${sectionDynamicsRows||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">Недостатньо історії або активів для порівняння.</div>'}
     </div>
 
     <div class="diag-section">
@@ -7748,5 +8057,7 @@ window.addEventListener('offline',()=>{updateNetworkStatusUI('offline');fillCurr
 </script>
 </body>
 </html>
+
+
 
 
