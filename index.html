@@ -1107,6 +1107,39 @@ body.theme-light::before{opacity:.18;}
   </button>
 </div>
 
+<!-- LIABILITIES SECTION -->
+<div id="liabButtonWrap" style="padding:0 16px;margin-top:14px;">
+  <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;" onclick="openLiabModal()" id="liabAddMainBtn">
+    <span class="plus" style="color:var(--red)">+</span>
+    <span>Зобов'язання / Кредит</span>
+  </button>
+</div>
+<div class="liab-section" id="liabilitiesSection" style="display:none;">
+  <div class="liab-header">
+    <div class="liab-title" id="liab_section_title">⚠️ ЗОБОВ'ЯЗАННЯ</div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="liab-toggle-net active" id="netCapitalToggle" onclick="toggleNetCapital(this)">Нетто</button>
+      <button class="liab-add-btn" style="width:auto;padding:6px 12px;margin:0;font-size:10px;" onclick="openLiabModal()" id="liab_add_btn_top">+ Кредит</button>
+    </div>
+  </div>
+  <div id="liabCardsContainer"></div>
+  <div id="liabNetBanner" style="display:none;" class="liab-net-banner">
+    <div>
+      <div class="liab-net-label" id="liab_net_label">НЕТТО-КАПІТАЛ</div>
+      <div class="liab-net-val" id="liabNetAmount" style="color:var(--green2)">0 ₴</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="liab-net-label" id="liab_debt_label">ЗАГАЛЬНИЙ БОРГ</div>
+      <div class="liab-net-val" id="liabTotalDebtAmount" style="color:var(--red)">0 ₴</div>
+    </div>
+  </div>
+  <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;margin-top:12px;" onclick="openLiabModal()">
+    <span class="plus" style="color:var(--red)">+</span>
+    <span>Додати ще кредит / іпотеку</span>
+  </button>
+</div>
+
+
 <!-- SECTION PICKER MODAL -->
 <div class="picker-overlay" id="pickerOverlay" onclick="pickerCloseOutside(event)">
   <div class="picker-box">
@@ -1483,38 +1516,6 @@ body.theme-light::before{opacity:.18;}
   </div>
 </div>
 
-
-<!-- LIABILITIES SECTION -->
-<div id="liabButtonWrap" style="padding:0 16px;margin-top:14px;">
-  <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;" onclick="openLiabModal()" id="liabAddMainBtn">
-    <span class="plus" style="color:var(--red)">+</span>
-    <span>Зобов'язання / Кредит</span>
-  </button>
-</div>
-<div class="liab-section" id="liabilitiesSection" style="display:none;">
-  <div class="liab-header">
-    <div class="liab-title" id="liab_section_title">⚠️ ЗОБОВ'ЯЗАННЯ</div>
-    <div style="display:flex;gap:6px;align-items:center;">
-      <button class="liab-toggle-net active" id="netCapitalToggle" onclick="toggleNetCapital(this)">Нетто</button>
-      <button class="liab-add-btn" style="width:auto;padding:6px 12px;margin:0;font-size:10px;" onclick="openLiabModal()" id="liab_add_btn_top">+ Кредит</button>
-    </div>
-  </div>
-  <div id="liabCardsContainer"></div>
-  <div id="liabNetBanner" style="display:none;" class="liab-net-banner">
-    <div>
-      <div class="liab-net-label" id="liab_net_label">НЕТТО-КАПІТАЛ</div>
-      <div class="liab-net-val" id="liabNetAmount" style="color:var(--green2)">0 ₴</div>
-    </div>
-    <div style="text-align:right;">
-      <div class="liab-net-label" id="liab_debt_label">ЗАГАЛЬНИЙ БОРГ</div>
-      <div class="liab-net-val" id="liabTotalDebtAmount" style="color:var(--red)">0 ₴</div>
-    </div>
-  </div>
-  <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;margin-top:12px;" onclick="openLiabModal()">
-    <span class="plus" style="color:var(--red)">+</span>
-    <span>Додати ще кредит / іпотеку</span>
-  </button>
-</div>
 
 <!-- ADD LIAB MODAL -->
 <div class="picker-overlay" id="liabModal" onclick="liabModalCloseOutside(event)">
