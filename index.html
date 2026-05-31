@@ -139,7 +139,14 @@ body.theme-light .header{background:linear-gradient(180deg,#f6f7fb 0%,#f6f7fbcc 
 .field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s;}
 .field-input:focus{border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d20;}
 .field-input::placeholder{color:var(--muted);}
-/* iOS keyboard fix */
+/* iOS PWA keyboard fix */
+input,textarea,select{
+  -webkit-user-select:text;
+  user-select:text;
+  touch-action:manipulation;
+  pointer-events:auto;
+  font-size:16px!important;
+}
 input[type="number"].field-input{-webkit-appearance:none;appearance:none;}
 .field-input:focus{border-color:var(--green);}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -2436,9 +2443,11 @@ function removeDeposit(idx){
 // Swipe
 let touchStartX=0;
 document.addEventListener('touchstart',e=>{
+  if(isEditableTapTarget(e.target))return;
   if(e.target.closest('.deposits-slider'))touchStartX=e.touches[0].clientX;
 },{passive:true});
 document.addEventListener('touchend',e=>{
+  if(isEditableTapTarget(e.target))return;
   if(!e.target.closest('.deposits-slider'))return;
   const dx=e.changedTouches[0].clientX-touchStartX;
   if(Math.abs(dx)>50)slideDeposit(dx<0?1:-1);
@@ -4593,6 +4602,26 @@ function toggleCard(name){
 function initDrag(){refreshDrag();}
 let _activeTouchDrag=null;
 
+function isEditableTapTarget(el){
+  return el&&el.closest&&el.closest('input, textarea, select');
+}
+function focusEditableForIOS(el){
+  const input=isEditableTapTarget(el);
+  if(!input||input.disabled||input.readOnly)return;
+  if(input.tagName==='SELECT')return;
+  try{input.focus({preventScroll:true});}
+  catch(e){try{input.focus();}catch(_e){}}
+}
+document.addEventListener('touchstart',e=>{
+  if(isEditableTapTarget(e.target)&&_activeTouchDrag){
+    clearTimeout(_activeTouchDrag.timer);
+    _activeTouchDrag=null;
+  }
+}, {capture:true, passive:true});
+document.addEventListener('touchend',e=>{
+  focusEditableForIOS(e.target);
+}, {capture:true, passive:true});
+
 function getDragContainers(){
   return ['cardsContainer','customCardsContainer','securitiesContainer','metalsContainer']
     .map(id=>$(id))
@@ -4757,7 +4786,7 @@ function saveOrder(){
   customSections=reorderCollectionByGlobalOrder(customSections);
   securitiesSections=reorderCollectionByGlobalOrder(securitiesSections);
   metalsSections=reorderCollectionByGlobalOrder(metalsSections);
-  saveData();
+  saveDataNow();
 }
 
 function restoreOrder(){
@@ -4978,10 +5007,11 @@ function loadData(){
   if(Array.isArray(d.liabilities))liabilities=d.liabilities;
     if(d.appTheme){appTheme=d.appTheme==='light'?'light':'dark';localStorage.setItem('app_theme',appTheme);applyAppTheme(appTheme);}
     if(Array.isArray(d.cardOrder)){
-      // Strip any securities/metals IDs that leaked into cardOrder
-      const _sIds=new Set((d.securitiesSections||[]).map(s=>s.id));
-      const _mIds=new Set((d.metalsSections||[]).map(s=>s.id));
-      cardOrder=d.cardOrder.filter(id=>!_sIds.has(id)&&!_mIds.has(id));
+      const validIds=new Set(['deposit','crypto','usd','forex','cash','other']);
+      (d.customSections||[]).forEach(s=>{if(s&&s.id)validIds.add(s.id);});
+      (d.securitiesSections||[]).forEach(s=>{if(s&&s.id)validIds.add(s.id);});
+      (d.metalsSections||[]).forEach(s=>{if(s&&s.id)validIds.add(s.id);});
+      cardOrder=d.cardOrder.filter(id=>validIds.has(id));
     }
     if(d.hiddenCards)hiddenCards=d.hiddenCards;
     if(d.currentLang)currentLang=d.currentLang;
