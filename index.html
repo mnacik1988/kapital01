@@ -659,11 +659,14 @@ body.theme-light::before{opacity:.18;}
   .ticker-search-row{display:grid;grid-template-columns:1fr;gap:8px;}
   .ticker-fetch-btn{width:100%;justify-content:center;}
   .ticker-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .ticker-card{min-width:0;width:100%;padding:10px;}
-  .ticker-card-head{gap:6px;}
+  .ticker-card{min-width:0;width:100%;padding:8px;border-radius:12px;}
+  .ticker-card-head{gap:5px;}
+  .ticker-card-sym{font-size:11px;}
+  .ticker-card-qty{font-size:9px;padding:1px 5px;}
+  .ticker-card-name{font-size:8px;margin-top:3px;}
   .ticker-card-sym,.ticker-card-qty{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .ticker-card-price{font-size:13px;overflow-wrap:anywhere;}
-  .ticker-card-pnl,.ticker-card-div{line-height:1.3;overflow-wrap:anywhere;}
+  .ticker-card-price{font-size:12px;margin-top:4px;overflow-wrap:anywhere;}
+  .ticker-card-pnl,.ticker-card-div{font-size:8px;line-height:1.25;overflow-wrap:anywhere;}
   .chart-card{padding:14px;}
   .chart-header{align-items:flex-start;gap:10px;}
   .chart-period-tabs{flex-wrap:wrap;justify-content:flex-end;}
@@ -715,10 +718,12 @@ body.theme-light::before{opacity:.18;}
   .deposits-swipe-wrap{margin-left:10px;margin-right:10px;}
   .card-header{padding-left:12px;padding-right:12px;}
   .card-inner{padding-left:12px;padding-right:12px;}
-  .ticker-cards{grid-template-columns:1fr;}
   .price-cards{grid-template-columns:1fr;}
   .diag-stat-grid,.liab-stats-grid,.startup-stat-grid,.stock-detail-grid{grid-template-columns:1fr;}
   .settings-currency-row{grid-template-columns:1fr;}
+}
+@media (max-width:330px){
+  .ticker-cards{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -2222,8 +2227,13 @@ function parseInputNumber(v){
 }
 const val=id=>{const e=$(id);return e?parseInputNumber(e.value):0;};
 const sval=id=>{const e=$(id);return e?e.value:'';};
+const roundMoney=n=>Math.round((Number(n)||0)*100)/100;
 const fmtN=n=>Math.round(n).toLocaleString('uk-UA');
-const fmtD=(n,d=2)=>n.toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtD=(n,d=2)=>Number(n||0).toLocaleString('uk-UA',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtMax2=n=>{
+  const v=roundMoney(n);
+  return v.toLocaleString('uk-UA',{minimumFractionDigits:0,maximumFractionDigits:2});
+};
 const pct=(v,total)=>total?((v/total*100).toFixed(1)+'%'):'0%';
 
 // ── STATE ────────────────────────────────────
@@ -2828,9 +2838,10 @@ function toggleDepCalc(depId){
 function deleteBuiltinCard(name){
   customConfirm(t('confirmDeleteCard'), function(){
     hiddenCards[name]=true;
+    cardOrder=cardOrder.filter(x=>x!==name);
     const card=$('card-'+name);
     if(card)card.style.display='none';
-    saveData(); updateAll();
+    saveDataNow(); updateAll();
   });
 }
 
@@ -2985,27 +2996,30 @@ function getCustomCardHtml(s,idx){
 }
 
 function calcCustomSection(id){
-  const P=parseFloat($('customPrincipal_'+id)?.value)||0;
+  const P=parseInputNumber($('customPrincipal_'+id)?.value);
   if(!P){['cust-total','cust-interest','cust-tax','cust-net','cust-eff'].forEach(k=>setText(k+'_'+id,'—'));return;}
-  const r=parseFloat($('customRate_'+id)?.value||16)/100;
-  const n=parseFloat($('customFreq_'+id)?.value||12);
-  const tt=(parseFloat($('customMonths_'+id)?.value||12))/12;
-  const tax=parseFloat($('customTax_'+id)?.value||0)/100;
-  const tf=parseFloat($('customTaxFree_'+id)?.value||0);
+  const r=parseInputNumber($('customRate_'+id)?.value||16)/100;
+  const n=parseInputNumber($('customFreq_'+id)?.value||12);
+  const tt=(parseInputNumber($('customMonths_'+id)?.value||12))/12;
+  const tax=parseInputNumber($('customTax_'+id)?.value||0)/100;
+  const tf=parseInputNumber($('customTaxFree_'+id)?.value||0);
   const A=P*Math.pow(1+r/n,n*tt);
   const interest=A-P, taxBase=Math.max(0,interest-tf);
   const taxAmt=taxBase*tax, net=interest-taxAmt;
   const eff=P&&tt?(net/P/tt*100):0;
-  setText('cust-total_'+id,    fmtN(Math.round(A))+' ₴');
-  setText('cust-interest_'+id, '+'+fmtN(Math.round(interest))+' ₴');
-  setText('cust-tax_'+id,      '−'+fmtN(Math.round(taxAmt))+' ₴');
-  setText('cust-net_'+id,      '+'+fmtN(Math.round(net))+' ₴');
+  const sym=getCurrSym();
+  setText('cust-total_'+id,    sym+fmtN(toDisplayCurr(A)));
+  setText('cust-interest_'+id, '+'+sym+fmtN(toDisplayCurr(interest)));
+  setText('cust-tax_'+id,      '−'+sym+fmtN(toDisplayCurr(taxAmt)));
+  setText('cust-net_'+id,      '+'+sym+fmtN(toDisplayCurr(net)));
   setText('cust-eff_'+id,      eff.toFixed(2)+'%');
 }
 function removeCustomSection(id){
   customConfirm(t('confirmDelete'), function(){
     customSections=customSections.filter(s=>s.id!==id);
-    renderCustomCards(); updateAll(); saveData();
+    cardOrder=cardOrder.filter(x=>x!==id);
+    removeExistingCardsByIds([id]);
+    renderCustomCards(); updateAll(); saveDataNow();
   });
 }
 function getCustomTotal(){
@@ -3531,7 +3545,7 @@ function getBondSectionStats(section){
 function setSecCashAmount(secId,value){
   const sec=securitiesSections.find(s=>s.id===secId);
   if(!sec)return;
-  sec.stockCashAmount=parseInputNumber(value);
+  sec.stockCashAmount=roundMoney(parseInputNumber(value));
   updateAll();saveData();
 }
 function setSecCashCurrency(secId,value){
@@ -3542,7 +3556,7 @@ function setSecCashCurrency(secId,value){
   const prevCur=getStockCashCurrency(sec);
   const prevAmount=getStockCashAmount(sec);
   if(prevAmount>0&&prevCur!==nextCur){
-    sec.stockCashAmount=(prevAmount*getStockCurrencyRate(prevCur))/getStockCurrencyRate(nextCur);
+    sec.stockCashAmount=roundMoney((prevAmount*getStockCurrencyRate(prevCur))/getStockCurrencyRate(nextCur));
   }
   sec.stockCashCurrency=nextCur;
   renderSecuritiesCards();updateAll();saveData();
@@ -3556,9 +3570,9 @@ function addStockSaleCash(section,amount,currency){
   const prevAmount=getStockCashAmount(section);
   if(prevAmount>0&&prevCur!==safeCur){
     const totalUah=prevAmount*getStockCurrencyRate(prevCur)+incoming*getStockCurrencyRate(safeCur);
-    section.stockCashAmount=totalUah/getStockCurrencyRate(safeCur);
+    section.stockCashAmount=roundMoney(totalUah/getStockCurrencyRate(safeCur));
   }else{
-    section.stockCashAmount=prevAmount+incoming;
+    section.stockCashAmount=roundMoney(prevAmount+incoming);
   }
   section.stockCashCurrency=safeCur;
 }
@@ -3708,7 +3722,7 @@ function getSecCardHtml(s,idx){
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(holdingsTotal))+'</span></div>'+
-    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockSaleCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtN(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
+    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockSaleCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
     '</div>'+
     (hasTickers?`<div class="auto-refresh-bar">
       <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
@@ -3736,7 +3750,7 @@ function getSecCardHtml(s,idx){
       <div style="background:linear-gradient(135deg,#4ecb8d12,#5b9cf610);border:1px solid #4ecb8d35;border-radius:14px;padding:14px;margin-top:12px;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiText('stockSaleCash')}</div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?stockCashAmount:''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
+          <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?fmtMax2(stockCashAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
           <select class="field-input" id="secCashCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecCashCurrency('${s.id}',this.value)">
             ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${stockCashCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
           </select>
@@ -3834,7 +3848,7 @@ function getBondCardHtml(s,idx){
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(stats.holdingsTotal))+'</span></div>'+
-    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtN(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
+    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
     '</div>'
   ):'';
 
@@ -3858,7 +3872,7 @@ function getBondCardHtml(s,idx){
       <div style="background:linear-gradient(135deg,#e8c97a12,#4ecb8d10);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiText('bondCash')}</div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?stockCashAmount:''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
+          <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?fmtMax2(stockCashAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
           <select class="field-input" id="secCashCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecCashCurrency('${s.id}',this.value)">
             ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${stockCashCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
           </select>
@@ -4001,7 +4015,9 @@ function removeSecItem(secId,itemIdx){
 function removeSecCard(secId){
   customConfirm(t('confirmDelete'), function(){
     securitiesSections=securitiesSections.filter(s=>s.id!==secId);
-    renderSecuritiesCards(); updateAll(); saveData();
+    cardOrder=cardOrder.filter(x=>x!==secId);
+    removeExistingCardsByIds([secId]);
+    renderSecuritiesCards(); updateAll(); saveDataNow();
   });
 }
 function getSecuritiesTotal(){
@@ -4207,7 +4223,7 @@ function addCoin(){
   const buyPrice=parseInputNumber($('newCoinBuyPrice')?.value);
   const curPrice=parseInputNumber($('newCoinCurPrice')?.value);
   if(!name)return;
-  coins.push({name,qty,buyPrice,curPrice});
+  coins.push({name,qty,buyPrice:roundMoney(buyPrice),curPrice:roundMoney(curPrice)});
   if($('newCoinName'))$('newCoinName').value='';
   if($('newCoinQty'))$('newCoinQty').value='';
   if($('newCoinBuyPrice'))$('newCoinBuyPrice').value='';
@@ -4347,7 +4363,7 @@ function sellCrypto(coinKey){
     if(totalProfitUsd>0){
       const usdtEl=document.getElementById('cryptoUsdt');
       if(usdtEl){
-        usdtEl.value=String(parseInputNumber(usdtEl.value)+totalProfitUsd);
+        usdtEl.value=fmtMax2(parseInputNumber(usdtEl.value)+totalProfitUsd);
         addedToUsdt=true;
       }
     }
@@ -4358,7 +4374,7 @@ function sellCrypto(coinKey){
     saveData();
     if(totalProfitUsd>0&&addedToUsdt){
       const rate=getCryptoRate();
-      alert('Продано '+qty+' '+coinKey+' за $'+fmtN(Math.round(totalProfitUsd))+' USDT\n\n💵 Додано до USDT балансу\n≈ '+fmtN(Math.round(totalProfitUsd*rate))+' ₴');
+      alert('Продано '+fmtMax2(qty)+' '+coinKey+' за $'+fmtMax2(totalProfitUsd)+' USDT\n\n💵 Додано до USDT балансу\n≈ '+fmtMax2(totalProfitUsd*rate)+' ₴');
     }
   });
 }
@@ -4442,17 +4458,17 @@ function sellStock(secId,tickerKey,refIdx){
   const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
   const ownedQty=group.reduce((s,t)=>s+stockNum(t.qty),0);
   if(qty>ownedQty){alert('Не можна продати більше ніж є: '+ownedQty+' шт');return;}
-  customConfirm('Продати '+qty+' шт по '+getStockCurrencySymbol(saleCurrency)+fmtN(Math.round(price))+'?', function(){
+  customConfirm('Продати '+fmtMax2(qty)+' шт по '+getStockCurrencySymbol(saleCurrency)+fmtMax2(price)+'?', function(){
     const ref=sec.items[refIdx];
     sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency,liveOrigPrice:ref?.liveOrigPrice,divYield:ref?.divYield,div:ref?.div,divAbs:ref?.divAbs||0});
     cleanZeroStocks(sec);
-    const totalProfit=qty*price;
+    const totalProfit=roundMoney(qty*price);
     if(totalProfit>0){
       addStockSaleCash(sec,totalProfit,saleCurrency);
     }
     closeStockDetail();renderSecuritiesCards();updateAll();saveData();
     if(totalProfit>0){
-      alert('📈 Продано '+qty+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtN(Math.round(totalProfit))+'\n\n💵 Суму додано до кешу акцій');
+      alert('📈 Продано '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(totalProfit)+'\n\n💵 Суму додано до кешу акцій');
     }
   });
 }
@@ -4642,6 +4658,22 @@ function getAllOrderableCards(){
   return cards;
 }
 
+function getValidOrderCardIds(){
+  const ids=new Set(['deposit','crypto','usd','forex','cash','other']);
+  (customSections||[]).forEach(s=>{if(s&&s.id)ids.add(s.id);});
+  (securitiesSections||[]).forEach(s=>{if(s&&s.id)ids.add(s.id);});
+  (metalsSections||[]).forEach(s=>{if(s&&s.id)ids.add(s.id);});
+  return ids;
+}
+function cleanupRemovedCards(){
+  const valid=getValidOrderCardIds();
+  getAllOrderableCards().forEach(card=>{
+    const id=card.dataset.card;
+    if(id&&!valid.has(id))card.remove();
+  });
+  cardOrder=cardOrder.filter(id=>valid.has(id));
+}
+
 function getUnifiedRoot(){
   return $('cardsContainer')||document.body;
 }
@@ -4782,6 +4814,7 @@ function reorderCollectionByGlobalOrder(collection){
 }
 
 function saveOrder(){
+  cleanupRemovedCards();
   cardOrder=getAllOrderableCards().map(c=>c.dataset.card).filter(Boolean);
   customSections=reorderCollectionByGlobalOrder(customSections);
   securitiesSections=reorderCollectionByGlobalOrder(securitiesSections);
@@ -4790,6 +4823,7 @@ function saveOrder(){
 }
 
 function restoreOrder(){
+  cleanupRemovedCards();
   const root=getUnifiedRoot();
   if(!root)return;
   const cards=getAllOrderableCards();
@@ -4878,7 +4912,7 @@ function migrateSecuritySection(sec,index){
   if(!out.name)out.name=out.type==='bonds'?t('bondsBtn'):out.type==='ovdp'?t('ovdpBtn'):t('stocksBtn');
   if(!out.icon)out.icon=out.type==='bonds'?'📜':out.type==='ovdp'?'🇺🇦':'📈';
   out.items=ensureArray(out.items).map((it,j)=>({...ensureObject(it),id:it?.id||'sec_item_'+Date.now()+'_'+index+'_'+j}));
-  out.stockCashAmount=parseInputNumber(out.stockCashAmount);
+  out.stockCashAmount=roundMoney(parseInputNumber(out.stockCashAmount));
   out.stockCashCurrency=getStockCashCurrency(out);
   return out;
 }
@@ -5235,9 +5269,14 @@ function setDisplayCurrency(cur){
   document.querySelectorAll('.settings-curr-btn').forEach(b=>{
     b.classList.toggle('active', b.id==='scurr-'+cur);
   });
-  // Update all currency symbols in UI
+  // Re-render dynamic cards so inner prices, P&L rows and summaries use the selected display currency.
   document.querySelectorAll('.curr-sym').forEach(el=>el.textContent=getCurrSym());
+  renderDeposits();
+  renderCustomCards();
+  renderSecuritiesCards();
+  if(typeof renderMetalsCards==='function')renderMetalsCards();
   updateAll();
+  saveDataNow();
 }
 
 const PRIVACY_I18N={
@@ -5544,7 +5583,7 @@ function addMetalItem(secId){
   if(!grams||!price)return;
   const idx=metalsSections.findIndex(s=>s.id===secId);
   if(idx<0)return;
-  metalsSections[idx].items.push({type,grams,price});
+  metalsSections[idx].items.push({type,grams:roundMoney(grams),price:roundMoney(price)});
   if(gramsEl)gramsEl.value='';
   if(priceEl)priceEl.value='';
   renderMetalsCards(); updateAll(); saveData();
@@ -5556,11 +5595,42 @@ function removeMetalItem(secId,itemIdx){
   metalsSections[idx].items.splice(itemIdx,1);
   renderMetalsCards(); updateAll(); saveData();
 }
+function getMetalHeldGrams(section,type){
+  return (section?.items||[]).filter(it=>it.type===type).reduce((sum,it)=>sum+parseInputNumber(it.grams),0);
+}
+function sellMetalFromForm(secId){
+  const idx=metalsSections.findIndex(s=>s.id===secId);
+  if(idx<0)return;
+  const section=metalsSections[idx];
+  const type=document.getElementById('metal_type_'+secId)?.value||'gold';
+  const gramsEl=document.getElementById('metal_grams_'+secId);
+  const grams=roundMoney(parseInputNumber(gramsEl?.value));
+  if(!grams||grams<=0)return;
+  const held=roundMoney(getMetalHeldGrams(section,type));
+  if(grams>held){alert('Не можна продати більше ніж є: '+fmtMax2(held)+' г');return;}
+  let left=grams;
+  for(let i=section.items.length-1;i>=0&&left>0;i--){
+    const it=section.items[i];
+    if(it.type!==type)continue;
+    const have=roundMoney(parseInputNumber(it.grams));
+    if(have<=left+0.000001){
+      left=roundMoney(left-have);
+      section.items.splice(i,1);
+    }else{
+      it.grams=roundMoney(have-left);
+      left=0;
+    }
+  }
+  if(gramsEl)gramsEl.value='';
+  renderMetalsCards(); updateAll(); saveData();
+}
 
 function removeMetalsCard(secId){
   customConfirm(t('confirmDelete'), function(){
     metalsSections=metalsSections.filter(s=>s.id!==secId);
-    renderMetalsCards(); updateAll(); saveData();
+    cardOrder=cardOrder.filter(x=>x!==secId);
+    removeExistingCardsByIds([secId]);
+    renderMetalsCards(); updateAll(); saveDataNow();
   });
 }
 
@@ -5727,7 +5797,10 @@ function getMetalsCardHtml(s){
             <input class="field-input" type="text" inputmode="decimal" id="metal_price_${s.id}" placeholder="4000">
           </div>
         </div>
-        <button class="add-btn" onclick="addMetalItem('${s.id}')">+ Додати</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="add-btn" onclick="addMetalItem('${s.id}')">+ Додати</button>
+          <button class="add-btn" style="color:var(--red);border-color:#f8717130;" onclick="sellMetalFromForm('${s.id}')">− Продати</button>
+        </div>
       </div>
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeMetalsCard('${s.id}')">${t('removeSection')}</button>
     </div></div>
@@ -6477,7 +6550,7 @@ function updateBizField(secId,field,val){
   const net=(parseInputNumber(b.profit))-(parseInputNumber(b.rent))-(parseInputNumber(b.salary))-(parseInputNumber(b.tax))-(parseInputNumber(b.expense));
   const netEl=document.getElementById('biz_net_'+secId);
   if(netEl){
-    netEl.textContent=(net>=0?'+':'-')+fmtN(Math.abs(Math.round(net)))+' в‚ґ';
+    netEl.textContent=(net>=0?'+':'-')+getCurrSym()+fmtN(toDisplayCurr(Math.abs(net)));
     netEl.style.color=net>=0?'var(--green2)':'var(--red)';
   }
   customSections[idx].amount=Math.max(0,net);
@@ -6535,7 +6608,7 @@ function updateFamilyField(secId,field,val){
   const f=customSections[idx].family;
   const total=(f.communal||0)+(f.food||0)+(f.entertain||0)+(f.med||0)+(f.kids||0)+(f.alimony||0)+(f.other||0);
   const totalEl=document.getElementById('family_total_'+secId);
-  if(totalEl)totalEl.textContent=fmtN(Math.round(total))+' ₴';
+  if(totalEl)totalEl.textContent=getCurrSym()+fmtN(toDisplayCurr(total));
   customSections[idx].amount=total;
   updateAll();saveData();
 }
@@ -8054,8 +8127,11 @@ async function fetchCoinPrice(){
 // Unified visual order for built-in, custom, stocks, OVDP and metals cards.
 function removeExistingCardsByIds(ids){
   (ids||[]).forEach(id=>{
-    const el=$('card-'+id);
-    if(el)el.remove();
+    let el=document.getElementById('card-'+id);
+    while(el){
+      el.remove();
+      el=document.getElementById('card-'+id);
+    }
   });
 }
 const _renderCustomCardsUnified=renderCustomCards;
