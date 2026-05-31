@@ -49,7 +49,7 @@ html,body{height:100%;width:100%;overflow-x:hidden;background:var(--bg);}
 body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;}
 /* iOS PWA: allow text selection in inputs */
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
-.app{position:relative;z-index:1;min-height:100vh;padding-bottom:50px;}
+.app{position:relative;z-index:1;min-height:100vh;padding-bottom:104px;}
 
 /* LANG SWITCHER */
 .lang-bar{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:3px;}
@@ -360,8 +360,23 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 
 
 /* ── CALCULATOR POPUP ── */
-.calc-fab{position:fixed;bottom:24px;right:18px;width:50px;height:50px;border-radius:14px;background:var(--bg2);border:none;box-shadow:0 0 0 1.5px #4ecb8d60;cursor:pointer;z-index:400;display:flex;align-items:center;justify-content:center;transition:opacity .15s;}
+.calc-fab{position:fixed;bottom:24px;right:18px;width:50px;height:50px;border-radius:14px;background:var(--bg2);border:none;box-shadow:0 0 0 1.5px #4ecb8d60;cursor:pointer;z-index:400;display:none;align-items:center;justify-content:center;transition:opacity .15s;}
 .calc-fab:active{opacity:0.5;}
+
+/* BOTTOM NAV */
+.header-diag-btn{display:none!important;}
+.bottom-nav{position:fixed;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));z-index:390;width:min(430px,calc(100vw - 16px));height:76px;transform:translateX(-50%);display:grid;grid-template-columns:1fr 1fr 68px 1fr 1fr;align-items:end;gap:2px;padding:8px 10px 9px;background:linear-gradient(180deg,color-mix(in srgb,var(--bg2) 94%,transparent),color-mix(in srgb,var(--bg) 96%,transparent));border:1px solid color-mix(in srgb,var(--border2) 78%,transparent);border-radius:28px;box-shadow:0 18px 48px #00000066, inset 0 1px 0 #ffffff0d;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
+.bottom-nav-btn{min-width:0;height:54px;border:0;background:transparent;color:var(--muted2);border-radius:18px;padding:7px 2px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:background .15s,color .15s,transform .15s;}
+.bottom-nav-btn:active{transform:translateY(1px) scale(.97);background:var(--bg3);}
+.bottom-nav-btn .bn-icon{font-size:18px;line-height:1;filter:saturate(.92);}
+.bottom-nav-btn .bn-label{font-family:'DM Mono',monospace;font-size:7.5px;line-height:1.1;letter-spacing:0;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.bottom-nav-btn.primary{color:var(--green2);}
+.bottom-nav-btn.center{height:68px;align-self:start;margin-top:-24px;color:#fff;gap:5px;padding-top:0;}
+.bottom-nav-btn.center .bn-icon{width:48px;height:48px;border-radius:16px;background:linear-gradient(145deg,#ff9c54,#fb6f45 55%,#e75836);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 12px 28px #fb6f4552, inset 0 1px 0 #ffffff55;clip-path:polygon(50% 0%,88% 18%,88% 78%,50% 100%,12% 78%,12% 18%);}
+.bottom-nav-btn.center .bn-label{color:var(--text);font-size:7px;margin-top:-1px;}
+.bottom-nav-btn.loading .bn-icon{animation:navSpin .9s linear infinite;}
+@keyframes navSpin{to{transform:rotate(360deg);}}
+body.theme-light .bottom-nav{box-shadow:0 16px 38px #27304a2e;background:linear-gradient(180deg,#ffffffef,#eef1f8ee);}
 .calc-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
 .calc-overlay.open{display:flex;}
 .calc-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px 16px 44px;width:100%;max-height:88vh;overflow-y:auto;}
@@ -628,7 +643,7 @@ body.theme-light::before{opacity:.18;}
 
 /* MOBILE LAYOUT */
 @media (max-width:430px){
-  .app{padding-bottom:calc(42px + env(safe-area-inset-bottom));}
+  .app{padding-bottom:calc(104px + env(safe-area-inset-bottom));}
   .header{padding:calc(42px + env(safe-area-inset-top)) 16px 16px;}
   .header-top-row{gap:10px;}
   .header-label{font-size:9px;letter-spacing:.16em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -717,6 +732,12 @@ body.theme-light::before{opacity:.18;}
   .cards,.chart-section,.liab-section,.add-section-wrap{padding-left:10px;padding-right:10px;}
   .deposits-swipe-wrap{margin-left:10px;margin-right:10px;}
   .card-header{padding-left:12px;padding-right:12px;}
+  .bottom-nav{width:calc(100vw - 12px);height:72px;padding:7px 8px 8px;border-radius:24px;grid-template-columns:1fr 1fr 62px 1fr 1fr;}
+  .bottom-nav-btn{height:50px;padding:6px 1px 4px;border-radius:15px;}
+  .bottom-nav-btn .bn-icon{font-size:16px;}
+  .bottom-nav-btn .bn-label{font-size:7px;}
+  .bottom-nav-btn.center{height:64px;margin-top:-22px;}
+  .bottom-nav-btn.center .bn-icon{width:44px;height:44px;font-size:20px;border-radius:15px;}
   .card-inner{padding-left:12px;padding-right:12px;}
   .price-cards{grid-template-columns:1fr;}
   .diag-stat-grid,.liab-stats-grid,.startup-stat-grid,.stock-detail-grid{grid-template-columns:1fr;}
@@ -735,7 +756,7 @@ body.theme-light::before{opacity:.18;}
   <div class="header-top-row">
     <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
     <div style="display:flex;gap:6px;align-items:center;">
-      <button class="diag-btn" onclick="openDiagnostics()" title="Діагностика">📊</button>
+      <button class="diag-btn header-diag-btn" onclick="openDiagnostics()" title="Діагностика">📊</button>
       <button class="gear-btn" onclick="openSettings()" title="Налаштування">⚙️</button>
     </div>
   </div>
@@ -1213,6 +1234,30 @@ body.theme-light::before{opacity:.18;}
     <line x1="8" y1="18" x2="12" y2="18" stroke-width="2"/><circle cx="16" cy="18" r="0.8" fill="#4ecb8d"/>
   </svg>
 </button>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" aria-label="Швидка навігація">
+  <button class="bottom-nav-btn" onclick="openSectionPicker()" title="Створити розділ">
+    <span class="bn-icon">▣</span>
+    <span class="bn-label">Создать</span>
+  </button>
+  <button class="bottom-nav-btn" onclick="openCapitalDynamicsFromNav()" title="Динаміка капіталу">
+    <span class="bn-icon">⌁</span>
+    <span class="bn-label">Динаміка</span>
+  </button>
+  <button class="bottom-nav-btn center primary" onclick="openDiagnostics()" title="Діагностика капіталу">
+    <span class="bn-icon">📊</span>
+    <span class="bn-label">Капітал</span>
+  </button>
+  <button class="bottom-nav-btn" onclick="openCalc()" title="Калькулятор">
+    <span class="bn-icon">🧮</span>
+    <span class="bn-label">Кальк.</span>
+  </button>
+  <button class="bottom-nav-btn" onclick="refreshFromBottomNav(event)" title="Обновить">
+    <span class="bn-icon">↻</span>
+    <span class="bn-label">Обновить</span>
+  </button>
+</nav>
 
 <!-- CALCULATOR MODAL -->
 <div class="calc-overlay" id="calcOverlay" onclick="calcCloseOutside(event)">
@@ -2023,6 +2068,16 @@ Object.assign(EXTRA_I18N,{
   'на тіло':{uk:'на тіло',ru:'в тело',en:'to principal',de:'zum Kapital',zh:'计入本金'}
 });
 
+Object.assign(EXTRA_I18N,{
+  'Розділ':{uk:'Розділ',ru:'Раздел',en:'Section',de:'Bereich',zh:'部分'},
+  'Динаміка':{uk:'Динаміка',ru:'Динамика',en:'Dynamics',de:'Dynamik',zh:'动态'},
+  'Калькулятор':{uk:'Калькулятор',ru:'Калькулятор',en:'Calculator',de:'Rechner',zh:'计算器'},
+  'Діагностика капіталу':{uk:'Діагностика капіталу',ru:'Диагностика капитала',en:'Capital diagnostics',de:'Kapitaldiagnose',zh:'资本诊断'},
+  'Створити розділ':{uk:'Створити розділ',ru:'Создать раздел',en:'Create section',de:'Bereich erstellen',zh:'创建部分'},
+  'Обновить':{uk:'Оновити',ru:'Обновить',en:'Refresh',de:'Aktual.',zh:'刷新'},
+  'Создать':{uk:'Створити',ru:'Создать',en:'Create',de:'Erstellen',zh:'创建'},
+  'Кальк.':{uk:'Кальк.',ru:'Кальк.',en:'Calc',de:'Rechn.',zh:'计算'}
+});
 function getAutoI18nMap(){
   const map={...EXTRA_I18N};
   Object.entries(LANGS.uk||{}).forEach(([key,ukVal])=>{
@@ -7055,6 +7110,30 @@ function addExportButton(){
 
 // ── CHART COLLAPSE ────────────────────────────────────────
 // chartExpanded declared at top with other state vars
+window.openCapitalDynamicsFromNav=function(){
+  if(!chartExpanded)toggleChart();
+  const chart=document.getElementById('chartSection');
+  if(chart)chart.scrollIntoView({behavior:'smooth',block:'start'});
+};
+window.refreshFromBottomNav=async function(event){
+  const btn=event?.currentTarget;
+  if(btn?.classList.contains('loading'))return;
+  btn?.classList.add('loading');
+  try{
+    if(!isOffline()){
+      await fetchUsdUahRate().catch(()=>null);
+      await refreshCryptoPrices(true).catch(()=>null);
+      const stockJobs=(securitiesSections||[])
+        .filter(sec=>(sec.items||[]).some(it=>it.ticker))
+        .map(sec=>refreshAllStockPrices(sec.id).catch(()=>null));
+      await Promise.all(stockJobs);
+    }
+    _updateAllNow();
+    saveDataNow();
+  }finally{
+    setTimeout(()=>btn?.classList.remove('loading'),350);
+  }
+};
 function toggleChart(){
   chartExpanded = !chartExpanded;
   const body = document.getElementById('chartBody');
