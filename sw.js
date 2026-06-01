@@ -1,14 +1,14 @@
-const CACHE_NAME = 'kapital-app-v0-0-21-bottom-panel-icons-v4';
+const CACHE_NAME = 'kapital-app-v0-0-21-bottom-panel-icons-alpha';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
   './privacy-policy.html',
   './terms-disclaimer.html',
-  './panel-icons/1.png?v=3',
-  './panel-icons/2.png?v=3',
-  './panel-icons/3.png?v=3',
-  './panel-icons/4.png?v=3',
-  './panel-icons/5.png?v=3'
+  './panel-icons/1.png?v=4',
+  './panel-icons/2.png?v=4',
+  './panel-icons/3.png?v=4',
+  './panel-icons/4.png?v=4',
+  './panel-icons/5.png?v=4'
 ];
 
 self.addEventListener('install', event => {
