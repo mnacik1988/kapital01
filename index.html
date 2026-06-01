@@ -4978,12 +4978,14 @@ function restoreOrder(){
 
 // ── PERSIST// ── PERSIST ───────────────────────────────────
 let _saveTimer=null;
+window._kapitalImportInProgress=false;
 function saveData(){
+  if(window._kapitalImportInProgress)return;
   // Debounce: wait 400ms before actually saving (prevents lag on fast typing)
   if(_saveTimer)clearTimeout(_saveTimer);
   _saveTimer=setTimeout(_saveDataNow, 400);
 }
-function saveDataNow(){_saveDataNow();} // force immediate save when needed
+function saveDataNow(){if(!window._kapitalImportInProgress)_saveDataNow();} // force immediate save when needed
 function buildStoragePayload(){
   const savedAt=new Date().toISOString();
   const previousAppVersion=localStorage.getItem('kapital_last_app_version')||APP_VERSION;
@@ -5136,6 +5138,7 @@ function migrateStoragePayload(d){
   return d;
 }
 function _saveDataNow(){
+  if(window._kapitalImportInProgress)return;
   try{
     const payload=buildStoragePayload();
     const next=JSON.stringify(payload);
@@ -5248,6 +5251,10 @@ function bootstrapApp(){
   if(window._kapitalBootstrapped)return;
   window._kapitalBootstrapped=true;
   try{
+    if(localStorage.getItem('kapital_import_pending_reload')==='true'){
+      localStorage.removeItem('kapital_import_pending_reload');
+      window._kapitalImportInProgress=false;
+    }
     loadData();
     loadCapitalHistory();
 
@@ -8236,6 +8243,8 @@ function normalizeBackupPayload(raw){
 function restoreBackupPayload(payload){
   if(!payload||!payload.storage||!payload.storage.kapital_v6)return false;
   createRollbackSnapshot();
+  window._kapitalImportInProgress=true;
+  if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
   BACKUP_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
   Object.entries(payload.storage).forEach(([key,val])=>{
     if(BACKUP_STORAGE_KEYS.includes(key)&&typeof val==='string')localStorage.setItem(key,val);
@@ -8243,6 +8252,7 @@ function restoreBackupPayload(payload){
   if(payload.capitalHistory&&!payload.storage.cap_history){
     localStorage.setItem('cap_history',JSON.stringify(payload.capitalHistory));
   }
+  localStorage.setItem('kapital_import_pending_reload','true');
   return true;
 }
 
@@ -8415,8 +8425,8 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 // Save data before app closes
-window.addEventListener('beforeunload',()=>{_saveDataNow();});
-window.addEventListener('pagehide',()=>{_saveDataNow();});
+window.addEventListener('beforeunload',()=>{if(!window._kapitalImportInProgress)_saveDataNow();});
+window.addEventListener('pagehide',()=>{if(!window._kapitalImportInProgress)_saveDataNow();});
 // Auto-refresh rates when coming back online
 window.addEventListener('online',()=>{updateNetworkStatusUI('restored');fetchUsdUahRate();refreshCryptoPrices();});
 window.addEventListener('offline',()=>{updateNetworkStatusUI('offline');fillCurrencyFields();});
