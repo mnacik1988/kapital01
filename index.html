@@ -371,13 +371,13 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .bottom-nav{position:fixed;left:50%;bottom:0;z-index:390;width:min(414px,100vw);height:calc(62px + env(safe-area-inset-bottom));transform:translateX(-50%);display:grid;grid-template-columns:1fr 1fr 58px 1fr 1fr;align-items:start;gap:1px;padding:7px 8px calc(5px + env(safe-area-inset-bottom));background:linear-gradient(180deg,color-mix(in srgb,var(--bg2) 96%,transparent),var(--bg) 88%);border:1px solid color-mix(in srgb,var(--border2) 78%,transparent);border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -10px 32px #00000055, inset 0 1px 0 #ffffff0d;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);}
 .bottom-nav-btn{min-width:0;height:43px;border:0;background:transparent;color:var(--muted2);border-radius:14px;padding:5px 1px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:background .15s,color .15s,transform .15s;}
 .bottom-nav-btn:active{transform:translateY(1px) scale(.97);background:var(--bg3);}
-.bottom-nav-btn .bn-icon{width:29px;height:29px;line-height:1;display:flex;align-items:center;justify-content:center;filter:saturate(.95);}
-.bottom-nav-icon{width:29px;height:29px;display:block;object-fit:contain;filter:drop-shadow(0 2px 5px #00000055);}
+.bottom-nav-btn .bn-icon{width:58px;height:58px;line-height:1;display:flex;align-items:center;justify-content:center;filter:saturate(.95);}
+.bottom-nav-icon{width:58px;height:58px;display:block;object-fit:contain;filter:drop-shadow(0 2px 5px #00000055);}
 .bottom-nav-btn .bn-label{font-family:'DM Mono',monospace;font-size:6.6px;line-height:1.05;letter-spacing:0;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .bottom-nav-btn.primary{color:var(--green2);}
 .bottom-nav-btn.center{height:54px;align-self:start;margin-top:-17px;color:#fff;gap:2px;padding-top:0;}
-.bottom-nav-btn.center .bn-icon{width:48px;height:48px;border-radius:16px;background:transparent;display:flex;align-items:center;justify-content:center;box-shadow:0 9px 22px #00000042;}
-.bottom-nav-btn.center .bottom-nav-icon{width:48px;height:48px;border-radius:16px;filter:drop-shadow(0 8px 16px #00000066);}
+.bottom-nav-btn.center .bn-icon{width:60px;height:60px;border-radius:18px;background:transparent;display:flex;align-items:center;justify-content:center;box-shadow:0 9px 22px #00000042;}
+.bottom-nav-btn.center .bottom-nav-icon{width:60px;height:60px;border-radius:18px;filter:drop-shadow(0 8px 16px #00000066);}
 .bottom-nav-btn.center .bn-label{color:var(--text);font-size:6.4px;margin-top:-1px;}
 .bottom-nav-btn.loading .bn-icon{animation:none;}
 @keyframes navSpin{to{transform:rotate(360deg);}}
@@ -763,12 +763,12 @@ body.theme-light::before{opacity:.18;}
   .card-header{padding-left:12px;padding-right:12px;}
   .bottom-nav{width:100vw;height:calc(60px + env(safe-area-inset-bottom));padding:6px 7px calc(5px + env(safe-area-inset-bottom));border-radius:20px 20px 0 0;grid-template-columns:1fr 1fr 54px 1fr 1fr;}
   .bottom-nav-btn{height:41px;padding:4px 1px 3px;border-radius:13px;}
-  .bottom-nav-btn .bn-icon{width:26px;height:26px;}
-  .bottom-nav-icon{width:26px;height:26px;}
+  .bottom-nav-btn .bn-icon{width:52px;height:52px;}
+  .bottom-nav-icon{width:52px;height:52px;}
   .bottom-nav-btn .bn-label{font-size:6.2px;}
   .bottom-nav-btn.center{height:52px;margin-top:-16px;}
-  .bottom-nav-btn.center .bn-icon{width:46px;height:46px;border-radius:15px;}
-  .bottom-nav-btn.center .bottom-nav-icon{width:46px;height:46px;border-radius:15px;}
+  .bottom-nav-btn.center .bn-icon{width:58px;height:58px;border-radius:18px;}
+  .bottom-nav-btn.center .bottom-nav-icon{width:58px;height:58px;border-radius:18px;}
   .card-inner{padding-left:12px;padding-right:12px;}
   .price-cards{grid-template-columns:1fr;}
   .diag-stat-grid,.liab-stats-grid,.startup-stat-grid,.stock-detail-grid{grid-template-columns:1fr;}
@@ -1318,23 +1318,23 @@ body.theme-light::before{opacity:.18;}
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav" aria-label="Швидка навігація">
   <button class="bottom-nav-btn" onclick="openSectionPicker()" title="Створити розділ">
-    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/1.png" alt=""></span>
+    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/1.png?v=3" alt=""></span>
     <span class="bn-label">Создать</span>
   </button>
   <button class="bottom-nav-btn" onclick="openCapitalDynamicsFromNav()" title="Динаміка капіталу">
-    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/2.png" alt=""></span>
+    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/2.png?v=3" alt=""></span>
     <span class="bn-label">Динаміка</span>
   </button>
   <button class="bottom-nav-btn center primary" onclick="openDiagnostics()" title="Діагностика капіталу">
-    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/3.png" alt=""></span>
+    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/3.png?v=3" alt=""></span>
     <span class="bn-label">Капітал</span>
   </button>
   <button class="bottom-nav-btn" onclick="openCalc()" title="Калькулятор">
-    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/4.png" alt=""></span>
+    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/4.png?v=3" alt=""></span>
     <span class="bn-label">Кальк.</span>
   </button>
   <button class="bottom-nav-btn" onclick="refreshFromBottomNav(event)" title="Обновить">
-    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/5.png" alt=""></span>
+    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/5.png?v=3" alt=""></span>
     <span class="bn-label">Обновить</span>
   </button>
 </nav>
