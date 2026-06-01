@@ -249,6 +249,9 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .section-type-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:10px 8px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);transition:all .15s;}
 .section-type-btn:hover{border-color:var(--green);color:var(--green2);}
 
+/* backup import hardening v1 */
+.backup-file-input{position:fixed;left:-9999px;top:auto;width:1px;height:1px;opacity:0;pointer-events:none;}
+
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:#000000a0;z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-overlay.open{opacity:1;pointer-events:all;}
@@ -1500,7 +1503,7 @@ body.theme-light::before{opacity:.18;}
         <button onclick="backupImport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #5b9cf640;background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;">📥 Імпорт даних</button>
       </div>
       <div id="storageHealthInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
-      <input type="file" id="backupFileInput" accept=".json" style="display:none" onchange="handleBackupFile(this)">
+      <input class="backup-file-input" type="file" id="backupFileInput" accept=".json,application/json" onchange="handleBackupFile(this)">
       </div>
       <div class="app-version-card">
         <span class="app-version-label" id="appVersionLabel">Версія застосунку</span>
@@ -8202,7 +8205,20 @@ function createRollbackSnapshot(){
 }
 
 function normalizeBackupPayload(raw){
-  if(raw&&raw.backupVersion&&raw.storage)return raw;
+  if(raw&&raw.backupVersion&&raw.storage&&raw.storage.kapital_v6)return raw;
+  if(raw&&raw.backupVersion&&raw.data&&!raw.storage){
+    return {
+      app:raw.app||'Kapital',
+      appVersion:raw.appVersion||'',
+      backupVersion:raw.backupVersion,
+      storageSchemaVersion:raw.storageSchemaVersion||1,
+      importedLegacy:true,
+      exportedAt:raw.exportedAt||'',
+      storage:{kapital_v6:JSON.stringify(raw.data)},
+      data:raw.data,
+      capitalHistory:Array.isArray(raw.capitalHistory)?raw.capitalHistory:[]
+    };
+  }
   if(raw&&(raw.deposits||raw.coins||raw.forexItems||raw.customSections||raw.securitiesSections||raw.liabilities||raw.metalsSections)){
     return {
       app:'Kapital',
@@ -8249,11 +8265,19 @@ function backupExport(){
   }catch(e){alert(backupTxt('exportErr')+e.message);}
 }
 function backupImport(){
-  document.getElementById('backupFileInput').click();
+  const input=document.getElementById('backupFileInput');
+  if(!input){alert(backupTxt('badFormat'));return;}
+  input.value='';
+  input.click();
 }
 function handleBackupFile(input){
-  const file=input.files[0];
+  const file=input.files&&input.files[0];
   if(!file)return;
+  if(file.name&&!/\.json$/i.test(file.name)){
+    alert(backupTxt('badFormat')+'\n\n'+backupTxt('file')+': '+file.name);
+    input.value='';
+    return;
+  }
   const reader=new FileReader();
   reader.onload=function(e){
     try{
