@@ -596,6 +596,17 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .startup-stat-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;}
 .startup-stat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
 
+
+/* crypto add popup v1 */
+.crypto-add-overlay{position:fixed;inset:0;background:#000000cc;z-index:540;display:none;align-items:flex-end;}
+.crypto-add-overlay.open{display:flex;}
+.crypto-add-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px 16px calc(34px + env(safe-area-inset-bottom));width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - 10px);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.crypto-add-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.crypto-add-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.crypto-add-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.08em;}
+.crypto-add-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);flex:0 0 auto;}
+.crypto-add-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px;}
+
 /* ── CRYPTO MONITORING ── */
 .crypto-live-badge{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:#a78bfa15;color:var(--purple2);vertical-align:middle;}
 .crypto-price-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
@@ -746,6 +757,36 @@ body.theme-light::before{opacity:.18;}
 @media (max-width:330px){
   .ticker-cards{grid-template-columns:1fr;}
 }
+
+/* small-screen controls compact v1 */
+@media (max-width:380px){
+  .settings-box,.diag-box{padding-left:12px!important;padding-right:12px!important;}
+  .settings-title,.diag-title{font-size:16px!important;line-height:1.2;margin-bottom:14px!important;}
+  .settings-section{margin-bottom:14px!important;}
+  .settings-label{font-size:8px!important;letter-spacing:.11em!important;margin-bottom:7px!important;}
+  .settings-langs,.settings-currency-row{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;}
+  .settings-lang-btn,.settings-curr-btn,.settings-theme-btn{font-size:9px!important;min-height:32px!important;padding:6px 5px!important;border-radius:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .settings-theme-row{gap:6px!important;}
+  .settings-link-btn{font-size:9px!important;padding:9px 10px!important;}
+  .settings-dev-actions{gap:6px!important;}
+  .settings-dev-btn{font-size:9px!important;min-height:32px!important;padding:6px 5px!important;}
+  .diag-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-bottom:10px!important;}
+  .diag-stat{padding:8px 5px!important;border-radius:11px!important;min-width:0;}
+  .diag-stat-val{font-size:13px!important;line-height:1.15;overflow-wrap:anywhere;margin-bottom:1px!important;}
+  .diag-stat-lbl{font-size:6.8px!important;letter-spacing:.025em!important;line-height:1.2;}
+  .diag-history-btn{min-height:52px!important;padding:7px 5px!important;border-radius:11px!important;}
+  .diag-history-btn .diag-stat-val{font-size:14px!important;}
+  .diag-stat[style*="grid-column"] .diag-stat-val{font-size:16px!important;}
+  .diag-section{padding:10px!important;border-radius:12px!important;margin-bottom:9px!important;}
+  .diag-section-title{font-size:8px!important;letter-spacing:.1em!important;margin-bottom:7px!important;}
+  .diag-row{padding:7px 2px!important;}
+  .diag-row-key{font-size:9px!important;}
+  .diag-row-val{font-size:10px!important;}
+}
+@media (max-width:340px){
+  .settings-langs,.settings-currency-row{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+}
+
 </style>
 </head>
 <body>
@@ -915,21 +956,7 @@ body.theme-light::before{opacity:.18;}
           <button class="ticker-fetch-btn" onclick="fetchCoinPrice()">🔍 Отримати ціну</button>
         </div>
         <div id="cryptoLivePreview" style="display:none;margin:8px 0;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;"></div>
-        <div class="row2">
-          <div class="field-group">
-            <div class="field-label" data-i18n="coinQty">Кількість</div>
-            <input class="field-input" type="text" id="newCoinQty" placeholder="0.5" inputmode="decimal">
-          </div>
-          <div class="field-group">
-            <div class="field-label" data-i18n="coinBuyPrice">Ціна купівлі ($)</div>
-            <input class="field-input" type="text" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
-          </div>
-        </div>
-        <div class="field-group">
-          <div class="field-label" data-i18n="coinCurPrice">Поточна ціна ($) авто</div>
-          <input class="field-input" type="text" id="newCoinCurPrice" placeholder="автоматично" inputmode="decimal">
-        </div>
-        <button class="add-btn" onclick="addCoin()" data-i18n="addCoinBtn">+ Додати монету</button>
+        <button class="add-btn" onclick="openCoinAddPopup()" data-i18n="addCoinBtn">+ Додати монету</button>
       </div>
     </div></div>
   </div>
@@ -1384,6 +1411,38 @@ body.theme-light::before{opacity:.18;}
   </div>
 </div>
 
+
+
+<!-- CRYPTO ADD POPUP -->
+<div class="crypto-add-overlay" id="cryptoAddOverlay" onclick="cryptoAddCloseOutside(event)">
+  <div class="crypto-add-box">
+    <div class="crypto-add-head">
+      <div>
+        <div class="crypto-add-title" data-i18n="addCoinTitle">Додати монету</div>
+        <div class="crypto-add-sub" id="cryptoAddCoinName">BTC, ETH, SOL...</div>
+      </div>
+      <button class="crypto-add-close" onclick="closeCoinAddPopup()">✕</button>
+    </div>
+    <div class="row2">
+      <div class="field-group">
+        <div class="field-label" data-i18n="coinQty">Кількість</div>
+        <input class="field-input" type="text" id="newCoinQty" placeholder="0.5" inputmode="decimal">
+      </div>
+      <div class="field-group">
+        <div class="field-label" data-i18n="coinBuyPrice">Ціна купівлі (USDT)</div>
+        <input class="field-input" type="text" id="newCoinBuyPrice" placeholder="50000" inputmode="decimal">
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label" data-i18n="coinCurPrice">Поточна ціна (USDT)</div>
+      <input class="field-input" type="text" id="newCoinCurPrice" placeholder="автоматично" inputmode="decimal">
+    </div>
+    <div class="crypto-add-actions">
+      <button class="modal-confirm" onclick="addCoin()" data-i18n="addCoinBtn">+ Додати монету</button>
+      <button class="modal-cancel" onclick="closeCoinAddPopup()" data-i18n="cancel">Скасувати</button>
+    </div>
+  </div>
+</div>
 
 <!-- SETTINGS MODAL -->
 <div class="settings-overlay" id="settingsOverlay" onclick="settingsCloseOutside(event)">
@@ -4273,6 +4332,25 @@ function updateCryptoPnl(){
   if(pe){pe.textContent=(pnl>=0?'+':'')+fmtN(toDisplayCurr(pnl))+' '+getCurrSym();pe.className='result-val '+(pnl>=0?'green':'red');}
   if(re){re.textContent=(roi>=0?'+':'')+roi.toFixed(2)+'%';re.className='result-val '+(roi>=0?'green':'red');}
 }
+let cryptoPendingCoinName='';
+let cryptoPendingCoinPrice=0;
+function openCoinAddPopup(){
+  const name=($('newCoinName')?.value||'').trim().toUpperCase();
+  if(!name){alert('Введіть символ монети (BTC, ETH, SOL...)');return;}
+  const title=$('cryptoAddCoinName');
+  if(title)title.textContent=name;
+  const priceEl=$('newCoinCurPrice');
+  if(priceEl){
+    priceEl.value=(cryptoPendingCoinName===name&&cryptoPendingCoinPrice)?fmtMax2(cryptoPendingCoinPrice):'';
+  }
+  document.getElementById('cryptoAddOverlay')?.classList.add('open');
+}
+function closeCoinAddPopup(){
+  document.getElementById('cryptoAddOverlay')?.classList.remove('open');
+}
+function cryptoAddCloseOutside(e){
+  if(e.target===document.getElementById('cryptoAddOverlay'))closeCoinAddPopup();
+}
 function addCoin(){
   const name=($('newCoinName')?.value||'').trim().toUpperCase();
   const qty=parseInputNumber($('newCoinQty')?.value);
@@ -4284,6 +4362,7 @@ function addCoin(){
   if($('newCoinQty'))$('newCoinQty').value='';
   if($('newCoinBuyPrice'))$('newCoinBuyPrice').value='';
   if($('newCoinCurPrice'))$('newCoinCurPrice').value='';
+  closeCoinAddPopup();
   renderCoins(); updateAll(); saveData();
 }
 function removeCoin(i){coins.splice(i,1);renderCoins();updateAll();saveData();}
@@ -6713,11 +6792,47 @@ function normalizeCapitalHistory(){
   capitalHistory=[...byDate.values()].sort((a,b)=>a.date.localeCompare(b.date)).slice(-365);
 }
 
-function makePerfItem(label,icon,value,basis=null,pnl=null,mode='value'){
+function makePerfItem(label,icon,value,basis=null,pnl=null,mode='value',details=null){
   value=Number(value)||0;
   if(basis===null||basis===undefined)basis=null; else basis=Number(basis)||0;
   if(pnl===null||pnl===undefined)pnl=basis!==null?value-basis:value;
-  return {label,icon,value,basis,pnl:Number(pnl)||0,mode};
+  return {label,icon,value,basis,pnl:Number(pnl)||0,mode,details:details||{}};
+}
+function makePriceDetails(entries){
+  const out={};
+  Object.entries(entries||{}).forEach(([key,item])=>{
+    const qty=Number(item.qty)||0;
+    const unitValue=Number(item.unitValue)||0;
+    const scale=Number(item.scale)||1;
+    if(qty>0&&unitValue>0)out[key]={qty,unitValue,scale};
+  });
+  return out;
+}
+function hasPriceDetails(section){
+  return !!(section&&section.details&&Object.keys(section.details).length);
+}
+function hasDetailedPerfSections(sections){
+  return !!(sections&&(hasPriceDetails(sections.stocks)||hasPriceDetails(sections.crypto)));
+}
+function getPriceOnlyDelta(current,key,baseSections){
+  const cur=current?.sections?.[key];
+  const prev=baseSections?.[key];
+  if(!cur||!prev||!hasPriceDetails(cur)||!hasPriceDetails(prev))return null;
+  let change=0,baseValue=0,matched=false;
+  Object.entries(cur.details||{}).forEach(([id,now])=>{
+    const old=prev.details?.[id];
+    if(!old)return; // new buy is not counted as growth
+    const qty=Math.min(Number(now.qty)||0,Number(old.qty)||0);
+    if(qty<=0)return;
+    matched=true;
+    const oldUnit=Number(old.unitValue)||0;
+    const nowUnit=Number(now.unitValue)||0;
+    const scale=Number(now.scale)||Number(old.scale)||1;
+    change+=qty*(nowUnit-oldUnit)*scale;
+    baseValue+=Math.abs(qty*oldUnit*scale);
+  });
+  if(!matched)return {change:0,pct:0};
+  return {change,pct:baseValue>0?(change/baseValue*100):0};
 }
 function getMetalsBasisUah(){
   return metalsSections.reduce((sum,sec)=>sum+(sec.items||[]).reduce((s,it)=>s+parseInputNumber(it.grams)*parseInputNumber(it.price),0),0);
@@ -6729,12 +6844,22 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const cryptoRate=getCryptoRate();
   const cryptoValue=cryptoStats.portfolioUsd*cryptoRate;
   const cryptoBasis=cryptoStats.remainingCostUsd*cryptoRate;
+  const cryptoDetails=makePriceDetails(Object.fromEntries(Object.entries(cryptoStats.groups||{}).map(([k,g])=>[k,{qty:Math.max(0,Number(g.totalQty)||0),unitValue:Number(g.curPrice)||0,scale:cryptoRate}])));
   const stockStats=securitiesSections.filter(s=>s.type==='stocks').reduce((acc,sec)=>{
     const st=getStockSectionStats(sec);
     acc.value+=st.holdingsTotal;
-    Object.values(st.groups).forEach(g=>acc.basis+=g.remainingCost);
+    Object.values(st.groups).forEach(g=>{
+      acc.basis+=g.remainingCost;
+      const key=g.ticker||g.name;
+      if(key){
+        const prev=acc.details[key]||{qty:0,unitValue:0};
+        const qty=Number(g.totalQty)||0;
+        const unitValue=Number(g.curPrice)||0;
+        acc.details[key]={qty:prev.qty+qty,unitValue:unitValue||prev.unitValue};
+      }
+    });
     return acc;
-  },{value:0,basis:0});
+  },{value:0,basis:0,details:{}});
   const bondStats=securitiesSections.filter(s=>s.type==='bonds').reduce((acc,sec)=>{
     const st=getBondSectionStats(sec); acc.value+=st.holdingsTotal; acc.basis+=st.holdingsTotal-st.pnl; acc.pnl+=st.pnl; return acc;
   },{value:0,basis:0,pnl:0});
@@ -6753,8 +6878,8 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const debtValue=getLiabilitiesTotal();
   const sections={
     deposits:makePerfItem('Депозити','🏦',depValue,depBasis,depValue-depBasis,'pnl'),
-    stocks:makePerfItem('Акції','📈',stockStats.value,stockStats.basis,stockStats.value-stockStats.basis,'pnl'),
-    crypto:makePerfItem('Криптовалюта','₮',cryptoValue,cryptoBasis,cryptoValue-cryptoBasis,'pnl'),
+    stocks:makePerfItem('Акції','📈',stockStats.value,stockStats.basis,stockStats.value-stockStats.basis,'pnl',makePriceDetails(stockStats.details)),
+    crypto:makePerfItem('Криптовалюта','₮',cryptoValue,cryptoBasis,cryptoValue-cryptoBasis,'pnl',cryptoDetails),
     bonds:makePerfItem('Облігації','📜',bondStats.value,bondStats.basis,bondStats.pnl,'pnl'),
     ovdp:makePerfItem('ОВДП','🏛',ovdpStats.value,ovdpStats.basis,ovdpStats.pnl,'pnl'),
     metals:makePerfItem('Метали','💎',metalsValue,metalsBasis,metalsValue-metalsBasis,'pnl'),
@@ -6782,7 +6907,10 @@ function getSectionPeriodDelta(current,key,days){
   const cur=current.sections[key];
   const prev=base?.sections?.[key];
   if(!cur||!prev)return null;
-  const metric=cur.mode==='pnl'?'pnl':'value';
+  const priceDelta=getPriceOnlyDelta(current,key,base.sections);
+  if(priceDelta)return priceDelta;
+  if(cur.mode==='pnl')return null;
+  const metric='value';
   const nowVal=Number(cur[metric])||0;
   const oldVal=Number(prev[metric])||0;
   const change=nowVal-oldVal;
@@ -6794,7 +6922,10 @@ function getSectionDayDelta(current,key){
   const open=today?.openSections?.[key];
   const cur=current.sections[key];
   if(!cur||!open)return null;
-  const metric=cur.mode==='pnl'?'pnl':'value';
+  const priceDelta=getPriceOnlyDelta(current,key,today.openSections);
+  if(priceDelta)return priceDelta;
+  if(cur.mode==='pnl')return null;
+  const metric='value';
   const change=(Number(cur[metric])||0)-(Number(open[metric])||0);
   const baseValue=Math.abs(Number(open.value)||Number(open.basis)||Number(open[metric])||0);
   return {change,pct:baseValue>0?(change/baseValue*100):0};
@@ -6816,7 +6947,7 @@ function recordDailySnapshot(total){
       minTotal:Math.min(Number(prev.minTotal)||Number(prev.total)||cleanTotal,cleanTotal),
       maxTotal:Math.max(Number(prev.maxTotal)||Number(prev.total)||cleanTotal,cleanTotal),
       sections:clonePerfSections(perf.sections),
-      openSections:hasPerfSections(prev.openSections)?clonePerfSections(prev.openSections):(hasPerfSections(prev.sections)?clonePerfSections(prev.sections):clonePerfSections(perf.sections)),
+      openSections:hasDetailedPerfSections(prev.openSections)?clonePerfSections(prev.openSections):clonePerfSections(perf.sections),
       updatedAt:new Date().toISOString()
     };
   }else{
@@ -7179,6 +7310,20 @@ function diagCloseOutside(e){
 }
 
 
+function sectionPerfTxt(key){
+  const dict={
+    title:{uk:'📊 Динаміка по розділах',ru:'📊 Динамика по разделам',en:'📊 Section dynamics',de:'📊 Bereichsdynamik',zh:'📊 分类动态'},
+    note:{uk:'Показує тільки рух ціни вже наявних акцій і монет. Купівля, продаж або поповнення не рахуються як зростання.',ru:'Показывает только движение цены уже имеющихся акций и монет. Покупка, продажа или пополнение не считаются ростом.',en:'Shows only price movement of already held stocks and coins. Buys, sells and top-ups are not counted as growth.',de:'Zeigt nur Preisbewegungen bereits gehaltener Aktien und Coins. Käufe, Verkäufe und Einzahlungen zählen nicht als Wachstum.',zh:'仅显示已持有股票和币种的价格变化。买入、卖出或充值不计为增长。'},
+    price:{uk:'рух ціни',ru:'движение цены',en:'price move',de:'Preisbewegung',zh:'价格变化'},
+    day:{uk:'День',ru:'День',en:'Day',de:'Tag',zh:'日'},
+    d7:{uk:'7д',ru:'7д',en:'7d',de:'7T',zh:'7天'},
+    d30:{uk:'30д',ru:'30д',en:'30d',de:'30T',zh:'30天'},
+    empty:{uk:'Поки недостатньо історії цін для порівняння акцій/криптовалюти.',ru:'Пока недостаточно истории цен для сравнения акций/криптовалюты.',en:'Not enough price history yet to compare stocks/crypto.',de:'Noch nicht genug Preisverlauf für Aktien/Krypto.',zh:'价格历史不足，暂无法比较股票/加密资产。'},
+    stocks:{uk:'Акції',ru:'Акции',en:'Stocks',de:'Aktien',zh:'股票'},
+    crypto:{uk:'Криптовалюта',ru:'Криптовалюта',en:'Crypto',de:'Krypto',zh:'加密资产'}
+  };
+  return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
+}
 function diagMonthUnit(){return ({uk:'/міс',ru:'/мес',en:'/mo',de:'/Mon.',zh:'/月'}[currentLang]||'/міс');}
 function diagMonthWord(){return ({uk:'/місяць',ru:'/месяц',en:'/month',de:'/Monat',zh:'/月'}[currentLang]||'/місяць');}
 function diagDepositShort(){return ({uk:'Деп:',ru:'Деп:',en:'Dep:',de:'Einl.:',zh:'存款：'}[currentLang]||'Деп:');}
@@ -7329,13 +7474,14 @@ function renderDiagnostics(){
     const d1=getSectionDayDelta(currentPerf,key);
     const d7=getSectionPeriodDelta(currentPerf,key,7);
     const d30=getSectionPeriodDelta(currentPerf,key,30);
-    const basisNote=item.mode==='pnl'?'P&L':'сума';
+    const basisNote=sectionPerfTxt('price');
+    const label=sectionPerfTxt(key);
     return '<div class="diag-row" style="align-items:flex-start;gap:8px;">'+
-      '<span class="diag-row-key" style="min-width:84px;">'+item.icon+' '+item.label+'<br><span style="font-size:8px;color:var(--muted);">'+basisNote+'</span></span>'+
+      '<span class="diag-row-key" style="min-width:84px;">'+item.icon+' '+label+'<br><span style="font-size:8px;color:var(--muted);">'+basisNote+'</span></span>'+
       '<span class="diag-row-val" style="font-size:10px;display:grid;grid-template-columns:1fr;gap:3px;max-width:64%;width:64%;">'+
-        '<span>День: '+fmtSmallChange(d1)+'</span>'+
-        '<span>7д: '+fmtSmallChange(d7)+'</span>'+
-        '<span>30д: '+fmtSmallChange(d30)+'</span>'+
+        '<span>'+sectionPerfTxt('day')+': '+fmtSmallChange(d1)+'</span>'+
+        '<span>'+sectionPerfTxt('d7')+': '+fmtSmallChange(d7)+'</span>'+
+        '<span>'+sectionPerfTxt('d30')+': '+fmtSmallChange(d30)+'</span>'+
       '</span>'+
     '</div>';
   }).join('');
@@ -7406,9 +7552,9 @@ function renderDiagnostics(){
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">📊 Динаміка по розділах</div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">Акції та криптовалюта показують зміну P&L, тобто рух ціни активів без простого поповнення.</div>
-      ${sectionDynamicsRows||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">Недостатньо історії або активів в акціях/криптовалюті для порівняння.</div>'}
+      <div class="diag-section-title">${sectionPerfTxt('title')}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">${sectionPerfTxt('note')}</div>
+      ${sectionDynamicsRows||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">'+sectionPerfTxt('empty')+'</div>'}
     </div>
 
     <div class="diag-section">
@@ -8185,7 +8331,9 @@ async function fetchCoinPrice(){
     return;
   }
   
-  // Fill current price automatically
+  // Fill current price automatically when the add popup is open.
+  cryptoPendingCoinName=name;
+  cryptoPendingCoinPrice=data.price;
   const priceEl=$('newCoinCurPrice');
   if(priceEl) priceEl.value=data.price.toFixed(2);
   
