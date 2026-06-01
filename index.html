@@ -630,6 +630,19 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .ticker-card-pnl{font-family:'DM Mono',monospace;font-size:10px;margin-top:2px;}
 .ticker-card-div{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;}
 
+
+/* stock add popup v1 */
+.stock-add-overlay{position:fixed;inset:0;background:#000000cc;z-index:545;display:none;align-items:flex-end;}
+.stock-add-overlay.open{display:flex;}
+.stock-add-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px 16px calc(34px + env(safe-area-inset-bottom));width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - 10px);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.stock-add-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.stock-add-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.stock-add-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.08em;}
+.stock-add-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);flex:0 0 auto;}
+.stock-add-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px;}
+.stock-action-row{display:flex;gap:6px;margin-bottom:8px;}
+.stock-action-btn{flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:transparent;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;}
+
 /* ── STOCK DETAIL MODAL ── */
 .stock-detail-overlay{position:fixed;inset:0;background:#000000cc;z-index:520;display:none;align-items:flex-end;}
 body.theme-light .modal-overlay,
@@ -1415,6 +1428,21 @@ body.theme-light::before{opacity:.18;}
 </div>
 
 
+
+
+<!-- STOCK ADD POPUP -->
+<div class="stock-add-overlay" id="stockAddOverlay" onclick="stockAddCloseOutside(event)">
+  <div class="stock-add-box">
+    <div class="stock-add-head">
+      <div>
+        <div class="stock-add-title" id="stockAddTitle">Додати позицію</div>
+        <div class="stock-add-sub" id="stockAddTicker">AAPL, MSFT...</div>
+      </div>
+      <button class="stock-add-close" onclick="closeSecAddPopup()">✕</button>
+    </div>
+    <div id="stockAddFields"></div>
+  </div>
+</div>
 
 <!-- CRYPTO ADD POPUP -->
 <div class="crypto-add-overlay" id="cryptoAddOverlay" onclick="cryptoAddCloseOutside(event)">
@@ -2241,6 +2269,8 @@ const UI_TEXT={
   bondManualMode:{uk:'Ручний режим · API Cbonds можна підключити пізніше',ru:'Ручной режим · API Cbonds можно подключить позже',en:'Manual mode · Cbonds API can be connected later',de:'Manueller Modus · Cbonds API kann später verbunden werden',zh:'手动模式 · 之后可连接 Cbonds API'},
   buyPriceForPnl:{uk:'для P&L',ru:'для P&L',en:'for P&L',de:'für GuV',zh:'用于盈亏'},
   autoFull:{uk:'автоматично',ru:'автоматически',en:'automatic',de:'automatisch',zh:'自动'},
+  stockAddAction:{uk:'📈 Додати',ru:'📈 Добавить',en:'📈 Add',de:'📈 Hinzufügen',zh:'📈 添加'},
+  stockRemoveAction:{uk:'📉 Убрати',ru:'📉 Убрать',en:'📉 Remove',de:'📉 Entfernen',zh:'📉 移除'},
   cryptoPortfolio:{uk:'💰 Портфель (монети)',ru:'💰 Портфель (монеты)',en:'💰 Portfolio (coins)',de:'💰 Portfolio (Coins)',zh:'💰 投资组合（币种）'},
   onlinePrices:{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
   refresh:{uk:'⟳ Оновити',ru:'⟳ Обновить',en:'⟳ Refresh',de:'⟳ Aktualisieren',zh:'⟳ 刷新'},
@@ -3882,32 +3912,11 @@ function getSecCardHtml(s,idx){
           <button class="ticker-fetch-btn" id="fetchBtn_${s.id}" onclick="fetchTickerForInput('${s.id}')">🔍 Отримати ціну</button>
         </div>
         <div class="stock-price-info" id="stockInfo_${s.id}"></div>
-        <div style="display:flex;gap:6px;margin-bottom:8px;">
-          <button id="secTypeBuy_${s.id}" onclick="setSecTradeType('${s.id}','buy')" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--green);background:#4ecb8d15;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;font-weight:600;">📈 Купівля</button>
-          <button id="secTypeSell_${s.id}" onclick="setSecTradeType('${s.id}','sell')" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:transparent;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;">📉 Продаж</button>
+        <div class="stock-action-row">
+          <button class="stock-action-btn" id="secTypeBuy_${s.id}" onclick="openSecAddPopup('${s.id}','buy')">${uiText('stockAddAction')}</button>
+          <button class="stock-action-btn" id="secTypeSell_${s.id}" onclick="openSecAddPopup('${s.id}','sell')">${uiText('stockRemoveAction')}</button>
         </div>
         <input type="hidden" id="secTradeType_${s.id}" value="buy">
-        <div class="row2">
-          <div class="field-group">
-            <div class="field-label">${t('secQtyShares')}</div>
-            <input class="field-input" type="text" id="secQty_${s.id}" placeholder="10" inputmode="decimal">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Ціна купівлі (₴)</div>
-            <input class="field-input" type="text" id="secBuyPrice_${s.id}" placeholder="${uiText('buyPriceForPnl')}" inputmode="decimal">
-          </div>
-        </div>
-        <div class="row2">
-          <div class="field-group">
-            <div class="field-label">${t('secPriceCurrent')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
-            <input class="field-input" type="text" id="secPrice_${s.id}" placeholder="${uiText('autoFull')}" inputmode="decimal">
-          </div>
-          <div class="field-group">
-            <div class="field-label">${t('secDivPct')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
-            <input class="field-input" type="text" id="secDiv_${s.id}" placeholder="авто" inputmode="decimal">
-          </div>
-        </div>
-        <button class="add-btn" onclick="addSecItem('${s.id}')">${lang.addSecItem}</button>
       </div>
       <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--blue2);text-transform:uppercase;margin-bottom:6px;">${uiText('workerLabel')}</div>
@@ -4092,6 +4101,59 @@ function setSecTradeType(secId, type){
     sellBtn.style.fontWeight=type==='sell'?'600':'400';
   }
 }
+function getSecCachedPriceUah(ticker){
+  const cached=ticker?stockPriceCache[ticker]:null;
+  if(!cached)return {price:0,divYield:0};
+  const price=cached.currency==='UAH'?cached.price:(cached.price*getStockCurrencyRate(cached.currency));
+  return {price,divYield:cached.divYield||0};
+}
+function openSecAddPopup(secId,type){
+  const ticker=($('secName_'+secId)?.value||'').trim().toUpperCase();
+  if(!ticker){alert(t('secTicker'));return;}
+  setSecTradeType(secId,type);
+  const cached=getSecCachedPriceUah(ticker);
+  const title=$('stockAddTitle');
+  const tickerEl=$('stockAddTicker');
+  const fields=$('stockAddFields');
+  if(title)title.textContent=type==='sell'?uiText('stockRemoveAction'):uiText('stockAddAction');
+  if(tickerEl)tickerEl.textContent=ticker;
+  if(fields){
+    fields.innerHTML=`
+      <div class="row2">
+        <div class="field-group">
+          <div class="field-label">${t('secQtyShares')}</div>
+          <input class="field-input" type="text" id="secQty_${secId}" placeholder="10" inputmode="decimal">
+        </div>
+        <div class="field-group">
+          <div class="field-label">${t('secBuyPrice')}</div>
+          <input class="field-input" type="text" id="secBuyPrice_${secId}" placeholder="${uiText('buyPriceForPnl')}" inputmode="decimal">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field-group">
+          <div class="field-label">${t('secPriceCurrent')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
+          <input class="field-input" type="text" id="secPrice_${secId}" value="${cached.price?cached.price.toFixed(2):''}" placeholder="${uiText('autoFull')}" inputmode="decimal">
+        </div>
+        <div class="field-group">
+          <div class="field-label">${t('secDivPct')} <span style="color:var(--muted);font-size:9px">${t('secPriceAuto')}</span></div>
+          <input class="field-input" type="text" id="secDiv_${secId}" value="${cached.divYield?cached.divYield.toFixed(2):''}" placeholder="${uiText('autoFull')}" inputmode="decimal">
+        </div>
+      </div>
+      <div class="stock-add-actions">
+        <button class="modal-confirm" onclick="addSecItem('${secId}')">${type==='sell'?uiText('stockRemoveAction'):uiText('stockAddAction')}</button>
+        <button class="modal-cancel" onclick="closeSecAddPopup()">${t('cancel')}</button>
+      </div>`;
+  }
+  document.getElementById('stockAddOverlay')?.classList.add('open');
+}
+function closeSecAddPopup(){
+  document.getElementById('stockAddOverlay')?.classList.remove('open');
+  const fields=$('stockAddFields');
+  if(fields)fields.innerHTML='';
+}
+function stockAddCloseOutside(e){
+  if(e.target===document.getElementById('stockAddOverlay'))closeSecAddPopup();
+}
 
 function addSecItem(secId){
   const _secFreemium = securitiesSections.find(s=>s.id===secId);
@@ -4118,7 +4180,7 @@ function addSecItem(secId){
     liveOrigPrice:cached?.price||null,
     divAbs:cached?.divAbs||0,
   });
-  renderSecuritiesCards(); updateAll(); saveData();
+  closeSecAddPopup(); renderSecuritiesCards(); updateAll(); saveData();
   // Auto-refresh only for PRO or first ticker (free demo)
   if(ticker){
     const totalLive = securitiesSections.reduce((sum,s)=>sum+s.items.filter(it=>it.ticker).length, 0);
