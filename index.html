@@ -92,6 +92,11 @@ body.theme-light .header{background:linear-gradient(180deg,#f6f7fb 0%,#f6f7fbcc 
 .card-value{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;letter-spacing:-0.5px;}
 .card-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px;}
 .card-actions{display:flex;align-items:center;gap:4px;}
+.card-sparkline{width:76px;height:44px;flex:0 0 76px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.95;}
+.card-sparkline:empty::before{content:'';width:58px;height:3px;border-radius:999px;background:currentColor;opacity:.55;box-shadow:0 0 8px currentColor;}
+.card-sparkline svg{width:76px;height:44px;display:block;overflow:visible;}
+.card-sparkline path{fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px currentColor);}
+.card-sparkline.flat{opacity:.45;}
 .card-del-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:color .15s,background .15s;flex-shrink:0;}
 .card-del-btn:hover{color:var(--red);background:#f8717115;}
 .card-toggle{color:var(--muted);font-size:14px;transition:transform .25s;flex-shrink:0;padding:4px;cursor:pointer;}
@@ -906,6 +911,9 @@ body.modern-mockup .card-del-btn,
 body.modern-mockup .card-toggle{
   color:#7f849d;
 }
+body.modern-mockup .card-sparkline{width:80px;height:48px;flex-basis:80px;margin-right:2px;}
+body.modern-mockup .card-sparkline svg{width:80px;height:48px;}
+body.modern-mockup.theme-light .card-sparkline path{filter:none;}
 body.modern-mockup .card-inner{padding:0 18px 18px;}
 body.modern-mockup .divider{
   background:linear-gradient(90deg,transparent,#ffffff14,transparent);
@@ -1050,7 +1058,291 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
   body.modern-mockup .card-header{min-height:72px;padding:13px 14px;}
   body.modern-mockup .card-icon{width:40px;height:40px;border-radius:14px;}
   body.modern-mockup .card-value{font-size:21px;}
+  body.modern-mockup .card-sparkline{width:62px;height:38px;flex-basis:62px;}
+  body.modern-mockup .card-sparkline svg{width:62px;height:38px;}
+  body.modern-mockup .card-sparkline path{stroke-width:3.4;}
   body.modern-mockup .bottom-nav{width:100vw;border-radius:22px 22px 0 0;}
+}
+/* DASHBOARD MOCKUP V1 - second reversible visual direction */
+body.dashboard-mockup{
+  --bg:#11131b;
+  --bg2:#1a1d27;
+  --bg3:#242836;
+  --card:#1e222e;
+  --border:#ffffff10;
+  --border2:#ffffff1d;
+  background:
+    radial-gradient(circle at 70% -10%,rgba(91,156,246,.20),transparent 30%),
+    radial-gradient(circle at 15% 12%,rgba(245,223,160,.12),transparent 28%),
+    linear-gradient(180deg,#11131b 0%,#0d0f17 54%,#090a10 100%);
+}
+body.dashboard-mockup::before{opacity:.18;}
+body.dashboard-mockup .app{
+  max-width:460px;
+  margin:0 auto;
+  padding-bottom:calc(98px + env(safe-area-inset-bottom));
+}
+body.dashboard-mockup .header{
+  position:relative;
+  overflow:hidden;
+  margin:12px 12px 10px;
+  padding:34px 16px 18px;
+  border-radius:28px;
+  background:
+    linear-gradient(145deg,rgba(36,40,54,.98),rgba(24,27,38,.94)),
+    radial-gradient(circle at 82% 16%,rgba(91,156,246,.18),transparent 32%);
+  border:1px solid #ffffff14;
+  box-shadow:0 22px 48px #00000045, inset 0 1px 0 #ffffff12;
+}
+body.dashboard-mockup .header::after{
+  content:'';
+  position:absolute;
+  right:-24px;
+  top:36px;
+  width:148px;
+  height:104px;
+  border-radius:28px;
+  background:
+    linear-gradient(135deg,#5b9cf6 0 38%,#f5dfa0 38% 58%,#4ecb8d 58% 100%);
+  opacity:.22;
+  transform:rotate(-12deg);
+  filter:blur(.2px);
+  pointer-events:none;
+}
+body.dashboard-mockup .header-top-row,
+body.dashboard-mockup .total-wrap,
+body.dashboard-mockup .total-subs{position:relative;z-index:1;}
+body.dashboard-mockup .header-label{
+  color:#b6bfd4;
+  font-family:'Inter',sans-serif;
+  font-size:10px;
+  letter-spacing:0;
+  text-transform:none;
+}
+body.dashboard-mockup .header-label::before{content:'Hi, ';opacity:.65;}
+body.dashboard-mockup .total-wrap{margin-top:3px;}
+body.dashboard-mockup .total-amount{
+  font-family:'Inter',sans-serif;
+  font-size:clamp(36px,10vw,56px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:0;
+  background:linear-gradient(135deg,#ffffff 0%,#f5dfa0 62%,#d69e2e 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+}
+body.dashboard-mockup .total-currency{font-size:19px;color:#f5dfa0;opacity:.95;}
+body.dashboard-mockup .total-subs{gap:7px;margin-top:12px;}
+body.dashboard-mockup .badge,
+body.dashboard-mockup .network-badge{
+  min-height:24px;
+  display:inline-flex;
+  align-items:center;
+  border:1px solid #ffffff12;
+  background:#ffffff0c;
+  box-shadow:inset 0 1px 0 #ffffff10;
+}
+body.dashboard-mockup .gear-btn,
+body.dashboard-mockup .diag-btn{
+  border-radius:16px;
+  background:#ffffff10;
+  border:1px solid #ffffff16;
+  box-shadow:inset 0 1px 0 #ffffff12;
+}
+body.dashboard-mockup .section-label{
+  padding:14px 20px 8px;
+  font-family:'Inter',sans-serif;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.04em;
+  color:#a4abc1;
+  text-transform:none;
+}
+body.dashboard-mockup .section-label::before{content:'Dashboard · ';color:#6edba0;}
+body.dashboard-mockup .chart-section{padding:0 12px;margin-bottom:12px;}
+body.dashboard-mockup .chart-card{
+  border-radius:26px;
+  padding:16px;
+  background:
+    linear-gradient(145deg,rgba(39,43,57,.98),rgba(28,31,43,.96)),
+    radial-gradient(circle at 85% 10%,rgba(91,156,246,.14),transparent 38%);
+  border:1px solid #ffffff16;
+  box-shadow:0 18px 38px #00000036, inset 0 1px 0 #ffffff12;
+}
+body.dashboard-mockup .chart-title{
+  font-family:'Inter',sans-serif;
+  letter-spacing:0;
+  text-transform:none;
+  font-size:12px;
+  font-weight:800;
+  color:#eef2ff;
+}
+body.dashboard-mockup .chart-period-btn{
+  border-radius:999px;
+  background:#ffffff0b;
+  border-color:#ffffff10;
+}
+body.dashboard-mockup .chart-period-btn.active{
+  background:#5b9cf6;
+  color:white;
+}
+body.dashboard-mockup .cards,
+body.dashboard-mockup #customCardsContainer{
+  padding:0 12px;
+  gap:12px;
+}
+body.dashboard-mockup .card{
+  border-radius:26px;
+  background:
+    linear-gradient(145deg,rgba(35,39,52,.98),rgba(27,30,41,.96)),
+    radial-gradient(circle at 100% 0,rgba(255,255,255,.05),transparent 42%);
+  border:1px solid #ffffff14;
+  box-shadow:0 16px 34px #00000032, inset 0 1px 0 #ffffff12;
+}
+body.dashboard-mockup .card-header{
+  min-height:76px;
+  padding:14px 15px;
+  gap:12px;
+}
+body.dashboard-mockup .card-icon{
+  width:44px;
+  height:44px;
+  border-radius:16px;
+  background:#ffffff0e;
+  box-shadow:inset 0 1px 0 #ffffff12;
+}
+body.dashboard-mockup .card-name{
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:.02em;
+  text-transform:none;
+  color:#dce3f5;
+}
+body.dashboard-mockup .card-value{
+  font-family:'Inter',sans-serif;
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:0;
+  line-height:1.04;
+}
+body.dashboard-mockup .card-pct{
+  font-family:'Inter',sans-serif;
+  font-size:10px;
+  color:#9099b1;
+}
+body.dashboard-mockup .drag-handle,
+body.dashboard-mockup .card-del-btn,
+body.dashboard-mockup .card-toggle{color:#858da4;}
+body.dashboard-mockup .card-inner{padding:0 16px 16px;}
+body.dashboard-mockup .divider{
+  background:linear-gradient(90deg,transparent,#ffffff12,transparent);
+  margin-bottom:14px;
+}
+body.dashboard-mockup .live-wrap,
+body.dashboard-mockup .diag-card,
+body.dashboard-mockup .history-card,
+body.dashboard-mockup .result-box,
+body.dashboard-mockup .ticker-card,
+body.dashboard-mockup .liab-card{
+  border-radius:22px;
+  background:linear-gradient(145deg,rgba(31,35,48,.98),rgba(23,26,36,.96));
+  border-color:#ffffff14;
+  box-shadow:inset 0 1px 0 #ffffff10;
+}
+body.dashboard-mockup .live-wrap{
+  border-color:#5b9cf640;
+  background:
+    linear-gradient(145deg,rgba(23,34,54,.98),rgba(22,26,39,.96)),
+    radial-gradient(circle at 92% 0,rgba(91,156,246,.18),transparent 42%);
+}
+body.dashboard-mockup input,
+body.dashboard-mockup select,
+body.dashboard-mockup textarea,
+body.dashboard-mockup .input{
+  border-radius:16px;
+  background:#242836;
+  border-color:#ffffff14;
+}
+body.dashboard-mockup .btn,
+body.dashboard-mockup .add-section-btn,
+body.dashboard-mockup .add-liab-btn,
+body.dashboard-mockup .stock-action-btn,
+body.dashboard-mockup .crypto-action-btn,
+body.dashboard-mockup .dep-add-btn,
+body.dashboard-mockup .dep-nav-btn{
+  border-radius:16px;
+}
+body.dashboard-mockup .bottom-nav{
+  width:min(404px,calc(100vw - 24px));
+  bottom:calc(10px + env(safe-area-inset-bottom));
+  height:66px;
+  padding:7px 12px;
+  border-radius:28px;
+  background:linear-gradient(180deg,rgba(35,38,50,.94),rgba(19,21,30,.96));
+  border:1px solid #ffffff15;
+  box-shadow:0 18px 54px #00000070, inset 0 1px 0 #ffffff12;
+}
+body.dashboard-mockup .bottom-nav-btn{height:48px;border-radius:18px;}
+body.dashboard-mockup .bottom-nav-btn .bn-label{
+  font-family:'Inter',sans-serif;
+  font-size:7px;
+  font-weight:700;
+  color:#aeb6ca;
+}
+body.dashboard-mockup .bottom-nav-btn.center{margin-top:-18px;}
+body.dashboard-mockup .bottom-nav-btn.center .bottom-nav-icon{
+  filter:drop-shadow(0 12px 18px #00000075);
+}
+body.dashboard-mockup.theme-light{
+  --bg:#eef2f7;
+  --bg2:#ffffff;
+  --bg3:#edf1f6;
+  --card:#ffffff;
+  --border:#17203312;
+  --border2:#17203320;
+  --text:#172033;
+  --muted:#667085;
+  --muted2:#475467;
+  background:linear-gradient(180deg,#f4f6fb,#e8edf5);
+}
+body.dashboard-mockup.theme-light .header,
+body.dashboard-mockup.theme-light .chart-card,
+body.dashboard-mockup.theme-light .card,
+body.dashboard-mockup.theme-light .live-wrap,
+body.dashboard-mockup.theme-light .diag-card,
+body.dashboard-mockup.theme-light .history-card,
+body.dashboard-mockup.theme-light .result-box,
+body.dashboard-mockup.theme-light .ticker-card,
+body.dashboard-mockup.theme-light .liab-card{
+  background:linear-gradient(145deg,#ffffff,#f4f7fb);
+  border-color:#17203314;
+  box-shadow:0 16px 34px #27304a18, inset 0 1px 0 #ffffffcc;
+}
+body.dashboard-mockup.theme-light .header-label,
+body.dashboard-mockup.theme-light .section-label,
+body.dashboard-mockup.theme-light .card-pct{color:#667085;}
+body.dashboard-mockup.theme-light .chart-title,
+body.dashboard-mockup.theme-light .card-name{color:#172033;}
+body.dashboard-mockup.theme-light input,
+body.dashboard-mockup.theme-light select,
+body.dashboard-mockup.theme-light textarea,
+body.dashboard-mockup.theme-light .input{background:#ffffff;color:#172033;border-color:#17203318;}
+body.dashboard-mockup.theme-light .bottom-nav{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(239,243,249,.96));
+  border-color:#17203318;
+  box-shadow:0 18px 44px #27304a22, inset 0 1px 0 #ffffff;
+}
+body.dashboard-mockup.theme-light .bottom-nav-btn .bn-label{color:#475467;}
+@media(max-width:390px){
+  body.dashboard-mockup .header{margin:10px 10px 9px;padding:32px 14px 17px;border-radius:25px;}
+  body.dashboard-mockup .total-amount{font-size:clamp(34px,12vw,46px);}
+  body.dashboard-mockup .cards,
+  body.dashboard-mockup #customCardsContainer,
+  body.dashboard-mockup .chart-section{padding-left:10px;padding-right:10px;}
+  body.dashboard-mockup .card{border-radius:23px;}
+  body.dashboard-mockup .card-value{font-size:22px;}
+  body.dashboard-mockup .bottom-nav{width:calc(100vw - 18px);}
 }
 </style>
 </head>
@@ -1163,6 +1455,7 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
         <div class="card-value" id="depositDisplay">0 ₴</div>
         <div class="card-pct" id="depositPct">0% від капіталу</div>
       </div>
+      <div class="card-sparkline" id="spark_deposits" data-spark-key="deposits"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('deposit')" title="Видалити">✕</button>
         <div class="card-toggle" onclick="toggleCard('deposit')">▼</div>
@@ -1184,6 +1477,7 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
         <div class="card-value" id="cryptoDisplay">0 ₴</div>
         <div class="card-pct" id="cryptoPct">0% від капіталу</div>
       </div>
+      <div class="card-sparkline" id="spark_crypto" data-spark-key="crypto"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('crypto')" title="Видалити">✕</button>
         <div class="card-toggle" onclick="toggleCard('crypto')">▼</div>
@@ -1236,6 +1530,7 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
         <div class="card-value" id="usdDisplay">0 ₴</div>
         <div class="card-pct" id="usdPct">0% від капіталу</div>
       </div>
+      <div class="card-sparkline" id="spark_usd" data-spark-key="forex"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('usd')" title="Видалити">✕</button>
         <div class="card-toggle" onclick="toggleCard('usd')">▼</div>
@@ -1274,6 +1569,7 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
         <div class="card-value" id="forexDisplay">0 ₴</div>
         <div class="card-pct" id="forexPct">0% від капіталу</div>
       </div>
+      <div class="card-sparkline" id="spark_forex" data-spark-key="forex"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('forex')" title="Видалити">✕</button>
         <div class="card-toggle" onclick="toggleCard('forex')">▼</div>
@@ -1324,6 +1620,7 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
         <div class="card-value" id="cashDisplay">0 ₴</div>
         <div class="card-pct" id="cashPct">0% від капіталу</div>
       </div>
+      <div class="card-sparkline" id="spark_cash" data-spark-key="cash"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('cash')" title="Видалити">✕</button>
         <div class="card-toggle" onclick="toggleCard('cash')">▼</div>
@@ -1362,6 +1659,7 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
         <div class="card-value" id="otherDisplay">0 ₴</div>
         <div class="card-pct" id="otherPct">0% від капіталу</div>
       </div>
+      <div class="card-sparkline" id="spark_account" data-spark-key="cash"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('other')" title="Видалити">✕</button>
         <div class="card-toggle" onclick="toggleCard('other')">▼</div>
@@ -2637,6 +2935,7 @@ const pct=(v,total)=>total?((v/total*100).toFixed(1)+'%'):'0%';
 let coins=[], forexItems=[], cardOrder=[], customSections=[], securitiesSections=[];
 let hiddenCards={}; // which builtin cards are hidden
 let capitalHistory = []; // [{date:'2026-01-01', total: 150000}]
+let sectionHourlyHistory = []; // [{hour:'2026-01-01T14', sections:{crypto:{...}}}]
 let chartPeriod = '30d';
 let chartExpanded = true;
 
@@ -3286,6 +3585,7 @@ function getCustomCardHtml(s,idx){
         <div class="card-value" id="customDisplay_${s.id}">0 ₴</div>
         <div class="card-pct" id="customPct_${s.id}">0% ${lang.pctOfCapital}</div>
       </div>
+      ${getCardSparklineHtml(getCustomSparklineKey(s))}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">✕</button>
         <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
@@ -4136,6 +4436,7 @@ function getSecCardHtml(s,idx){
         <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(total))}</div>
         <div class="card-pct" id="secPct_${s.id}">—</div>
       </div>
+      ${getCardSparklineHtml('stocks')}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeSecCard('${s.id}')">✕</button>
         <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
@@ -4236,6 +4537,7 @@ function getBondCardHtml(s,idx){
         <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(stats.total))}</div>
         <div class="card-pct" id="secPct_${s.id}">—</div>
       </div>
+      ${getCardSparklineHtml(s.type==='ovdp'?'ovdp':'bonds')}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeSecCard('${s.id}')">×</button>
         <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
@@ -6223,6 +6525,7 @@ function getMetalsCardHtml(s){
         <div class="card-value">${sym}${fmtN(toDisplayCurr(totalCur))}</div>
         <div class="card-pct" style="color:${pnlColor}">${pnlSign}${pnlPct.toFixed(1)}% · ${totalGrams.toFixed(1)}г</div>
       </div>
+      ${getCardSparklineHtml('metals')}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeMetalsCard('${s.id}')">✕</button>
         <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
@@ -6994,6 +7297,8 @@ const _origUpdateAll=updateAll;
 updateAll=function(){
   _origUpdateAll();
   renderLiabilities();
+  scheduleSectionHourlySnapshot();
+  refreshCardSparklines();
   // Update net capital display
   if(showNetCapital&&liabilities.length>0){
     const totalDebt=getLiabilitiesTotal();
@@ -7233,6 +7538,124 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   };
   const total=totalOverride!==null&&totalOverride!==undefined?Number(totalOverride)||0:Object.values(sections).reduce((sum,x)=>sum+(x.value||0),0);
   return {total,sections};
+}
+function getCustomSparklineKey(section){
+  if(!section)return 'custom';
+  if(section.sectionType==='startup')return 'startups';
+  if(section.sectionType==='business')return 'business';
+  return 'custom';
+}
+const HOURLY_SPARKLINE_KEYS=['crypto','stocks','bonds','ovdp','metals','forex','usd','startups','business','custom','debts'];
+const DAILY_SPARKLINE_KEYS=['deposits','cash','account'];
+let sectionHourlyHistoryLoaded=false;
+let _sectionHourlyRecordTimer=null;
+function getLocalHourKey(date=new Date()){
+  const d=new Date(date);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'T'+String(d.getHours()).padStart(2,'0');
+}
+function loadSectionHourlyHistory(){
+  try{
+    const raw=localStorage.getItem('section_hourly_history');
+    sectionHourlyHistory=raw?JSON.parse(raw):[];
+    if(!Array.isArray(sectionHourlyHistory))sectionHourlyHistory=[];
+  }catch(e){
+    sectionHourlyHistory=[];
+  }
+  sectionHourlyHistoryLoaded=true;
+  normalizeSectionHourlyHistory();
+}
+function normalizeSectionHourlyHistory(){
+  if(!Array.isArray(sectionHourlyHistory))sectionHourlyHistory=[];
+  const byHour=new Map();
+  sectionHourlyHistory.forEach(h=>{
+    if(!h||!h.hour)return;
+    if(!byHour.has(h.hour)||String(h.updatedAt||'')>String(byHour.get(h.hour).updatedAt||'')){
+      byHour.set(h.hour,{hour:h.hour,sections:clonePerfSections(h.sections||{}),updatedAt:h.updatedAt||''});
+    }
+  });
+  sectionHourlyHistory=[...byHour.values()].sort((a,b)=>a.hour.localeCompare(b.hour)).slice(-720);
+}
+function saveSectionHourlyHistory(){
+  if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();
+  normalizeSectionHourlyHistory();
+  localStorage.setItem('section_hourly_history',JSON.stringify(sectionHourlyHistory));
+}
+function recordSectionHourlySnapshot(){
+  if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();
+  const hour=getLocalHourKey();
+  const perf=getSectionPerformanceSnapshot();
+  const sections={};
+  HOURLY_SPARKLINE_KEYS.forEach(key=>{
+    const item=perf.sections[key];
+    if(item)sections[key]={...item};
+  });
+  const existing=sectionHourlyHistory.findIndex(h=>h.hour===hour);
+  const entry={hour,sections,updatedAt:new Date().toISOString()};
+  if(existing>=0)sectionHourlyHistory[existing]=entry;
+  else sectionHourlyHistory.push(entry);
+  saveSectionHourlyHistory();
+}
+function scheduleSectionHourlySnapshot(){
+  if(_sectionHourlyRecordTimer)return;
+  _sectionHourlyRecordTimer=setTimeout(()=>{
+    _sectionHourlyRecordTimer=null;
+    try{recordSectionHourlySnapshot();refreshCardSparklines();}catch(e){}
+  },250);
+}
+function getSparklineSeries(key){
+  if(!key)return [];
+  const useDaily=DAILY_SPARKLINE_KEYS.includes(key);
+  let series=[];
+  if(useDaily){
+    if(!capitalHistoryLoaded)loadCapitalHistory();
+    series=(capitalHistory||[])
+      .filter(h=>h&&h.date)
+      .map(h=>{
+        const item=(h.sections&&h.sections[key])||(h.openSections&&h.openSections[key]);
+        return item?Number(item.value):null;
+      })
+      .filter(v=>Number.isFinite(v)&&v>=0);
+  }else{
+    if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();
+    series=(sectionHourlyHistory||[])
+      .filter(h=>h&&h.hour)
+      .map(h=>{
+        const item=h.sections&&h.sections[key];
+        return item?Number(item.value):null;
+      })
+      .filter(v=>Number.isFinite(v)&&v>=0);
+  }
+  const current=getSectionPerformanceSnapshot().sections[key];
+  if(current&&Number.isFinite(Number(current.value))){
+    const cur=Number(current.value);
+    if(!series.length||Math.abs(series[series.length-1]-cur)>0.0001)series.push(cur);
+  }
+  return series.slice(-14);
+}
+function getCardSparklineHtml(key){
+  const series=getSparklineSeries(key);
+  const values=series.length>=2?series:(series.length?[series[0],series[0]]:[0,0]);
+  const w=80,h=48,pad=5;
+  const min=Math.min(...values);
+  const max=Math.max(...values);
+  const span=Math.max(1,max-min);
+  const step=(w-pad*2)/(Math.max(1,values.length-1));
+  const pts=values.map((v,i)=>{
+    const x=pad+i*step;
+    const y=h-pad-((v-min)/span)*(h-pad*2);
+    return [x,y];
+  });
+  const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const delta=values[values.length-1]-values[0];
+  const flat=Math.abs(delta)<0.01;
+  const color=flat?'var(--muted2)':(key==='debts'?delta<=0?'var(--green2)':'var(--red)':delta>=0?'var(--green2)':'var(--red)');
+  return `<div class="card-sparkline${flat?' flat':''}" data-spark-key="${key}" style="color:${color}"><svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}"></path></svg></div>`;
+}
+function refreshCardSparklines(){
+  const keys=['deposits','crypto','usd','forex','cash','account','stocks','bonds','ovdp','metals','startups','business','custom','debts'];
+  keys.forEach(key=>{
+    document.querySelectorAll(`[data-spark-key="${key}"]`).forEach(el=>{el.outerHTML=getCardSparklineHtml(key);});
+  });
 }
 function clonePerfSections(sections){
   const out={};
@@ -8325,6 +8748,7 @@ getCustomCardHtml=function(s,idx){
           <div class="card-value" id="customDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(st.total))}</div>
           <div class="card-pct" id="customPct_${s.id}" style="color:${pnlColor}">${st.pnl>=0?'+':''}${st.pnlPct.toFixed(1)}%</div>
         </div>
+        ${getCardSparklineHtml('startups')}
         <div class="card-actions">
           <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">×</button>
           <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
@@ -8472,6 +8896,7 @@ const BACKUP_STORAGE_KEYS = [
   'kapital_v6',
   'kapital_v6_prev',
   'cap_history',
+  'section_hourly_history',
   'display_currency',
   'app_theme',
   'kapital_last_saved_at',
@@ -8514,6 +8939,7 @@ function backupTxt(key){
 function collectBackupPayload(){
   saveDataNow();
   saveCapitalHistory();
+  saveSectionHourlyHistory();
   const storage={};
   BACKUP_STORAGE_KEYS.forEach(key=>{
     const val=localStorage.getItem(key);
@@ -8536,6 +8962,7 @@ function createRollbackSnapshot(){
   try{
     saveDataNow();
     saveCapitalHistory();
+    saveSectionHourlyHistory();
     const storage={};
     BACKUP_STORAGE_KEYS.forEach(key=>{
       const val=localStorage.getItem(key);
@@ -8748,6 +9175,7 @@ renderCustomCards=function(){
   _renderCustomCardsUnified();
   restoreOrder();
   refreshDrag();
+  refreshCardSparklines();
 };
 const _renderSecuritiesCardsUnified=renderSecuritiesCards;
 renderSecuritiesCards=function(){
@@ -8755,6 +9183,7 @@ renderSecuritiesCards=function(){
   _renderSecuritiesCardsUnified();
   restoreOrder();
   refreshDrag();
+  refreshCardSparklines();
 };
 const _renderMetalsCardsUnified=renderMetalsCards;
 renderMetalsCards=function(){
@@ -8762,10 +9191,12 @@ renderMetalsCards=function(){
   _renderMetalsCardsUnified();
   restoreOrder();
   refreshDrag();
+  refreshCardSparklines();
 };
 
 // Final app start after every module/override is declared
 setTimeout(bootstrapApp,0);
+setTimeout(()=>{try{recordSectionHourlySnapshot();refreshCardSparklines();}catch(e){}},450);
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
