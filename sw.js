@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-21-modern-mockup-light-v2';
+const CACHE_NAME = 'kapital-app-v0-0-21-hourly-sparklines-v1';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
