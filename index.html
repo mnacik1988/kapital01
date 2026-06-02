@@ -807,9 +807,198 @@ body.theme-light::before{opacity:.18;}
   .settings-langs,.settings-currency-row{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
 }
 
+/* MODERN MOCKUP V1 - reversible visual layer */
+body.modern-mockup{
+  --card:#141722;
+  --bg2:#10131c;
+  --bg3:#191d2a;
+  background:
+    radial-gradient(circle at 50% -14%, rgba(78,203,141,.16), transparent 34%),
+    radial-gradient(circle at 92% 8%, rgba(91,156,246,.10), transparent 28%),
+    linear-gradient(180deg,#070914 0%,#07080f 48%,#05060a 100%);
+}
+body.modern-mockup::before{opacity:.28;}
+body.modern-mockup .app{padding-bottom:calc(92px + env(safe-area-inset-bottom));}
+body.modern-mockup .header{
+  margin:0 0 12px;
+  padding:60px 18px 24px;
+  background:
+    linear-gradient(180deg,rgba(10,13,25,.94),rgba(10,13,25,.76) 62%,rgba(10,13,25,0)),
+    radial-gradient(circle at 22% 18%,rgba(245,223,160,.13),transparent 34%);
+  border-bottom:1px solid #ffffff0b;
+  box-shadow:0 18px 42px #00000038;
+}
+body.modern-mockup .header-label{
+  font-size:9px;
+  letter-spacing:.24em;
+  color:#9aa2bd;
+}
+body.modern-mockup .total-wrap{gap:7px;margin-top:5px;}
+body.modern-mockup .total-amount{
+  font-size:clamp(38px,10vw,58px);
+  line-height:1;
+  letter-spacing:0;
+  background:linear-gradient(135deg,#ffe8a5 0%,#f7d56e 42%,#fff7d6 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+}
+body.modern-mockup .total-currency{font-size:22px;color:#f4d36d;opacity:.9;}
+body.modern-mockup .total-subs{gap:7px;margin-top:10px;}
+body.modern-mockup .badge,
+body.modern-mockup .network-badge{
+  min-height:23px;
+  display:inline-flex;
+  align-items:center;
+  border:1px solid #ffffff10;
+  box-shadow:inset 0 1px 0 #ffffff0c;
+}
+body.modern-mockup .section-label{
+  padding:14px 18px 8px;
+  font-size:8.5px;
+  letter-spacing:.28em;
+  color:#8288a5;
+}
+body.modern-mockup .cards,
+body.modern-mockup #customCardsContainer{
+  padding:0 14px;
+  gap:12px;
+}
+body.modern-mockup .card{
+  border-radius:24px;
+  background:
+    linear-gradient(180deg,rgba(25,29,42,.92),rgba(14,16,25,.96)),
+    radial-gradient(circle at 0 0,rgba(255,255,255,.06),transparent 36%);
+  border-color:#ffffff14;
+  box-shadow:0 18px 42px #00000038, inset 0 1px 0 #ffffff0b;
+}
+body.modern-mockup .card.expanded{border-color:#ffffff22;}
+body.modern-mockup .card-header{
+  min-height:78px;
+  padding:15px 16px;
+  gap:11px;
+}
+body.modern-mockup .drag-handle{font-size:16px;color:#737993;}
+body.modern-mockup .card-icon{
+  width:44px;
+  height:44px;
+  border-radius:16px;
+  box-shadow:inset 0 1px 0 #ffffff12;
+}
+body.modern-mockup .card-name{
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:800;
+  color:#a8adc3;
+}
+body.modern-mockup .card-value{
+  font-family:'Inter',sans-serif;
+  font-size:24px;
+  font-weight:850;
+  letter-spacing:0;
+  line-height:1.08;
+}
+body.modern-mockup .card-pct{
+  font-size:10px;
+  color:#858ba4;
+}
+body.modern-mockup .card-del-btn,
+body.modern-mockup .card-toggle{
+  color:#7f849d;
+}
+body.modern-mockup .card-inner{padding:0 18px 18px;}
+body.modern-mockup .divider{
+  background:linear-gradient(90deg,transparent,#ffffff14,transparent);
+  margin-bottom:16px;
+}
+body.modern-mockup .chart-card,
+body.modern-mockup .live-wrap,
+body.modern-mockup .diag-card,
+body.modern-mockup .history-card,
+body.modern-mockup .result-box,
+body.modern-mockup .ticker-card{
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(26,29,42,.88),rgba(15,17,26,.92));
+  border-color:#ffffff14;
+  box-shadow:inset 0 1px 0 #ffffff0a;
+}
+body.modern-mockup .chart-card{
+  margin:0 14px 12px;
+  padding:16px;
+}
+body.modern-mockup .ticker-card{
+  border-top-width:1px;
+  border-color:#4ecb8d42;
+  box-shadow:0 10px 26px #00000022, inset 0 1px 0 #ffffff0a;
+}
+body.modern-mockup .input,
+body.modern-mockup input,
+body.modern-mockup select,
+body.modern-mockup textarea{
+  border-radius:15px;
+  background:#1a1d2a;
+  border-color:#ffffff14;
+}
+body.modern-mockup .btn,
+body.modern-mockup .add-section-btn,
+body.modern-mockup .add-liab-btn,
+body.modern-mockup .stock-action-btn,
+body.modern-mockup .crypto-action-btn{
+  border-radius:15px;
+  box-shadow:inset 0 1px 0 #ffffff0b;
+}
+body.modern-mockup .bottom-nav{
+  width:min(386px,calc(100vw - 18px));
+  height:calc(66px + env(safe-area-inset-bottom));
+  bottom:0;
+  padding:7px 10px calc(6px + env(safe-area-inset-bottom));
+  border-radius:26px 26px 0 0;
+  background:linear-gradient(180deg,rgba(18,20,31,.92),rgba(7,8,13,.96));
+  border-color:#ffffff18;
+  box-shadow:0 -16px 42px #00000066, inset 0 1px 0 #ffffff12;
+}
+body.modern-mockup .bottom-nav-btn{
+  height:45px;
+  border-radius:17px;
+}
+body.modern-mockup .bottom-nav-btn:active{background:#ffffff08;}
+body.modern-mockup .bottom-nav-btn.center{
+  margin-top:-20px;
+}
+body.modern-mockup .bottom-nav-btn .bn-label{
+  color:#aeb4c9;
+  font-family:'Inter',sans-serif;
+  font-size:7px;
+  font-weight:700;
+}
+body.modern-mockup .bottom-nav-btn.center .bn-label{color:#fff;}
+body.modern-mockup.theme-light{
+  background:linear-gradient(180deg,#f4f6fb,#eef2f8);
+}
+body.modern-mockup.theme-light .header{
+  background:linear-gradient(180deg,rgba(246,247,251,.96),rgba(246,247,251,.82) 62%,rgba(246,247,251,0));
+}
+body.modern-mockup.theme-light .card,
+body.modern-mockup.theme-light .chart-card,
+body.modern-mockup.theme-light .ticker-card{
+  background:linear-gradient(180deg,#ffffff,#f4f6fb);
+  border-color:#17203316;
+  box-shadow:0 14px 34px #27304a18;
+}
+@media(max-width:390px){
+  body.modern-mockup .header{padding:54px 16px 21px;}
+  body.modern-mockup .total-amount{font-size:clamp(34px,12vw,46px);}
+  body.modern-mockup .cards,
+  body.modern-mockup #customCardsContainer{padding:0 12px;gap:11px;}
+  body.modern-mockup .card{border-radius:21px;}
+  body.modern-mockup .card-header{min-height:72px;padding:13px 14px;}
+  body.modern-mockup .card-icon{width:40px;height:40px;border-radius:14px;}
+  body.modern-mockup .card-value{font-size:21px;}
+  body.modern-mockup .bottom-nav{width:100vw;border-radius:22px 22px 0 0;}
+}
 </style>
 </head>
-<body>
+<body class="modern-mockup">
 <div class="app">
 
 <!-- HEADER -->
