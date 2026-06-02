@@ -973,18 +973,74 @@ body.modern-mockup .bottom-nav-btn .bn-label{
 }
 body.modern-mockup .bottom-nav-btn.center .bn-label{color:#fff;}
 body.modern-mockup.theme-light{
+  --bg:#f4f6fb;
+  --bg2:#ffffff;
+  --bg3:#eef2f8;
+  --card:#ffffff;
+  --border:#17203312;
+  --border2:#17203322;
+  --text:#172033;
+  --muted:#667085;
+  --muted2:#475467;
   background:linear-gradient(180deg,#f4f6fb,#eef2f8);
 }
 body.modern-mockup.theme-light .header{
   background:linear-gradient(180deg,rgba(246,247,251,.96),rgba(246,247,251,.82) 62%,rgba(246,247,251,0));
 }
+body.modern-mockup.theme-light .header-label,
+body.modern-mockup.theme-light .section-label{color:#667085;}
+body.modern-mockup.theme-light .total-amount{
+  background:linear-gradient(135deg,#9a6416 0%,#d69e2e 46%,#5f3d0a 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+}
+body.modern-mockup.theme-light .total-currency{color:#b7791f;}
 body.modern-mockup.theme-light .card,
 body.modern-mockup.theme-light .chart-card,
+body.modern-mockup.theme-light .live-wrap,
+body.modern-mockup.theme-light .diag-card,
+body.modern-mockup.theme-light .history-card,
+body.modern-mockup.theme-light .result-box,
 body.modern-mockup.theme-light .ticker-card{
   background:linear-gradient(180deg,#ffffff,#f4f6fb);
   border-color:#17203316;
   box-shadow:0 14px 34px #27304a18;
 }
+body.modern-mockup.theme-light .live-wrap{
+  background:
+    linear-gradient(180deg,#ffffff,#f1f6ff),
+    radial-gradient(circle at 0 0,#2563eb10,transparent 44%);
+  border-color:#2563eb24;
+}
+body.modern-mockup.theme-light .live-wrap::before{
+  background:radial-gradient(ellipse at top left,#2563eb10 0%,transparent 62%);
+}
+body.modern-mockup.theme-light .live-label,
+body.modern-mockup.theme-light .daily-toggle,
+body.modern-mockup.theme-light .daily-row,
+body.modern-mockup.theme-light .daily-date{color:#475467;}
+body.modern-mockup.theme-light .daily-row{border-bottom-color:#17203312;}
+body.modern-mockup.theme-light .daily-toggle-arrow,
+body.modern-mockup.theme-light .card-toggle,
+body.modern-mockup.theme-light .card-del-btn{color:#667085;}
+body.modern-mockup.theme-light .card-name{color:#475467;}
+body.modern-mockup.theme-light .card-pct{color:#667085;}
+body.modern-mockup.theme-light .divider{background:linear-gradient(90deg,transparent,#17203316,transparent);}
+body.modern-mockup.theme-light .input,
+body.modern-mockup.theme-light input,
+body.modern-mockup.theme-light select,
+body.modern-mockup.theme-light textarea{
+  background:#ffffff;
+  border-color:#1720331f;
+  color:#172033;
+}
+body.modern-mockup.theme-light .bottom-nav{
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(238,242,248,.98));
+  border-color:#17203318;
+  box-shadow:0 -14px 34px #27304a24, inset 0 1px 0 #ffffffcc;
+}
+body.modern-mockup.theme-light .bottom-nav-btn .bn-label{color:#475467;}
+body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
 @media(max-width:390px){
   body.modern-mockup .header{padding:54px 16px 21px;}
   body.modern-mockup .total-amount{font-size:clamp(34px,12vw,46px);}
