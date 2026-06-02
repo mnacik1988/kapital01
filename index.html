@@ -622,11 +622,11 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 
 /* ── STOCK TICKER CARDS ── */
 .ticker-cards{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
-.ticker-card{flex:1;min-width:calc(50% - 4px);background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;transition:border-color .15s;}
-.ticker-card:active{border-color:var(--green);}
+.ticker-card{flex:1;min-width:calc(50% - 4px);background:linear-gradient(135deg,#4ecb8d10,var(--bg3));border:1px solid #4ecb8d42;border-top:2px solid var(--green);border-radius:14px;padding:12px;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+.ticker-card:active{border-color:var(--green);box-shadow:0 0 0 1px #4ecb8d55;}
 .ticker-card-head{display:flex;justify-content:space-between;align-items:center;}
 .ticker-card-sym{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--green2);}
-.ticker-card-qty{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:var(--bg);padding:2px 6px;border-radius:8px;}
+.ticker-card-qty{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);font-weight:700;background:var(--bg);padding:2px 6px;border-radius:8px;box-shadow:inset 0 0 0 1px #ffffff10;}
 .ticker-card-name{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .ticker-card-price{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;margin-top:6px;}
 .ticker-card-pnl{font-family:'DM Mono',monospace;font-size:10px;margin-top:2px;}
@@ -643,7 +643,7 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .stock-add-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);flex:0 0 auto;}
 .stock-add-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px;}
 .stock-action-row{display:flex;gap:6px;margin-bottom:8px;}
-.stock-action-btn{flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:transparent;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;}
+.stock-action-btn{flex:1;padding:11px;border-radius:10px;border:1px solid #4ecb8d70;background:#4ecb8d12;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;}
 
 /* ── STOCK DETAIL MODAL ── */
 .stock-detail-overlay{position:fixed;inset:0;background:#000000cc;z-index:520;display:none;align-items:flex-end;}
@@ -3857,7 +3857,7 @@ function getSecCardHtml(s,idx){
       return `<div class="ticker-card" onclick="openStockDetail('${s.id}','${key.replace(/'/g,"\\'")}')">
         <div class="ticker-card-head">
           <span class="ticker-card-sym">${g.ticker||'—'}</span>
-          <span class="ticker-card-qty">${totalQty} шт</span>
+          <span class="ticker-card-qty">${fmtMax2(totalQty)} шт</span>
         </div>
         <div class="ticker-card-name">${g.name}</div>
         <div class="ticker-card-price" style="color:${pnlCol}">${sym}${fmtN(toDisplayCurr(curVal))}</div>
@@ -3913,12 +3913,11 @@ function getSecCardHtml(s,idx){
         <div class="calc-title">${lang.addSecItem}</div>
         <div class="ticker-search-row">
           <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="${t('secTicker')}">
-          <button class="ticker-fetch-btn" id="fetchBtn_${s.id}" onclick="fetchTickerForInput('${s.id}')">🔍 Отримати ціну</button>
+          <button class="ticker-fetch-btn" id="fetchBtn_${s.id}" onclick="fetchTickerForInput('${s.id}')">${t('secFetchBtn')}</button>
         </div>
         <div class="stock-price-info" id="stockInfo_${s.id}"></div>
         <div class="stock-action-row">
           <button class="stock-action-btn" id="secTypeBuy_${s.id}" onclick="openSecAddPopup('${s.id}','buy')">${uiText('stockAddAction')}</button>
-          <button class="stock-action-btn" id="secTypeSell_${s.id}" onclick="openSecAddPopup('${s.id}','sell')">${uiText('stockRemoveAction')}</button>
         </div>
         <input type="hidden" id="secTradeType_${s.id}" value="buy">
       </div>
@@ -4587,6 +4586,27 @@ function sellCrypto(coinKey){
 const FFLAGS={EUR:'🇪🇺',GBP:'🇬🇧',PLN:'🇵🇱',CHF:'🇨🇭',CZK:'🇨🇿',RUB:'🇷🇺',KZT:'🇰🇿',OTHER:'🌐'};
 const FSYM  ={EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',OTHER:'?'};
 // ── STOCK DETAIL MODAL ────────────────────────
+function stockDetailTxt(key){
+  const dict={
+    value:{uk:'Вартість',ru:'Стоимость',en:'Value',de:'Wert',zh:'价值'},
+    qty:{uk:'Кількість',ru:'Количество',en:'Quantity',de:'Menge',zh:'数量'},
+    price:{uk:'Ціна',ru:'Цена',en:'Price',de:'Preis',zh:'价格'},
+    avg:{uk:'Ø Середня',ru:'Ø Средняя',en:'Ø Average',de:'Ø Durchschnitt',zh:'Ø 平均'},
+    divMonth:{uk:'Дивід./міс',ru:'Дивид./мес',en:'Div./mo',de:'Div./Monat',zh:'股息/月'},
+    trades:{uk:'📋 Угоди',ru:'📋 Сделки',en:'📋 Trades',de:'📋 Transaktionen',zh:'📋 交易'},
+    buy:{uk:'📈 Купівля',ru:'📈 Добавление',en:'📈 Add',de:'📈 Hinzufügen',zh:'📈 添加'},
+    sell:{uk:'📉 Продаж',ru:'📉 Продажа',en:'📉 Sale',de:'📉 Verkauf',zh:'📉 卖出'},
+    sellTitle:{uk:'📉 Продати',ru:'📉 Продать',en:'📉 Sell',de:'📉 Verkaufen',zh:'📉 卖出'},
+    saleCurrency:{uk:'Валюта продажу',ru:'Валюта продажи',en:'Sale currency',de:'Verkaufswährung',zh:'卖出货币'},
+    confirmSale:{uk:'📉 Підтвердити продаж',ru:'📉 Подтвердить продажу',en:'📉 Confirm sale',de:'📉 Verkauf bestätigen',zh:'📉 确认卖出'},
+    cancel:{uk:'Скасувати',ru:'Отмена',en:'Cancel',de:'Abbrechen',zh:'取消'},
+    specifySellQty:{uk:'Вкажіть кількість для продажу',ru:'Укажите количество для продажи',en:'Enter quantity to sell',de:'Verkaufsmenge eingeben',zh:'输入卖出数量'},
+    cannotSellMore:{uk:'Не можна продати більше ніж є',ru:'Нельзя продать больше, чем есть',en:'Cannot sell more than owned',de:'Mehr verkaufen als vorhanden ist nicht möglich',zh:'不能卖出超过持有数量'},
+    sold:{uk:'Продано',ru:'Продано',en:'Sold',de:'Verkauft',zh:'已卖出'},
+    addedCash:{uk:'Суму додано до кешу акцій',ru:'Сумма добавлена в деньги от продажи акций',en:'Amount added to stock sale cash',de:'Betrag zu Aktien-Verkaufserlösen hinzugefügt',zh:'金额已加入股票卖出资金'}
+  };
+  return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
+}
 function openStockDetail(secId, tickerKey){
   const sec=securitiesSections.find(s=>s.id===secId);
   if(!sec)return;
@@ -4614,22 +4634,22 @@ function openStockDetail(secId, tickerKey){
 
   document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+ticker+'</span> '+name;
   let html='<div class="stock-detail-grid">'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal))+'</div><div class="stock-detail-stat-lbl">Вартість</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+totalQty+' шт</div><div class="stock-detail-stat-lbl">Кількість</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(curPrice))+'</div><div class="stock-detail-stat-lbl">Ціна</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(avgBuy))+'</div><div class="stock-detail-stat-lbl">Ø Середня</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('value')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtMax2(totalQty)+' шт</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('qty')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(curPrice))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('price')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(avgBuy))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('avg')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">Дивід./міс</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('divMonth')+'</div></div>'+
     '</div>';
 
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">📋 Угоди ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=stockNum(t.qty);
     const bp=stockNum(t.buyPrice);
     const isSell=qty<0||(t.tradeType==='sell');
     html+='<div class="stock-detail-trade"><div>'+
-      '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?'📉 Продаж':'📈 Купівля')+' '+Math.abs(qty)+' шт</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?stockDetailTxt('sell'):stockDetailTxt('buy'))+' '+fmtMax2(Math.abs(qty))+' шт</div>'+
       '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+sym+fmtN(toDisplayCurr(bp)):'—')+'</div>'+
       '</div><button class="rm-btn" onclick="removeSecItem(\''+secId+'\','+t.origIdx+');closeStockDetail()">×</button></div>';
   });
@@ -4637,15 +4657,15 @@ function openStockDetail(secId, tickerKey){
   html+='</div>'; // close collapsible trades
 
   html+='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
-    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📉 Продати</div>'+
-    '<div class="row2"><div class="field-group"><div class="field-label">Кількість</div>'+
-    '<input class="field-input" type="text" id="sellQty_detail" placeholder="'+totalQty+'" inputmode="decimal" value="'+totalQty+'"></div>'+
-    '<div class="field-group"><div class="field-label">Ціна (₴)</div>'+
-    '<input class="field-input" type="text" id="sellPrice_detail" placeholder="'+curPrice+'" inputmode="decimal" value="'+curPrice+'"></div></div>'+
-    '<div class="field-group"><div class="field-label">Валюта продажу</div>'+
+    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">'+stockDetailTxt('sellTitle')+'</div>'+
+    '<div class="row2"><div class="field-group"><div class="field-label">'+stockDetailTxt('qty')+'</div>'+
+    '<input class="field-input" type="text" id="sellQty_detail" placeholder="'+fmtMax2(totalQty)+'" inputmode="decimal" value="'+fmtMax2(totalQty)+'"></div>'+
+    '<div class="field-group"><div class="field-label">'+stockDetailTxt('price')+' (₴)</div>'+
+    '<input class="field-input" type="text" id="sellPrice_detail" placeholder="'+fmtMax2(curPrice)+'" inputmode="decimal" value="'+fmtMax2(curPrice)+'"></div></div>'+
+    '<div class="field-group"><div class="field-label">'+stockDetailTxt('saleCurrency')+'</div>'+
     '<select class="field-input" id="sellCurrency_detail">'+saleCurrencyOptions+'</select></div>'+
-    '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">📉 Підтвердити продаж</button>'+
-    '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">Скасувати</button></div>';
+    '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">'+stockDetailTxt('confirmSale')+'</button>'+
+    '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">'+stockDetailTxt('cancel')+'</button></div>';
 
   document.getElementById('stockDetailContent').innerHTML=html;
   document.getElementById('stockDetailOverlay').classList.add('open');
@@ -4654,14 +4674,14 @@ function closeStockDetail(){document.getElementById('stockDetailOverlay').classL
 function sellStock(secId,tickerKey,refIdx){
   const sec=securitiesSections.find(s=>s.id===secId);if(!sec)return;
   const qty=parseInputNumber(document.getElementById('sellQty_detail')?.value);
-  const price=parseInputNumber(document.getElementById('sellPrice_detail')?.value);
+  const price=roundMoney(parseInputNumber(document.getElementById('sellPrice_detail')?.value));
   const saleCurrency=String(document.getElementById('sellCurrency_detail')?.value||getStockCashCurrency(sec)).toUpperCase();
-  if(!qty||qty<=0){alert('Вкажіть кількість для продажу');return;}
+  if(!qty||qty<=0){alert(stockDetailTxt('specifySellQty'));return;}
   // Check can't sell more than owned
   const items=sec.items.map((it,j)=>({...it,origIdx:j}));
   const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
   const ownedQty=group.reduce((s,t)=>s+stockNum(t.qty),0);
-  if(qty>ownedQty){alert('Не можна продати більше ніж є: '+ownedQty+' шт');return;}
+  if(qty>ownedQty){alert(stockDetailTxt('cannotSellMore')+': '+fmtMax2(ownedQty)+' шт');return;}
   customConfirm('Продати '+fmtMax2(qty)+' шт по '+getStockCurrencySymbol(saleCurrency)+fmtMax2(price)+'?', function(){
     const ref=sec.items[refIdx];
     sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency,liveOrigPrice:ref?.liveOrigPrice,divYield:ref?.divYield,div:ref?.div,divAbs:ref?.divAbs||0});
@@ -4672,7 +4692,7 @@ function sellStock(secId,tickerKey,refIdx){
     }
     closeStockDetail();renderSecuritiesCards();updateAll();saveData();
     if(totalProfit>0){
-      alert('📈 Продано '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(totalProfit)+'\n\n💵 Суму додано до кешу акцій');
+      alert('📈 '+stockDetailTxt('sold')+' '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(totalProfit)+'\n\n💵 '+stockDetailTxt('addedCash'));
     }
   });
 }
@@ -7394,9 +7414,24 @@ function sectionPerfTxt(key){
     day:{uk:'День',ru:'День',en:'Day',de:'Tag',zh:'日'},
     d7:{uk:'7д',ru:'7д',en:'7d',de:'7T',zh:'7天'},
     d30:{uk:'30д',ru:'30д',en:'30d',de:'30T',zh:'30天'},
+    insufficient:{uk:'недостатньо історії',ru:'недостаточно истории',en:'not enough history',de:'zu wenig Verlauf',zh:'历史不足'},
     empty:{uk:'Поки недостатньо історії цін для порівняння акцій/криптовалюти.',ru:'Пока недостаточно истории цен для сравнения акций/криптовалюты.',en:'Not enough price history yet to compare stocks/crypto.',de:'Noch nicht genug Preisverlauf für Aktien/Krypto.',zh:'价格历史不足，暂无法比较股票/加密资产。'},
     stocks:{uk:'Акції',ru:'Акции',en:'Stocks',de:'Aktien',zh:'股票'},
-    crypto:{uk:'Криптовалюта',ru:'Криптовалюта',en:'Crypto',de:'Krypto',zh:'加密资产'}
+    crypto:{uk:'Криптовалюта',ru:'Криптовалюта',en:'Crypto',de:'Krypto',zh:'加密资产'},
+    deposits:{uk:'Депозити',ru:'Депозиты',en:'Deposits',de:'Einlagen',zh:'存款'},
+    currency:{uk:'Валюта',ru:'Валюта',en:'Currency',de:'Währung',zh:'货币'},
+    cash:{uk:'Готівка',ru:'Наличные',en:'Cash',de:'Bargeld',zh:'现金'},
+    account:{uk:'Рахунок',ru:'Счёт',en:'Account',de:'Konto',zh:'账户'},
+    metals:{uk:'Метали',ru:'Металлы',en:'Metals',de:'Metalle',zh:'贵金属'},
+    other:{uk:'Інше',ru:'Другое',en:'Other',de:'Andere',zh:'其他'},
+    statsPeriod:{uk:'📅 Статистика за період',ru:'📅 Статистика за период',en:'📅 Period statistics',de:'📅 Zeitraumstatistik',zh:'📅 周期统计'},
+    today:{uk:'Сьогодні',ru:'Сегодня',en:'Today',de:'Heute',zh:'今天'},
+    last7:{uk:'За 7 днів',ru:'За 7 дней',en:'Last 7 days',de:'Letzte 7 Tage',zh:'过去 7 天'},
+    last30:{uk:'За 30 днів',ru:'За 30 дней',en:'Last 30 days',de:'Letzte 30 Tage',zh:'过去 30 天'},
+    assetsDist:{uk:'📊 Розподіл активів',ru:'📊 Распределение активов',en:'📊 Asset distribution',de:'📊 Vermögensverteilung',zh:'📊 资产分布'},
+    portfolioValue:{uk:'Вартість портфелю',ru:'Стоимость портфеля',en:'Portfolio value',de:'Portfoliowert',zh:'组合价值'},
+    buyValue:{uk:'Вартість покупки',ru:'Стоимость покупки',en:'Purchase value',de:'Kaufwert',zh:'买入价值'},
+    profitLoss:{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'盈亏'}
   };
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
 }
@@ -7564,19 +7599,19 @@ function renderDiagnostics(){
 
   // Asset distribution
   const assets=[
-    {name:'Депозити',val:dep,color:'var(--blue2)',icon:'🏦'},
-    {name:'Крипто',val:crypto,color:'var(--purple2)',icon:'₮'},
+    {name:sectionPerfTxt('deposits'),val:dep,color:'var(--blue2)',icon:'🏦'},
+    {name:sectionPerfTxt('crypto'),val:crypto,color:'var(--purple2)',icon:'₮'},
     {name:'USD',val:usd,color:'var(--teal2)',icon:'💵'},
-    {name:'Валюта',val:forex,color:'var(--orange2)',icon:'🌐'},
-    {name:'Готівка',val:cash,color:'var(--gold2)',icon:'💴'},
-    {name:'Рахунок',val:other,color:'var(--green2)',icon:'💳'},
-    {name:'Акції',val:securities,color:'var(--green2)',icon:'📈'},
-    {name:'Метали',val:metals,color:'var(--gold2)',icon:'💎'},
-    {name:'Інше',val:custom,color:'var(--purple2)',icon:'✏️'},
+    {name:sectionPerfTxt('currency'),val:forex,color:'var(--orange2)',icon:'🌐'},
+    {name:sectionPerfTxt('cash'),val:cash,color:'var(--gold2)',icon:'💴'},
+    {name:sectionPerfTxt('account'),val:other,color:'var(--green2)',icon:'💳'},
+    {name:sectionPerfTxt('stocks'),val:securities,color:'var(--green2)',icon:'📈'},
+    {name:sectionPerfTxt('metals'),val:metals,color:'var(--gold2)',icon:'💎'},
+    {name:sectionPerfTxt('other'),val:custom,color:'var(--purple2)',icon:'✏️'},
   ].filter(a=>a.val>0).sort((a,b)=>b.val-a.val);
 
   const fmtChange=(stat,pMaybe)=>{
-    if(stat===null||stat===undefined)return '<span style="color:var(--muted2)">недостатньо історії</span>';
+    if(stat===null||stat===undefined)return '<span style="color:var(--muted2)">'+sectionPerfTxt('insufficient')+'</span>';
     const v=typeof stat==='object'?stat.change:stat;
     const p=typeof stat==='object'?stat.pct:(pMaybe||0);
     const sign=v>=0?'+':'';
@@ -7621,10 +7656,10 @@ function renderDiagnostics(){
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">📅 Статистика за період</div>
-      <div class="diag-row"><span class="diag-row-key">Сьогодні</span><span class="diag-row-val">${fmtChange(dailyChange,dailyChangePct)}</span></div>
-      <div class="diag-row"><span class="diag-row-key">За 7 днів</span><span class="diag-row-val">${fmtChange(weekStats)}</span></div>
-      <div class="diag-row"><span class="diag-row-key">За 30 днів</span><span class="diag-row-val">${fmtChange(monthStats)}</span></div>
+      <div class="diag-section-title">${sectionPerfTxt('statsPeriod')}</div>
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('today')}</span><span class="diag-row-val">${fmtChange(dailyChange,dailyChangePct)}</span></div>
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('last7')}</span><span class="diag-row-val">${fmtChange(weekStats)}</span></div>
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('last30')}</span><span class="diag-row-val">${fmtChange(monthStats)}</span></div>
     </div>
 
     <div class="diag-section">
@@ -7634,7 +7669,7 @@ function renderDiagnostics(){
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">📊 Розподіл активів</div>
+      <div class="diag-section-title">${sectionPerfTxt('assetsDist')}</div>
       ${assets.map(a=>`
         <div class="diag-row">
           <span class="diag-row-key">${a.icon} ${a.name}</span>
@@ -7645,11 +7680,11 @@ function renderDiagnostics(){
   // Stocks P&L section
   if(totalSecVal>0){
     html+=`<div class="diag-section">
-      <div class="diag-section-title">📈 Акції — P&L</div>
-      <div class="diag-row"><span class="diag-row-key">Вартість портфелю</span><span class="diag-row-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(totalSecVal))}</span></div>
+      <div class="diag-section-title">📈 ${sectionPerfTxt('stocks')} — P&L</div>
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('portfolioValue')}</span><span class="diag-row-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(totalSecVal))}</span></div>
       ${totalSecBuyCost>0?`
-      <div class="diag-row"><span class="diag-row-key">Вартість покупки</span><span class="diag-row-val">${sym}${fmtN(toDisplayCurr(totalSecBuyCost))}</span></div>
-      <div class="diag-row"><span class="diag-row-key">Прибуток / Збиток</span><span class="diag-row-val" style="color:${secPnl>=0?'var(--green2)':'var(--red)'}">${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(Math.abs(secPnl)))} (${secPnl>=0?'+':''}${secPnlPct.toFixed(1)}%)</span></div>`:''}
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('buyValue')}</span><span class="diag-row-val">${sym}${fmtN(toDisplayCurr(totalSecBuyCost))}</span></div>
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('profitLoss')}</span><span class="diag-row-val" style="color:${secPnl>=0?'var(--green2)':'var(--red)'}">${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(Math.abs(secPnl)))} (${secPnl>=0?'+':''}${secPnlPct.toFixed(1)}%)</span></div>`:''}
     </div>`;
   }
 
