@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-21-soft-bg-gradient-v3';
+const CACHE_NAME = 'kapital-app-v0-0-21-ios-pwa-safearea-v1';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
