@@ -1349,6 +1349,57 @@ body.dashboard-mockup.theme-light .bottom-nav-btn .bn-label{color:#475467;}
   body.dashboard-mockup .card-value{font-size:22px;}
   body.dashboard-mockup .bottom-nav{width:calc(100vw - 18px);}
 }
+/* Mobile performance test mode: keep the design, reduce expensive paint work. */
+@media(max-width:520px), (pointer:coarse){
+  body,
+  body.modern-mockup,
+  body.modern-mockup.theme-light{
+    background-attachment:scroll;
+  }
+  body::before{
+    opacity:.22;
+  }
+  .header,
+  .bottom-nav{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+  body.modern-mockup .header{
+    box-shadow:0 10px 24px #00000024;
+  }
+  body.modern-mockup .card{
+    box-shadow:0 10px 24px #00000028, inset 0 1px 0 #ffffff0a;
+  }
+  body.modern-mockup .chart-card,
+  body.modern-mockup .live-wrap,
+  body.modern-mockup .diag-card,
+  body.modern-mockup .history-card,
+  body.modern-mockup .result-box,
+  body.modern-mockup .ticker-card{
+    box-shadow:inset 0 1px 0 #ffffff08;
+  }
+  body.modern-mockup .bottom-nav{
+    box-shadow:0 -8px 22px #00000044, inset 0 1px 0 #ffffff10;
+    background:linear-gradient(180deg,rgba(18,20,31,.98),rgba(7,8,13,.99));
+  }
+  body.modern-mockup.theme-light .bottom-nav{
+    box-shadow:0 -8px 20px #27304a18, inset 0 1px 0 #ffffffcc;
+    background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(238,242,248,.99));
+  }
+  .card-sparkline path{
+    filter:none;
+  }
+  .card-sparkline:empty::before{
+    box-shadow:none;
+  }
+  .bottom-nav-icon,
+  .bottom-nav-btn.center .bottom-nav-icon{
+    filter:none;
+  }
+  .bottom-nav-btn.center .bn-icon{
+    box-shadow:none;
+  }
+}
 </style>
 </head>
 <body class="modern-mockup">
