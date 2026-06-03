@@ -95,7 +95,8 @@ body.theme-light .header{background:linear-gradient(180deg,#f6f7fb 0%,#f6f7fbcc 
 .card-sparkline{width:76px;height:44px;flex:0 0 76px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.95;}
 .card-sparkline:empty::before{content:'';width:58px;height:3px;border-radius:999px;background:currentColor;opacity:.55;box-shadow:0 0 8px currentColor;}
 .card-sparkline svg{width:76px;height:44px;display:block;overflow:visible;}
-.card-sparkline path{fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px currentColor);}
+.card-sparkline path{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px currentColor);}
+.card-sparkline .spark-grid line{stroke:currentColor;stroke-width:.6;opacity:.18;}
 .card-sparkline.flat{opacity:.45;}
 .card-del-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:color .15s,background .15s;flex-shrink:0;}
 .card-del-btn:hover{color:var(--red);background:#f8717115;}
@@ -1060,7 +1061,7 @@ body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
   body.modern-mockup .card-value{font-size:21px;}
   body.modern-mockup .card-sparkline{width:62px;height:38px;flex-basis:62px;}
   body.modern-mockup .card-sparkline svg{width:62px;height:38px;}
-  body.modern-mockup .card-sparkline path{stroke-width:3.4;}
+  body.modern-mockup .card-sparkline path{stroke-width:2.1;}
   body.modern-mockup .bottom-nav{width:100vw;border-radius:22px 22px 0 0;}
 }
 /* DASHBOARD MOCKUP V1 - second reversible visual direction */
@@ -7547,6 +7548,7 @@ function getCustomSparklineKey(section){
 }
 const HOURLY_SPARKLINE_KEYS=['crypto','stocks','bonds','ovdp','metals','forex','usd','startups','business','custom','debts'];
 const DAILY_SPARKLINE_KEYS=['deposits','cash','account'];
+const SPARKLINE_POINT_LIMIT=12;
 let sectionHourlyHistoryLoaded=false;
 let _sectionHourlyRecordTimer=null;
 function getLocalHourKey(date=new Date()){
@@ -7630,7 +7632,7 @@ function getSparklineSeries(key){
     const cur=Number(current.value);
     if(!series.length||Math.abs(series[series.length-1]-cur)>0.0001)series.push(cur);
   }
-  return series.slice(-14);
+  return series.slice(-SPARKLINE_POINT_LIMIT);
 }
 function getCardSparklineHtml(key){
   const series=getSparklineSeries(key);
@@ -7646,10 +7648,15 @@ function getCardSparklineHtml(key){
     return [x,y];
   });
   const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const tickCount=Math.max(SPARKLINE_POINT_LIMIT,values.length);
+  const ticks=Array.from({length:tickCount},(_,i)=>{
+    const x=pad+(i*(w-pad*2)/Math.max(1,tickCount-1));
+    return `<line x1="${x.toFixed(1)}" y1="${pad}" x2="${x.toFixed(1)}" y2="${h-pad}"></line>`;
+  }).join('');
   const delta=values[values.length-1]-values[0];
   const flat=Math.abs(delta)<0.01;
   const color=flat?'var(--muted2)':(key==='debts'?delta<=0?'var(--green2)':'var(--red)':delta>=0?'var(--green2)':'var(--red)');
-  return `<div class="card-sparkline${flat?' flat':''}" data-spark-key="${key}" style="color:${color}"><svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}"></path></svg></div>`;
+  return `<div class="card-sparkline${flat?' flat':''}" data-spark-key="${key}" style="color:${color}"><svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><g class="spark-grid">${ticks}</g><path d="${d}"></path></svg></div>`;
 }
 function refreshCardSparklines(){
   const keys=['deposits','crypto','usd','forex','cash','account','stocks','bonds','ovdp','metals','startups','business','custom','debts'];
