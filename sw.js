@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-21-stable-crypto-refresh-v2';
+const CACHE_NAME = 'kapital-app-v0-0-21-stable-stock-card-border-v1';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
