@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#100d09">
+<meta name="theme-color" content="#07192d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Капітал">
@@ -19,7 +19,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--card:#16161f;
-  --app-bg-gradient:radial-gradient(circle at 88% 7%,#e8c97a20 0%,transparent 31%),radial-gradient(circle at 8% 62%,#b7791f14 0%,transparent 35%),linear-gradient(180deg,#0d0b0a 0%,#100d0a 38%,#0b0a0b 74%,#08080d 100%);
+  --app-bg-gradient:radial-gradient(circle at 86% 8%,#38bdf84d 0%,#0ea5e926 24%,transparent 46%),radial-gradient(circle at 4% 58%,#2563eb3d 0%,#0284c71f 30%,transparent 50%),linear-gradient(180deg,#071426 0%,#071b30 40%,#07111f 74%,#05080f 100%);
   --border:#ffffff0f;--border2:#ffffff1a;
   --text:#f0f0f8;--muted:#6b6b80;--muted2:#9090a8;
   --gold:#e8c97a;--gold2:#f5dfa0;
@@ -32,7 +32,7 @@
 }
 body.theme-light{
   --bg:#f6f7fb;--bg2:#ffffff;--bg3:#edf1f7;--card:#ffffff;
-  --app-bg-gradient:radial-gradient(circle at 88% 7%,#d69e2e24 0%,transparent 31%),radial-gradient(circle at 8% 62%,#e8c97a20 0%,transparent 36%),linear-gradient(180deg,#fffdf8 0%,#f8f3e9 45%,#f8f8f6 100%);
+  --app-bg-gradient:radial-gradient(circle at 86% 8%,#38bdf847 0%,transparent 42%),radial-gradient(circle at 4% 58%,#60a5fa3d 0%,transparent 48%),linear-gradient(180deg,#f4fbff 0%,#e5f4ff 48%,#f4f9fd 100%);
   --border:#17203312;--border2:#17203322;
   --text:#172033;--muted:#667085;--muted2:#475467;
   --gold:#b7791f;--gold2:#d69e2e;
@@ -56,8 +56,8 @@ body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:env(safe-ar
 .lang-btn.active{background:var(--bg3);color:var(--text);}
 
 /* HEADER */
-.header{padding:56px 20px 20px;padding-right:20px;background:linear-gradient(180deg,#100d09f5 0%,#100d09d0 58%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
-body.theme-light .header{background:linear-gradient(180deg,#fffaf0f5 0%,#fffaf0d0 55%,transparent 100%);}
+.header{padding:56px 20px 20px;padding-right:20px;background:linear-gradient(180deg,#07192df5 0%,#07192dd8 58%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd8 55%,transparent 100%);}
 .header-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
 .header-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
 .total-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0;overflow:visible;padding-bottom:2px;}
@@ -154,6 +154,13 @@ input,textarea,select{
 }
 input[type="number"].field-input{-webkit-appearance:none;appearance:none;}
 .field-input:focus{border-color:var(--green);}
+.local-date-wrap{position:relative;min-width:0;}
+.local-date-wrap .field-input{position:relative;z-index:1;background:transparent;}
+.local-date-wrap::after{content:attr(data-date-placeholder);position:absolute;z-index:0;left:14px;top:50%;transform:translateY(-50%);font:500 12px 'DM Mono',monospace;color:var(--muted2);pointer-events:none;}
+.local-date-wrap:has(input:valid)::after{display:none;}
+.local-date-wrap input:invalid::-webkit-datetime-edit{color:transparent;}
+.local-date-wrap input:focus::-webkit-datetime-edit{color:var(--text);}
+.local-date-wrap:focus-within::after{display:none;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
@@ -571,6 +578,9 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .diag-history-btn{width:100%;height:100%;min-height:78px;background:linear-gradient(135deg,#5b9cf616,#4ecb8d10);border:1px dashed #5b9cf660;border-radius:14px;padding:12px;text-align:center;cursor:pointer;color:var(--text);}
 .diag-history-btn:active{opacity:.75;}
 .diag-history-btn .diag-stat-val{color:var(--blue2);font-size:18px;}
+.diag-passive-banner{grid-column:1/-1;background:linear-gradient(135deg,var(--bg3),#1a1a2e);border:1px solid #e8c97a30;}
+body.theme-light .diag-passive-banner{background:linear-gradient(135deg,#fff9e8,#f3ead2);border-color:#b7791f38;box-shadow:inset 0 1px 0 #ffffffa8;}
+body.theme-light .diag-passive-banner .diag-stat-lbl{color:#667085;}
 .history-overlay{position:fixed;inset:0;background:#000000cc;z-index:620;display:none;align-items:flex-end;}
 .history-overlay.open{display:flex;}
 .history-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
@@ -653,6 +663,9 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 /* ── STOCK DETAIL MODAL ── */
 .stock-detail-overlay{position:fixed;inset:0;background:#000000cc;z-index:520;display:none;align-items:flex-end;}
 body.theme-light .modal-overlay,
+body.theme-light .calc-overlay,
+body.theme-light .crypto-add-overlay,
+body.theme-light .stock-add-overlay,
 body.theme-light .settings-overlay,
 body.theme-light .diag-overlay,
 body.theme-light .history-overlay,
@@ -662,6 +675,20 @@ body.theme-light .privacy-overlay,
 body.theme-light .paywall-overlay,
 body.theme-light .trial-overlay{background:#17203366;}
 body.theme-light::before{opacity:.18;}
+.custom-dialog-overlay{position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;}
+.custom-dialog-box{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;box-shadow:0 20px 60px #00000055;}
+.custom-dialog-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.45;white-space:pre-line;}
+.custom-dialog-message{font-family:'DM Mono',monospace;font-size:13px;color:var(--text);margin-bottom:16px;line-height:1.5;white-space:pre-line;}
+.custom-dialog-input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:'DM Mono',monospace;font-size:14px;box-sizing:border-box;margin-bottom:12px;}
+.custom-dialog-input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d20;}
+.custom-dialog-actions{display:flex;gap:8px;}
+.custom-dialog-cancel,.custom-dialog-ok{flex:1;padding:10px;border-radius:12px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;}
+.custom-dialog-cancel{border:1px solid var(--border);background:transparent;color:var(--muted2);}
+.custom-dialog-ok{border:none;background:var(--green);color:#07120c;font-weight:700;}
+body.theme-light .custom-dialog-overlay{background:#17203366;}
+body.theme-light .custom-dialog-box{box-shadow:0 20px 60px #27304a2e;}
+body.theme-light .custom-dialog-input{background:#edf1f7;color:#172033;}
+body.theme-light .trial-box > div[style*="color:#fff"]{color:var(--text)!important;}
 .stock-detail-overlay.open{display:flex;}
 .stock-detail-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .stock-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
@@ -818,9 +845,9 @@ body.modern-mockup{
   --bg2:#10131c;
   --bg3:#191d2a;
   background:
-    radial-gradient(circle at 82% 5%,rgba(245,223,160,.30) 0%,rgba(232,201,122,.12) 22%,transparent 44%),
-    radial-gradient(circle at 4% 55%,rgba(183,121,31,.24) 0%,rgba(183,121,31,.07) 28%,transparent 48%),
-    linear-gradient(180deg,#171109 0%,#130f0a 38%,#0d0b0b 72%,#070709 100%);
+    radial-gradient(circle at 82% 5%,rgba(56,189,248,.42) 0%,rgba(14,165,233,.18) 24%,transparent 48%),
+    radial-gradient(circle at 4% 55%,rgba(37,99,235,.34) 0%,rgba(2,132,199,.12) 30%,transparent 52%),
+    linear-gradient(180deg,#07182c 0%,#072239 38%,#081522 72%,#05080f 100%);
   background-attachment:fixed;
 }
 body.modern-mockup::before{opacity:.28;}
@@ -829,8 +856,8 @@ body.modern-mockup .header{
   margin:0 0 12px;
   padding:60px 18px 24px;
   background:
-    linear-gradient(180deg,rgba(22,16,9,.96),rgba(19,14,9,.82) 62%,rgba(15,11,8,0)),
-    radial-gradient(circle at 76% 8%,rgba(245,223,160,.25),transparent 40%);
+    linear-gradient(180deg,rgba(6,25,46,.97),rgba(6,25,46,.84) 62%,rgba(5,18,33,0)),
+    radial-gradient(circle at 76% 8%,rgba(56,189,248,.36),transparent 44%);
   border-bottom:1px solid #ffffff0b;
   box-shadow:0 18px 42px #00000038;
 }
@@ -992,13 +1019,13 @@ body.modern-mockup.theme-light{
   --muted:#667085;
   --muted2:#475467;
   background:
-    radial-gradient(circle at 84% 6%,rgba(214,158,46,.25) 0%,transparent 42%),
-    radial-gradient(circle at 4% 58%,rgba(232,201,122,.22) 0%,transparent 46%),
-    linear-gradient(180deg,#fffaf0 0%,#f8f0df 48%,#f8f6f1 100%);
+    radial-gradient(circle at 84% 6%,rgba(56,189,248,.30) 0%,transparent 44%),
+    radial-gradient(circle at 4% 58%,rgba(96,165,250,.26) 0%,transparent 50%),
+    linear-gradient(180deg,#f3fbff 0%,#e3f3ff 48%,#f4f9fd 100%);
   background-attachment:fixed;
 }
 body.modern-mockup.theme-light .header{
-  background:linear-gradient(180deg,rgba(255,250,240,.97),rgba(255,248,232,.86) 62%,rgba(255,248,232,0));
+  background:linear-gradient(180deg,rgba(241,250,255,.98),rgba(229,246,255,.88) 62%,rgba(229,246,255,0));
 }
 body.modern-mockup.theme-light .header-label,
 body.modern-mockup.theme-light .section-label{color:#667085;}
@@ -1390,21 +1417,31 @@ body.modern-mockup .card-value{
 .balance-list-btn.minus{color:var(--orange2);}
 .balance-list-btn.delete{flex:0 0 30px;color:var(--red);}
 .usdt-balance-card{
+  position:relative;
+  width:100%;
+  min-width:0;
   border:1px solid var(--border);
   border-top:2px solid var(--purple);
-  border-radius:16px;
-  padding:14px;
+  border-radius:14px;
+  padding:12px;
   margin-bottom:12px;
-  background:linear-gradient(135deg,#a78bfa10,var(--bg3));
-  cursor:pointer;
+  background:linear-gradient(135deg,#a78bfa12,var(--bg3));
+  box-shadow:inset 0 1px 0 #a78bfa12;
 }
-.usdt-balance-card:active{border-color:var(--purple);box-shadow:0 0 0 1px #a78bfa45;}
-.usdt-balance-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
-.usdt-balance-title{font:800 10px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);}
-.usdt-balance-main{font:850 22px 'Inter',sans-serif;color:var(--purple2);margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.usdt-balance-equiv{font:700 12px 'DM Mono',monospace;color:var(--green2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.usdt-balance-rate{font:9px 'DM Mono',monospace;color:var(--muted);margin-top:5px;}
-.usdt-balance-edit{flex:0 0 auto;border:1px solid var(--border2);border-radius:9px;padding:6px 8px;color:var(--purple2);font:700 9px 'DM Mono',monospace;background:var(--bg2);}
+.usdt-balance-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;}
+.usdt-balance-info{min-width:0;flex:1;}
+.usdt-balance-title{display:flex;align-items:center;gap:7px;font:800 11px 'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--purple2);}
+.usdt-balance-main{font:850 20px 'Inter',sans-serif;color:var(--text);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.usdt-balance-equiv{font:700 11px 'DM Mono',monospace;color:var(--purple2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.usdt-balance-rate{flex:0 0 auto;max-width:42%;font:8px 'DM Mono',monospace;color:var(--muted);line-height:1.45;text-align:right;margin-top:2px;}
+.usdt-balance-actions{display:flex;gap:5px;margin-top:10px;}
+.usdt-balance-btn{flex:1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--purple2);font:800 12px 'DM Mono',monospace;padding:6px;cursor:pointer;}
+.usdt-balance-btn:active{border-color:var(--purple);background:#a78bfa18;}
+.usdt-balance-btn.rate{flex:0 0 42px;color:var(--muted2);}
+@media(max-width:350px){
+  .usdt-balance-main{font-size:17px;}
+  .usdt-balance-rate{max-width:46%;font-size:7px;}
+}
 .card-stocks .ticker-card{
   border-top:2px solid var(--green2)!important;
   box-shadow:inset 0 1px 0 #4ecb8d18,0 -1px 8px #4ecb8d14;
@@ -1557,17 +1594,21 @@ body.modern-mockup .card-value{
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
       <!-- USDT BALANCE CARD -->
-      <div class="usdt-balance-card" onclick="openUsdtBalanceEditor()">
+      <div class="usdt-balance-card">
         <input type="hidden" id="cryptoUsdt" value="0">
         <input type="hidden" id="usdtUah" value="41">
         <div class="usdt-balance-top">
-          <div>
+          <div class="usdt-balance-info">
             <div class="usdt-balance-title">💵 <span id="usdtBalanceCardTitle">USDT баланс</span></div>
             <div class="usdt-balance-main" id="usdtBalanceCardAmount">0 USDT</div>
             <div class="usdt-balance-equiv" id="cryptoUahVal">0 ₴</div>
-            <div class="usdt-balance-rate" id="usdtBalanceCardRate">1 USDT = 41 ₴</div>
           </div>
-          <div class="usdt-balance-edit">± Змінити</div>
+          <div class="usdt-balance-rate" id="usdtBalanceCardRate">1 USDT = 41 ₴</div>
+        </div>
+        <div class="usdt-balance-actions">
+          <button class="usdt-balance-btn" id="usdtSubtractBtn" onclick="changeUsdtBalance(-1)">−</button>
+          <button class="usdt-balance-btn" id="usdtAddBtn" onclick="changeUsdtBalance(1)">+</button>
+          <button class="usdt-balance-btn rate" id="usdtRateBtn" onclick="setCustomUsdtRate()">⇄</button>
         </div>
       </div>
       <!-- COINS AS TICKER CARDS -->
@@ -2970,6 +3011,7 @@ function applyTranslations(){
   translateDynamicUI();
   applyAutoTranslations();
   updateAppVersionUI();
+  renderChartI18n();
   startAutoI18nObserver();
   if(typeof updateProUI==='function')updateProUI();
   updateAll();
@@ -2980,6 +3022,31 @@ const $=id=>document.getElementById(id);
 const setText=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
 const escHtml=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const escAttr=escHtml;
+function appLocale(){return ({uk:'uk-UA',ru:'ru-RU',en:'en-US',de:'de-DE',zh:'zh-CN'}[currentLang]||'uk-UA');}
+function datePlaceholderText(){return ({uk:'ДД.ММ.РРРР',ru:'ДД.ММ.ГГГГ',en:'MM/DD/YYYY',de:'TT.MM.JJJJ',zh:'年/月/日'}[currentLang]||'ДД.ММ.РРРР');}
+function chartUiText(key){
+  const dict={
+    p1d:{uk:'1Д',ru:'1Д',en:'1D',de:'1T',zh:'1天'},
+    p7d:{uk:'7Д',ru:'7Д',en:'7D',de:'7T',zh:'7天'},
+    p30d:{uk:'30Д',ru:'30Д',en:'30D',de:'30T',zh:'30天'},
+    p90d:{uk:'90Д',ru:'90Д',en:'90D',de:'90T',zh:'90天'},
+    p1y:{uk:'1Р',ru:'1Г',en:'1Y',de:'1J',zh:'1年'},
+    start:{uk:'Старт',ru:'Старт',en:'Start',de:'Start',zh:'开始'},
+    now:{uk:'Зараз',ru:'Сейчас',en:'Now',de:'Jetzt',zh:'现在'},
+    min:{uk:'Мін',ru:'Мин',en:'Min',de:'Min.',zh:'最低'},
+    max:{uk:'Макс',ru:'Макс',en:'Max',de:'Max.',zh:'最高'},
+    change:{uk:'Зміна',ru:'Изменение',en:'Change',de:'Änderung',zh:'变化'},
+    growth:{uk:'Зростання',ru:'Рост',en:'Growth',de:'Wachstum',zh:'增长'},
+    day:{uk:'День',ru:'День',en:'Day',de:'Tag',zh:'日'}
+  };
+  return dict[key]?.[currentLang]||dict[key]?.uk||key;
+}
+function renderChartI18n(){
+  [['cpt_1d','p1d'],['cpt_7d','p7d'],['cpt_30d','p30d'],['cpt_90d','p90d'],['cpt_1y','p1y']].forEach(([id,key])=>setText(id,chartUiText(key)));
+  const labels=document.querySelectorAll('.chart-stats .chart-stat-lbl');
+  ['min','max','change','growth','day'].forEach((key,i)=>{if(labels[i])labels[i].textContent=chartUiText(key);});
+  document.documentElement.lang=currentLang;
+}
 function parseInputNumber(v){
   if(typeof v==='number')return Number.isFinite(v)?v:0;
   const raw=String(v??'').trim().replace(/\s+/g,'').replace(/[^0-9,.-]/g,'');
@@ -3073,13 +3140,13 @@ function getDepositHtml(dep,idx){
         <div class="row2">
           <div class="field-group">
             <div class="field-label">${lang.depStart}</div>
-            <input class="field-input" type="date" id="depStartDate_${dep.id}" value="${dep.startDate}"
-              oninput="deposits[${idx}].startDate=this.value;updateAll();startLiveTicker('${dep.id}')">
+            <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" required lang="${currentLang}" id="depStartDate_${dep.id}" value="${dep.startDate}"
+              oninput="deposits[${idx}].startDate=this.value;updateAll();startLiveTicker('${dep.id}')"></div>
           </div>
           <div class="field-group">
             <div class="field-label">${lang.depEnd}</div>
-            <input class="field-input" type="date" id="depEndDate_${dep.id}" value="${dep.endDate}"
-              oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')">
+            <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" required lang="${currentLang}" id="depEndDate_${dep.id}" value="${dep.endDate}"
+              oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')"></div>
             <div id="depDateError_${dep.id}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);margin-top:4px;display:none;">⚠ Невірна дата</div>
           </div>
         </div>
@@ -5370,15 +5437,23 @@ function addForex(){
   renderForex();updateAll();saveData();
 }
 // ── CUSTOM DIALOG (replaces prompt/confirm to hide "file://" on Android) ──
+function customDialogConfirmText(){return ({uk:'Підтвердити',ru:'Подтвердить',en:'Confirm',de:'Bestätigen',zh:'确认'}[currentLang]||'Підтвердити');}
+function forexBalancePromptText(action,cur,amount){
+  const dict={
+    add:{uk:'Скільки додати до {cur}? (зараз: {amount})',ru:'Сколько добавить к {cur}? (сейчас: {amount})',en:'How much to add to {cur}? (current: {amount})',de:'Wie viel zu {cur} hinzufügen? (aktuell: {amount})',zh:'要添加多少 {cur}？（当前：{amount}）'},
+    subtract:{uk:'Скільки зняти з {cur}? (зараз: {amount})',ru:'Сколько снять с {cur}? (сейчас: {amount})',en:'How much to subtract from {cur}? (current: {amount})',de:'Wie viel von {cur} abziehen? (aktuell: {amount})',zh:'要扣除多少 {cur}？（当前：{amount}）'}
+  };
+  return (dict[action]?.[currentLang]||dict[action]?.uk||'').replace('{cur}',cur).replace('{amount}',amount);
+}
 function customPrompt(msg, defVal, cb){
   const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
-    <div style="font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">${msg}</div>
-    <input id="_cpInput" type="text" inputmode="decimal" value="${defVal||''}" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg3);color:#fff;font-family:DM Mono,monospace;font-size:14px;box-sizing:border-box;margin-bottom:12px;">
-    <div style="display:flex;gap:8px;">
-      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
-      <button id="_cpOk" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
+  ov.className='custom-dialog-overlay';
+  ov.innerHTML=`<div class="custom-dialog-box">
+    <div class="custom-dialog-title">${msg}</div>
+    <input id="_cpInput" class="custom-dialog-input" type="text" inputmode="decimal" value="${defVal||''}">
+    <div class="custom-dialog-actions">
+      <button class="custom-dialog-cancel" onclick="this.closest('.custom-dialog-overlay').remove()">${t('cancel')||'Скасувати'}</button>
+      <button id="_cpOk" class="custom-dialog-ok">OK</button>
     </div></div>`;
   document.body.appendChild(ov);
   const inp=document.getElementById('_cpInput');inp.focus();inp.select();
@@ -5390,10 +5465,10 @@ function customPrompt(msg, defVal, cb){
 const _nativeAlert=window.alert;
 window.alert=function(msg){
   const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
-    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
-    <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">OK</button>
+  ov.className='custom-dialog-overlay';
+  ov.innerHTML=`<div class="custom-dialog-box">
+    <div class="custom-dialog-message">${msg}</div>
+    <button onclick="this.closest('.custom-dialog-overlay').remove()" class="custom-dialog-ok" style="width:100%;">OK</button>
   </div>`;
   document.body.appendChild(ov);
 };
@@ -5409,12 +5484,12 @@ window.confirm=function(msg){
 // Async custom confirm for critical dialogs
 function customConfirm(msg, onYes, onNo){
   const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:#000000cc;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:100%;max-width:340px;">
-    <div style="font-family:DM Mono,monospace;font-size:13px;color:#fff;margin-bottom:16px;line-height:1.5;white-space:pre-line;">${msg}</div>
-    <div style="display:flex;gap:8px;">
-      <button id="_ccNo" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted);cursor:pointer;">Скасувати</button>
-      <button id="_ccYes" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--green);font-family:DM Mono,monospace;font-size:12px;color:#0a0a0f;cursor:pointer;font-weight:600;">Підтвердити</button>
+  ov.className='custom-dialog-overlay';
+  ov.innerHTML=`<div class="custom-dialog-box">
+    <div class="custom-dialog-message">${msg}</div>
+    <div class="custom-dialog-actions">
+      <button id="_ccNo" class="custom-dialog-cancel">${t('cancel')||'Скасувати'}</button>
+      <button id="_ccYes" class="custom-dialog-ok">${customDialogConfirmText()}</button>
     </div></div>`;
   document.body.appendChild(ov);
   document.getElementById('_ccYes').onclick=()=>{ov.remove();if(onYes)onYes();};
@@ -5425,7 +5500,7 @@ function customConfirm(msg, onYes, onNo){
 function subtractForex(i){
   const f=forexItems[i];
   if(!f)return;
-  customPrompt('Скільки зняти з '+f.cur+'? (зараз: '+fmtD(f.amt)+')', '', function(amt){
+  customPrompt(forexBalancePromptText('subtract',f.cur,fmtD(f.amt)), '', function(amt){
     if(!amt)return;
     const val=parseInputNumber(amt);
     if(val<=0)return;
@@ -5471,7 +5546,7 @@ function renderForex(){
 }
 function openForexTopup(i){
   const f=forexItems[i];if(!f)return;
-  customPrompt('Скільки додати до '+f.cur+'? (зараз: '+fmtD(f.amt)+')','',function(amt){
+  customPrompt(forexBalancePromptText('add',f.cur,fmtD(f.amt)),'',function(amt){
     const value=parseInputNumber(amt);
     if(value<=0)return;
     f.amt=roundMoney(parseInputNumber(f.amt)+value);
@@ -7863,6 +7938,7 @@ function setChartPeriod(p,btn){
 }
 
 function renderChart(){
+  renderChartI18n();
   normalizeCapitalHistory();
   const todayKey=getLocalDateKey();
   const todayEntry=capitalHistory.find(h=>h.date===todayKey);
@@ -7939,9 +8015,9 @@ function renderChart(){
     labelEl.innerHTML=labelPoints.map(p=>{
       if(chartPeriod==='1d'){
         const suffix=String(p.date).split(' ').pop();
-        return '<span>'+(suffix==='00:00'?'Старт':suffix==='now'?'Зараз':suffix==='min'?'Мін':suffix==='max'?'Макс':suffix)+'</span>';
+        return '<span>'+(suffix==='00:00'?chartUiText('start'):suffix==='now'?chartUiText('now'):suffix==='min'?chartUiText('min'):suffix==='max'?chartUiText('max'):suffix)+'</span>';
       }
-      return `<span>${new Date(p.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}</span>`;
+      return `<span>${new Date(p.date).toLocaleDateString(appLocale(),{day:'numeric',month:'short'})}</span>`;
     }).join('');
   }
 
@@ -8426,7 +8502,7 @@ function renderDiagnostics(){
         <div class="diag-stat-lbl">Дохід/день (деп. після податку)</div>
         ${dailyDepIncomeGross!==dailyDepIncome?`<div style="font-size:8px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">до податку: +${sym}${fmtN(toDisplayCurr(dailyDepIncomeGross))}</div>`:''}
       </div>
-      <div class="diag-stat" style="grid-column:1/-1;background:linear-gradient(135deg,var(--bg3),#1a1a2e);border:1px solid var(--gold)30;">
+      <div class="diag-stat diag-passive-banner">
         <div class="diag-stat-val" style="color:var(--gold2);font-size:20px;">+${sym}${fmtN(toDisplayCurr(combinedMonth))}<span style="font-size:11px;color:var(--muted);font-weight:400;"> ${diagMonthWord()}</span></div>
         <div class="diag-stat-lbl">Загальний пасивний дохід (деп. + дивіденди)</div>
         <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;">${diagDepositShort()} +${sym}${fmtN(toDisplayCurr(depMonthIncome))} · ${diagDividendShort()} +${sym}${fmtN(toDisplayCurr(stockDivMonth))}</div>
@@ -9407,6 +9483,10 @@ function renderUsdtBalanceCard(){
   setText('usdtBalanceCardAmount',fmtMax2(amount)+' USDT');
   setText('cryptoUahVal',fmtN(toDisplayCurr(amount*rate))+' '+sym);
   setText('usdtBalanceCardRate','1 USDT = '+fmtMax2(rate)+' ₴');
+  const addBtn=$('usdtAddBtn'),subBtn=$('usdtSubtractBtn'),rateBtn=$('usdtRateBtn');
+  if(addBtn)addBtn.title=usdtBalanceText('add');
+  if(subBtn)subBtn.title=usdtBalanceText('subtract');
+  if(rateBtn)rateBtn.title=usdtBalanceText('rate');
 }
 function changeUsdtBalance(direction){
   const label=direction>0?usdtBalanceText('add'):usdtBalanceText('subtract');
