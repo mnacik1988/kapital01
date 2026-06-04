@@ -1349,6 +1349,69 @@ body.dashboard-mockup.theme-light .bottom-nav-btn .bn-label{color:#475467;}
   body.dashboard-mockup .card-value{font-size:22px;}
   body.dashboard-mockup .bottom-nav{width:calc(100vw - 18px);}
 }
+
+
+/* Keep large capital amounts on one line and shrink only when necessary. */
+body.modern-mockup .total-wrap,
+body.modern-mockup .card-info{min-width:0;}
+body.modern-mockup .total-amount,
+body.modern-mockup .card-value{
+  white-space:nowrap;
+  overflow:hidden;
+  overflow-wrap:normal;
+  word-break:normal;
+  text-overflow:clip;
+}
+body.modern-mockup .card-value{
+  max-width:100%;
+}
+
+
+
+/* Compact balance cards for currencies and USDT. */
+.balance-list-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px;}
+.balance-list-card{
+  position:relative;
+  min-width:0;
+  padding:12px;
+  border:1px solid var(--border);
+  border-top:2px solid var(--orange);
+  border-radius:14px;
+  background:linear-gradient(135deg,#fb923c0c,var(--bg3));
+}
+.balance-list-head{display:flex;align-items:center;gap:7px;min-width:0;}
+.balance-list-flag{font-size:17px;flex:0 0 auto;}
+.balance-list-code{font-family:'DM Mono',monospace;font-size:11px;font-weight:800;color:var(--orange2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.balance-list-amount{font-family:'Inter',sans-serif;font-size:18px;font-weight:850;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:8px;}
+.balance-list-equiv{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.balance-list-rate{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.balance-list-actions{display:flex;gap:5px;margin-top:9px;}
+.balance-list-btn{flex:1;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--muted2);font:700 11px 'DM Mono',monospace;padding:5px;cursor:pointer;}
+.balance-list-btn.minus{color:var(--orange2);}
+.balance-list-btn.delete{flex:0 0 30px;color:var(--red);}
+.usdt-balance-card{
+  border:1px solid var(--border);
+  border-top:2px solid var(--purple);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
+  background:linear-gradient(135deg,#a78bfa10,var(--bg3));
+  cursor:pointer;
+}
+.usdt-balance-card:active{border-color:var(--purple);box-shadow:0 0 0 1px #a78bfa45;}
+.usdt-balance-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.usdt-balance-title{font:800 10px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);}
+.usdt-balance-main{font:850 22px 'Inter',sans-serif;color:var(--purple2);margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.usdt-balance-equiv{font:700 12px 'DM Mono',monospace;color:var(--green2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.usdt-balance-rate{font:9px 'DM Mono',monospace;color:var(--muted);margin-top:5px;}
+.usdt-balance-edit{flex:0 0 auto;border:1px solid var(--border2);border-radius:9px;padding:6px 8px;color:var(--purple2);font:700 9px 'DM Mono',monospace;background:var(--bg2);}
+.card-stocks .ticker-card{border-top:2px solid var(--green);}
+@media(max-width:390px){
+  .balance-list-cards{gap:7px;}
+  .balance-list-card{padding:10px;}
+  .balance-list-amount{font-size:15px;}
+}
+
 </style>
 </head>
 <body class="modern-mockup">
@@ -1478,7 +1541,7 @@ body.dashboard-mockup.theme-light .bottom-nav-btn .bn-label{color:#475467;}
       <div class="drag-handle">⠿</div>
       <div class="card-icon">₮</div>
       <div class="card-info" onclick="toggleCard('crypto')">
-        <div class="card-name" data-i18n="cryptoName">Крипто · USDT</div>
+        <div class="card-name" data-i18n="cryptoName">Крипто</div>
         <div class="card-value" id="cryptoDisplay">0 ₴</div>
         <div class="card-pct" id="cryptoPct">0% від капіталу</div>
       </div>
@@ -1490,21 +1553,18 @@ body.dashboard-mockup.theme-light .bottom-nav-btn .bn-label{color:#475467;}
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
-      <!-- USDT BALANCE -->
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">💵 USDT баланс</div>
-        <div class="row2">
-          <div class="field-group">
-            <div class="field-label">USDT ($)</div>
-            <input class="field-input" type="text" id="cryptoUsdt" placeholder="0" inputmode="decimal" oninput="updateAll()">
+      <!-- USDT BALANCE CARD -->
+      <div class="usdt-balance-card" onclick="openUsdtBalanceEditor()">
+        <input type="hidden" id="cryptoUsdt" value="0">
+        <input type="hidden" id="usdtUah" value="41">
+        <div class="usdt-balance-top">
+          <div>
+            <div class="usdt-balance-title">💵 <span id="usdtBalanceCardTitle">USDT баланс</span></div>
+            <div class="usdt-balance-main" id="usdtBalanceCardAmount">0 USDT</div>
+            <div class="usdt-balance-equiv" id="cryptoUahVal">0 ₴</div>
+            <div class="usdt-balance-rate" id="usdtBalanceCardRate">1 USDT = 41 ₴</div>
           </div>
-          <div class="field-group">
-            <div class="field-label">Курс USDT/₴</div>
-            <input class="field-input" type="text" id="usdtUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
-          </div>
-        </div>
-        <div class="result-box" style="margin-top:8px;">
-          <div class="result-row"><span class="result-key" data-i18n="uahEquiv">Еквівалент у ₴</span><span class="result-val blue" id="cryptoUahVal">0 ₴</span></div>
+          <div class="usdt-balance-edit">± Змінити</div>
         </div>
       </div>
       <!-- COINS AS TICKER CARDS -->
@@ -2337,7 +2397,7 @@ const LANGS={
   uk:{
     totalCapital:'Загальний капітал',enterData:'введіть дані',sectionLabel:'Активи · утримай та перетягни для сортування',
     liveCnt:'Живий лічильник',deposit:'Депозит',depositAll:'Депозит (всього)',
-    cryptoName:'Крипто · USDT',totalUsdtInv:'Загальна сума вкладень в USDT',rateUsdtUah:'Курс USDT / ₴',
+    cryptoName:'Крипто',totalUsdtInv:'Загальна сума вкладень в USDT',rateUsdtUah:'Курс USDT / ₴',
     costPrice:'Собівартість (₴)',uahEquiv:'Еквівалент у ₴',addCoinTitle:'Додати монету',
     coinName:'Назва монети',coinQty:'Кількість',coinBuyPrice:'Ціна купівлі (USDT)',coinCurPrice:'Поточна ціна (USDT)',addCoinBtn:'+ Додати монету',
     usdName:'USD · Доларові заощадження',usdAmount:'Сума в доларах ($)',rateUsdUah:'Курс USD / ₴',
@@ -2378,7 +2438,7 @@ const LANGS={
   ru:{
     totalCapital:'Общий капитал',enterData:'введите данные',sectionLabel:'Активы · удерживай и перетаскивай для сортировки',
     liveCnt:'Живой счётчик',deposit:'Депозит',depositAll:'Депозит (всего)',
-    cryptoName:'Крипто · USDT',totalUsdtInv:'Общая сумма вложений в USDT',rateUsdtUah:'Курс USDT / ₴',
+    cryptoName:'Крипто',totalUsdtInv:'Общая сумма вложений в USDT',rateUsdtUah:'Курс USDT / ₴',
     costPrice:'Себестоимость (₴)',uahEquiv:'Эквивалент в ₴',addCoinTitle:'Добавить монету',
     coinName:'Название монеты',coinQty:'Количество',coinBuyPrice:'Цена покупки (USDT)',coinCurPrice:'Текущая цена (USDT)',addCoinBtn:'+ Добавить монету',
     usdName:'USD · Долларовые сбережения',usdAmount:'Сумма в долларах ($)',rateUsdUah:'Курс USD / ₴',
@@ -2419,7 +2479,7 @@ const LANGS={
   en:{
     totalCapital:'Total Capital',enterData:'enter data',sectionLabel:'Assets · hold and drag to sort',
     liveCnt:'Live Counter',deposit:'Deposit',depositAll:'Deposit (total)',
-    cryptoName:'Crypto · USDT',totalUsdtInv:'Total USDT investment',rateUsdtUah:'USDT / ₴ Rate',
+    cryptoName:'Crypto',totalUsdtInv:'Total USDT investment',rateUsdtUah:'USDT / ₴ Rate',
     costPrice:'Cost Price (₴)',uahEquiv:'UAH Equivalent',addCoinTitle:'Add Coin',
     coinName:'Coin Name',coinQty:'Quantity',coinBuyPrice:'Buy Price (USDT)',coinCurPrice:'Current Price (USDT)',addCoinBtn:'+ Add Coin',
     usdName:'USD · Dollar Savings',usdAmount:'Amount in USD ($)',rateUsdUah:'USD / ₴ Rate',
@@ -2465,7 +2525,7 @@ const LANGS={
     calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfügbar. Wählen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschränkungen während der Testphase',pwB2:'Alle Vermögenswerte an einem Ort',pwB2sub:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerät',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',pwClose:'Ohne Abo fortfahren',
     secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
-    cryptoName:'Krypto · USDT',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
+    cryptoName:'Krypto',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
     costPrice:'Einstandspreis (₴)',uahEquiv:'UAH-Äquivalent',addCoinTitle:'Münze hinzufügen',
     coinName:'Münzname',coinQty:'Menge',coinBuyPrice:'Kaufpreis (USDT)',coinCurPrice:'Aktueller Preis (USDT)',addCoinBtn:'+ Hinzufügen',
     usdName:'USD · Dollar-Ersparnisse',usdAmount:'Betrag in USD ($)',rateUsdUah:'USD/₴ Kurs',
@@ -2506,7 +2566,7 @@ const LANGS={
     calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'免费使用 30 天',pwSub:'从第一天起即可使用全部功能。试用期结束后，选择适合您的方案。',pwB1:'30 天免费版',pwB1sub:'试用期间不受限制',pwB2:'在一个地方管理所有资产',pwB2sub:'存款、货币、加密货币、股票、贷款和贵金属',pwB3:'本地数据存储',pwB3sub:'您的财务数据保留在设备上',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'开始 30 天免费使用',pwRestore:'恢复购买',pwClose:'不订阅继续使用',
     secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
-    cryptoName:'加密货币 · USDT',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
+    cryptoName:'加密货币',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
     costPrice:'成本价 (₴)',uahEquiv:'₴等值',addCoinTitle:'添加币种',
     coinName:'币种名称',coinQty:'数量',coinBuyPrice:'买入价 (USDT)',coinCurPrice:'当前价 (USDT)',addCoinBtn:'+ 添加',
     usdName:'USD · 美元储蓄',usdAmount:'美元金额 ($)',rateUsdUah:'USD/₴汇率',
@@ -4034,22 +4094,40 @@ async function fetchMultipleStocks(tickers){
     updateNetworkStatusUI('offline');
     return {};
   }
-  // Try Worker for all at once (efficient)
+  const normalized=[...new Set(tickers.map(t=>String(t||'').trim().toUpperCase()).filter(Boolean))];
+  const results={};
+  // Try one efficient batch request first.
   if(WORKER_URL){
     try{
-      const result=await workerGetStock(tickers);
+      const result=await workerGetStock(normalized);
       if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
       const now=Date.now();
-      Object.entries(result.stocks||{}).forEach(([t,s])=>{stockPriceCache[t]={...s,updated:now};});
-      return result.stocks||{};
-    }catch(e){}
+      Object.entries(result.stocks||{}).forEach(([ticker,data])=>{
+        if(!data||!data.price)return;
+        const key=String(ticker).toUpperCase();
+        stockPriceCache[key]={...data,updated:now};
+        results[key]=stockPriceCache[key];
+      });
+    }catch(e){stockLastError='Worker batch: '+e.message;}
   }
-  // Fallback: fetch one by one
-  const results={};
-  await Promise.all(tickers.map(async t=>{
-    const d=await fetchStockPrice(t);
-    if(d)results[t]=d;
+  // The Worker can return an empty/partial multi response. Retry missing tickers one by one.
+  const missing=normalized.filter(t=>!results[t]);
+  await Promise.all(missing.map(async ticker=>{
+    try{
+      const result=await workerGetStock([ticker]);
+      if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
+      const data=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
+      if(data&&data.price){
+        const entry={...data,updated:Date.now()};
+        stockPriceCache[ticker]=entry;
+        results[ticker]=entry;
+      }
+    }catch(e){
+      const cached=stockPriceCache[ticker];
+      if(cached)results[ticker]=cached;
+    }
   }));
+  stockLastError=Object.keys(results).length?'':'Worker returned no stock prices';
   return results;
 }
 
@@ -4134,7 +4212,7 @@ async function refreshAllStockPrices(secId){
     return;
   }
   if(btn)btn.textContent='⏳ ...';
-  if(status)status.textContent='Запит до Claude...';
+  if(status)status.textContent='Оновлення онлайн-цін...';
   const tickers=[...new Set(sec.items.filter(it=>it.ticker).map(it=>it.ticker))];
   if(!tickers.length){if(btn)btn.textContent='⟳ Оновити';return;}
   const stocks=await fetchMultipleStocks(tickers);
@@ -5365,22 +5443,37 @@ function renderForex(){
   },0);
   setText('forexTotal',sym+fmtN(toDisplayCurr(total)));
   if(!forexItems.length){el.innerHTML='';return;}
-  el.innerHTML=forexItems.map((f,i)=>{
+  el.innerHTML='<div class="balance-list-cards">'+forexItems.map((f,i)=>{
     const cur=f.cur?.toUpperCase()||'EUR';
     const amount=parseInputNumber(f.amt);
     const liveRate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:parseInputNumber(f.rate);
     const valueUah=amount*liveRate;
     const isLive=(liveRates[cur]&&liveRates[cur]>0);
-    return `<div class="list-row">
-      <span style="font-size:16px;flex-shrink:0">${FFLAGS[f.cur]||'🌐'}</span>
-      <div class="list-sym" style="color:var(--orange2)">${FSYM[f.cur]||''} ${f.cur}</div>
-      <div class="list-info">${fmtD(amount)} × ${liveRate.toFixed(2)} ₴ ${isLive?'<span style="color:var(--green2);font-size:8px">●</span>':''}</div>
-      <div class="list-val">${sym}${fmtN(toDisplayCurr(valueUah))}</div>
-      <button class="rm-btn" style="font-size:14px;color:var(--orange2);margin-right:4px;" onclick="subtractForex(${i})" title="Зняти">−</button>
-      <button class="rm-btn" onclick="removeForex(${i})">×</button>
+    return `<div class="balance-list-card">
+      <div class="balance-list-head">
+        <span class="balance-list-flag">${FFLAGS[f.cur]||'🌐'}</span>
+        <span class="balance-list-code">${FSYM[f.cur]||''} ${cur}</span>
+      </div>
+      <div class="balance-list-amount">${fmtD(amount)} ${cur}</div>
+      <div class="balance-list-equiv">${sym}${fmtN(toDisplayCurr(valueUah))}</div>
+      <div class="balance-list-rate">1 ${cur} = ${liveRate.toFixed(2)} ₴ ${isLive?'●':''}</div>
+      <div class="balance-list-actions">
+        <button class="balance-list-btn minus" onclick="subtractForex(${i})">−</button>
+        <button class="balance-list-btn" onclick="openForexTopup(${i})">+</button>
+        <button class="balance-list-btn delete" onclick="removeForex(${i})">×</button>
+      </div>
     </div>`;
-  }).join('');
+  }).join('')+'</div>';
   applyAutoTranslations(el);
+}
+function openForexTopup(i){
+  const f=forexItems[i];if(!f)return;
+  customPrompt('Скільки додати до '+f.cur+'? (зараз: '+fmtD(f.amt)+')','',function(amt){
+    const value=parseInputNumber(amt);
+    if(value<=0)return;
+    f.amt=roundMoney(parseInputNumber(f.amt)+value);
+    renderForex();updateAll();saveData();
+  });
 }
 
 // ── TOGGLE CARD ───────────────────────────────
@@ -5927,6 +6020,7 @@ function bootstrapApp(){
         });
       }catch(e){console.error('stock startup refresh failed',e);}
     },500);
+    startAutoRefresh();
 
     updateNetworkStatusUI();
     if(!isOffline())fetchUsdUahRate();
@@ -8474,19 +8568,7 @@ addCoin=function(){
 
 // ── CRYPTO ONLINE PRICE MONITORING ───────────────────────
 let cryptoPriceCache={};
-
-async function fetchCryptoPrice(coinName,forceFresh=false){
-  coinName=coinName.toUpperCase().trim();
-  if(!coinName)return null;
-  const cached=cryptoPriceCache[coinName];
-  if(!forceFresh&&cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
-  if(isOffline()){
-    updateNetworkStatusUI('offline');
-    return cached||null;
-  }
-  
-  // Try CoinGecko free API
-  const cgMap={
+const CRYPTO_CG_MAP={
     'BTC':'bitcoin','ETH':'ethereum','BNB':'binancecoin','SOL':'solana',
     'XRP':'ripple','ADA':'cardano','DOT':'polkadot','DOGE':'dogecoin',
     'AVAX':'avalanche-2','MATIC':'matic-network','LINK':'chainlink',
@@ -8512,6 +8594,19 @@ async function fetchCryptoPrice(coinName,forceFresh=false){
     'W':'wormhole','STRK':'starknet','ZK':'zksync','BLAST':'blast',
     'ENA':'ethena','EIGEN':'eigenlayer','MOVE':'movement',
   };
+
+async function fetchCryptoPrice(coinName,forceFresh=false){
+  coinName=coinName.toUpperCase().trim();
+  if(!coinName)return null;
+  const cached=cryptoPriceCache[coinName];
+  if(!forceFresh&&cached&&(Date.now()-cached.updated)<5*60*1000)return cached;
+  if(isOffline()){
+    updateNetworkStatusUI('offline');
+    return cached||null;
+  }
+  
+  // Try CoinGecko free API
+  const cgMap=CRYPTO_CG_MAP;
   let cgId=cgMap[coinName];
   
   // If not in map, try CoinGecko search API
@@ -8557,46 +8652,96 @@ async function fetchCryptoPrice(coinName,forceFresh=false){
   return null;
 }
 
+function cryptoRefreshText(key){
+  const dict={
+    online:{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
+    updated:{uk:'Оновлено',ru:'Обновлено',en:'Updated',de:'Aktualisiert',zh:'已更新'},
+    failed:{uk:'Не вдалося оновити ціни',ru:'Не удалось обновить цены',en:'Could not update prices',de:'Preise konnten nicht aktualisiert werden',zh:'无法更新价格'},
+    error:{uk:'Помилка оновлення',ru:'Ошибка обновления',en:'Update error',de:'Aktualisierungsfehler',zh:'更新错误'}
+  };
+  return dict[key]?.[currentLang]||dict[key]?.uk||key;
+}
+
 async function refreshCryptoPrices(forceFresh=false){
-  try{
-  if(!coins.length)return;
-  if(isOffline()){
-    updateNetworkStatusUI('offline');
-    return;
-  }
-  // Freemium check
-  /* crypto refresh free */
-  
-  const rate=val('usdtUah')||41;
-  let anyUpdated=false;
   const btn=$('cryptoRefreshBtn');
-  if(btn){
-    btn.disabled=true;
-    btn.textContent=uiText('refreshing');
-  }
-  
-  for(const coin of coins){
-    if(!coin.name)continue;
-    const data=await fetchCryptoPrice(coin.name,forceFresh);
-    if(data){
+  const status=$('cryptoRefreshStatus');
+  try{
+    if(!coins.length){
+      if(status)status.innerHTML='<span class="live-dot" style="width:5px;height:5px;"></span> '+cryptoRefreshText('online');
+      return;
+    }
+    if(isOffline()){
+      updateNetworkStatusUI('offline');
+      if(status)status.textContent=offlineTxt('cryptoOffline');
+      return;
+    }
+    if(btn){
+      btn.disabled=true;
+      btn.textContent=uiText('refreshing');
+    }
+    if(status)status.textContent=uiText('refreshing');
+
+    const names=[...new Set(coins.map(c=>String(c.name||'').trim().toUpperCase()).filter(Boolean))];
+    const fresh={};
+    const now=Date.now();
+    const needFetch=names.filter(name=>{
+      const cached=cryptoPriceCache[name];
+      if(!forceFresh&&cached&&(now-cached.updated)<5*60*1000){
+        fresh[name]=cached;
+        return false;
+      }
+      return true;
+    });
+
+    // Fetch known CoinGecko IDs in batches to reduce API requests and rate-limit risk.
+    const known=needFetch.filter(name=>CRYPTO_CG_MAP[name]);
+    for(let i=0;i<known.length;i+=50){
+      const chunk=known.slice(i,i+50);
+      const ids=chunk.map(name=>CRYPTO_CG_MAP[name]);
+      try{
+        const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+ids.map(encodeURIComponent).join(',')+'&vs_currencies=usd&include_24hr_change=true');
+        if(r.ok){
+          const data=await r.json();
+          chunk.forEach(name=>{
+            const row=data[CRYPTO_CG_MAP[name]];
+            if(row&&Number(row.usd)>0){
+              const entry={price:Number(row.usd),change24h:Number(row.usd_24h_change)||0,updated:Date.now()};
+              cryptoPriceCache[name]=entry;
+              fresh[name]=entry;
+            }
+          });
+        }
+      }catch(e){}
+    }
+
+    // Search/fallback path only for unknown or missing tickers.
+    const missing=needFetch.filter(name=>!fresh[name]);
+    for(const name of missing){
+      const data=await fetchCryptoPrice(name,true);
+      if(data)fresh[name]=data;
+    }
+
+    let updated=0;
+    coins.forEach(coin=>{
+      const data=fresh[String(coin.name||'').trim().toUpperCase()];
+      if(!data)return;
       coin.curPrice=data.price;
       coin.change24h=data.change24h;
-      anyUpdated=true;
+      updated++;
+    });
+    if(updated){
+      renderCoins();
+      updateAll();
+      saveData();
     }
-  }
-  
-  if(anyUpdated){
-    renderCoins();
-    updateAll();
-    saveData();
-  }
-  if(btn){
-    btn.disabled=false;
-    btn.textContent=uiText('refresh');
-  }
+    if(status){
+      status.innerHTML='<span class="live-dot" style="width:5px;height:5px;"></span> '+(updated?cryptoRefreshText('updated')+' '+new Date().toLocaleTimeString():cryptoRefreshText('failed'));
+      status.style.color=updated?'var(--green2)':'var(--red)';
+    }
   }catch(e){
     console.error('refreshCrypto:',e);
-    const btn=$('cryptoRefreshBtn');
+    if(status){status.textContent=cryptoRefreshText('error');status.style.color='var(--red)';}
+  }finally{
     if(btn){
       btn.disabled=false;
       btn.textContent=uiText('refresh');
@@ -9205,9 +9350,102 @@ renderMetalsCards=function(){
   refreshCardSparklines();
 };
 
+
+
+// Keep large total/card amounts readable on narrow screens without wrapping.
+function fitStableMoneyAmount(el,baseSize,minSize){
+  if(!el)return;
+  el.style.fontSize=baseSize+'px';
+  const available=el.clientWidth;
+  if(!available)return;
+  let size=baseSize;
+  while(el.scrollWidth>available && size>minSize){
+    size-=1;
+    el.style.fontSize=size+'px';
+  }
+}
+function fitStableMoneyAmounts(){
+  const mobile=window.innerWidth<=520;
+  fitStableMoneyAmount(document.getElementById('totalAmount'),mobile?46:54,mobile?25:34);
+  document.querySelectorAll('.card-value').forEach(el=>fitStableMoneyAmount(el,mobile?21:24,mobile?13:16));
+}
+let _fitStableMoneyTimer=null;
+function scheduleFitStableMoneyAmounts(){
+  clearTimeout(_fitStableMoneyTimer);
+  _fitStableMoneyTimer=setTimeout(fitStableMoneyAmounts,30);
+}
+const _updateAllBeforeStableMoneyFit=updateAll;
+updateAll=function(){
+  _updateAllBeforeStableMoneyFit();
+  scheduleFitStableMoneyAmounts();
+};
+window.addEventListener('resize',scheduleFitStableMoneyAmounts,{passive:true});
+
+
+
+function usdtBalanceText(key){
+  const dict={
+    title:{uk:'USDT баланс',ru:'Баланс USDT',en:'USDT balance',de:'USDT-Guthaben',zh:'USDT 余额'},
+    edit:{uk:'Змінити баланс USDT',ru:'Изменить баланс USDT',en:'Edit USDT balance',de:'USDT-Guthaben ändern',zh:'修改 USDT 余额'},
+    add:{uk:'Додати USDT',ru:'Добавить USDT',en:'Add USDT',de:'USDT hinzufügen',zh:'添加 USDT'},
+    subtract:{uk:'Відняти USDT',ru:'Вычесть USDT',en:'Subtract USDT',de:'USDT abziehen',zh:'扣除 USDT'},
+    rate:{uk:'Вказати свій курс',ru:'Указать свой курс',en:'Set custom rate',de:'Eigenen Kurs setzen',zh:'设置自定义汇率'},
+    cancel:{uk:'Закрити',ru:'Закрыть',en:'Close',de:'Schließen',zh:'关闭'}
+  };
+  return dict[key]?.[currentLang]||dict[key]?.uk||key;
+}
+function renderUsdtBalanceCard(){
+  const amount=val('cryptoUsdt');
+  const rate=getCryptoRate();
+  const sym=getCurrSym();
+  setText('usdtBalanceCardTitle',usdtBalanceText('title'));
+  setText('usdtBalanceCardAmount',fmtMax2(amount)+' USDT');
+  setText('cryptoUahVal',fmtN(toDisplayCurr(amount*rate))+' '+sym);
+  setText('usdtBalanceCardRate','1 USDT = '+fmtMax2(rate)+' ₴');
+}
+function changeUsdtBalance(direction){
+  const label=direction>0?usdtBalanceText('add'):usdtBalanceText('subtract');
+  customPrompt(label,'',function(raw){
+    const amount=parseInputNumber(raw);
+    if(amount<=0)return;
+    const input=$('cryptoUsdt');
+    const current=val('cryptoUsdt');
+    input.value=roundMoney(Math.max(0,current+(direction>0?amount:-amount)));
+    updateAll();saveData();
+  });
+}
+function setCustomUsdtRate(){
+  customPrompt(usdtBalanceText('rate'),fmtMax2(getCryptoRate()),function(raw){
+    const rate=parseInputNumber(raw);
+    if(rate<=0)return;
+    $('usdtUah').value=roundMoney(rate);
+    updateAll();saveData();
+  });
+}
+function openUsdtBalanceEditor(){
+  const ov=document.createElement('div');
+  ov.className='picker-overlay open';
+  ov.style.zIndex='620';
+  ov.innerHTML=`<div class="picker-sheet" style="padding-bottom:calc(20px + env(safe-area-inset-bottom));">
+    <div class="picker-handle"></div>
+    <div class="picker-title">${usdtBalanceText('edit')}</div>
+    <button class="picker-item" onclick="this.closest('.picker-overlay').remove();changeUsdtBalance(1)"><span class="picker-item-icon">＋</span><span class="picker-item-name">${usdtBalanceText('add')}</span></button>
+    <button class="picker-item" onclick="this.closest('.picker-overlay').remove();changeUsdtBalance(-1)"><span class="picker-item-icon">−</span><span class="picker-item-name">${usdtBalanceText('subtract')}</span></button>
+    <button class="picker-item" onclick="this.closest('.picker-overlay').remove();setCustomUsdtRate()"><span class="picker-item-icon">⇄</span><span class="picker-item-name">${usdtBalanceText('rate')}</span></button>
+    <button class="modal-cancel" onclick="this.closest('.picker-overlay').remove()">${usdtBalanceText('cancel')}</button>
+  </div>`;
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  document.body.appendChild(ov);
+}
+const _updateAllBeforeUsdtCard=updateAll;
+updateAll=function(){
+  _updateAllBeforeUsdtCard();
+  renderUsdtBalanceCard();
+};
+
 // Final app start after every module/override is declared
 setTimeout(bootstrapApp,0);
-setTimeout(()=>{try{recordSectionHourlySnapshot();refreshCardSparklines();}catch(e){}},450);
+setTimeout(()=>{try{recordSectionHourlySnapshot();refreshCardSparklines();fitStableMoneyAmounts();renderUsdtBalanceCard();}catch(e){}},450);
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
