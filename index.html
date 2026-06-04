@@ -5269,8 +5269,8 @@ function openStockDetail(secId, tickerKey){
   let html='<div class="stock-detail-grid">'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('value')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtMax2(totalQty)+' шт</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('qty')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(curPrice))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('price')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtN(toDisplayCurr(avgBuy))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('avg')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtDisplayMoney2(curPrice)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('price')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtDisplayMoney2(avgBuy)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('avg')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('divMonth')+'</div></div>'+
     '</div>';
@@ -5283,7 +5283,7 @@ function openStockDetail(secId, tickerKey){
     const isSell=qty<0||(t.tradeType==='sell');
     html+='<div class="stock-detail-trade"><div>'+
       '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?stockDetailTxt('sell'):stockDetailTxt('buy'))+' '+fmtMax2(Math.abs(qty))+' шт</div>'+
-      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+sym+fmtN(toDisplayCurr(bp)):'—')+'</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+sym+fmtDisplayMoney2(bp):'—')+'</div>'+
       '</div><button class="rm-btn" onclick="removeSecItem(\''+secId+'\','+t.origIdx+');closeStockDetail()">×</button></div>';
   });
 
@@ -6142,6 +6142,8 @@ function getCurrRate(){
   return {'usd':1/(usdUahRate||41),'eur':1/((usdUahRate||41)*1.08),'rub':1/((usdUahRate||41)*0.009),'cny':1/((usdUahRate||41)/7.3)}[displayCurrency]||1;
 }
 function toDisplayCurr(uah){return Math.round(uah*getCurrRate());}
+function toDisplayCurrExact(uah){return (Number(uah)||0)*getCurrRate();}
+function fmtDisplayMoney2(uah){return fmtMax2(toDisplayCurrExact(uah));}
 
 function setDisplayCurrency(cur){
   displayCurrency=cur;
