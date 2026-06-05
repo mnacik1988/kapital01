@@ -575,6 +575,28 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .diag-row:last-child{border-bottom:none;}
 .diag-row-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
 .diag-row-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;}
+.section-dyn-grid{display:grid;grid-template-columns:1fr;gap:9px;margin-top:10px;}
+.section-dyn-card{border:1px solid var(--border);border-radius:14px;padding:12px;background:linear-gradient(135deg,var(--bg2),var(--bg3));box-shadow:inset 0 1px 0 #ffffff08;}
+.section-dyn-card.positive{border-color:#4ecb8d36;background:linear-gradient(135deg,#4ecb8d12,var(--bg3));}
+.section-dyn-card.negative{border-color:#f8717138;background:linear-gradient(135deg,#f8717112,var(--bg3));}
+.section-dyn-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.section-dyn-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;}
+.section-dyn-status{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em;}
+.section-dyn-main{text-align:right;min-width:112px;}
+.section-dyn-value{font-family:'DM Mono',monospace;font-size:16px;font-weight:800;line-height:1.1;}
+.section-dyn-pct{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:2px;}
+.section-dyn-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:9px;}
+.section-dyn-chip{border:1px solid var(--border);border-radius:999px;padding:6px 8px;background:var(--bg2);font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;}
+.section-dyn-chip span:last-child{font-weight:800;white-space:nowrap;}
+.section-dyn-chip.full{grid-column:1/-1;}
+body.theme-light .section-dyn-card{box-shadow:0 10px 24px #27304a12,inset 0 1px 0 #ffffffc0;}
+body.theme-light .section-dyn-chip{background:#ffffff;}
+@media(max-width:360px){
+  .section-dyn-card{padding:10px;}
+  .section-dyn-name{font-size:12px;}
+  .section-dyn-value{font-size:14px;}
+  .section-dyn-chip{font-size:8px;padding:5px 7px;}
+}
 .diag-history-btn{width:100%;height:100%;min-height:78px;background:linear-gradient(135deg,#5b9cf616,#4ecb8d10);border:1px dashed #5b9cf660;border-radius:14px;padding:12px;text-align:center;cursor:pointer;color:var(--text);}
 .diag-history-btn:active{opacity:.75;}
 .diag-history-btn .diag-stat-val{color:var(--blue2);font-size:18px;}
@@ -8285,7 +8307,11 @@ function sectionPerfTxt(key){
     assetsDist:{uk:'📊 Розподіл активів',ru:'📊 Распределение активов',en:'📊 Asset distribution',de:'📊 Vermögensverteilung',zh:'📊 资产分布'},
     portfolioValue:{uk:'Вартість портфелю',ru:'Стоимость портфеля',en:'Portfolio value',de:'Portfoliowert',zh:'组合价值'},
     buyValue:{uk:'Вартість покупки',ru:'Стоимость покупки',en:'Purchase value',de:'Kaufwert',zh:'买入价值'},
-    profitLoss:{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'盈亏'}
+    profitLoss:{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'盈亏'},
+    dayResult:{uk:'Сьогодні',ru:'Сегодня',en:'Today',de:'Heute',zh:'今天'},
+    upPrice:{uk:'▲ ріст ціни',ru:'▲ рост цены',en:'▲ price up',de:'▲ Preis steigt',zh:'▲ 价格上涨'},
+    downPrice:{uk:'▼ падіння ціни',ru:'▼ падение цены',en:'▼ price down',de:'▼ Preis fällt',zh:'▼ 价格下跌'},
+    flatPrice:{uk:'— без змін',ru:'— без изменений',en:'— no change',de:'— unverändert',zh:'— 无变化'}
   };
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
 }
@@ -8433,23 +8459,35 @@ function renderDiagnostics(){
     const col=v>=0?'var(--green2)':'var(--red)';
     return '<span style="color:'+col+'">'+sign+sym+fmtN(toDisplayCurr(Math.abs(v)))+' <span style="font-size:8px;color:var(--muted)">('+(stat.pct>=0?'+':'')+stat.pct.toFixed(1)+'%)</span></span>';
   };
-  const sectionDynamicsRows=sectionOrder.map(key=>{
+  const formatSectionChip=(label,stat)=>{
+    if(!stat)return '<div class="section-dyn-chip"><span>'+label+'</span><span style="color:var(--muted)">—</span></div>';
+    return '<div class="section-dyn-chip"><span>'+label+'</span><span>'+fmtSmallChange(stat)+'</span></div>';
+  };
+  const sectionDynamicsRows='<div class="section-dyn-grid">'+sectionOrder.map(key=>{
     const item=currentPerf.sections[key];
     if(!item||Math.abs(item.value)<0.01&&Math.abs(item.pnl)<0.01)return '';
     const d1=getSectionDayDelta(currentPerf,key);
     const d7=getSectionPeriodDelta(currentPerf,key,7);
     const d30=getSectionPeriodDelta(currentPerf,key,30);
-    const basisNote=sectionPerfTxt('price');
+    const dayValue=d1?.change||0;
+    const state=dayValue>0?'positive':dayValue<0?'negative':'flat';
+    const col=dayValue>=0?'var(--green2)':'var(--red)';
+    const status=dayValue>0?sectionPerfTxt('upPrice'):dayValue<0?sectionPerfTxt('downPrice'):sectionPerfTxt('flatPrice');
+    const sign=dayValue>=0?'+':'-';
     const label=sectionPerfTxt(key);
-    return '<div class="diag-row" style="align-items:flex-start;gap:8px;">'+
-      '<span class="diag-row-key" style="min-width:84px;">'+item.icon+' '+label+'<br><span style="font-size:8px;color:var(--muted);">'+basisNote+'</span></span>'+
-      '<span class="diag-row-val" style="font-size:10px;display:grid;grid-template-columns:1fr;gap:3px;max-width:64%;width:64%;">'+
-        '<span>'+sectionPerfTxt('day')+': '+fmtSmallChange(d1)+'</span>'+
-        '<span>'+sectionPerfTxt('d7')+': '+fmtSmallChange(d7)+'</span>'+
-        '<span>'+sectionPerfTxt('d30')+': '+fmtSmallChange(d30)+'</span>'+
-      '</span>'+
+    const pct=d1?((d1.pct>=0?'+':'')+d1.pct.toFixed(1)+'%'):'—';
+    return '<div class="section-dyn-card '+state+'">'+
+      '<div class="section-dyn-head">'+
+        '<div><div class="section-dyn-name"><span>'+item.icon+'</span><span>'+label+'</span></div><div class="section-dyn-status">'+status+'</div></div>'+
+        '<div class="section-dyn-main"><div class="section-dyn-value" style="color:'+col+'">'+sign+sym+fmtN(toDisplayCurr(Math.abs(dayValue)))+'</div><div class="section-dyn-pct">'+pct+'</div></div>'+
+      '</div>'+
+      '<div class="section-dyn-chips">'+
+        formatSectionChip(sectionPerfTxt('d7'),d7)+
+        formatSectionChip(sectionPerfTxt('d30'),d30)+
+        '<div class="section-dyn-chip full"><span>'+sectionPerfTxt('price')+'</span><span>'+sectionPerfTxt('dayResult')+'</span></div>'+
+      '</div>'+
     '</div>';
-  }).join('');
+  }).join('')+'</div>';
 
   // Asset distribution
   const assets=[
@@ -8519,7 +8557,7 @@ function renderDiagnostics(){
     <div class="diag-section">
       <div class="diag-section-title">${sectionPerfTxt('title')}</div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">${sectionPerfTxt('note')}</div>
-      ${sectionDynamicsRows||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">'+sectionPerfTxt('empty')+'</div>'}
+      ${sectionDynamicsRows.replace('<div class="section-dyn-grid"></div>','')||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">'+sectionPerfTxt('empty')+'</div>'}
     </div>
 
     <div class="diag-section">
