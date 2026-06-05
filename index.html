@@ -86,6 +86,12 @@ body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd
 .card-header{padding:16px 18px 14px;display:flex;align-items:center;gap:12px;user-select:none;}
 .drag-handle{font-size:18px;color:var(--muted);cursor:grab;padding:4px 2px;touch-action:none;flex-shrink:0;line-height:1;}
 .card-icon{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.section-card-icon-img{width:35px;height:35px;object-fit:contain;display:block;filter:drop-shadow(0 2px 5px #00000066);}
+.app-png-icon{width:1.35em;height:1.35em;object-fit:contain;display:inline-block;vertical-align:-0.25em;filter:drop-shadow(0 1px 3px #00000055);}
+.settings-png-icon{width:25px;height:25px;object-fit:contain;display:inline-block;vertical-align:-6px;filter:drop-shadow(0 1px 4px #00000055);}
+.gear-btn .settings-png-icon{width:32px;height:32px;vertical-align:0;}
+.settings-close-icon{width:21px;height:21px;object-fit:contain;display:block;filter:drop-shadow(0 1px 3px #00000055);}
+.picker-item-icon .section-card-icon-img{width:44px;height:44px;margin:0 auto;}
 .card-info{flex:1;min-width:0;cursor:pointer;}
 .card-name{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:2px;}
 .card-value{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;letter-spacing:-0.5px;}
@@ -740,6 +746,7 @@ body.theme-light .trial-box > div[style*="color:#fff"]{color:var(--text)!importa
   .card{border-radius:16px;}
   .card-header{padding:14px 14px 12px;gap:10px;}
   .card-icon{width:36px;height:36px;border-radius:11px;font-size:16px;}
+  .section-card-icon-img{width:32px;height:32px;}
   .card-name{font-size:10px;letter-spacing:.06em;line-height:1.35;}
   .card-value{font-size:18px;overflow-wrap:anywhere;}
   .card-inner{padding:0 14px 16px;}
@@ -1485,7 +1492,7 @@ body.modern-mockup .card-value{
     <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
     <div style="display:flex;gap:6px;align-items:center;">
       <button class="diag-btn header-diag-btn" onclick="openDiagnostics()" title="Діагностика">📊</button>
-      <button class="gear-btn" onclick="openSettings()" title="Налаштування">⚙️</button>
+      <button class="gear-btn" onclick="openSettings()" title="Налаштування"><img class="settings-png-icon" src="icons/section-settings.png?v=1" alt=""></button>
     </div>
   </div>
   <div class="total-wrap">
@@ -1579,7 +1586,7 @@ body.modern-mockup .card-value{
   <div class="card card-deposit" id="card-deposit" draggable="true" data-card="deposit">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">🏦</div>
+      <div class="card-icon"><img class="section-card-icon-img" src="icons/section-deposit.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('deposit')">
         <div class="card-name" data-i18n="depositAll">Депозит (всього)</div>
         <div class="card-value" id="depositDisplay">0 ₴</div>
@@ -1601,7 +1608,7 @@ body.modern-mockup .card-value{
   <div class="card card-crypto" id="card-crypto" draggable="true" data-card="crypto">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">₮</div>
+      <div class="card-icon"><img class="section-card-icon-img" src="icons/section-crypto.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('crypto')">
         <div class="card-name" data-i18n="cryptoName">Крипто</div>
         <div class="card-value" id="cryptoDisplay">0 ₴</div>
@@ -1694,7 +1701,7 @@ body.modern-mockup .card-value{
   <div class="card card-forex" id="card-forex" draggable="true" data-card="forex">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">🌐</div>
+      <div class="card-icon"><img class="section-card-icon-img" src="icons/section-forex.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('forex')">
         <div class="card-name" data-i18n="forexName">Валютні накопичення</div>
         <div class="card-value" id="forexDisplay">0 ₴</div>
@@ -1745,7 +1752,7 @@ body.modern-mockup .card-value{
   <div class="card card-cash" id="card-cash" draggable="true" data-card="cash">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">💴</div>
+      <div class="card-icon"><img class="section-card-icon-img" src="icons/section-cash.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('cash')">
         <div class="card-name" data-i18n="cashName">Готівка (₴)</div>
         <div class="card-value" id="cashDisplay">0 ₴</div>
@@ -1784,7 +1791,7 @@ body.modern-mockup .card-value{
   <div class="card card-other" id="card-other" draggable="true" data-card="other">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">💳</div>
+      <div class="card-icon"><img class="section-card-icon-img" src="icons/section-account.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('other')">
         <div class="card-name" data-i18n="currentAcc">Поточний рахунок</div>
         <div class="card-value" id="otherDisplay">0 ₴</div>
@@ -1870,44 +1877,59 @@ body.modern-mockup .card-value{
     </div>
     <div class="picker-grid">
       <div class="picker-item" onclick="pickerAdd('stocks')">
-        <div class="picker-item-icon">📈</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-stocks.png?v=1" alt=""></div>
         <div class="picker-item-name" data-i18n="stocksBtn">Акції</div>
         <div class="picker-item-desc" id="picker_desc_stocks">NYSE, NASDAQ, дивіденди</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('bonds')">
-        <div class="picker-item-icon">📜</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-bonds.png?v=1" alt=""></div>
         <div class="picker-item-name" data-i18n="bondsBtn">Облігації</div>
         <div class="picker-item-desc" id="picker_desc_bonds">Корпоративні, державні</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('ovdp')">
-        <div class="picker-item-icon">🏛</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-bonds.png?v=1" alt=""></div>
         <div class="picker-item-name" data-i18n="ovdpBtn">ОВДП</div>
         <div class="picker-item-desc" id="picker_desc_ovdp">Державні облігації України</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('metals')">
-        <div class="picker-item-icon">💎</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-metals.png?v=1" alt=""></div>
         <div class="picker-item-name" data-i18n="metalsBtn">Дорог. метали</div>
         <div class="picker-item-desc" id="picker_desc_metals">Золото, срібло, платина</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('business')">
-        <div class="picker-item-icon">💼</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-business.png?v=1" alt=""></div>
         <div class="picker-item-name" data-i18n="businessBtn">Бізнес</div>
         <div class="picker-item-desc" id="picker_desc_biz">Власна справа, частка</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('family')">
-        <div class="picker-item-icon">👨‍👩‍👧‍👦</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-family.png?v=1" alt=""></div>
         <div class="picker-item-name" id="picker_family_name">Сімейні витрати</div>
         <div class="picker-item-desc" id="picker_desc_family">Комуналка, їжа, діти...</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('startup')">
-        <div class="picker-item-icon">🚀</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-startups.png?v=1" alt=""></div>
         <div class="picker-item-name">Стартап</div>
         <div class="picker-item-desc" id="picker_desc_startup">Вкладення в стартап</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('cash_custom')">
-        <div class="picker-item-icon">💵</div>
-        <div class="picker-item-name">Готівка</div>
-        <div class="picker-item-desc">Готівкові кошти у валюті</div>
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-cash.png?v=1" alt=""></div>
+        <div class="picker-item-name" id="picker_cash_name">Готівка</div>
+        <div class="picker-item-desc" id="picker_desc_cash_custom">Готівкові кошти у валюті</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('crypto_custom')">
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-crypto.png?v=1" alt=""></div>
+        <div class="picker-item-name" id="picker_crypto_name">Криптовалюта</div>
+        <div class="picker-item-desc" id="picker_desc_crypto_custom">Окремий крипто-розділ</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('forex_custom')">
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-forex.png?v=1" alt=""></div>
+        <div class="picker-item-name" id="picker_forex_name">Валютні накопичення</div>
+        <div class="picker-item-desc" id="picker_desc_forex_custom">Валюти та заощадження</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('account_custom')">
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="icons/section-account.png?v=1" alt=""></div>
+        <div class="picker-item-name" id="picker_account_name">Поточний рахунок</div>
+        <div class="picker-item-desc" id="picker_desc_account_custom">Банківський рахунок</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('custom')">
         <div class="picker-item-icon">✏️</div>
@@ -2157,7 +2179,7 @@ body.modern-mockup .card-value{
 <div class="settings-overlay" id="settingsOverlay" onclick="settingsCloseOutside(event)">
   <div class="settings-box">
     <div class="settings-title">
-      <span id="settingsTitleText">⚙️ Налаштування</span>
+      <span><img class="settings-png-icon" src="icons/section-settings.png?v=1" alt=""> <span id="settingsTitleText">Налаштування</span></span>
       <button class="settings-close" onclick="closeSettings()">✕</button>
     </div>
     <div class="settings-section">
@@ -3736,7 +3758,7 @@ function getCustomCardHtml(s,idx){
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">${s.icon}</div>
+      <div class="card-icon">${sectionIconHtml(s,s.icon)}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${escHtml(s.name)}</div>
         <div class="card-value" id="customDisplay_${s.id}">0 ₴</div>
@@ -4345,8 +4367,8 @@ function addSimpleCard(type){
   const cfg={
     gold:{icon:'🥇',uk:'Золото',ru:'Золото',en:'Gold'},
     silver:{icon:'🥈',uk:'Срібло',ru:'Серебро',en:'Silver'},
-    business:{icon:'💼',uk:'Бізнес',ru:'Бизнес',en:'Business',de:'Geschäft',zh:'商业'},
-    family:{icon:'👨‍👩‍👧‍👦',uk:'Сімейні витрати',ru:'Семейные расходы',en:'Family expenses',de:'Familienausgaben',zh:'家庭支出'}
+    business:{icon:'business',uk:'Бізнес',ru:'Бизнес',en:'Business',de:'Geschäft',zh:'商业'},
+    family:{icon:'family',uk:'Сімейні витрати',ru:'Семейные расходы',en:'Family expenses',de:'Familienausgaben',zh:'家庭支出'}
   }[type];
   if(!cfg)return;
   const id='custom_'+type+'_'+Date.now();
@@ -4359,7 +4381,7 @@ function addSimpleCard(type){
 
 function addSecuritiesCard(type){
   /* all stock sections free */
-  const icons={stocks:'📈',bonds:'📜',ovdp:'🏛'};
+  const icons={stocks:'stocks',bonds:'bonds',ovdp:'bonds'};
   const names={stocks:t('stocksBtn'),bonds:t('bondsBtn'),ovdp:t('ovdpBtn')};
   const id='sec_'+type+'_'+Date.now();
   const stockCashCurrency=(displayCurrency||'uah').toUpperCase();
@@ -4368,6 +4390,42 @@ function addSecuritiesCard(type){
   saveData(); updateAll();
 }
 
+
+function sectionIconKey(section){
+  if(!section)return 'custom';
+  const type=section.sectionType||section.type||section.id||'';
+  if(type==='stocks')return 'stocks';
+  if(type==='bonds'||type==='ovdp')return 'bonds';
+  if(type==='metals')return 'metals';
+  if(type==='startup')return 'startups';
+  if(type==='business')return 'business';
+  if(type==='family')return 'family';
+  if(type==='cash'||type==='cash_custom')return 'cash';
+  if(type==='crypto'||type==='crypto_custom')return 'crypto';
+  if(type==='forex'||type==='forex_custom')return 'forex';
+  if(type==='account'||type==='account_custom')return 'account';
+  if(type==='deposit')return 'deposit';
+  return null;
+}
+function sectionIconHtml(section,fallback){
+  const key=sectionIconKey(section);
+  if(key)return '<img class="section-card-icon-img" src="icons/section-'+key+'.png?v=1" alt="">';
+  return fallback||section?.icon||'✏️';
+}
+function diagIconHtml(key,fallback){
+  const iconKey=sectionIconKey({sectionType:key,type:key,id:key});
+  return iconKey?'<img class="app-png-icon" src="icons/section-'+iconKey+'.png?v=1" alt="">':fallback;
+}
+function customAssetText(type){
+  const packs={
+    cash_custom:{uk:['Готівка','Готівкові кошти у валюті'],ru:['Наличные','Наличные средства в валюте'],en:['Cash','Cash funds by currency'],de:['Bargeld','Bargeld in Währung'],zh:['现金','按货币记录现金']},
+    crypto_custom:{uk:['Криптовалюта','Окремий крипто-розділ'],ru:['Криптовалюта','Отдельный крипто-раздел'],en:['Crypto','Separate crypto section'],de:['Krypto','Eigener Krypto-Bereich'],zh:['加密货币','单独的加密资产部分']},
+    forex_custom:{uk:['Валютні накопичення','Валюти та заощадження'],ru:['Валютные накопления','Валюты и сбережения'],en:['Currency savings','Currencies and savings'],de:['Währungsersparnisse','Währungen und Ersparnisse'],zh:['外币储蓄','货币与储蓄']},
+    account_custom:{uk:['Поточний рахунок','Банківський рахунок'],ru:['Текущий счёт','Банковский счёт'],en:['Current account','Bank account'],de:['Girokonto','Bankkonto'],zh:['活期账户','银行账户']}
+  };
+  const pair=packs[type]?.[currentLang]||packs[type]?.uk||['Розділ',''];
+  return {name:pair[0],desc:pair[1]};
+}
 
 function stockNum(v){return parseInputNumber(v);}
 function getStockCurrencyRate(cur){
@@ -4605,7 +4663,7 @@ function getSecCardHtml(s,idx){
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">${s.icon}</div>
+      <div class="card-icon">${sectionIconHtml(s,s.icon)}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
         <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(total))}</div>
@@ -4706,7 +4764,7 @@ function getBondCardHtml(s,idx){
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">${s.icon||'📜'}</div>
+      <div class="card-icon">${sectionIconHtml(s,s.icon||'📜')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
         <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(stats.total))}</div>
@@ -6134,11 +6192,11 @@ function bootstrapApp(){
 }
 
 const SETTINGS_I18N={
-  uk:{title:'⚙️ Налаштування',langLbl:'Мова / Language',currLbl:'Відображення суми',themeLbl:'Тема',themeDark:'🌙 Темна',themeLight:'☀ Світла',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовий чек-лист',legalLbl:'Правові документи',privacyBtn:'🔐 Політика конфіденційності',termsBtn:'⚖️ Умови та відмова від відповідальності'},
-  ru:{title:'⚙️ Настройки',langLbl:'Язык / Language',currLbl:'Отображение суммы',themeLbl:'Тема',themeDark:'🌙 Тёмная',themeLight:'☀ Светлая',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовый чек-лист',legalLbl:'Правовые документы',privacyBtn:'🔐 Политика конфиденциальности',termsBtn:'⚖️ Условия и отказ от ответственности'},
-  en:{title:'⚙️ Settings',langLbl:'Language',currLbl:'Display currency',themeLbl:'Theme',themeDark:'🌙 Dark',themeLight:'☀ Light',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test checklist',legalLbl:'Legal documents',privacyBtn:'🔐 Privacy Policy',termsBtn:'⚖️ Terms & Disclaimer'},
-  de:{title:'⚙️ Einstellungen',langLbl:'Sprache / Language',currLbl:'Währungsanzeige',themeLbl:'Design',themeDark:'🌙 Dunkel',themeLight:'☀ Hell',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test-Checkliste',legalLbl:'Rechtliches',privacyBtn:'🔐 Datenschutzrichtlinie',termsBtn:'⚖️ Nutzungsbedingungen & Haftungsausschluss'},
-  zh:{title:'⚙️ 设置',langLbl:'语言 / Language',currLbl:'显示货币',themeLbl:'主题',themeDark:'🌙 深色',themeLight:'☀ 浅色',qaLbl:'QA / Release',testChecklistBtn:'🧪 测试清单',legalLbl:'法律文件',privacyBtn:'🔐 隐私政策',termsBtn:'⚖️ 条款与免责声明'},
+  uk:{title:'Налаштування',langLbl:'Мова / Language',currLbl:'Відображення суми',themeLbl:'Тема',themeDark:'🌙 Темна',themeLight:'☀ Світла',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовий чек-лист',legalLbl:'Правові документи',privacyBtn:'🔐 Політика конфіденційності',termsBtn:'⚖️ Умови та відмова від відповідальності'},
+  ru:{title:'Настройки',langLbl:'Язык / Language',currLbl:'Отображение суммы',themeLbl:'Тема',themeDark:'🌙 Тёмная',themeLight:'☀ Светлая',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовый чек-лист',legalLbl:'Правовые документы',privacyBtn:'🔐 Политика конфиденциальности',termsBtn:'⚖️ Условия и отказ от ответственности'},
+  en:{title:'Settings',langLbl:'Language',currLbl:'Display currency',themeLbl:'Theme',themeDark:'🌙 Dark',themeLight:'☀ Light',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test checklist',legalLbl:'Legal documents',privacyBtn:'🔐 Privacy Policy',termsBtn:'⚖️ Terms & Disclaimer'},
+  de:{title:'Einstellungen',langLbl:'Sprache / Language',currLbl:'Währungsanzeige',themeLbl:'Design',themeDark:'🌙 Dunkel',themeLight:'☀ Hell',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test-Checkliste',legalLbl:'Rechtliches',privacyBtn:'🔐 Datenschutzrichtlinie',termsBtn:'⚖️ Nutzungsbedingungen & Haftungsausschluss'},
+  zh:{title:'设置',langLbl:'语言 / Language',currLbl:'显示货币',themeLbl:'主题',themeDark:'🌙 深色',themeLight:'☀ 浅色',qaLbl:'QA / Release',testChecklistBtn:'🧪 测试清单',legalLbl:'法律文件',privacyBtn:'🔐 隐私政策',termsBtn:'⚖️ 条款与免责声明'},
 };
 function applyAppTheme(theme=appTheme){
   appTheme=theme==='light'?'light':'dark';
@@ -6720,7 +6778,7 @@ function getMetalsCardHtml(s){
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
       <div class="drag-handle">⠿</div>
-      <div class="card-icon">💎</div>
+      <div class="card-icon">${sectionIconHtml({sectionType:'metals'},'💎')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${t('metalsBtn')||'Дорогоцінні метали'}</div>
         <div class="card-value">${sym}${fmtN(toDisplayCurr(totalCur))}</div>
@@ -7053,6 +7111,12 @@ function translateDynamicUI(){
   Object.entries(pickerDescs).forEach(([id,key])=>{
     const el=document.getElementById(id);
     if(el)el.textContent=t(key);
+  });
+  [['picker_cash_name','cash_custom'],['picker_desc_cash_custom','cash_custom_desc'],['picker_crypto_name','crypto_custom'],['picker_desc_crypto_custom','crypto_custom_desc'],['picker_forex_name','forex_custom'],['picker_desc_forex_custom','forex_custom_desc'],['picker_account_name','account_custom'],['picker_desc_account_custom','account_custom_desc']].forEach(([id,key])=>{
+    const el=document.getElementById(id); if(!el)return;
+    const type=key.replace('_desc','');
+    const txt=customAssetText(type);
+    el.textContent=key.endsWith('_desc')?txt.desc:txt.name;
   });
 }
 
@@ -8491,14 +8555,14 @@ function renderDiagnostics(){
 
   // Asset distribution
   const assets=[
-    {name:sectionPerfTxt('deposits'),val:dep,color:'var(--blue2)',icon:'🏦'},
-    {name:sectionPerfTxt('crypto'),val:crypto,color:'var(--purple2)',icon:'₮'},
+    {name:sectionPerfTxt('deposits'),val:dep,color:'var(--blue2)',icon:diagIconHtml('deposit','🏦')},
+    {name:sectionPerfTxt('crypto'),val:crypto,color:'var(--purple2)',icon:diagIconHtml('crypto','₮')},
     {name:'USD',val:usd,color:'var(--teal2)',icon:'💵'},
-    {name:sectionPerfTxt('currency'),val:forex,color:'var(--orange2)',icon:'🌐'},
-    {name:sectionPerfTxt('cash'),val:cash,color:'var(--gold2)',icon:'💴'},
-    {name:sectionPerfTxt('account'),val:other,color:'var(--green2)',icon:'💳'},
-    {name:sectionPerfTxt('stocks'),val:securities,color:'var(--green2)',icon:'📈'},
-    {name:sectionPerfTxt('metals'),val:metals,color:'var(--gold2)',icon:'💎'},
+    {name:sectionPerfTxt('currency'),val:forex,color:'var(--orange2)',icon:diagIconHtml('forex','🌐')},
+    {name:sectionPerfTxt('cash'),val:cash,color:'var(--gold2)',icon:diagIconHtml('cash','💴')},
+    {name:sectionPerfTxt('account'),val:other,color:'var(--green2)',icon:diagIconHtml('account','💳')},
+    {name:sectionPerfTxt('stocks'),val:securities,color:'var(--green2)',icon:diagIconHtml('stocks','📈')},
+    {name:sectionPerfTxt('metals'),val:metals,color:'var(--gold2)',icon:diagIconHtml('metals','💎')},
     {name:sectionPerfTxt('other'),val:custom,color:'var(--purple2)',icon:'✏️'},
   ].filter(a=>a.val>0).sort((a,b)=>b.val-a.val);
 
@@ -8880,7 +8944,7 @@ function addStartupCard(){
   const section={
     id,
     name:'Стартап',
-    icon:'🚀',
+    icon:'startups',
     sectionType:'startup',
     principal:'',
     startupInvested:'',
@@ -8912,7 +8976,16 @@ pickerAdd=function(type){
   if(type==='cash_custom'){
     closeSectionPicker();
     const id='cash_'+Date.now();
-    customSections.push({id,name:'Готівка',icon:'💵',principal:'',currency:'UAH'});
+    customSections.push({id,name:customAssetText('cash_custom').name,icon:'cash',principal:'',currency:'UAH',sectionType:'cash_custom'});
+    renderCustomCards();updateAll();saveData();
+    return;
+  }
+  if(type==='crypto_custom'||type==='forex_custom'||type==='account_custom'){
+    closeSectionPicker();
+    const id=type.replace('_custom','')+'_'+Date.now();
+    const info=customAssetText(type);
+    const icon=type==='crypto_custom'?'crypto':(type==='forex_custom'?'forex':'account');
+    customSections.push({id,name:info.name,icon,principal:'',currency:(displayCurrency||'uah').toUpperCase(),sectionType:type});
     renderCustomCards();updateAll();saveData();
     return;
   }
@@ -9017,7 +9090,7 @@ getCustomCardHtml=function(s,idx){
     return `<div class="card card-startup" id="card-${s.id}" draggable="true" data-card="${s.id}">
       <div class="card-header">
         <div class="drag-handle">⠿</div>
-        <div class="card-icon">🚀</div>
+        <div class="card-icon">${sectionIconHtml(s,'🚀')}</div>
         <div class="card-info" onclick="toggleCard('${s.id}')">
           <div class="card-name">${escapeHtml(startupTitle)}</div>
           <div class="card-value" id="customDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(st.total))}</div>
