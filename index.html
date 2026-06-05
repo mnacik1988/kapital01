@@ -569,7 +569,10 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .diag-overlay.open{display:flex;}
 .diag-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .diag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.diag-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.diag-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
+.diag-title-icon{width:28px;height:28px;object-fit:contain;display:inline-block;filter:drop-shadow(0 2px 5px #00000055);}
+.diag-section-title{display:flex;align-items:center;gap:6px;}
+.diag-section-title-icon{width:18px;height:18px;object-fit:contain;display:inline-block;filter:drop-shadow(0 1px 3px #00000055);}
 .diag-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);}
 .diag-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .diag-stat{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center;}
@@ -2383,7 +2386,7 @@ body.modern-mockup .card-value{
 <div class="diag-overlay" id="diagOverlay" onclick="diagCloseOutside(event)">
   <div class="diag-box">
     <div class="diag-header">
-      <div class="diag-title">📊 Діагностика капіталу</div>
+      <div class="diag-title"><img class="diag-title-icon" src="section-icons/section-diagnostics.png?v=1" alt=""> <span>Діагностика капіталу</span></div>
       <button class="diag-close" onclick="closeDiagnostics()">✕</button>
     </div>
     <div id="diagContent"></div>
@@ -4415,6 +4418,13 @@ function sectionIconHtml(section,fallback){
 function diagIconHtml(key,fallback){
   const iconKey=sectionIconKey({sectionType:key,type:key,id:key});
   return iconKey?'<img class="app-png-icon" src="section-icons/section-'+iconKey+'.png?v=1" alt="">':fallback;
+}
+function diagTitleIcon(kind){
+  const file=kind==='period'?'section-period-stats.png':'section-diagnostics.png';
+  return '<img class="diag-section-title-icon" src="section-icons/'+file+'?v=1" alt="">';
+}
+function diagHeaderIcon(){
+  return '<img class="diag-title-icon" src="section-icons/section-diagnostics.png?v=1" alt="">';
 }
 function customAssetText(type){
   const packs={
@@ -8612,20 +8622,20 @@ function renderDiagnostics(){
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">${sectionPerfTxt('statsPeriod')}</div>
+      <div class="diag-section-title">${diagTitleIcon('period')}<span>${sectionPerfTxt('statsPeriod').replace(/^📅\s*/,'')}</span></div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('today')}</span><span class="diag-row-val">${fmtChange(dailyChange,dailyChangePct)}</span></div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('last7')}</span><span class="diag-row-val">${fmtChange(weekStats)}</span></div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('last30')}</span><span class="diag-row-val">${fmtChange(monthStats)}</span></div>
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">${sectionPerfTxt('title')}</div>
+      <div class="diag-section-title">${diagTitleIcon('diagnostics')}<span>${sectionPerfTxt('title').replace(/^📊\s*/,'')}</span></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">${sectionPerfTxt('note')}</div>
       ${sectionDynamicsRows.replace('<div class="section-dyn-grid"></div>','')||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">'+sectionPerfTxt('empty')+'</div>'}
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">${sectionPerfTxt('assetsDist')}</div>
+      <div class="diag-section-title">${diagTitleIcon('diagnostics')}<span>${sectionPerfTxt('assetsDist').replace(/^📊\s*/,'')}</span></div>
       ${assets.map(a=>`
         <div class="diag-row">
           <span class="diag-row-key">${a.icon} ${a.name}</span>
