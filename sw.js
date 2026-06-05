@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-21-stable-section-dynamics-cards-v1';
+const CACHE_NAME = 'kapital-app-v0-0-21-stable-section-icons-v2';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
@@ -8,7 +8,19 @@ const APP_SHELL = [
   './panel-icons/2.png?v=4',
   './panel-icons/3.png?v=4',
   './panel-icons/4.png?v=4',
-  './panel-icons/5.png?v=4'
+  './panel-icons/5.png?v=4',
+  './icons/section-crypto.png?v=1',
+  './icons/section-stocks.png?v=1',
+  './icons/section-account.png?v=1',
+  './icons/section-business.png?v=1',
+  './icons/section-cash.png?v=1',
+  './icons/section-deposit.png?v=1',
+  './icons/section-metals.png?v=1',
+  './icons/section-settings.png?v=1',
+  './icons/section-bonds.png?v=1',
+  './icons/section-family.png?v=1',
+  './icons/section-startups.png?v=1',
+  './icons/section-forex.png?v=1'
 ];
 
 self.addEventListener('install', event => {
