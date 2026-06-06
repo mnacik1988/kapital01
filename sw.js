@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-21-stable-diagnostics-inner-icons-v2';
+const CACHE_NAME = 'kapital-app-v0-0-21-stable-diag-icons-v7-clean';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
@@ -22,7 +22,15 @@ const APP_SHELL = [
   './section-icons/section-startups.png?v=1',
   './section-icons/section-forex.png?v=1',
   './section-icons/section-diagnostics.png?v=1',
-  './section-icons/section-period-stats.png?v=1'
+  './section-icons/section-period-stats.png?v=1',
+  './section-icons/ui-pnl.png?v=1',
+  './section-icons/ui-usdt.png?v=1',
+  './section-icons/ui-percent.png?v=1',
+  './section-icons/ui-period-stats.png?v=1',
+  './section-icons/ui-clock.png?v=1',
+  './section-icons/ui-net-profit.png?v=1',
+  './section-icons/ui-tax.png?v=1',
+  './section-icons/ui-accrued.png?v=1'
 ];
 
 self.addEventListener('install', event => {
