@@ -88,6 +88,10 @@ body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd
 .card-icon{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .section-card-icon-img{width:35px;height:35px;object-fit:contain;display:block;filter:drop-shadow(0 2px 5px #00000066);}
 .app-png-icon{width:1.35em;height:1.35em;object-fit:contain;display:inline-block;vertical-align:-0.25em;filter:drop-shadow(0 1px 3px #00000055);}
+.ui-inline-icon{width:1.55em;height:1.55em;object-fit:contain;display:inline-block;vertical-align:-0.34em;filter:drop-shadow(0 1px 3px #00000055);}
+.live-key .ui-inline-icon,.result-key .ui-inline-icon,.daily-title .ui-inline-icon,.chart-title .ui-inline-icon{width:1.44em;height:1.44em;margin-right:5px;}
+.usdt-balance-title .ui-inline-icon,.sec-cash-title .ui-inline-icon,.stock-action-btn .ui-inline-icon,.calc-head-title .ui-inline-icon,.calc-title .ui-inline-icon{margin-right:6px;}
+.calc-title-icon{width:1.67em;height:1.67em;object-fit:contain;display:inline-block;vertical-align:-0.39em;margin-right:7px;filter:drop-shadow(0 1px 3px #00000055);}
 .settings-png-icon{width:25px;height:25px;object-fit:contain;display:inline-block;vertical-align:-6px;filter:drop-shadow(0 1px 4px #00000055);}
 .gear-btn .settings-png-icon{width:32px;height:32px;vertical-align:0;}
 .settings-close-icon{width:21px;height:21px;object-fit:contain;display:block;filter:drop-shadow(0 1px 3px #00000055);}
@@ -569,11 +573,7 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .diag-overlay.open{display:flex;}
 .diag-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .diag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.diag-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
-.diag-title-icon{width:28px;height:28px;object-fit:contain;display:inline-block;filter:drop-shadow(0 2px 5px #00000055);}
-.diag-section-title{display:flex;align-items:center;gap:6px;}
-.diag-section-title-icon{width:18px;height:18px;object-fit:contain;display:inline-block;filter:drop-shadow(0 1px 3px #00000055);}
-.diag-stat-icon{width:26px;height:26px;object-fit:contain;display:inline-block;filter:drop-shadow(0 2px 5px #00000055);}
+.diag-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
 .diag-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);}
 .diag-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .diag-stat{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center;}
@@ -1539,7 +1539,7 @@ body.modern-mockup .card-value{
   <div class="chart-card">
     <div class="chart-header" onclick="toggleChart()" style="cursor:pointer;">
       <div>
-        <div class="chart-title" id="chart_title_lbl">📉 ДИНАМІКА КАПІТАЛУ</div>
+        <div class="chart-title" id="chart_title_lbl"><img class="ui-inline-icon" src="section-icons/ui-period-stats.png?v=1" alt=""> ДИНАМІКА КАПІТАЛУ</div>
         <div class="chart-total" id="chartCurrentTotal">0 ₴</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
@@ -1632,7 +1632,7 @@ body.modern-mockup .card-value{
         <input type="hidden" id="usdtUah" value="41">
         <div class="usdt-balance-top">
           <div class="usdt-balance-info">
-            <div class="usdt-balance-title">💵 <span id="usdtBalanceCardTitle">USDT баланс</span></div>
+            <div class="usdt-balance-title"><img class="ui-inline-icon" src="section-icons/ui-usdt.png?v=1" alt=""> <span id="usdtBalanceCardTitle">USDT баланс</span></div>
             <div class="usdt-balance-main" id="usdtBalanceCardAmount">0 USDT</div>
             <div class="usdt-balance-equiv" id="cryptoUahVal">0 ₴</div>
           </div>
@@ -2043,7 +2043,7 @@ body.modern-mockup .card-value{
 <div class="calc-overlay" id="calcOverlay" onclick="calcCloseOutside(event)">
   <div class="calc-box">
     <div class="calc-head">
-      <div class="calc-head-title" id="calc_title">🧮 Калькулятор</div>
+      <div class="calc-head-title" id="calc_title"><img class="calc-title-icon" src="panel-icons/4.png?v=4" alt=""> Калькулятор</div>
       <button class="calc-head-close" onclick="closeCalc()">✕</button>
     </div>
     <div class="calc-tabs">
@@ -2387,7 +2387,7 @@ body.modern-mockup .card-value{
 <div class="diag-overlay" id="diagOverlay" onclick="diagCloseOutside(event)">
   <div class="diag-box">
     <div class="diag-header">
-      <div class="diag-title"><img class="diag-title-icon" src="section-icons/section-diagnostics.png?v=1" alt=""> <span>Діагностика капіталу</span></div>
+      <div class="diag-title">📊 Діагностика капіталу</div>
       <button class="diag-close" onclick="closeDiagnostics()">✕</button>
     </div>
     <div id="diagContent"></div>
@@ -2512,19 +2512,19 @@ const LANGS={
     liabTotalDebt:'Загальний борг',liabExtraPayment:'Якщо платити +X на місяць',liabSaveMonths:'Заощадить місяців',
     liabAddBtn:'Додати',liabDeleteBtn:'Видалити кредит',
     topupBtn:'+ Поповнити',topupTitle:'Поповнення депозиту',topupAmount:'Сума поповнення',topupDate:'Дата поповнення',topupAdd:'Додати поповнення',topupHistory:'Історія поповнень',topupTotal:'Загалом поповнено',topupDelete:'Видалити',depSettings:'⚙ Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depEnd:'Дата закінчення',
-    compCalc:'⚡ Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
+    compCalc:'Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
     taxPct:'Податок (%)',taxFree:'Без податку (₴)',
     finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',
-    incomeDays:'📊 Дохід по днях (перші 30 днів)',yield:'⚡ Дохідність',
+    incomeDays:'Дохід по днях (перші 30 днів)',yield:'⚡ Дохідність',
     secName:'Назва',secQty:'Кількість',secPrice:'Ціна (₴)',secDiv:'Дивіденди (%)',secTotal:'Вартість',secActions:'Дія',
     addSecItem:'+ Додати позицію',removeSection:'✕ Видалити розділ',
     secNamePh:'Apple, AAPL...',assets:'активів',pctOfCapital:'% від капіталу',
-    perSec:'⚡ В секунду',perDay:'📅 В день (сьогодні)',taxLabel:'🏛 Податок',accruedPct:'📈 Нараховано %',netProfitLabel:'✅ Чистий прибуток',
+    perSec:'В секунду',perDay:'В день (сьогодні)',taxLabel:'Податок',accruedPct:'Нараховано %',netProfitLabel:'Чистий прибуток',
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Ваші фінансові дані залишаються на пристрої',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',pwClose:'Продовжити без підписки',
+    calcTitle:'Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Ваші фінансові дані залишаються на пристрої',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',pwClose:'Продовжити без підписки',
     secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'💰 Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
@@ -2553,19 +2553,19 @@ const LANGS={
     liabTotalDebt:'Общий долг',liabExtraPayment:'Если платить +X в месяц',liabSaveMonths:'Сэкономит месяцев',
     liabAddBtn:'Добавить',liabDeleteBtn:'Удалить кредит',
     topupBtn:'+ Пополнить',topupTitle:'Пополнение депозита',topupAmount:'Сумма пополнения',topupDate:'Дата пополнения',topupAdd:'Добавить пополнение',topupHistory:'История пополнений',topupTotal:'Итого пополнено',topupDelete:'Удалить',depSettings:'⚙ Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depEnd:'Дата окончания',
-    compCalc:'⚡ Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
+    compCalc:'Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
     taxPct:'Налог (%)',taxFree:'Без налога (₴)',
     finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',
-    incomeDays:'📊 Доход по дням (первые 30 дней)',yield:'⚡ Доходность',
+    incomeDays:'Доход по дням (первые 30 дней)',yield:'⚡ Доходность',
     secName:'Название',secQty:'Количество',secPrice:'Цена (₴)',secDiv:'Дивиденды (%)',secTotal:'Стоимость',secActions:'Действие',
     addSecItem:'+ Добавить позицию',removeSection:'✕ Удалить раздел',
     secNamePh:'Apple, AAPL...',assets:'активов',pctOfCapital:'% от капитала',
-    perSec:'⚡ В секунду',perDay:'📅 В день (сегодня)',taxLabel:'🏛 Налог',accruedPct:'📈 Начислено %',netProfitLabel:'✅ Чистая прибыль',
+    perSec:'В секунду',perDay:'В день (сегодня)',taxLabel:'Налог',accruedPct:'Начислено %',netProfitLabel:'Чистая прибыль',
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
-    calcTitle:'🧮 Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Ваши финансовые данные остаются на устройстве',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',pwClose:'Продолжить без подписки',
+    calcTitle:'Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Ваши финансовые данные остаются на устройстве',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',pwClose:'Продолжить без подписки',
     secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'💰 Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
@@ -2594,19 +2594,19 @@ const LANGS={
     liabTotalDebt:'Total debt',liabExtraPayment:'If paying +X/month',liabSaveMonths:'Months saved',
     liabAddBtn:'Add',liabDeleteBtn:'Delete loan',
     topupBtn:'+ Top Up',topupTitle:'Deposit Top-Up',topupAmount:'Top-up amount',topupDate:'Top-up date',topupAdd:'Add top-up',topupHistory:'Top-up history',topupTotal:'Total topped up',topupDelete:'Delete',depSettings:'⚙ Deposit Settings',depPrincipalLbl:'Deposit Amount (₴)',depStart:'Start Date',depEnd:'End Date',
-    compCalc:'⚡ Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
+    compCalc:'Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
     monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
     taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
     finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',
-    incomeDays:'📊 Daily Income (first 30 days)',yield:'⚡ Yield',
+    incomeDays:'Daily Income (first 30 days)',yield:'⚡ Yield',
     secName:'Name',secQty:'Qty',secPrice:'Price (₴)',secDiv:'Dividends (%)',secTotal:'Value',secActions:'Action',
     addSecItem:'+ Add Position',removeSection:'✕ Delete Section',
     secNamePh:'Apple, AAPL...',assets:'assets',pctOfCapital:'% of capital',
-    perSec:'⚡ Per second',perDay:'📅 Per day (today)',taxLabel:'🏛 Tax',accruedPct:'📈 Accrued %',netProfitLabel:'✅ Net profit',
+    perSec:'Per second',perDay:'Per day (today)',taxLabel:'Tax',accruedPct:'Accrued %',netProfitLabel:'Net profit',
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-    calcTitle:'🧮 Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your financial data stays on your device',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',pwClose:'Continue without subscription',
+    calcTitle:'Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your financial data stays on your device',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',pwClose:'Continue without subscription',
     secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'💰 Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
@@ -2614,7 +2614,7 @@ const LANGS={
     liveCnt:'Live-Zähler',addDeposit:'+ Einlage',deleteDep:'Einlage löschen?',maxDep:'Max. 3 Einlagen',
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
-    calcTitle:'🧮 Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfügbar. Wählen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschränkungen während der Testphase',pwB2:'Alle Vermögenswerte an einem Ort',pwB2sub:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerät',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',pwClose:'Ohne Abo fortfahren',
+    calcTitle:'Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfügbar. Wählen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschränkungen während der Testphase',pwB2:'Alle Vermögenswerte an einem Ort',pwB2sub:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerät',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',pwClose:'Ohne Abo fortfahren',
     secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
     cryptoName:'Krypto',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
@@ -2637,14 +2637,14 @@ const LANGS={
     topupBtn:'+ Einzahlen',topupTitle:'Einlagenaufstockung',topupAmount:'Aufstockungsbetrag',topupDate:'Aufstockungsdatum',topupAdd:'Aufstockung hinzufügen',topupHistory:'Aufstockungsverlauf',topupTotal:'Gesamt aufgestockt',topupDelete:'Löschen',depSettings:'⚙ Einlageneinstellungen',depPrincipalLbl:'Einlagenbetrag (₴)',depStart:'Eröffnungsdatum',depEnd:'Enddatum',
     rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxPct:'Steuer (%)',taxFree:'Steuerfrei (€)',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
     monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
-    compCalc:'⚡ Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
+    compCalc:'Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
     finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',
-    incomeDays:'📊 Tageseinkommen (erste 30 Tage)',
+    incomeDays:'Tageseinkommen (erste 30 Tage)',
     calcTitle:'Zinseszinsrechner',totalSum:'Gesamtbetrag',taxBase:'Steuerbasis',
-    perSecond:'Pro Sekunde',perDay:'Pro Tag',perSec:'⚡ Pro Sekunde',
+    perSecond:'Pro Sekunde',perDay:'Pro Tag',perSec:'Pro Sekunde',
     secName:'Name',secQty:'Menge',secPrice:'Preis (₴)',secDiv:'Dividende (%)',secTotal:'Wert',
     addSecItem:'+ Position hinzufügen',secNamePh:'Apple, AAPL...',assets:'Aktiva',pctOfCapital:'% des Kapitals',
-    taxLabel:'🏛 Steuer',accruedPct:'📈 Aufgelaufen %',netProfitLabel:'✅ Nettogewinn',
+    taxLabel:'Steuer',accruedPct:'Aufgelaufen %',netProfitLabel:'Nettogewinn',
     daysPassed:'vergangen',daysLeft:'verbleibend',days:'T',
     maxDep:'Max. 3 Einlagen',depName:'Einlagenname',depPlaceholder:'Einlage',
     deleteDep:'Diese Einlage löschen?',footer:'KAPITAL · Daten lokal gespeichert',
@@ -2655,7 +2655,7 @@ const LANGS={
     liveCnt:'实时计数器',addDeposit:'+ 存款',deleteDep:'删除存款?',maxDep:'最多3个存款',
     deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
     stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
-    calcTitle:'🧮 计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'免费使用 30 天',pwSub:'从第一天起即可使用全部功能。试用期结束后，选择适合您的方案。',pwB1:'30 天免费版',pwB1sub:'试用期间不受限制',pwB2:'在一个地方管理所有资产',pwB2sub:'存款、货币、加密货币、股票、贷款和贵金属',pwB3:'本地数据存储',pwB3sub:'您的财务数据保留在设备上',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'开始 30 天免费使用',pwRestore:'恢复购买',pwClose:'不订阅继续使用',
+    calcTitle:'计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'免费使用 30 天',pwSub:'从第一天起即可使用全部功能。试用期结束后，选择适合您的方案。',pwB1:'30 天免费版',pwB1sub:'试用期间不受限制',pwB2:'在一个地方管理所有资产',pwB2sub:'存款、货币、加密货币、股票、贷款和贵金属',pwB3:'本地数据存储',pwB3sub:'您的财务数据保留在设备上',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'开始 30 天免费使用',pwRestore:'恢复购买',pwClose:'不订阅继续使用',
     secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
     cryptoName:'加密货币',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
@@ -2678,14 +2678,14 @@ const LANGS={
     topupBtn:'+ 追加',topupTitle:'追加存款',topupAmount:'追加金额',topupDate:'追加日期',topupAdd:'添加追加',topupHistory:'追加历史',topupTotal:'共追加',topupDelete:'删除',depSettings:'⚙ 存款设置',depPrincipalLbl:'存款金额 (₴)',depStart:'开始日期',depEnd:'结束日期',
     rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxPct:'税率 (%)',taxFree:'免税额 (¥)',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
     monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
-    compCalc:'⚡ 复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
+    compCalc:'复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
     finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',
-    incomeDays:'📊 每日收入（前30天）',
+    incomeDays:'每日收入（前30天）',
     calcTitle:'复利计算器',totalSum:'总金额',
-    perSecond:'每秒',perDay:'每天',perSec:'⚡ 每秒',
+    perSecond:'每秒',perDay:'每天',perSec:'每秒',
     secName:'名称',secQty:'数量',secPrice:'价格 (₴)',secDiv:'股息 (%)',secTotal:'总值',
     addSecItem:'+ 添加头寸',secNamePh:'苹果, AAPL...',assets:'资产',pctOfCapital:'占总资产%',
-    taxLabel:'🏛 税款',accruedPct:'📈 累计利息%',netProfitLabel:'✅ 净利润',
+    taxLabel:'税款',accruedPct:'累计利息%',netProfitLabel:'净利润',
     daysPassed:'已过',daysLeft:'剩余',days:'天',
     maxDep:'最多3个存款',depName:'存款名称',depPlaceholder:'存款',
     deleteDep:'删除此存款?',footer:'资本 · 数据本地存储',
@@ -2766,10 +2766,10 @@ const EXTRA_I18N={
   'Погасити':{uk:'Погасити',ru:'Погасить',en:'Repay',de:'Tilgen',zh:'还款'},
   '📊 Діагностика капіталу':{uk:'📊 Діагностика капіталу',ru:'📊 Диагностика капитала',en:'📊 Capital diagnostics',de:'📊 Kapitaldiagnose',zh:'📊 资本诊断'},
   '✦ БЕЗКОШТОВНИЙ ДОСТУП':{uk:'✦ БЕЗКОШТОВНИЙ ДОСТУП',ru:'✦ БЕСПЛАТНЫЙ ДОСТУП',en:'✦ FREE ACCESS',de:'✦ KOSTENLOSER ZUGANG',zh:'✦ 免费访问'},
-  '📅 Прогноз/місяць':{uk:'📅 Прогноз/місяць',ru:'📅 Прогноз/месяц',en:'📅 Forecast/month',de:'📅 Prognose/Monat',zh:'📅 预测/月'},
-  '💰 Проценти':{uk:'💰 Проценти',ru:'💰 Проценты',en:'💰 Interest',de:'💰 Zinsen',zh:'💰 利息'},
+  '📅 Прогноз/місяць':{uk:'📅 Прогноз/місяць',ru:'Прогноз/месяц',en:'Forecast/month',de:'Prognose/Monat',zh:'预测/月'},
+  '💰 Проценти':{uk:'💰 Проценти',ru:'Проценты',en:'Interest',de:'Zinsen',zh:'利息'},
   '⚠ Невірна дата':{uk:'⚠ Невірна дата',ru:'⚠ Неверная дата',en:'⚠ Invalid date',de:'⚠ Ungültiges Datum',zh:'⚠ 日期无效'},
-  '💰 Виплата процентів':{uk:'💰 Виплата процентів',ru:'💰 Выплата процентов',en:'💰 Interest payout',de:'💰 Zinsauszahlung',zh:'💰 利息支付'},
+  '💰 Виплата процентів':{uk:'Виплата процентів',ru:'Выплата процентов',en:'Interest payout',de:'Zinsauszahlung',zh:'利息支付'},
   '→ Капіталізація (на тіло)':{uk:'→ Капіталізація (на тіло)',ru:'→ Капитализация (в тело)',en:'→ Capitalize into principal',de:'→ Zum Kapital hinzufügen',zh:'→ 计入本金'},
   '→ На окремий рахунок':{uk:'→ На окремий рахунок',ru:'→ На отдельный счёт',en:'→ To separate account',de:'→ Auf separates Konto',zh:'→ 到单独账户'},
   'Моніторинг почнеться завтра':{uk:'Моніторинг почнеться завтра',ru:'Мониторинг начнётся завтра',en:'Monitoring starts tomorrow',de:'Überwachung startet morgen',zh:'监控明天开始'},
@@ -2843,7 +2843,7 @@ Object.assign(EXTRA_I18N,{
 });
 
 Object.assign(EXTRA_I18N,{
-  '💵 USDT баланс':{uk:'💵 USDT баланс',ru:'💵 USDT баланс',en:'💵 USDT balance',de:'💵 USDT-Guthaben',zh:'💵 USDT 余额'},
+  '💵 USDT баланс':{uk:'💵 USDT баланс',ru:'USDT баланс',en:'USDT balance',de:'USDT-Guthaben',zh:'USDT 余额'},
   'Курс USDT/₴':{uk:'Курс USDT/₴',ru:'Курс USDT/₴',en:'USDT/₴ rate',de:'USDT/₴ Kurs',zh:'USDT/₴ 汇率'},
   'Еквівалент у ₴':{uk:'Еквівалент у ₴',ru:'Эквивалент в ₴',en:'₴ equivalent',de:'₴ Gegenwert',zh:'₴ 等值'},
   'Онлайн ціни':{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
@@ -2853,8 +2853,8 @@ Object.assign(EXTRA_I18N,{
   'Вдома, сейф...':{uk:'Вдома, сейф...',ru:'Дома, сейф...',en:'Home, safe...',de:'Zuhause, Safe...',zh:'家中、保险箱...'},
   'Необл. мінімум ₴':{uk:'Неоподатк. мінімум ₴',ru:'Необл. минимум ₴',en:'Tax-free minimum ₴',de:'Steuerfreier Mindestbetrag ₴',zh:'免税最低额 ₴'},
   'для P&L':{uk:'для P&L',ru:'для P&L',en:'for P&L',de:'für GuV',zh:'用于盈亏'},
-  '💰 Портфель (монети)':{uk:'💰 Портфель (монети)',ru:'💰 Портфель (монеты)',en:'💰 Portfolio (coins)',de:'💰 Portfolio (Coins)',zh:'💰 投资组合（币种）'},
-  '💵 Кошти від продажів акцій':{uk:'💵 Кошти від продажів акцій',ru:'💵 Деньги от продажи акций',en:'💵 Stock sale cash',de:'💵 Geld aus Aktienverkäufen',zh:'💵 股票卖出资金'},
+  '💰 Портфель (монети)':{uk:'💰 Портфель (монети)',ru:'Портфель (монеты)',en:'Portfolio (coins)',de:'Portfolio (Coins)',zh:'投资组合（币种）'},
+  '💵 Кошти від продажів акцій':{uk:'💵 Кошти від продажів акцій',ru:'Деньги от продажи акций',en:'Stock sale cash',de:'Geld aus Aktienverkäufen',zh:'股票卖出资金'},
   'Буде поповнюватися після продажу акцій':{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
   'Тріал':{uk:'Тріал',ru:'Триал',en:'Trial',de:'Test',zh:'试用'},
   'дн.':{uk:'дн.',ru:'дн.',en:'d',de:'Tg.',zh:'天'},
@@ -2951,8 +2951,8 @@ function startAutoI18nObserver(){
 let currentLang='uk';
 function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LANGS['uk'][key]||key;}
 const UI_TEXT={
-  stockSaleCash:{uk:'💵 Кошти від продажів акцій',ru:'💵 Деньги от продажи акций',en:'💵 Stock sale cash',de:'💵 Geld aus Aktienverkäufen',zh:'💵 股票卖出资金'},
-  stockSaleCashShort:{uk:'💵 Кошти від продажів',ru:'💵 Деньги от продаж',en:'💵 Sale cash',de:'💵 Verkaufserlöse',zh:'💵 卖出资金'},
+  stockSaleCash:{uk:'Кошти від продажів акцій',ru:'Деньги от продажи акций',en:'Stock sale cash',de:'Geld aus Aktienverkäufen',zh:'股票卖出资金'},
+  stockSaleCashShort:{uk:'Кошти від продажів',ru:'Деньги от продаж',en:'Sale cash',de:'Verkaufserlöse',zh:'卖出资金'},
   stockSaleCashHint:{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
   bondCash:{uk:'💵 Кошти від продажу / погашення',ru:'💵 Деньги от продажи / погашения',en:'💵 Sale / redemption cash',de:'💵 Geld aus Verkauf / Rückzahlung',zh:'💵 卖出 / 赎回资金'},
   bondCashShort:{uk:'💵 Продаж / погашення',ru:'💵 Продажа / погашение',en:'💵 Sale / redemption',de:'💵 Verkauf / Rückzahlung',zh:'💵 卖出 / 赎回'},
@@ -2973,13 +2973,13 @@ const UI_TEXT={
   bondManualMode:{uk:'Ручний режим · API Cbonds можна підключити пізніше',ru:'Ручной режим · API Cbonds можно подключить позже',en:'Manual mode · Cbonds API can be connected later',de:'Manueller Modus · Cbonds API kann später verbunden werden',zh:'手动模式 · 之后可连接 Cbonds API'},
   buyPriceForPnl:{uk:'для P&L',ru:'для P&L',en:'for P&L',de:'für GuV',zh:'用于盈亏'},
   autoFull:{uk:'автоматично',ru:'автоматически',en:'automatic',de:'automatisch',zh:'自动'},
-  stockAddAction:{uk:'📈 Додати',ru:'📈 Добавить',en:'📈 Add',de:'📈 Hinzufügen',zh:'📈 添加'},
+  stockAddAction:{uk:'Додати',ru:'Добавить',en:'Add',de:'Hinzufügen',zh:'添加'},
   stockRemoveAction:{uk:'📉 Убрати',ru:'📉 Убрать',en:'📉 Remove',de:'📉 Entfernen',zh:'📉 移除'},
-  cryptoPortfolio:{uk:'💰 Портфель (монети)',ru:'💰 Портфель (монеты)',en:'💰 Portfolio (coins)',de:'💰 Portfolio (Coins)',zh:'💰 投资组合（币种）'},
+  cryptoPortfolio:{uk:'Портфель (монети)',ru:'Портфель (монеты)',en:'Portfolio (coins)',de:'Portfolio (Coins)',zh:'投资组合（币种）'},
   onlinePrices:{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
   refresh:{uk:'⟳ Оновити',ru:'⟳ Обновить',en:'⟳ Refresh',de:'⟳ Aktualisieren',zh:'⟳ 刷新'},
   refreshing:{uk:'⟳ ...',ru:'⟳ ...',en:'⟳ ...',de:'⟳ ...',zh:'⟳ ...'},
-  usdtBalance:{uk:'💵 USDT баланс',ru:'💵 USDT баланс',en:'💵 USDT balance',de:'💵 USDT-Guthaben',zh:'💵 USDT 余额'},
+  usdtBalance:{uk:'USDT баланс',ru:'USDT баланс',en:'USDT balance',de:'USDT-Guthaben',zh:'USDT 余额'},
   usdtRate:{uk:'Курс USDT/₴',ru:'Курс USDT/₴',en:'USDT/₴ rate',de:'USDT/₴ Kurs',zh:'USDT/₴ 汇率'},
   uahEquivalent:{uk:'Еквівалент у ₴',ru:'Эквивалент в ₴',en:'₴ equivalent',de:'₴ Gegenwert',zh:'₴ 等值'},
   noTaxMinimum:{uk:'Неоподатк. мінімум ₴',ru:'Необл. минимум ₴',en:'Tax-free minimum ₴',de:'Steuerfreier Mindestbetrag ₴',zh:'免税最低额 ₴'},
@@ -2987,8 +2987,8 @@ const UI_TEXT={
   daysShort:{uk:'дн.',ru:'дн.',en:'d',de:'Tg.',zh:'天'},
   toPrincipal:{uk:'→ на тіло',ru:'→ в тело',en:'→ to principal',de:'→ zum Kapital',zh:'→ 计入本金'},
   toSeparate:{uk:'→ окремий рахунок',ru:'→ отдельный счёт',en:'→ separate account',de:'→ separates Konto',zh:'→ 单独账户'},
-  perMonthForecast:{uk:'📅 Прогноз/місяць',ru:'📅 Прогноз/месяц',en:'📅 Forecast/month',de:'📅 Prognose/Monat',zh:'📅 预测/月'},
-  interestLabel:{uk:'💰 Проценти',ru:'💰 Проценты',en:'💰 Interest',de:'💰 Zinsen',zh:'💰 利息'},
+  perMonthForecast:{uk:'Прогноз/місяць',ru:'Прогноз/месяц',en:'Forecast/month',de:'Prognose/Monat',zh:'预测/月'},
+  interestLabel:{uk:'Проценти',ru:'Проценты',en:'Interest',de:'Zinsen',zh:'利息'},
   taxShort:{uk:'подат.',ru:'налог',en:'tax',de:'Steuer',zh:'税'},
   trialShort:{uk:'Тріал',ru:'Триал',en:'Trial',de:'Test',zh:'试用'},
   netBtn:{uk:'Нетто',ru:'Нетто',en:'Net',de:'Netto',zh:'净值'},
@@ -3145,19 +3145,19 @@ function getDepositHtml(dep,idx){
         <div class="live-num" id="liveAmount_${dep.id}">0<span class="live-kopeck">.00 ₴</span></div>
         <div class="live-sub" id="liveSub_${dep.id}">${lang.daysPassed} 0 ${lang.days}</div>
         <div class="live-rows">
-          <div class="live-row"><span class="live-key">${lang.accruedPct}</span><span class="live-val g" id="liveInterest_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">${lang.taxLabel}</span><span class="live-val r" id="liveTaxLive_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">${lang.netProfitLabel}</span><span class="live-val g" id="liveNet_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">${lang.perSec}</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">${lang.perDay}</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">${uiText('perMonthForecast')}</span><span class="live-val g" id="livePerMonth_${dep.id}">—</span></div>
-          <div class="live-row"><span class="live-key">${uiText('interestLabel')}</span><span class="live-val" id="liveInterestTo_${dep.id}" style="font-size:9px;color:var(--muted2)">${dep.interestTo==='separate'?uiText('toSeparate'):uiText('toPrincipal')}</span></div>
+          <div class="live-row"><span class="live-key">${liveMetricLabel('accrued',lang.accruedPct)}</span><span class="live-val g" id="liveInterest_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${liveMetricLabel('tax',lang.taxLabel)}</span><span class="live-val r" id="liveTaxLive_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${liveMetricLabel('net',lang.netProfitLabel)}</span><span class="live-val g" id="liveNet_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${liveMetricLabel('sec',lang.perSec)}</span><span class="live-val b" id="livePerSec_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${liveMetricLabel('day',lang.perDay)}</span><span class="live-val o" id="livePerDay_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${liveMetricLabel('month',uiText('perMonthForecast'))}</span><span class="live-val g" id="livePerMonth_${dep.id}">—</span></div>
+          <div class="live-row"><span class="live-key">${liveMetricLabel('interest',uiText('interestLabel'))}</span><span class="live-val" id="liveInterestTo_${dep.id}" style="font-size:9px;color:var(--muted2)">${dep.interestTo==='separate'?uiText('toSeparate'):uiText('toPrincipal')}</span></div>
         </div>
         <div class="live-bar-wrap"><div class="live-bar" id="liveBar_${dep.id}" style="width:0%"></div></div>
         <div class="live-dates"><span id="liveDateStart_${dep.id}">—</span><span id="liveDatePct_${dep.id}">0%</span><span id="liveDateEnd_${dep.id}">—</span></div>
         <div class="daily-section">
           <div class="daily-toggle" id="dailyToggle_${dep.id}" onclick="toggleDailyLog('${dep.id}')">
-            <div class="daily-title" style="margin-bottom:0">${lang.incomeDays}</div>
+            <div class="daily-title" style="margin-bottom:0">${uiIconHtml('period')} ${cleanIconText(lang.incomeDays)}</div>
             <div class="daily-toggle-arrow" id="dailyArrow_${dep.id}">▼</div>
           </div>
           <div class="daily-scroll" id="dailyLog_${dep.id}"></div>
@@ -3199,7 +3199,7 @@ function getDepositHtml(dep,idx){
           </div>
         </div>
         <div class="field-group" style="margin-top:8px;">
-          <div class="field-label">💰 Виплата процентів</div>
+          <div class="field-label">${uiIconHtml('percent')} ${cleanIconText(translateAutoValue('💰 Виплата процентів')||'Виплата процентів')}</div>
           <select class="field-input" id="depInterestTo_${dep.id}"
             onchange="setDepositInterestTo('${dep.id}',${idx},this.value)">
             <option value="body" ${dep.interestTo!=='separate'?'selected':''}>→ Капіталізація (на тіло)</option>
@@ -3227,7 +3227,7 @@ function getDepositHtml(dep,idx){
           </div>
         </div>`:''}
         <div class="calc-section">
-          <div class="calc-title">${lang.compCalc}</div>
+          <div class="calc-title">${calcIconHtml()} ${cleanIconText(lang.compCalc)}</div>
           <div class="field-group">
             <div class="field-label">${lang.annualRate}</div>
             <input class="field-input" type="text" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
@@ -4411,26 +4411,30 @@ function sectionIconKey(section){
   if(type==='deposit')return 'deposit';
   return null;
 }
+function uiIconHtml(key, cls='ui-inline-icon'){
+  const map={accrued:'ui-accrued',tax:'ui-tax',net:'ui-net-profit',clock:'ui-clock',period:'ui-period-stats',percent:'ui-percent',usdt:'ui-usdt',pnl:'ui-pnl'};
+  const file=map[key];
+  return file?'<img class="'+cls+'" src="section-icons/'+file+'.png?v=1" alt="">':'';
+}
+function calcIconHtml(cls='calc-title-icon'){
+  return '<img class="'+cls+'" src="panel-icons/4.png?v=4" alt="">';
+}
+function cleanIconText(text){return String(text||'').replace(/^[📈📉📊📅💰💵💱🏦🏛⚡✅🧮%₮\s]+/u,'').trim();}
+function liveMetricLabel(key,text){
+  const map={accrued:'accrued',tax:'tax',net:'net',sec:'clock',day:'period',month:'period',interest:'percent'};
+  return uiIconHtml(map[key])+' '+cleanIconText(text);
+}
 function sectionIconHtml(section,fallback){
   const key=sectionIconKey(section);
   if(key)return '<img class="section-card-icon-img" src="section-icons/section-'+key+'.png?v=1" alt="">';
   return fallback||section?.icon||'✏️';
 }
 function diagIconHtml(key,fallback){
-  const iconKey=sectionIconKey({sectionType:key,type:key,id:key});
+  const uiMap={tax:'tax',period:'period',history:'period',pnl:'pnl',percent:'percent'};
+  if(uiMap[key])return uiIconHtml(uiMap[key],'app-png-icon');
+  const sectionMap={diagnostics:'diagnostics'};
+  const iconKey=sectionMap[key]||sectionIconKey({sectionType:key,type:key,id:key});
   return iconKey?'<img class="app-png-icon" src="section-icons/section-'+iconKey+'.png?v=1" alt="">':fallback;
-}
-function diagTitleIcon(kind){
-  const map={period:'section-period-stats.png',stocks:'section-stocks.png',tax:'section-cash.png',diagnostics:'section-diagnostics.png'};
-  const file=map[kind]||'section-diagnostics.png';
-  return '<img class="diag-section-title-icon" src="section-icons/'+file+'?v=1" alt="">';
-}
-function diagHeaderIcon(){
-  return '<img class="diag-title-icon" src="section-icons/section-diagnostics.png?v=1" alt="">';
-}
-function diagStatIcon(kind){
-  const file=kind==='period'?'section-period-stats.png':'section-diagnostics.png';
-  return '<img class="diag-stat-icon" src="section-icons/'+file+'?v=1" alt="">';
 }
 function customAssetText(type){
   const packs={
@@ -4695,7 +4699,7 @@ function getSecCardHtml(s,idx){
       <div class="divider"></div>
       ${rows}
       <div style="background:linear-gradient(135deg,#4ecb8d12,#5b9cf610);border:1px solid #4ecb8d35;border-radius:14px;padding:14px;margin-top:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiText('stockSaleCash')}</div>
+        <div class="sec-cash-title" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--green2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${diagIconHtml('cash','')} ${cleanIconText(uiText('stockSaleCash'))}</div>
         <div style="display:flex;gap:8px;align-items:center;">
           <input class="field-input" type="text" id="secCashAmount_${s.id}" value="${stockCashAmount?fmtMax2(stockCashAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecCashAmount('${s.id}',this.value)">
           <select class="field-input" id="secCashCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecCashCurrency('${s.id}',this.value)">
@@ -4712,7 +4716,7 @@ function getSecCardHtml(s,idx){
         </div>
         <div class="stock-price-info" id="stockInfo_${s.id}"></div>
         <div class="stock-action-row">
-          <button class="stock-action-btn" id="secTypeBuy_${s.id}" onclick="openSecAddPopup('${s.id}','buy')">${uiText('stockAddAction')}</button>
+          <button class="stock-action-btn" id="secTypeBuy_${s.id}" onclick="openSecAddPopup('${s.id}','buy')">${diagIconHtml('stocks','')} ${cleanIconText(uiText('stockAddAction'))}</button>
         </div>
         <input type="hidden" id="secTradeType_${s.id}" value="buy">
       </div>
@@ -5286,7 +5290,7 @@ function renderCoins(){
   if(totalVal>0){
     html+=`<div class="result-box" style="margin-top:10px">
       <div class="result-row"><span class="result-key">${uiText('cryptoPortfolio')}</span><span class="result-val" style="color:var(--purple2)">$${fmtN(Math.round(totalVal))} ≈ ${fmtN(toDisplayCurr(totalVal*rate))} ${sym}</span></div>
-      <div class="result-row"><span class="result-key">📊 P&L</span><span class="result-val" style="color:${totalPnl>=0?'var(--green2)':'var(--red)'}">${totalPnl>=0?'+':''}$${fmtN(Math.round(totalPnl))} (${totalPnl>=0?'+':''}${totalPnlPct.toFixed(1)}%)</span></div>
+      <div class="result-row"><span class="result-key">${uiIconHtml('pnl')} P&L</span><span class="result-val" style="color:${totalPnl>=0?'var(--green2)':'var(--red)'}">${totalPnl>=0?'+':''}${fmtN(Math.round(totalPnl))} (${totalPnl>=0?'+':''}${totalPnlPct.toFixed(1)}%)</span></div>
     </div>`;
   }
   
@@ -5390,7 +5394,7 @@ function stockDetailTxt(key){
     avg:{uk:'Ø Середня',ru:'Ø Средняя',en:'Ø Average',de:'Ø Durchschnitt',zh:'Ø 平均'},
     divMonth:{uk:'Дивід./міс',ru:'Дивид./мес',en:'Div./mo',de:'Div./Monat',zh:'股息/月'},
     trades:{uk:'📋 Угоди',ru:'📋 Сделки',en:'📋 Trades',de:'📋 Transaktionen',zh:'📋 交易'},
-    buy:{uk:'📈 Купівля',ru:'📈 Добавление',en:'📈 Add',de:'📈 Hinzufügen',zh:'📈 添加'},
+    buy:{uk:'📈 Купівля',ru:'📈 Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
     sell:{uk:'📉 Продаж',ru:'📉 Продажа',en:'📉 Sale',de:'📉 Verkauf',zh:'📉 卖出'},
     sellTitle:{uk:'📉 Продати',ru:'📉 Продать',en:'📉 Sell',de:'📉 Verkaufen',zh:'📉 卖出'},
     saleCurrency:{uk:'Валюта продажу',ru:'Валюта продажи',en:'Sale currency',de:'Verkaufswährung',zh:'卖出货币'},
@@ -8429,7 +8433,7 @@ function openCapitalHistory(){
   }).join('');
   const ov=document.createElement('div');
   ov.className='history-overlay open';
-  ov.innerHTML='<div class="history-box"><div class="diag-header"><div class="diag-title"><img class="diag-title-icon" src="section-icons/section-period-stats.png?v=1" alt=""> <span>'+historyTxt('title').replace(/^📈\\s*/,'')+'</span></div><button class="diag-close" onclick="this.closest(\'.history-overlay\').remove()">✕</button></div><div class="diag-section-title">'+historyTxt('last')+' '+Math.min(sorted.length,30)+' / '+sorted.length+' '+historyTxt('records')+'</div>'+(rows||'<div class="diag-section" style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--muted2);line-height:1.5;">'+historyTxt('empty')+'</div>')+'<button class="modal-cancel" onclick="this.closest(\'.history-overlay\').remove()">'+historyTxt('close')+'</button></div>';
+  ov.innerHTML='<div class="history-box"><div class="diag-header"><div class="diag-title">'+historyTxt('title')+'</div><button class="diag-close" onclick="this.closest(\'.history-overlay\').remove()">✕</button></div><div class="diag-section-title">'+historyTxt('last')+' '+Math.min(sorted.length,30)+' / '+sorted.length+' '+historyTxt('records')+'</div>'+(rows||'<div class="diag-section" style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--muted2);line-height:1.5;">'+historyTxt('empty')+'</div>')+'<button class="modal-cancel" onclick="this.closest(\'.history-overlay\').remove()">'+historyTxt('close')+'</button></div>';
   document.body.appendChild(ov);
   ov.onclick=e=>{if(e.target===ov)ov.remove();};
 }
@@ -8606,7 +8610,7 @@ function renderDiagnostics(){
         <div class="diag-stat-lbl">Борги</div>
       </div>
       <button class="diag-history-btn" onclick="openCapitalHistory()">
-        <div class="diag-stat-val">${diagStatIcon('period')}</div>
+        <div class="diag-stat-val">${diagIconHtml('history','')}</div>
         <div class="diag-stat-lbl">Історія графіка</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px;">${capitalHistory.length} записів</div>
       </button>
@@ -8628,20 +8632,20 @@ function renderDiagnostics(){
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">${diagTitleIcon('period')}<span>${sectionPerfTxt('statsPeriod').replace(/^📅\s*/,'')}</span></div>
+      <div class="diag-section-title">${diagIconHtml('period','')} ${cleanIconText(sectionPerfTxt('statsPeriod'))}</div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('today')}</span><span class="diag-row-val">${fmtChange(dailyChange,dailyChangePct)}</span></div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('last7')}</span><span class="diag-row-val">${fmtChange(weekStats)}</span></div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('last30')}</span><span class="diag-row-val">${fmtChange(monthStats)}</span></div>
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">${diagTitleIcon('diagnostics')}<span>${sectionPerfTxt('title').replace(/^📊\s*/,'')}</span></div>
+      <div class="diag-section-title">${diagIconHtml('diagnostics','')} ${cleanIconText(sectionPerfTxt('title'))}</div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.45;margin-bottom:8px;">${sectionPerfTxt('note')}</div>
       ${sectionDynamicsRows.replace('<div class="section-dyn-grid"></div>','')||'<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted2);">'+sectionPerfTxt('empty')+'</div>'}
     </div>
 
     <div class="diag-section">
-      <div class="diag-section-title">${diagTitleIcon('diagnostics')}<span>${sectionPerfTxt('assetsDist').replace(/^📊\s*/,'')}</span></div>
+      <div class="diag-section-title">${diagIconHtml('diagnostics','')} ${cleanIconText(sectionPerfTxt('assetsDist'))}</div>
       ${assets.map(a=>`
         <div class="diag-row">
           <span class="diag-row-key">${a.icon} ${a.name}</span>
@@ -8652,7 +8656,7 @@ function renderDiagnostics(){
   // Stocks P&L section
   if(totalSecVal>0){
     html+=`<div class="diag-section">
-      <div class="diag-section-title">${diagTitleIcon('stocks')}<span>${sectionPerfTxt('stocks')} — P&L</span></div>
+      <div class="diag-section-title">${diagIconHtml('stocks','')} ${sectionPerfTxt('stocks')} — P&L</div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('portfolioValue')}</span><span class="diag-row-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(totalSecVal))}</span></div>
       ${totalSecBuyCost>0?`
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('buyValue')}</span><span class="diag-row-val">${sym}${fmtN(toDisplayCurr(totalSecBuyCost))}</span></div>
@@ -8684,11 +8688,11 @@ function renderDiagnostics(){
   // Deposit tax info
   if(deposits.some(d=>d.principal)){
     html+=`<div class="diag-section">
-      <div class="diag-section-title">${diagTitleIcon('tax')}<span>Податки (депозити)</span></div>
+      <div class="diag-section-title">${diagIconHtml('tax','')} ${cleanIconText(uiText('🏛 Податки (депозити)')||'Податки (депозити)')}</div>
       ${deposits.filter(d=>d.principal).map(d=>{
         const tax=parseFloat(d.tax)||0;
         const taxLabel=tax>0?tax+'% ПДФО':'Без податку';
-        return `<div class="diag-row"><span class="diag-row-key">${diagIconHtml('deposit','🏦')} ${d.name||'Депозит'}</span><span class="diag-row-val" style="color:${tax>0?'var(--red)':'var(--green2)'}">${taxLabel}</span></div>`;
+        return `<div class="diag-row"><span class="diag-row-key">${diagIconHtml('deposit','')} ${d.name||uiText('Депозит')||'Депозит'}</span><span class="diag-row-val" style="color:${tax>0?'var(--red)':'var(--green2)'}">${taxLabel}</span></div>`;
       }).join('')}
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;padding:6px;background:var(--bg);border-radius:8px;">
         💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.
