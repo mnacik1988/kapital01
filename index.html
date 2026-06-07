@@ -2125,7 +2125,7 @@ body.modern-mockup .card-value{
         </div>
       </div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;" id="cur_rate_source"></div>
-      <button onclick="fetchUsdUahRate().then(()=>fillCurrencyFields())" style="display:block;margin:8px auto 0;padding:6px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">⟳ Оновити курси онлайн</button>
+      <button onclick="fetchUsdUahRate(true).then(()=>fillCurrencyFields())" style="display:block;margin:8px auto 0;padding:6px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">⟳ Оновити курси онлайн</button>
       <div class="calc-res" id="cur_result" style="display:none"></div>
     </div>
   </div>
@@ -3912,6 +3912,7 @@ let usdUahRate=41;
 // Live exchange rates (UAH base) from frankfurter.app
 let liveRates={UAH:1,USD:41,EUR:45,RUB:0.59,CNY:5.6,GBP:52,PLN:10}; // RUB: 1₽≈0.59₴ (Google: 1000₴=1690₽)
 let ratesLastFetched=0;
+const LIVE_RATES_CACHE_TTL_MS=60*60*1000;
 let stockLastError='';
 let networkMode = navigator.onLine ? 'online' : 'offline';
 function offlineTxt(key){
@@ -3941,6 +3942,9 @@ function loadLiveRatesCache(){
     if(cached.ratesLastFetched)ratesLastFetched=cached.ratesLastFetched;
     if(cached.rateSource)window._rateSource=cached.rateSource;
   }catch(e){}
+}
+function isLiveRatesCacheFresh(){
+  return !!(ratesLastFetched && Date.now()-ratesLastFetched<LIVE_RATES_CACHE_TTL_MS && liveRates.USD && liveRates.USD>1);
 }
 function updateNetworkStatusUI(mode){
   networkMode=mode||(isOffline()?'offline':'online');
@@ -4014,7 +4018,7 @@ async function claudeGetStockData(tickers){
   }catch(e){console.error('claudeGetStock:',e);throw e;}
 }
 
-async function fetchUsdUahRate(){
+async function fetchUsdUahRate(forceFresh=false){
   if(isOffline()){
     window._rateSource=offlineTxt('ratesOffline');
     updateNetworkStatusUI('offline');
@@ -4022,10 +4026,16 @@ async function fetchUsdUahRate(){
     return false;
   }
   updateNetworkStatusUI('online');
+  if(!forceFresh&&isLiveRatesCacheFresh()){
+    window._rateSource=(window._rateSource||offlineTxt('ratesFallback'))+' · cache';
+    if(typeof fillCurrencyFields==='function')try{fillCurrencyFields();}catch(e){}
+    if(displayCurrency!=='uah') updateAll();
+    return true;
+  }
   let success=false;
   let rateSource='';
 
-  // ISO 4217 numeric code → string code mapping
+  // ISO 4217 numeric code -> string code mapping.
   const ISO_CODES={840:'USD',978:'EUR',826:'GBP',985:'PLN',643:'RUB',156:'CNY',
     756:'CHF',392:'JPY',203:'CZK',949:'TRY',124:'CAD',36:'AUD',980:'UAH',
     784:'AED',818:'EGP',348:'HUF',946:'RON',941:'RSD',975:'BGN',208:'DKK',
@@ -4034,123 +4044,112 @@ async function fetchUsdUahRate(){
     986:'BRL',484:'MXN',356:'INR',586:'PKR',50:'BDT',51:'AMD',398:'KZT',
     417:'KGS',860:'UZS',981:'GEL',944:'AZN',933:'BYN',498:'MDL',934:'TMT',972:'TJS'};
 
-  // Source 0: Monobank API (free, no token, updates every 5 min)
-  try{
+  const applyRates=(rates,source)=>{
+    let hasUsd=false;
+    Object.entries(rates||{}).forEach(([cur,rate])=>{
+      cur=String(cur||'').toUpperCase();
+      rate=Number(rate);
+      if(cur&&rate>0){
+        liveRates[cur]=rate;
+        if(cur==='USD'&&rate>1)hasUsd=true;
+      }
+    });
+    liveRates.UAH=1;
+    if(liveRates.USD&&liveRates.USD>1){
+      usdUahRate=liveRates.USD;
+      hasUsd=true;
+    }
+    if(hasUsd){
+      ratesLastFetched=Date.now();
+      rateSource=source;
+      success=true;
+      return true;
+    }
+    return false;
+  };
+
+  const fetchMonobankRates=async()=>{
+    const rates={};
     const r=await fetch('https://api.monobank.ua/bank/currency');
-    if(r.ok){
-      const data=await r.json();
-      if(Array.isArray(data)){
-        data.forEach(item=>{
-          const codeA=ISO_CODES[item.currencyCodeA];
-          const codeB=ISO_CODES[item.currencyCodeB];
-          if(!codeA||codeB!=='UAH')return; // we only need X/UAH pairs
-          // rateBuy = bank buys currency from you (lower)
-          // rateSell = bank sells currency to you (higher)
-          // rateCross = cross-rate (when no buy/sell)
-          // Use mid-rate (average of buy and sell) for most accurate display
-          const rate=item.rateCross||(item.rateBuy&&item.rateSell?((item.rateBuy+item.rateSell)/2):item.rateSell||item.rateBuy);
-          if(rate&&rate>0) liveRates[codeA]=rate;
-        });
-        if(liveRates.USD&&liveRates.USD>10){
-          liveRates.UAH=1;
-          usdUahRate=liveRates.USD;
-          ratesLastFetched=Date.now();
-          rateSource='Monobank';
-          success=true;
-        }
-      }
-    }
-  }catch(e){}
+    if(!r.ok)return false;
+    const data=await r.json();
+    if(!Array.isArray(data))return false;
+    data.forEach(item=>{
+      const codeA=ISO_CODES[item.currencyCodeA];
+      const codeB=ISO_CODES[item.currencyCodeB];
+      if(!codeA||codeB!=='UAH')return;
+      const rate=item.rateCross||(item.rateBuy&&item.rateSell?((item.rateBuy+item.rateSell)/2):item.rateSell||item.rateBuy);
+      if(rate&&rate>0)rates[codeA]=rate;
+    });
+    return applyRates(rates,'Monobank');
+  };
 
-  // Source 1: exchangerate-api.com (free, no key for v6 open endpoint)
-  if(!success){
-  try{
+  const fetchExchangeRateOpen=async()=>{
     const r=await fetch('https://open.er-api.com/v6/latest/UAH');
-    if(r.ok){
-      const d=await r.json();
-      if(d.rates){
-        // Returns: how many of each currency per 1 UAH
-        // We need: how many UAH per 1 unit (invert)
-        Object.entries(d.rates).forEach(([cur,rate])=>{
-          if(rate&&rate>0) liveRates[cur.toUpperCase()]=1/rate;
-        });
-        liveRates.UAH=1;
-        usdUahRate=liveRates.USD||41;
-        ratesLastFetched=Date.now();
-        rateSource=rateSource||'ExchangeRate API';
-        success=true;
-      }
-    }
-  }catch(e){}
-  } // end Source 1
+    if(!r.ok)return false;
+    const d=await r.json();
+    if(!d.rates)return false;
+    const rates={};
+    Object.entries(d.rates).forEach(([cur,rate])=>{
+      if(rate&&rate>0)rates[cur.toUpperCase()]=1/rate;
+    });
+    return applyRates(rates,'ExchangeRate API');
+  };
 
-  // Source 2: frankfurter.app (ECB) — no RUB, but good for USD/EUR/CNY
-  if(!success){
-    try{
-      const r=await fetch('https://api.frankfurter.app/latest?from=UAH&to=USD,EUR,CNY,GBP,PLN,CHF,JPY,CZK,TRY');
-      if(r.ok){
-        const d=await r.json();
-        if(d.rates){
-          Object.entries(d.rates).forEach(([cur,rate])=>{
-            if(rate&&rate>0) liveRates[cur]=1/rate;
-          });
-          liveRates.UAH=1;
-          usdUahRate=liveRates.USD||41;
-          ratesLastFetched=Date.now();
-          success=true;
-        }
-      }
-    }catch(e){}
+  const fetchFrankfurterRates=async()=>{
+    const r=await fetch('https://api.frankfurter.app/latest?from=UAH&to=USD,EUR,CNY,GBP,PLN,CHF,JPY,CZK,TRY,CAD,AUD');
+    if(!r.ok)return false;
+    const d=await r.json();
+    if(!d.rates)return false;
+    const rates={};
+    Object.entries(d.rates).forEach(([cur,rate])=>{
+      if(rate&&rate>0)rates[cur.toUpperCase()]=1/rate;
+    });
+    return applyRates(rates,'Frankfurter');
+  };
+
+  const fetchWorkerRates=async()=>{
+    if(!WORKER_URL)return false;
+    const r=await fetch(WORKER_URL.replace(/\/$/,'')+'/rates');
+    if(!r.ok)return false;
+    const d=await r.json();
+    return applyRates(d,'Worker');
+  };
+
+  const selected=(displayCurrency||'uah').toLowerCase();
+  const sources=selected==='uah'
+    ? [fetchMonobankRates,fetchExchangeRateOpen,fetchFrankfurterRates,fetchWorkerRates]
+    : [fetchExchangeRateOpen,fetchFrankfurterRates,fetchWorkerRates,fetchMonobankRates];
+
+  for(const load of sources){
+    if(success)break;
+    try{await load();}catch(e){}
   }
 
-  // Source 3: NBU for UAH/RUB specifically
-  // Only if RUB wasn't already set correctly by Source 1
-  const rubFromSource1=liveRates.RUB;
-  const rubLooksCorrect=rubFromSource1&&rubFromSource1>0.3&&rubFromSource1<1.5; // sanity: 1 RUB = 0.3-1.5 UAH
+  // RUB sanity correction. Some free sources may omit or distort RUB.
+  const rubLooksCorrect=liveRates.RUB&&liveRates.RUB>0.3&&liveRates.RUB<1.5;
   if(!rubLooksCorrect&&liveRates.USD&&liveRates.USD>1){
     try{
       const r=await fetch('https://open.er-api.com/v6/latest/RUB');
       if(r.ok){
         const d=await r.json();
-        if(d.rates&&d.rates.UAH){
-          liveRates.RUB=d.rates.UAH; // UAH per 1 RUB
-        }
+        if(d.rates&&d.rates.UAH)liveRates.RUB=d.rates.UAH;
       }
     }catch(e){
-      // Fallback cross-rate: 1 USD ≈ 80 RUB (as of 2025)
-      if(liveRates.USD>1) liveRates.RUB=liveRates.USD/80;
+      liveRates.RUB=liveRates.USD/80;
     }
   }
 
-  // Source 4: Worker fallback for rates
-  if(!success&&WORKER_URL){
-    try{
-      const r=await fetch(WORKER_URL.replace(/\/$/,'')+'/rates');
-      if(r.ok){
-        const d=await r.json();
-        if(d.USD){
-          Object.entries(d).forEach(([cur,rate])=>{
-            if(rate&&rate>0) liveRates[cur.toUpperCase()]=rate;
-          });
-          liveRates.UAH=1;
-          usdUahRate=liveRates.USD||41;
-          ratesLastFetched=Date.now();
-          rateSource=rateSource||'Worker';
-          success=true;
-        }
-      }
-    }catch(e){}
-  }
   if(success&&displayCurrency!=='uah') updateAll();
   window._rateSource=rateSource||offlineTxt('ratesFallback');
   if(success)saveLiveRatesCache();
   updateNetworkStatusUI(success?'online':'error');
 
-  // Auto-update calculator fields if open
+  // Auto-update calculator fields if open.
   if(typeof fillCurrencyFields==='function'){
     try{fillCurrencyFields();}catch(e){}
   }
-  // Auto-update USDT rate field in crypto section
+  // Auto-update USDT rate field in crypto section.
   if(liveRates.USD && liveRates.USD > 10){
     const usdtEl=document.getElementById('usdtUah');
     if(usdtEl && (!usdtEl.value || usdtEl.value==='41')){
