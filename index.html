@@ -89,6 +89,7 @@ body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd
 .section-card-icon-img{width:35px;height:35px;object-fit:contain;display:block;filter:drop-shadow(0 2px 5px #00000066);}
 .app-png-icon{width:1.55em;height:1.55em;object-fit:contain;display:inline-block;vertical-align:-0.32em;filter:drop-shadow(0 1px 3px #00000055);}
 .ui-inline-icon{width:1.55em;height:1.55em;object-fit:contain;display:inline-block;vertical-align:-0.34em;filter:drop-shadow(0 1px 3px #00000055);}
+.tiny-png-icon{width:1.15em;height:1.15em;object-fit:contain;display:inline-block;vertical-align:-0.24em;margin-right:4px;filter:drop-shadow(0 1px 3px #00000055);}
 .live-key .ui-inline-icon,.result-key .ui-inline-icon,.daily-title .ui-inline-icon,.chart-title .ui-inline-icon{width:1.66em;height:1.66em;margin-right:6px;}
 .usdt-balance-title .ui-inline-icon,.sec-cash-title .ui-inline-icon,.stock-action-btn .ui-inline-icon,.calc-head-title .ui-inline-icon,.calc-title .ui-inline-icon{margin-right:6px;}
 .calc-title-icon{width:1.67em;height:1.67em;object-fit:contain;display:inline-block;vertical-align:-0.39em;margin-right:7px;filter:drop-shadow(0 1px 3px #00000055);}
@@ -1831,16 +1832,8 @@ body.modern-mockup .card-value{
 
 </div>
 
-<!-- ADD SECTION BUTTONS -->
-<div class="add-section-wrap" style="margin-top:14px;">
-  <button class="add-one-btn" onclick="openSectionPicker()">
-    <span class="plus">+</span>
-    <span id="addSectionBtnLabel" data-i18n="addCustom">Додати розділ</span>
-  </button>
-</div>
-
 <!-- LIABILITIES SECTION -->
-<div id="liabButtonWrap" style="padding:0 16px;margin-top:14px;">
+<div id="liabButtonWrap" class="add-section-wrap" style="margin-top:14px;">
   <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;" onclick="openLiabModal()" id="liabAddMainBtn">
     <span class="plus" style="color:var(--red)">+</span>
     <span>Зобов'язання / Кредит</span>
@@ -1915,35 +1908,30 @@ body.modern-mockup .card-value{
         <div class="picker-item-name">Стартап</div>
         <div class="picker-item-desc" id="picker_desc_startup">Вкладення в стартап</div>
       </div>
-      <div class="picker-item" onclick="pickerAdd('cash_custom')">
+      <div class="picker-item" onclick="pickerAdd('cash_builtin')">
         <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-cash.png?v=1" alt=""></div>
-        <div class="picker-item-name" id="picker_cash_name">Готівка</div>
-        <div class="picker-item-desc" id="picker_desc_cash_custom">Готівкові кошти у валюті</div>
+        <div class="picker-item-name" id="picker_cash_builtin_name">Готівка</div>
+        <div class="picker-item-desc" id="picker_desc_cash_builtin">Стандартний розділ готівки</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('crypto_custom')">
         <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-crypto.png?v=1" alt=""></div>
         <div class="picker-item-name" id="picker_crypto_name">Криптовалюта</div>
-        <div class="picker-item-desc" id="picker_desc_crypto_custom">Окремий крипто-розділ</div>
+        <div class="picker-item-desc" id="picker_desc_crypto_custom">Стандартний крипто-розділ</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('forex_custom')">
         <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-forex.png?v=1" alt=""></div>
         <div class="picker-item-name" id="picker_forex_name">Валютні накопичення</div>
-        <div class="picker-item-desc" id="picker_desc_forex_custom">Валюти та заощадження</div>
+        <div class="picker-item-desc" id="picker_desc_forex_custom">Стандартний валютний розділ</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('account_custom')">
         <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-account.png?v=1" alt=""></div>
         <div class="picker-item-name" id="picker_account_name">Поточний рахунок</div>
-        <div class="picker-item-desc" id="picker_desc_account_custom">Банківський рахунок</div>
+        <div class="picker-item-desc" id="picker_desc_account_custom">Стандартний банківський рахунок</div>
       </div>
       <div class="picker-item" onclick="pickerAdd('deposit_builtin')">
         <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-deposit.png?v=1" alt=""></div>
         <div class="picker-item-name" id="picker_deposit_builtin_name">Депозит (всього)</div>
         <div class="picker-item-desc" id="picker_desc_deposit_builtin">Усі депозити в одному розділі</div>
-      </div>
-      <div class="picker-item" onclick="pickerAdd('cash_builtin')">
-        <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-cash.png?v=1" alt=""></div>
-        <div class="picker-item-name" id="picker_cash_builtin_name">Готівка</div>
-        <div class="picker-item-desc" id="picker_desc_cash_builtin">Стандартний розділ готівки</div>
       </div>
     </div>
   </div>
@@ -4447,9 +4435,9 @@ function diagIconHtml(key,fallback){
 function customAssetText(type){
   const packs={
     cash_custom:{uk:['Готівка','Готівкові кошти у валюті'],ru:['Наличные','Наличные средства в валюте'],en:['Cash','Cash funds by currency'],de:['Bargeld','Bargeld in Währung'],zh:['现金','按货币记录现金']},
-    crypto_custom:{uk:['Криптовалюта','Окремий крипто-розділ'],ru:['Криптовалюта','Отдельный крипто-раздел'],en:['Crypto','Separate crypto section'],de:['Krypto','Eigener Krypto-Bereich'],zh:['加密货币','单独的加密资产部分']},
-    forex_custom:{uk:['Валютні накопичення','Валюти та заощадження'],ru:['Валютные накопления','Валюты и сбережения'],en:['Currency savings','Currencies and savings'],de:['Währungsersparnisse','Währungen und Ersparnisse'],zh:['外币储蓄','货币与储蓄']},
-    account_custom:{uk:['Поточний рахунок','Банківський рахунок'],ru:['Текущий счёт','Банковский счёт'],en:['Current account','Bank account'],de:['Girokonto','Bankkonto'],zh:['活期账户','银行账户']}
+    crypto_custom:{uk:['Криптовалюта','Стандартний крипто-розділ'],ru:['Криптовалюта','Стандартный крипто-раздел'],en:['Crypto','Default crypto section'],de:['Krypto','Standard-Krypto-Bereich'],zh:['加密货币','默认加密资产部分']},
+    forex_custom:{uk:['Валютні накопичення','Стандартний валютний розділ'],ru:['Валютные накопления','Стандартный валютный раздел'],en:['Currency savings','Default currency section'],de:['Währungsersparnisse','Standard-Währungsbereich'],zh:['外币储蓄','默认外币部分']},
+    account_custom:{uk:['Поточний рахунок','Стандартний банківський рахунок'],ru:['Текущий счёт','Стандартный банковский счёт'],en:['Current account','Default bank account'],de:['Girokonto','Standard-Bankkonto'],zh:['活期账户','默认银行账户']}
   };
   const pair=packs[type]?.[currentLang]||packs[type]?.uk||['Розділ',''];
   return {name:pair[0],desc:pair[1]};
@@ -6184,7 +6172,8 @@ function bootstrapApp(){
     });
     hiddenCards['usd']=true;
 
-    if(!securitiesSections.length)addDefaultSecuritiesCard();
+    repairBuiltinPickerSections();
+  if(!securitiesSections.length)addDefaultSecuritiesCard();
     renderDeposits();
     renderCustomCards();
     renderSecuritiesCards();
@@ -7140,7 +7129,7 @@ function translateDynamicUI(){
     const el=document.getElementById(id);
     if(el)el.textContent=t(key);
   });
-  [['picker_cash_name','cash_custom'],['picker_desc_cash_custom','cash_custom_desc'],['picker_crypto_name','crypto_custom'],['picker_desc_crypto_custom','crypto_custom_desc'],['picker_forex_name','forex_custom'],['picker_desc_forex_custom','forex_custom_desc'],['picker_account_name','account_custom'],['picker_desc_account_custom','account_custom_desc']].forEach(([id,key])=>{
+  [['picker_crypto_name','crypto_custom'],['picker_desc_crypto_custom','crypto_custom_desc'],['picker_forex_name','forex_custom'],['picker_desc_forex_custom','forex_custom_desc'],['picker_account_name','account_custom'],['picker_desc_account_custom','account_custom_desc']].forEach(([id,key])=>{
     const el=document.getElementById(id); if(!el)return;
     const type=key.replace('_desc','');
     const txt=customAssetText(type);
@@ -9007,36 +8996,36 @@ function addStartupCard(){
 
 // Override pickerAdd to handle startup
 const _origPickerAdd=pickerAdd;
+function restoreBuiltinCard(cardName){
+  hiddenCards[cardName]=false;
+  if(!cardOrder.includes(cardName))cardOrder.push(cardName);
+  const card=document.getElementById('card-'+cardName);
+  if(card)card.style.display='';
+  renderCustomCards(); updateAll(); saveData();
+}
+function repairBuiltinPickerSections(){
+  const map={crypto_custom:'crypto',forex_custom:'forex',account_custom:'other'};
+  let changed=false;
+  customSections=customSections.filter(s=>{
+    const card=map[s&&s.sectionType];
+    if(!card)return true;
+    hiddenCards[card]=false;
+    if(!cardOrder.includes(card))cardOrder.push(card);
+    changed=true;
+    return false;
+  });
+  if(changed){renderCustomCards(); updateAll(); saveData();}
+}
 pickerAdd=function(type){
-  if(type==='deposit_builtin'||type==='cash_builtin'){
+  const builtinPickerMap={deposit_builtin:'deposit',cash_builtin:'cash',crypto_custom:'crypto',forex_custom:'forex',account_custom:'other'};
+  if(builtinPickerMap[type]){
     closeSectionPicker();
-    const cardName=type==='deposit_builtin'?'deposit':'cash';
-    hiddenCards[cardName]=false;
-    if(!cardOrder.includes(cardName))cardOrder.push(cardName);
-    const card=document.getElementById('card-'+cardName);
-    if(card)card.style.display='';
-    renderCustomCards(); updateAll(); saveData();
+    restoreBuiltinCard(builtinPickerMap[type]);
     return;
   }
   if(type==='startup'){
     closeSectionPicker();
     addStartupCard();
-    return;
-  }
-  if(type==='cash_custom'){
-    closeSectionPicker();
-    const id='cash_'+Date.now();
-    customSections.push({id,name:customAssetText('cash_custom').name,icon:'cash',principal:'',currency:'UAH',sectionType:'cash_custom'});
-    renderCustomCards();updateAll();saveData();
-    return;
-  }
-  if(type==='crypto_custom'||type==='forex_custom'||type==='account_custom'){
-    closeSectionPicker();
-    const id=type.replace('_custom','')+'_'+Date.now();
-    const info=customAssetText(type);
-    const icon=type==='crypto_custom'?'crypto':(type==='forex_custom'?'forex':'account');
-    customSections.push({id,name:info.name,icon,principal:'',currency:(displayCurrency||'uah').toUpperCase(),sectionType:type});
-    renderCustomCards();updateAll();saveData();
     return;
   }
   _origPickerAdd(type);
