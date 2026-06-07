@@ -1935,10 +1935,15 @@ body.modern-mockup .card-value{
         <div class="picker-item-name" id="picker_account_name">Поточний рахунок</div>
         <div class="picker-item-desc" id="picker_desc_account_custom">Банківський рахунок</div>
       </div>
-      <div class="picker-item" onclick="pickerAdd('custom')">
-        <div class="picker-item-icon">✏️</div>
-        <div class="picker-item-name" data-i18n="addCustom">Власний розділ</div>
-        <div class="picker-item-desc" id="picker_desc_custom">Будь-який актив</div>
+      <div class="picker-item" onclick="pickerAdd('deposit_builtin')">
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-deposit.png?v=1" alt=""></div>
+        <div class="picker-item-name" id="picker_deposit_builtin_name">Депозит (всього)</div>
+        <div class="picker-item-desc" id="picker_desc_deposit_builtin">Усі депозити в одному розділі</div>
+      </div>
+      <div class="picker-item" onclick="pickerAdd('cash_builtin')">
+        <div class="picker-item-icon"><img class="section-card-icon-img" src="section-icons/section-cash.png?v=1" alt=""></div>
+        <div class="picker-item-name" id="picker_cash_builtin_name">Готівка</div>
+        <div class="picker-item-desc" id="picker_desc_cash_builtin">Стандартний розділ готівки</div>
       </div>
     </div>
   </div>
@@ -2239,7 +2244,7 @@ body.modern-mockup .card-value{
       </div>
       <div class="app-version-card">
         <span class="app-version-label" id="appVersionLabel">Версія застосунку</span>
-        <span class="app-version-value" id="appVersionValue">v0.0.21</span>
+        <span class="app-version-value" id="appVersionValue">v0.0.22</span>
       </div>
       <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
         <div class="settings-label" id="set_qa_label">QA / Release</div>
@@ -2370,7 +2375,7 @@ body.modern-mockup .card-value{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</span><span id="footerVersion"> · v0.0.21</span></div>
+<div class="footer"><span data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</span><span id="footerVersion"> · v0.0.22</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2442,8 +2447,8 @@ body.modern-mockup .card-value{
 
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
-const APP_VERSION = 'v0.0.21';
-const APP_BUILD_DATE = '2026-05-26';
+const APP_VERSION = 'v0.0.22';
+const APP_BUILD_DATE = '2026-06-07';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -2511,7 +2516,7 @@ const LANGS={
     liabNetCapital:'Нетто-капітал (з урахуванням боргів)',liabGrossCapital:'Брутто-капітал',
     liabTotalDebt:'Загальний борг',liabExtraPayment:'Якщо платити +X на місяць',liabSaveMonths:'Заощадить місяців',
     liabAddBtn:'Додати',liabDeleteBtn:'Видалити кредит',
-    topupBtn:'+ Поповнити',topupTitle:'Поповнення депозиту',topupAmount:'Сума поповнення',topupDate:'Дата поповнення',topupAdd:'Додати поповнення',topupHistory:'Історія поповнень',topupTotal:'Загалом поповнено',topupDelete:'Видалити',depSettings:'⚙ Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depEnd:'Дата закінчення',
+    topupBtn:'+ Поповнити',topupTitle:'Поповнення депозиту',topupAmount:'Сума поповнення',topupDate:'Дата поповнення',topupAdd:'Додати поповнення',topupHistory:'Історія поповнень',topupTotal:'Загалом поповнено',topupDelete:'Видалити',depSettings:'Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depEnd:'Дата закінчення',
     compCalc:'Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
     taxPct:'Податок (%)',taxFree:'Без податку (₴)',
@@ -2552,7 +2557,7 @@ const LANGS={
     liabNetCapital:'Нетто-капитал (с учётом долгов)',liabGrossCapital:'Брутто-капитал',
     liabTotalDebt:'Общий долг',liabExtraPayment:'Если платить +X в месяц',liabSaveMonths:'Сэкономит месяцев',
     liabAddBtn:'Добавить',liabDeleteBtn:'Удалить кредит',
-    topupBtn:'+ Пополнить',topupTitle:'Пополнение депозита',topupAmount:'Сумма пополнения',topupDate:'Дата пополнения',topupAdd:'Добавить пополнение',topupHistory:'История пополнений',topupTotal:'Итого пополнено',topupDelete:'Удалить',depSettings:'⚙ Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depEnd:'Дата окончания',
+    topupBtn:'+ Пополнить',topupTitle:'Пополнение депозита',topupAmount:'Сумма пополнения',topupDate:'Дата пополнения',topupAdd:'Добавить пополнение',topupHistory:'История пополнений',topupTotal:'Итого пополнено',topupDelete:'Удалить',depSettings:'Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depEnd:'Дата окончания',
     compCalc:'Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
     taxPct:'Налог (%)',taxFree:'Без налога (₴)',
@@ -2593,7 +2598,7 @@ const LANGS={
     liabNetCapital:'Net capital (after debts)',liabGrossCapital:'Gross capital',
     liabTotalDebt:'Total debt',liabExtraPayment:'If paying +X/month',liabSaveMonths:'Months saved',
     liabAddBtn:'Add',liabDeleteBtn:'Delete loan',
-    topupBtn:'+ Top Up',topupTitle:'Deposit Top-Up',topupAmount:'Top-up amount',topupDate:'Top-up date',topupAdd:'Add top-up',topupHistory:'Top-up history',topupTotal:'Total topped up',topupDelete:'Delete',depSettings:'⚙ Deposit Settings',depPrincipalLbl:'Deposit Amount (₴)',depStart:'Start Date',depEnd:'End Date',
+    topupBtn:'+ Top Up',topupTitle:'Deposit Top-Up',topupAmount:'Top-up amount',topupDate:'Top-up date',topupAdd:'Add top-up',topupHistory:'Top-up history',topupTotal:'Total topped up',topupDelete:'Delete',depSettings:'Deposit Settings',depPrincipalLbl:'Deposit Amount (₴)',depStart:'Start Date',depEnd:'End Date',
     compCalc:'Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
     monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
     taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
@@ -2634,7 +2639,7 @@ const LANGS={
     liabNetCapital:'Nettovermögen (nach Schulden)',liabGrossCapital:'Bruttovermögen',
     liabTotalDebt:'Gesamtschuld',liabExtraPayment:'Bei Zahlung +X/Monat',liabSaveMonths:'Monate gespart',
     liabAddBtn:'Hinzufügen',liabDeleteBtn:'Kredit löschen',
-    topupBtn:'+ Einzahlen',topupTitle:'Einlagenaufstockung',topupAmount:'Aufstockungsbetrag',topupDate:'Aufstockungsdatum',topupAdd:'Aufstockung hinzufügen',topupHistory:'Aufstockungsverlauf',topupTotal:'Gesamt aufgestockt',topupDelete:'Löschen',depSettings:'⚙ Einlageneinstellungen',depPrincipalLbl:'Einlagenbetrag (₴)',depStart:'Eröffnungsdatum',depEnd:'Enddatum',
+    topupBtn:'+ Einzahlen',topupTitle:'Einlagenaufstockung',topupAmount:'Aufstockungsbetrag',topupDate:'Aufstockungsdatum',topupAdd:'Aufstockung hinzufügen',topupHistory:'Aufstockungsverlauf',topupTotal:'Gesamt aufgestockt',topupDelete:'Löschen',depSettings:'Einlageneinstellungen',depPrincipalLbl:'Einlagenbetrag (₴)',depStart:'Eröffnungsdatum',depEnd:'Enddatum',
     rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxPct:'Steuer (%)',taxFree:'Steuerfrei (€)',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
     monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
     compCalc:'Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
@@ -2675,7 +2680,7 @@ const LANGS={
     liabNetCapital:'净资产（扣除债务）',liabGrossCapital:'总资产',
     liabTotalDebt:'总债务',liabExtraPayment:'若每月多付+X',liabSaveMonths:'节省月数',
     liabAddBtn:'添加',liabDeleteBtn:'删除贷款',
-    topupBtn:'+ 追加',topupTitle:'追加存款',topupAmount:'追加金额',topupDate:'追加日期',topupAdd:'添加追加',topupHistory:'追加历史',topupTotal:'共追加',topupDelete:'删除',depSettings:'⚙ 存款设置',depPrincipalLbl:'存款金额 (₴)',depStart:'开始日期',depEnd:'结束日期',
+    topupBtn:'+ 追加',topupTitle:'追加存款',topupAmount:'追加金额',topupDate:'追加日期',topupAdd:'添加追加',topupHistory:'追加历史',topupTotal:'共追加',topupDelete:'删除',depSettings:'存款设置',depPrincipalLbl:'存款金额 (₴)',depStart:'开始日期',depEnd:'结束日期',
     rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxPct:'税率 (%)',taxFree:'免税额 (¥)',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
     monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
     compCalc:'复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
@@ -3140,7 +3145,7 @@ function getDepositHtml(dep,idx){
         </div>
         ${deposits.length>1?`<button class="dep-delete-btn" onclick="removeDeposit(${idx})">✕</button>`:''}
       </div>
-      <div id="liveSetup_${dep.id}" class="live-setup" style="cursor:pointer" onclick="toggleDepCalc('${dep.id}')">${lang.depSetup} <span style="font-size:16px">⚙️</span></div>
+      <div id="liveSetup_${dep.id}" class="live-setup" style="cursor:pointer" onclick="toggleDepCalc('${dep.id}')">${lang.depSetup} ${settingsIconHtml('app-png-icon')}</div>
       <div id="liveMain_${dep.id}" style="display:none">
         <div class="live-num" id="liveAmount_${dep.id}">0<span class="live-kopeck">.00 ₴</span></div>
         <div class="live-sub" id="liveSub_${dep.id}">${lang.daysPassed} 0 ${lang.days}</div>
@@ -4399,6 +4404,7 @@ function sectionIconKey(section){
   const type=section.sectionType||section.type||section.id||'';
   if(type==='stocks')return 'stocks';
   if(type==='bonds'||type==='ovdp')return 'bonds';
+  if(type==='liability'||type==='liabilities'||type==='credit')return 'credit';
   if(type==='metals')return 'metals';
   if(type==='startup')return 'startups';
   if(type==='business')return 'business';
@@ -4411,12 +4417,15 @@ function sectionIconKey(section){
   return null;
 }
 function uiIconHtml(key, cls='ui-inline-icon'){
-  const map={accrued:'ui-accrued',tax:'ui-tax',net:'ui-net-profit',clock:'ui-clock',period:'ui-period-stats',percent:'ui-percent',usdt:'ui-usdt',pnl:'ui-pnl'};
+  const map={accrued:'ui-accrued',tax:'ui-tax',net:'ui-net-profit',clock:'ui-clock',period:'ui-period-stats',percent:'ui-percent',usdt:'ui-usdt',pnl:'ui-pnl',dividend:'ui-dividend-income'};
   const file=map[key];
   return file?'<img class="'+cls+'" src="section-icons/'+file+'.png?v=1" alt="">':'';
 }
 function calcIconHtml(cls='calc-title-icon'){
   return '<img class="'+cls+'" src="panel-icons/4.png?v=4" alt="">';
+}
+function settingsIconHtml(cls='ui-inline-icon'){
+  return '<img class="'+cls+'" src="section-icons/section-settings.png?v=1" alt="">';
 }
 function cleanIconText(text){return String(text||'').replace(/^[📈📉📊📅💰💵💱🏦🏛⚡✅🧮%₮\s]+/u,'').trim();}
 function liveMetricLabel(key,text){
@@ -4660,11 +4669,11 @@ function getSecCardHtml(s,idx){
         <div class="ticker-card-price" style="color:${pnlCol}">${sym}${fmtN(toDisplayCurr(curVal))}</div>
         <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
         ${avgBuy>0?`<div class="ticker-card-div">Ø ${sym}${fmtN(toDisplayCurr(avgBuy))}</div>`:''}
-        ${divMonth>0?`<div class="ticker-card-div">💰 ~${sym}${fmtN(toDisplayCurr(divMonth))}/міс</div>`:''}
+        ${divMonth>0?`<div class="ticker-card-div">${uiIconHtml('dividend','tiny-png-icon')} ~${sym}${fmtN(toDisplayCurr(divMonth))}/міс</div>`:''}
       </div>`;
     }).join('')+
     '</div>'+
-    '<div class="sec-summary-divs"><div class="sd-label">'+t('divIncome')+'</div>'+
+    '<div class="sec-summary-divs"><div class="sd-label">'+uiIconHtml('dividend','app-png-icon')+' '+cleanIconText(t('divIncome'))+'</div>'+
     '<div class="sd-row"><span class="sd-key">'+t('divAnnual')+'</span><span class="sd-val">+'+sym+fmtN(toDisplayCurr(totalDiv))+' '+t('perYear')+'</span></div>'+
     (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+sym+fmtN(toDisplayCurr(totalDivAbs))+' '+t('perYear')+'</span></div>':'')+
     '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+sym+fmtN(toDisplayCurr(totalDiv/12))+'</span></div>'+
@@ -7105,7 +7114,7 @@ function translateDynamicUI(){
   }
   // Liabilities section labels
   const liabSectionTitle=document.getElementById('liab_section_title');
-  if(liabSectionTitle)liabSectionTitle.textContent='⚠️ '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
+  if(liabSectionTitle)liabSectionTitle.innerHTML='<img class="app-png-icon" src="section-icons/section-credit.png?v=1" alt=""> '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
   const liabAddBtnTop=document.getElementById('liab_add_btn_top');
   if(liabAddBtnTop)liabAddBtnTop.textContent='+ '+(t('liabName')||'Кредит');
   const netToggle=document.getElementById('netCapitalToggle');
@@ -7124,7 +7133,7 @@ function translateDynamicUI(){
   const pickerDescs={
     'picker_desc_stocks':'metalStocksDesc','picker_desc_bonds':'metalBondsDesc',
     'picker_desc_ovdp':'metalOvdpDesc','picker_desc_metals':'metalMetalsDesc',
-    'picker_desc_biz':'metalBizDesc','picker_desc_custom':'metalCustomDesc',
+    'picker_desc_biz':'metalBizDesc',
     'picker_family_name':'familyBtn','picker_desc_family':'familyBtn'
   };
   Object.entries(pickerDescs).forEach(([id,key])=>{
@@ -7136,6 +7145,18 @@ function translateDynamicUI(){
     const type=key.replace('_desc','');
     const txt=customAssetText(type);
     el.textContent=key.endsWith('_desc')?txt.desc:txt.name;
+  });
+  const builtinPickerText={
+    uk:{dep:['Депозит (всього)','Усі депозити в одному розділі'],cash:['Готівка','Стандартний розділ готівки']},
+    ru:{dep:['Депозит (всего)','Все депозиты в одном разделе'],cash:['Наличные','Стандартный раздел наличных']},
+    en:{dep:['Deposits (total)','All deposits in one section'],cash:['Cash','Default cash section']},
+    de:{dep:['Einlagen (gesamt)','Alle Einlagen in einem Bereich'],cash:['Bargeld','Standard-Bargeldbereich']},
+    zh:{dep:['存款（总计）','所有存款在一个部分'],cash:['现金','默认现金部分']}
+  };
+  const builtins=builtinPickerText[currentLang]||builtinPickerText.uk;
+  [['picker_deposit_builtin_name','dep',0],['picker_desc_deposit_builtin','dep',1],['picker_cash_builtin_name','cash',0],['picker_desc_cash_builtin','cash',1]].forEach(([id,key,idx])=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=builtins[key][idx];
   });
 }
 
@@ -7439,7 +7460,7 @@ function renderLiabilities(){
 
   // Translate static labels
   const secTitle=document.getElementById('liab_section_title');
-  if(secTitle)secTitle.textContent='⚠️ '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
+  if(secTitle)secTitle.innerHTML='<img class="app-png-icon" src="section-icons/section-credit.png?v=1" alt=""> '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
   const addBtn=document.getElementById('liab_add_btn_top');
   if(addBtn)addBtn.textContent='+ '+(t('liabName')||'Кредит');
 
@@ -7463,7 +7484,7 @@ function renderLiabilities(){
 
     return `<div class="liab-card expanded" id="liab_card_${l.id}">
       <div class="liab-card-header" onclick="this.parentElement.classList.toggle('expanded')">
-        <div class="liab-card-icon">🏦</div>
+        <div class="liab-card-icon"><img class="section-card-icon-img" src="section-icons/section-credit.png?v=1" alt=""></div>
         <div class="liab-card-info">
           <div class="liab-card-name">${escHtml(l.name)}</div>
           <div class="liab-card-amount">-${sym}${fmtN(toDisplayCurr(remaining))}</div>
@@ -8987,6 +9008,16 @@ function addStartupCard(){
 // Override pickerAdd to handle startup
 const _origPickerAdd=pickerAdd;
 pickerAdd=function(type){
+  if(type==='deposit_builtin'||type==='cash_builtin'){
+    closeSectionPicker();
+    const cardName=type==='deposit_builtin'?'deposit':'cash';
+    hiddenCards[cardName]=false;
+    if(!cardOrder.includes(cardName))cardOrder.push(cardName);
+    const card=document.getElementById('card-'+cardName);
+    if(card)card.style.display='';
+    renderCustomCards(); updateAll(); saveData();
+    return;
+  }
   if(type==='startup'){
     closeSectionPicker();
     addStartupCard();
