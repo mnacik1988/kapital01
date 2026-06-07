@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-21-stable-diag-icons-v7-clean';
+const CACHE_NAME = 'kapital-app-v0-0-21-inner-icons-size-v8';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_21.html',
