@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-disclaimer-centered-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-diag-header-icon-v1';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_24.html',
