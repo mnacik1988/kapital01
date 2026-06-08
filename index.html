@@ -1486,6 +1486,18 @@ body.modern-mockup .card-value{
   .balance-list-amount{font-size:15px;}
 }
 
+
+.disclaimer-overlay{position:fixed;inset:0;background:#000000cc;z-index:650;display:none;align-items:flex-end;}
+.disclaimer-overlay.open{display:flex;}
+.disclaimer-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:22px 20px calc(26px + env(safe-area-inset-bottom));width:100%;box-shadow:0 -20px 60px #0008;}
+.disclaimer-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.disclaimer-sub{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted2);line-height:1.55;margin-bottom:14px;}
+.disclaimer-list{display:flex;flex-direction:column;gap:9px;margin:0 0 18px;padding:0;list-style:none;}
+.disclaimer-list li{display:flex;gap:10px;align-items:flex-start;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:11px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);line-height:1.45;}
+.disclaimer-list li::before{content:'✓';color:var(--green2);font-weight:900;flex:0 0 auto;}
+.disclaimer-accept{width:100%;border:none;border-radius:16px;padding:15px;background:linear-gradient(135deg,var(--green),var(--teal));font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#06110d;cursor:pointer;}
+body.theme-light .disclaimer-overlay{background:#17203366;}
+
 </style>
 </head>
 <body class="modern-mockup">
@@ -1990,9 +2002,25 @@ body.modern-mockup .card-value{
       </div>
     </div>
     <div class="price-note">Після 30 днів можна обрати зручний тариф</div>
-    <button class="paywall-btn" id="pw_btn" onclick="activatePro()">Почати 30 днів безкоштовно</button>
-    <button class="paywall-restore" id="pw_restore" onclick="restorePurchase()">Відновити покупку</button>
-    <button class="paywall-close" id="pw_close" onclick="closePaywall()">Продовжити без підписки</button>
+    <button class="paywall-btn" id="pw_btn" onclick="handlePaywallPrimary()">Почати 30 днів безкоштовно</button>
+    <button class="paywall-restore" id="pw_restore" onclick="handlePaywallRestore()">Відновити покупку</button>
+    <button class="paywall-close" id="pw_close" onclick="handlePaywallClose()">Продовжити без підписки</button>
+  </div>
+</div>
+
+
+
+<div class="disclaimer-overlay" id="financialDisclaimerOverlay">
+  <div class="disclaimer-box">
+    <div class="disclaimer-title" id="fd_title">Важлива інформація</div>
+    <div class="disclaimer-sub" id="fd_sub">Будь ласка, підтвердьте, що ви прочитали ці умови використання.</div>
+    <ul class="disclaimer-list">
+      <li id="fd_l1">Застосунок не надає фінансові поради.</li>
+      <li id="fd_l2">Дані зберігаються на вашому пристрої.</li>
+      <li id="fd_l3">Застосунок не призначений для купівлі або продажу активів.</li>
+      <li id="fd_l4">Застосунок призначений тільки для обліку та моніторингу власних активів.</li>
+    </ul>
+    <button class="disclaimer-accept" id="fd_btn" onclick="acceptFinancialDisclaimer()">Я прочитав і підтверджую</button>
   </div>
 </div>
 
@@ -2363,7 +2391,7 @@ body.modern-mockup .card-value{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">КАПІТАЛ · дані зберігаються локально на пристрої</span><span id="footerVersion"> · v0.0.22</span></div>
+<div class="footer"><span data-i18n="footer">КАПІТАЛ</span><span id="footerVersion"> · v0.0.24</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2493,7 +2521,7 @@ const LANGS={
     stocksBtn:'Акції',bondsBtn:'Облігації',ovdpBtn:'ОВДП',goldBtn:'Золото',silverBtn:'Срібло',businessBtn:'Бізнес',addCustom:'Власний розділ',
     newSection:'Новий розділ',newSectionSub:'Як депозит — з відсотками та датами',
     sectionNameLabel:'Назва розділу',iconLabel:'Іконка',createSection:'Створити розділ',cancel:'Скасувати',
-    footer:'КАПІТАЛ · дані зберігаються локально на пристрої',
+    footer:'КАПІТАЛ',
     confirmDelete:'Видалити цей розділ?',confirmDeleteCard:'Видалити цей блок? Дані будуть втрачені.',
     depSetup:'Вкажіть дату відкриття, суму та ставку депозиту — лічильник запрацює',
     familyBtn:'Сімейні витрати',familyTitle:'Сімейні витрати',familyCommunal:'Комунальні послуги',familyFood:'Їжа',familyEntertain:'Розваги',familyMed:'Медицина',familyKids:'Діти',familyOther:'Інші витрати',familyAlimony:'Аліменти',familyTotal:'Загальні витрати',bizRent:'Оренда',bizSalary:'Зарплата',bizTax:'Податок',bizExpense:'Витрати',bizProfit:'Прибуток',bizTotal:'Чистий прибуток',bizIncome:'Доходи',partialPayBtn:'Частково погасити',partialPayTitle:'Часткове погашення',partialPayAmount:'Сума платежу',liabSection:'Зобовʼязання',liabBtn:'+ Додати кредит',liabTitle:'Кредити та іпотека',
@@ -2534,7 +2562,7 @@ const LANGS={
     stocksBtn:'Акции',bondsBtn:'Облигации',ovdpBtn:'ОВГЗ',goldBtn:'Золото',silverBtn:'Серебро',businessBtn:'Бизнес',addCustom:'Свой раздел',
     newSection:'Новый раздел',newSectionSub:'Как депозит — с процентами и датами',
     sectionNameLabel:'Название раздела',iconLabel:'Иконка',createSection:'Создать раздел',cancel:'Отмена',
-    footer:'КАПИТАЛ · данные хранятся локально на устройстве',
+    footer:'КАПИТАЛ',
     confirmDelete:'Удалить этот раздел?',confirmDeleteCard:'Удалить этот блок? Данные будут потеряны.',
     depSetup:'Укажите дату открытия, сумму и ставку депозита — счётчик заработает',
     familyBtn:'Семейные расходы',familyTitle:'Семейные расходы',familyCommunal:'Коммунальные услуги',familyFood:'Еда',familyEntertain:'Развлечения',familyMed:'Медицина',familyKids:'Дети',familyOther:'Другие расходы',familyAlimony:'Алименты',familyTotal:'Общие расходы',bizRent:'Аренда',bizSalary:'Зарплата',bizTax:'Налог',bizExpense:'Расходы',bizProfit:'Прибыль',bizTotal:'Чистая прибыль',bizIncome:'Доходы',partialPayBtn:'Частично погасить',partialPayTitle:'Частичное погашение',partialPayAmount:'Сумма платежа',liabSection:'Обязательства',liabBtn:'+ Добавить кредит',liabTitle:'Кредиты и ипотека',
@@ -2575,7 +2603,7 @@ const LANGS={
     stocksBtn:'Stocks',bondsBtn:'Bonds',ovdpBtn:'Gov. Bonds',goldBtn:'Gold',silverBtn:'Silver',businessBtn:'Business',addCustom:'Custom Section',
     newSection:'New Section',newSectionSub:'Like a deposit — with rates and dates',
     sectionNameLabel:'Section Name',iconLabel:'Icon',createSection:'Create Section',cancel:'Cancel',
-    footer:'CAPITAL · data is stored locally on device',
+    footer:'CAPITAL',
     confirmDelete:'Delete this section?',confirmDeleteCard:'Delete this block? Data will be lost.',
     depSetup:'Enter start date, amount and rate — the counter will start',
     familyBtn:'Family expenses',familyTitle:'Family expenses',familyCommunal:'Utilities',familyFood:'Food',familyEntertain:'Entertainment',familyMed:'Healthcare',familyKids:'Children',familyOther:'Other expenses',familyAlimony:'Alimony',familyTotal:'Total expenses',bizRent:'Rent',bizSalary:'Salary',bizTax:'Tax',bizExpense:'Expenses',bizProfit:'Revenue',bizTotal:'Net profit',bizIncome:'Income',partialPayBtn:'Partial payment',partialPayTitle:'Partial repayment',partialPayAmount:'Payment amount',liabSection:'Liabilities',liabBtn:'+ Add loan',liabTitle:'Loans & Mortgages',
@@ -2640,7 +2668,7 @@ const LANGS={
     taxLabel:'Steuer',accruedPct:'Aufgelaufen %',netProfitLabel:'Nettogewinn',
     daysPassed:'vergangen',daysLeft:'verbleibend',days:'T',
     maxDep:'Max. 3 Einlagen',depName:'Einlagenname',depPlaceholder:'Einlage',
-    deleteDep:'Diese Einlage löschen?',footer:'KAPITAL · Daten lokal gespeichert',
+    deleteDep:'Diese Einlage löschen?',footer:'KAPITAL',
     confirmDeleteCard:'Diesen Block löschen?',yield:'⚡ Rendite',
   },
   zh:{
@@ -2681,7 +2709,7 @@ const LANGS={
     taxLabel:'税款',accruedPct:'累计利息%',netProfitLabel:'净利润',
     daysPassed:'已过',daysLeft:'剩余',days:'天',
     maxDep:'最多3个存款',depName:'存款名称',depPlaceholder:'存款',
-    deleteDep:'删除此存款?',footer:'资本 · 数据本地存储',
+    deleteDep:'删除此存款?',footer:'资本',
     confirmDeleteCard:'删除此区块？数据将丢失。',yield:'⚡ 收益',
   },
 };
@@ -9829,6 +9857,134 @@ window.openStockDetail=function(secId,tickerKey){
   btn.style.cssText='width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600';
   btn.onclick=()=>deleteSecurityPosition(secId,tickerKey);
   root.appendChild(btn);
+};
+
+
+
+// ── FINANCIAL DISCLAIMER AFTER PAYWALL ─────────────
+const FINANCIAL_DISCLAIMER_KEY='kapital_financial_disclaimer_accepted_v3';
+function financialDisclaimerTxt(key){
+  const dict={
+    title:{uk:'Важлива інформація',ru:'Важная информация',en:'Important information',de:'Wichtige Information',zh:'重要信息'},
+    sub:{uk:'Будь ласка, підтвердьте, що ви прочитали ці умови використання.',ru:'Пожалуйста, подтвердите, что вы прочитали эти условия использования.',en:'Please confirm that you have read these usage terms.',de:'Bitte bestätigen Sie, dass Sie diese Nutzungshinweise gelesen haben.',zh:'请确认您已阅读这些使用条款。'},
+    l1:{uk:'Застосунок не надає фінансові поради.',ru:'Приложение не даёт финансовые советы.',en:'The app does not provide financial advice.',de:'Die App bietet keine Finanzberatung.',zh:'本应用不提供财务建议。'},
+    l2:{uk:'Дані зберігаються на вашому пристрої.',ru:'Данные хранятся на вашем устройстве.',en:'Data is stored on your device.',de:'Daten werden auf Ihrem Gerät gespeichert.',zh:'数据存储在您的设备上。'},
+    l3:{uk:'Застосунок не призначений для купівлі або продажу активів.',ru:'Приложение не предназначено для покупки или продажи активов.',en:'The app is not intended for buying or selling assets.',de:'Die App ist nicht für den Kauf oder Verkauf von Vermögenswerten bestimmt.',zh:'本应用不用于购买或出售资产。'},
+    l4:{uk:'Застосунок призначений тільки для обліку та моніторингу власних активів.',ru:'Приложение только для учёта и мониторинга собственных активов.',en:'The app is only for tracking and monitoring your own assets.',de:'Die App dient nur zur Erfassung und Überwachung eigener Vermögenswerte.',zh:'本应用仅用于记录和监控您自己的资产。'},
+    btn:{uk:'Я прочитав і підтверджую',ru:'Я прочитал и подтверждаю',en:'I have read and confirm',de:'Gelesen und bestätigt',zh:'我已阅读并确认'}
+  };
+  return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
+}
+function updateFinancialDisclaimerText(){
+  setText('fd_title',financialDisclaimerTxt('title'));
+  setText('fd_sub',financialDisclaimerTxt('sub'));
+  setText('fd_l1',financialDisclaimerTxt('l1'));
+  setText('fd_l2',financialDisclaimerTxt('l2'));
+  setText('fd_l3',financialDisclaimerTxt('l3'));
+  setText('fd_l4',financialDisclaimerTxt('l4'));
+  setText('fd_btn',financialDisclaimerTxt('btn'));
+}
+function showFinancialDisclaimer(force){
+  if(!force && localStorage.getItem(FINANCIAL_DISCLAIMER_KEY)==='1')return;
+  updateFinancialDisclaimerText();
+  document.getElementById('financialDisclaimerOverlay')?.classList.add('open');
+}
+function acceptFinancialDisclaimer(){
+  localStorage.setItem(FINANCIAL_DISCLAIMER_KEY,'1');
+  document.getElementById('financialDisclaimerOverlay')?.classList.remove('open');
+}
+const _applyTranslationsBeforeFinancialDisclaimer=applyTranslations;
+applyTranslations=function(){
+  _applyTranslationsBeforeFinancialDisclaimer();
+  updateFinancialDisclaimerText();
+};
+if(typeof startTrial==='function'){
+  const _startTrialBeforeFinancialDisclaimer=startTrial;
+  startTrial=function(){
+    _startTrialBeforeFinancialDisclaimer();
+    setTimeout(()=>showFinancialDisclaimer(false),250);
+  };
+}
+window.closePaywall=function(){
+  document.getElementById('paywallOverlay')?.classList.remove('open');
+  setTimeout(()=>showFinancialDisclaimer(false),250);
+};
+window.closePaywallIfOutside=function(e){
+  if(e.target===document.getElementById('paywallOverlay'))closePaywall();
+};
+window.activatePro=function(){
+  isPro=true;
+  localStorage.setItem('kapital_pro','true');
+  localStorage.setItem('trial_start', Date.now().toString());
+  updateProUI();
+  closePaywall();
+};
+window.restorePurchase=function(){
+  closePaywall();
+};
+function bindFinancialDisclaimerPaywallButtons(){
+  ['pw_btn','pw_restore','pw_close'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(btn&&btn.dataset.financialDisclaimerBound!=='1'){
+      btn.dataset.financialDisclaimerBound='1';
+      btn.addEventListener('click',()=>setTimeout(()=>showFinancialDisclaimer(false),380));
+    }
+  });
+}
+bindFinancialDisclaimerPaywallButtons();
+setTimeout(bindFinancialDisclaimerPaywallButtons,500);
+
+
+
+// ── PAYWALL DISCLAIMER CLICK FALLBACK V3 ─────────────
+window.showFinancialDisclaimer = typeof showFinancialDisclaimer==='function' ? showFinancialDisclaimer : window.showFinancialDisclaimer;
+window.acceptFinancialDisclaimer = typeof acceptFinancialDisclaimer==='function' ? acceptFinancialDisclaimer : window.acceptFinancialDisclaimer;
+document.addEventListener('click', function(e){
+  const btn=e.target&&e.target.closest&&e.target.closest('#pw_btn,#pw_restore,#pw_close');
+  if(!btn)return;
+  setTimeout(function(){
+    if(typeof showFinancialDisclaimer==='function')showFinancialDisclaimer(false);
+    else if(window.showFinancialDisclaimer)window.showFinancialDisclaimer(false);
+    else document.getElementById('financialDisclaimerOverlay')?.classList.add('open');
+  }, 450);
+}, true);
+
+
+
+// ── HARDWIRED PAYWALL DISCLAIMER HANDLERS ─────────────
+function hidePaywallForDisclaimer(){
+  const el=document.getElementById('paywallOverlay');
+  if(el)el.classList.remove('open');
+}
+function showDisclaimerAfterPaywall(){
+  setTimeout(function(){
+    if(typeof showFinancialDisclaimer==='function')showFinancialDisclaimer(false);
+    else document.getElementById('financialDisclaimerOverlay')?.classList.add('open');
+  }, 250);
+}
+function handlePaywallPrimary(){
+  try{
+    isPro=true;
+    localStorage.setItem('kapital_pro','true');
+    if(!localStorage.getItem('trial_start'))localStorage.setItem('trial_start', Date.now().toString());
+    if(typeof updateProUI==='function')updateProUI();
+  }catch(e){}
+  hidePaywallForDisclaimer();
+  showDisclaimerAfterPaywall();
+}
+function handlePaywallRestore(){
+  hidePaywallForDisclaimer();
+  showDisclaimerAfterPaywall();
+}
+function handlePaywallClose(){
+  hidePaywallForDisclaimer();
+  showDisclaimerAfterPaywall();
+}
+window.activatePro=handlePaywallPrimary;
+window.restorePurchase=handlePaywallRestore;
+window.closePaywall=handlePaywallClose;
+window.closePaywallIfOutside=function(e){
+  if(e.target===document.getElementById('paywallOverlay'))handlePaywallClose();
 };
 
 </script>
