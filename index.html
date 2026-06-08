@@ -1487,16 +1487,20 @@ body.modern-mockup .card-value{
 }
 
 
-.disclaimer-overlay{position:fixed;inset:0;background:#000000cc;z-index:650;display:none;align-items:flex-end;}
+.disclaimer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:680;display:none;align-items:center;justify-content:center;padding:22px 18px calc(22px + env(safe-area-inset-bottom));backdrop-filter:blur(10px);}
 .disclaimer-overlay.open{display:flex;}
-.disclaimer-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:22px 20px calc(26px + env(safe-area-inset-bottom));width:100%;box-shadow:0 -20px 60px #0008;}
-.disclaimer-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;}
-.disclaimer-sub{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted2);line-height:1.55;margin-bottom:14px;}
-.disclaimer-list{display:flex;flex-direction:column;gap:9px;margin:0 0 18px;padding:0;list-style:none;}
-.disclaimer-list li{display:flex;gap:10px;align-items:flex-start;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:11px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);line-height:1.45;}
-.disclaimer-list li::before{content:'✓';color:var(--green2);font-weight:900;flex:0 0 auto;}
-.disclaimer-accept{width:100%;border:none;border-radius:16px;padding:15px;background:linear-gradient(135deg,var(--green),var(--teal));font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#06110d;cursor:pointer;}
-body.theme-light .disclaimer-overlay{background:#17203366;}
+.disclaimer-box{position:relative;background:linear-gradient(180deg,#191923,#111118);border:1px solid #4ecb8d55;border-radius:24px;padding:26px 20px 20px;width:min(430px,100%);box-shadow:0 24px 80px #000c,0 0 0 1px #ffffff0d,0 0 42px #4ecb8d16;text-align:left;}
+.disclaimer-box::before{content:'!';display:flex;align-items:center;justify-content:center;width:42px;height:42px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#15100a;font-family:'Syne',sans-serif;font-weight:900;font-size:24px;box-shadow:0 12px 32px #e8c97a25;}
+.disclaimer-title{font-family:'Syne',sans-serif;font-size:23px;line-height:1.05;font-weight:900;color:var(--text);margin-bottom:8px;text-align:center;}
+.disclaimer-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);line-height:1.6;margin:0 auto 16px;text-align:center;max-width:340px;}
+.disclaimer-list{display:flex;flex-direction:column;gap:10px;margin:0 0 20px;padding:0;list-style:none;}
+.disclaimer-list li{display:flex;gap:11px;align-items:flex-start;background:linear-gradient(180deg,#20202c,#171720);border:1px solid #ffffff14;border-radius:15px;padding:12px 13px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);line-height:1.45;box-shadow:inset 0 1px 0 #ffffff08;}
+.disclaimer-list li::before{content:'✓';display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#4ecb8d1f;color:var(--green2);font-weight:900;flex:0 0 18px;margin-top:1px;}
+.disclaimer-accept{width:100%;border:none;border-radius:16px;padding:16px;background:linear-gradient(135deg,var(--green),var(--teal));font-family:'Syne',sans-serif;font-size:16px;font-weight:900;color:#06110d;cursor:pointer;box-shadow:0 14px 36px #4ecb8d28;}
+.disclaimer-accept:active{transform:translateY(1px);}
+body.theme-light .disclaimer-overlay{background:rgba(23,32,51,.66);}
+body.theme-light .disclaimer-box{background:linear-gradient(180deg,#ffffff,#f4f7fb);border-color:#10b98166;box-shadow:0 24px 70px #27304a30,0 0 0 1px #ffffffcc;}
+body.theme-light .disclaimer-list li{background:linear-gradient(180deg,#ffffff,#eef3f8);border-color:#17203314;color:#172033;}
 
 </style>
 </head>
@@ -2450,10 +2454,10 @@ body.theme-light .disclaimer-overlay{background:#17203366;}
         <div class="trial-feature-text">Дані зберігаються локально на вашому пристрої</div>
       </div>
     </div>
-    <button onclick="startTrial()" style="width:100%;background:linear-gradient(135deg,var(--green),var(--teal));border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;">
+    <button id="trialStartBtn" onclick="handleTrialStartWithDisclaimer()" style="width:100%;background:linear-gradient(135deg,var(--green),var(--teal));border:none;border-radius:16px;padding:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;">
       Почати 30 днів безкоштовно →
     </button>
-    <button onclick="skipTrial()" style="width:100%;background:transparent;border:none;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;">
+    <button id="trialSkipBtn" onclick="handleTrialSkipWithDisclaimer()" style="width:100%;background:transparent;border:none;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;">
       Продовжити без підписки
     </button>
   </div>
@@ -9862,7 +9866,7 @@ window.openStockDetail=function(secId,tickerKey){
 
 
 // ── FINANCIAL DISCLAIMER AFTER PAYWALL ─────────────
-const FINANCIAL_DISCLAIMER_KEY='kapital_financial_disclaimer_accepted_v3';
+const FINANCIAL_DISCLAIMER_KEY='kapital_financial_disclaimer_accepted_v4';
 function financialDisclaimerTxt(key){
   const dict={
     title:{uk:'Важлива інформація',ru:'Важная информация',en:'Important information',de:'Wichtige Information',zh:'重要信息'},
@@ -9986,6 +9990,43 @@ window.closePaywall=handlePaywallClose;
 window.closePaywallIfOutside=function(e){
   if(e.target===document.getElementById('paywallOverlay'))handlePaywallClose();
 };
+
+
+// ── HARDWIRED TRIAL DISCLAIMER HANDLERS ─────────────
+function hideTrialForDisclaimer(){
+  const el=document.getElementById('trialOverlay');
+  if(el)el.style.display='none';
+}
+function showDisclaimerAfterTrial(){
+  setTimeout(function(){
+    if(typeof showFinancialDisclaimer==='function')showFinancialDisclaimer(false);
+    else document.getElementById('financialDisclaimerOverlay')?.classList.add('open');
+  },250);
+}
+function handleTrialStartWithDisclaimer(){
+  try{
+    localStorage.setItem('trial_start', Date.now().toString());
+    localStorage.setItem('trial_shown','1');
+    localStorage.setItem('onboarded','1');
+    isPro=true;
+    localStorage.setItem('kapital_pro','true');
+    if(typeof updateProUI==='function')updateProUI();
+  }catch(e){}
+  hideTrialForDisclaimer();
+  showDisclaimerAfterTrial();
+}
+function handleTrialSkipWithDisclaimer(){
+  try{
+    localStorage.setItem('trial_shown','1');
+    localStorage.setItem('onboarded','1');
+  }catch(e){}
+  hideTrialForDisclaimer();
+  showDisclaimerAfterTrial();
+}
+window.handleTrialStartWithDisclaimer=handleTrialStartWithDisclaimer;
+window.handleTrialSkipWithDisclaimer=handleTrialSkipWithDisclaimer;
+window.startTrial=handleTrialStartWithDisclaimer;
+window.skipTrial=handleTrialSkipWithDisclaimer;
 
 </script>
 </body>
