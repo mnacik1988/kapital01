@@ -1506,6 +1506,22 @@ body.theme-light .disclaimer-overlay{background:rgba(23,32,51,.66);}
 body.theme-light .disclaimer-box{background:linear-gradient(180deg,#ffffff,#f4f7fb);border-color:#10b98166;box-shadow:0 24px 70px #27304a30,0 0 0 1px #ffffffcc;}
 body.theme-light .disclaimer-list li{background:linear-gradient(180deg,#ffffff,#eef3f8);border-color:#17203314;color:#172033;}
 
+
+/* clean single card outline */
+.card::before,.card::after{content:none!important;display:none!important;}
+body.modern-mockup .card{
+  border:1px solid #ffffff18!important;
+  background:linear-gradient(180deg,rgba(24,28,40,.96),rgba(14,17,27,.98))!important;
+  box-shadow:0 12px 28px #00000030!important;
+}
+body.modern-mockup .card.expanded{border-color:#ffffff24!important;}
+body.modern-mockup.theme-light .card{
+  border-color:#d8dee9!important;
+  background:#ffffff!important;
+  box-shadow:0 12px 24px #40507018!important;
+}
+body.modern-mockup.theme-light .card.expanded{border-color:#c8d2e1!important;}
+
 </style>
 </head>
 <body class="modern-mockup">
