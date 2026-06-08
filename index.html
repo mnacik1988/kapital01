@@ -9747,7 +9747,7 @@ window.addEventListener('offline',()=>{updateNetworkStatusUI('offline');fillCurr
 // ── POSITION DELETE CONFIRM OVERRIDES ─────────────
 function positionDeleteTxt(key){
   const dict={
-    deleteFromApp:{uk:'Видалити з застосунку',ru:'Удалить из приложения',en:'Remove from app',de:'Aus App entfernen',zh:'从应用中移除'},
+    deleteFromApp:{uk:'Видалити',ru:'Удалить',en:'Delete',de:'Löschen',zh:'删除'},
     deleteTrade:{uk:'Видалити запис',ru:'Удалить запись',en:'Delete entry',de:'Eintrag löschen',zh:'删除记录'},
     confirmPosition:{uk:'Видалити цю картку з застосунку? Сума не буде додана до рахунку.',ru:'Удалить эту карточку из приложения? Сумма не будет добавлена на счёт.',en:'Remove this card from the app? No amount will be added to cash.',de:'Diese Karte aus der App entfernen? Es wird kein Betrag gutgeschrieben.',zh:'从应用中移除此卡片？金额不会加入现金。'},
     confirmTrade:{uk:'Видалити цей запис? Сума не буде додана до рахунку.',ru:'Удалить эту запись? Сумма не будет добавлена на счёт.',en:'Delete this entry? No amount will be added to cash.',de:'Diesen Eintrag löschen? Es wird kein Betrag gutgeschrieben.',zh:'删除此记录？金额不会加入现金。'},
@@ -9808,25 +9808,27 @@ const _openCryptoDetailBeforePositionDelete=window.openCryptoDetail;
 window.openCryptoDetail=function(coinKey){
   _openCryptoDetailBeforePositionDelete(coinKey);
   const root=document.getElementById('stockDetailContent');
-  if(!root||root.querySelector('[data-position-delete="crypto"]'))return;
+  if(!root)return;
+  root.querySelectorAll('[data-position-delete="crypto"],button[onclick*="closeStockDetail"]').forEach(el=>el.remove());
   const btn=document.createElement('button');
   btn.dataset.positionDelete='crypto';
   btn.textContent='✕ '+positionDeleteTxt('deleteFromApp');
-  btn.style.cssText='width:100%;margin-top:14px;padding:12px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted2);cursor:pointer;font-weight:600';
+  btn.style.cssText='width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600';
   btn.onclick=()=>deleteCryptoPosition(coinKey);
-  root.insertBefore(btn, root.firstChild);
+  root.appendChild(btn);
 };
 const _openStockDetailBeforePositionDelete=window.openStockDetail;
 window.openStockDetail=function(secId,tickerKey){
   _openStockDetailBeforePositionDelete(secId,tickerKey);
   const root=document.getElementById('stockDetailContent');
-  if(!root||root.querySelector('[data-position-delete="stock"]'))return;
+  if(!root)return;
+  root.querySelectorAll('[data-position-delete="stock"],button[onclick*="closeStockDetail"]').forEach(el=>el.remove());
   const btn=document.createElement('button');
   btn.dataset.positionDelete='stock';
   btn.textContent='✕ '+positionDeleteTxt('deleteFromApp');
-  btn.style.cssText='width:100%;margin-top:14px;padding:12px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:12px;color:var(--muted2);cursor:pointer;font-weight:600';
+  btn.style.cssText='width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600';
   btn.onclick=()=>deleteSecurityPosition(secId,tickerKey);
-  root.insertBefore(btn, root.firstChild);
+  root.appendChild(btn);
 };
 
 </script>
