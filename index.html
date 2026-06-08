@@ -79,7 +79,10 @@ body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd
 /* CARDS */
 .cards{padding:0 16px;display:flex;flex-direction:column;gap:14px;}
 #customCardsContainer{display:flex;flex-direction:column;gap:14px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:border-color .2s,opacity .2s,transform .15s;position:relative;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:border-color .2s,opacity .2s,transform .15s;position:relative;--card-accent:var(--border2);--card-outline:var(--border);}
+.card::before{content:'';position:absolute;inset:0;border-radius:inherit;border:1px solid var(--card-outline);pointer-events:none;z-index:1;}
+.card::after{content:'';position:absolute;left:1px;right:1px;top:1px;height:2px;border-radius:999px;background:linear-gradient(90deg,transparent 0%,var(--card-accent) 18%,var(--card-accent) 82%,transparent 100%);opacity:.92;pointer-events:none;z-index:1;}
+.card > *{position:relative;z-index:2;}
 .card.dragging{opacity:0.45;transform:scale(0.97);z-index:50;}
 .card.drag-over{border-color:var(--gold)!important;transform:scale(1.01);}
 .card.expanded{border-color:var(--border2);}
@@ -118,34 +121,34 @@ body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd
 .divider{height:1px;background:var(--border);margin-bottom:18px;}
 
 /* CARD THEMES */
-.card-deposit{border-top:2px solid var(--blue);}
+.card-deposit{--card-accent:var(--blue);}
 .card-deposit .card-icon{background:#5b9cf614;}
 .card-deposit .card-value{color:var(--blue2);}
-.card-crypto{border-top:2px solid var(--purple);}
+.card-crypto{--card-accent:var(--purple);}
 .card-crypto .card-icon{background:#a78bfa14;}
 .card-crypto .card-value{color:var(--purple2);}
-.card-usd{border-top:2px solid var(--teal);}
+.card-usd{--card-accent:var(--teal);}
 .card-usd .card-icon{background:#2dd4bf14;}
 .card-usd .card-value{color:var(--teal2);}
-.card-forex{border-top:2px solid var(--orange);}
+.card-forex{--card-accent:var(--orange);}
 .card-forex .card-icon{background:#fb923c14;}
 .card-forex .card-value{color:var(--orange2);}
-.card-cash{border-top:2px solid var(--gold);}
+.card-cash{--card-accent:var(--gold);}
 .card-cash .card-icon{background:#e8c97a14;}
 .card-cash .card-value{color:var(--gold2);}
-.card-other{border-top:2px solid var(--green);}
+.card-other{--card-accent:var(--green);}
 .card-other .card-icon{background:#4ecb8d14;}
 .card-other .card-value{color:var(--green2);}
-.card-custom{border-top:2px solid var(--purple);}
+.card-custom{--card-accent:var(--purple);}
 .card-custom .card-icon{background:#a78bfa14;}
 .card-custom .card-value{color:var(--purple2);}
-.card-stocks{border-top:2px solid var(--green);}
+.card-stocks{--card-accent:var(--green);}
 .card-stocks .card-icon{background:#4ecb8d14;}
 .card-stocks .card-value{color:var(--green2);}
-.card-bonds{border-top:2px solid var(--blue);}
+.card-bonds{--card-accent:var(--blue);}
 .card-bonds .card-icon{background:#5b9cf614;}
 .card-bonds .card-value{color:var(--blue2);}
-.card-ovdp{border-top:2px solid var(--gold);}
+.card-ovdp{--card-accent:var(--gold);}
 .card-ovdp .card-icon{background:#e8c97a14;}
 .card-ovdp .card-value{color:var(--gold2);}
 
@@ -641,7 +644,7 @@ body.theme-light .diag-passive-banner .diag-stat-lbl{color:#667085;}
 .trial-feature-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);}
 
 /* ── STARTUP CARD ── */
-.card-startup{border-top:2px solid var(--teal);}
+.card-startup{--card-accent:var(--teal);}
 .card-startup .card-icon{background:#2dd4bf14;}
 .card-startup .card-value{color:var(--teal2);}
 .startup-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
@@ -935,10 +938,11 @@ body.modern-mockup .card{
   background:
     linear-gradient(180deg,rgba(25,29,42,.92),rgba(14,16,25,.96)),
     radial-gradient(circle at 0 0,rgba(255,255,255,.06),transparent 36%);
-  border-color:#ffffff14;
+  border-color:transparent;
+  --card-outline:#ffffff17;
   box-shadow:0 18px 42px #00000038, inset 0 1px 0 #ffffff0b;
 }
-body.modern-mockup .card.expanded{border-color:#ffffff22;}
+body.modern-mockup .card.expanded{--card-outline:#ffffff26;}
 body.modern-mockup .card-header{
   min-height:78px;
   padding:15px 16px;
@@ -2550,7 +2554,7 @@ const LANGS={
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
     calcTitle:'Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Ваші фінансові дані залишаються на пристрої',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',pwClose:'Продовжити без підписки',
-    secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'💰 Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
+    secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
     totalCapital:'Общий капитал',enterData:'введите данные',sectionLabel:'Активы · удерживай и перетаскивай для сортировки',
@@ -2591,7 +2595,7 @@ const LANGS={
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
     calcTitle:'Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Ваши финансовые данные остаются на устройстве',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',pwClose:'Продолжить без подписки',
-    secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'💰 Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
+    secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
     totalCapital:'Total Capital',enterData:'enter data',sectionLabel:'Assets · hold and drag to sort',
@@ -2632,7 +2636,7 @@ const LANGS={
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
     calcTitle:'Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your financial data stays on your device',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',pwClose:'Continue without subscription',
-    secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'💰 Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
+    secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
     totalCapital:'Gesamtkapital',enterData:'Daten eingeben',sectionLabel:'Vermögen · Halten & Ziehen zum Sortieren',
@@ -2640,7 +2644,7 @@ const LANGS={
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
     calcTitle:'Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfügbar. Wählen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschränkungen während der Testphase',pwB2:'Alle Vermögenswerte an einem Ort',pwB2sub:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerät',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',pwClose:'Ohne Abo fortfahren',
-    secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'💰 Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
+    secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
     cryptoName:'Krypto',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
     costPrice:'Einstandspreis (₴)',uahEquiv:'UAH-Äquivalent',addCoinTitle:'Münze hinzufügen',
@@ -2681,7 +2685,7 @@ const LANGS={
     deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
     stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
     calcTitle:'计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'免费使用 30 天',pwSub:'从第一天起即可使用全部功能。试用期结束后，选择适合您的方案。',pwB1:'30 天免费版',pwB1sub:'试用期间不受限制',pwB2:'在一个地方管理所有资产',pwB2sub:'存款、货币、加密货币、股票、贷款和贵金属',pwB3:'本地数据存储',pwB3sub:'您的财务数据保留在设备上',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'开始 30 天免费使用',pwRestore:'恢复购买',pwClose:'不订阅继续使用',
-    secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'💰 股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
+    secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
     cryptoName:'加密货币',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
     costPrice:'成本价 (₴)',uahEquiv:'₴等值',addCoinTitle:'添加币种',
@@ -2868,7 +2872,7 @@ Object.assign(EXTRA_I18N,{
 });
 
 Object.assign(EXTRA_I18N,{
-  '💵 USDT баланс':{uk:'💵 USDT баланс',ru:'USDT баланс',en:'USDT balance',de:'USDT-Guthaben',zh:'USDT 余额'},
+  '💵 USDT баланс':{uk:'USDT баланс',ru:'USDT баланс',en:'USDT balance',de:'USDT-Guthaben',zh:'USDT 余额'},
   'Курс USDT/₴':{uk:'Курс USDT/₴',ru:'Курс USDT/₴',en:'USDT/₴ rate',de:'USDT/₴ Kurs',zh:'USDT/₴ 汇率'},
   'Еквівалент у ₴':{uk:'Еквівалент у ₴',ru:'Эквивалент в ₴',en:'₴ equivalent',de:'₴ Gegenwert',zh:'₴ 等值'},
   'Онлайн ціни':{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'在线价格'},
@@ -8460,7 +8464,7 @@ function diagCloseOutside(e){
 
 function sectionPerfTxt(key){
   const dict={
-    title:{uk:'📊 Динаміка по розділах',ru:'📊 Динамика по разделам',en:'📊 Section dynamics',de:'📊 Bereichsdynamik',zh:'📊 分类动态'},
+    title:{uk:'Динаміка по розділах',ru:'Динамика по разделам',en:'Section dynamics',de:'Bereichsdynamik',zh:'分类动态'},
     note:{uk:'Показує тільки рух ціни вже наявних акцій і монет. Купівля, продаж або поповнення не рахуються як зростання.',ru:'Показывает только движение цены уже имеющихся акций и монет. Покупка, продажа или пополнение не считаются ростом.',en:'Shows only price movement of already held stocks and coins. Buys, sells and top-ups are not counted as growth.',de:'Zeigt nur Preisbewegungen bereits gehaltener Aktien und Coins. Käufe, Verkäufe und Einzahlungen zählen nicht als Wachstum.',zh:'仅显示已持有股票和币种的价格变化。买入、卖出或充值不计为增长。'},
     price:{uk:'рух ціни',ru:'движение цены',en:'price move',de:'Preisbewegung',zh:'价格变化'},
     day:{uk:'День',ru:'День',en:'Day',de:'Tag',zh:'日'},
@@ -8476,11 +8480,11 @@ function sectionPerfTxt(key){
     account:{uk:'Рахунок',ru:'Счёт',en:'Account',de:'Konto',zh:'账户'},
     metals:{uk:'Метали',ru:'Металлы',en:'Metals',de:'Metalle',zh:'贵金属'},
     other:{uk:'Інше',ru:'Другое',en:'Other',de:'Andere',zh:'其他'},
-    statsPeriod:{uk:'📅 Статистика за період',ru:'📅 Статистика за период',en:'📅 Period statistics',de:'📅 Zeitraumstatistik',zh:'📅 周期统计'},
+    statsPeriod:{uk:'Статистика за період',ru:'Статистика за период',en:'Period statistics',de:'Zeitraumstatistik',zh:'周期统计'},
     today:{uk:'Сьогодні',ru:'Сегодня',en:'Today',de:'Heute',zh:'今天'},
     last7:{uk:'За 7 днів',ru:'За 7 дней',en:'Last 7 days',de:'Letzte 7 Tage',zh:'过去 7 天'},
     last30:{uk:'За 30 днів',ru:'За 30 дней',en:'Last 30 days',de:'Letzte 30 Tage',zh:'过去 30 天'},
-    assetsDist:{uk:'📊 Розподіл активів',ru:'📊 Распределение активов',en:'📊 Asset distribution',de:'📊 Vermögensverteilung',zh:'📊 资产分布'},
+    assetsDist:{uk:'Розподіл активів',ru:'Распределение активов',en:'Asset distribution',de:'Vermögensverteilung',zh:'资产分布'},
     portfolioValue:{uk:'Вартість портфелю',ru:'Стоимость портфеля',en:'Portfolio value',de:'Portfoliowert',zh:'组合价值'},
     buyValue:{uk:'Вартість покупки',ru:'Стоимость покупки',en:'Purchase value',de:'Kaufwert',zh:'买入价值'},
     profitLoss:{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'盈亏'},
@@ -8498,7 +8502,7 @@ function diagDividendShort(){return ({uk:'Дивід:',ru:'Див:',en:'Div:',de
 
 function historyTxt(key){
   const dict={
-    title:{uk:'📈 Історія графіка',ru:'📈 История графика',en:'📈 Chart history',de:'📈 Diagrammverlauf',zh:'📈 图表历史'},
+    title:{uk:'Історія графіка',ru:'История графика',en:'Chart history',de:'Diagrammverlauf',zh:'图表历史'},
     empty:{uk:'Історія поки порожня. Вона зʼявиться після щоденних перерахунків капіталу.',ru:'История пока пустая. Она появится после ежедневных пересчётов капитала.',en:'History is empty for now. It will appear after daily capital recalculations.',de:'Der Verlauf ist noch leer. Er erscheint nach täglichen Kapital-Neuberechnungen.',zh:'历史记录暂时为空。每日重新计算资本后会出现。'},
     records:{uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'},
     last:{uk:'останні',ru:'последние',en:'latest',de:'letzte',zh:'最近'},
@@ -10027,6 +10031,76 @@ window.handleTrialStartWithDisclaimer=handleTrialStartWithDisclaimer;
 window.handleTrialSkipWithDisclaimer=handleTrialSkipWithDisclaimer;
 window.startTrial=handleTrialStartWithDisclaimer;
 window.skipTrial=handleTrialSkipWithDisclaimer;
+
+
+// ── PNG ICON LABEL CLEANUP ─────────────────────────────
+function stripLegacyIconGlyphs(text){
+  return String(text||'').replace(/^[\s📈📉📊📅💰💵💱🏦🏛⚡✅🧮₮%🔍⟳➕✦✓!]+/u,'').trimStart();
+}
+function cleanupPngIconLabels(root){
+  const scope=root&&root.querySelectorAll?root:document;
+  const selectors=[
+    '.usdt-balance-title',
+    '.diag-title',
+    '.diag-section-title',
+    '.chart-title',
+    '.daily-title',
+    '.field-label',
+    '.sd-label',
+    '.result-key',
+    '.stock-action-btn',
+    '.calc-head-title',
+    '.calc-title'
+  ].join(',');
+  scope.querySelectorAll(selectors).forEach(el=>{
+    if(!el.querySelector('img'))return;
+    el.childNodes.forEach(node=>{
+      if(node.nodeType===3)node.nodeValue=node.nodeValue.replace(/[📈📉📊📅💰💵💱🏦🏛⚡✅🧮₮]/gu,'');
+      if(node.nodeType===1&&!node.querySelector('img'))node.textContent=stripLegacyIconGlyphs(node.textContent);
+    });
+  });
+  const usdtTitle=document.getElementById('usdtBalanceCardTitle');
+  if(usdtTitle)usdtTitle.textContent=stripLegacyIconGlyphs(usdtTitle.textContent);
+}
+if(typeof applyAutoTranslations==='function'&&!window.__pngIconLabelCleanupBound){
+  window.__pngIconLabelCleanupBound=true;
+  const _applyAutoTranslationsBeforePngIconCleanup=applyAutoTranslations;
+  applyAutoTranslations=function(root){
+    const res=_applyAutoTranslationsBeforePngIconCleanup(root);
+    cleanupPngIconLabels(root||document);
+    return res;
+  };
+}
+if(typeof applyTranslations==='function'&&!window.__pngIconApplyTranslationsCleanupBound){
+  window.__pngIconApplyTranslationsCleanupBound=true;
+  const _applyTranslationsBeforePngIconCleanup=applyTranslations;
+  applyTranslations=function(){
+    const res=_applyTranslationsBeforePngIconCleanup();
+    cleanupPngIconLabels(document);
+    return res;
+  };
+}
+setTimeout(()=>cleanupPngIconLabels(document),0);
+setTimeout(()=>cleanupPngIconLabels(document),800);
+
+
+// ── PNG ICON CLEANUP AFTER RENDERS ─────────────────────
+function schedulePngIconCleanup(){
+  if(typeof cleanupPngIconLabels==='function')setTimeout(()=>cleanupPngIconLabels(document),0);
+}
+['renderDiagnostics','renderSecuritiesCards','renderCryptoRows','updateAll'].forEach(name=>{
+  const fn=window[name]||globalThis[name];
+  if(typeof fn==='function'&&!fn.__pngIconCleanupWrapped){
+    const wrapped=function(...args){
+      const res=fn.apply(this,args);
+      schedulePngIconCleanup();
+      return res;
+    };
+    wrapped.__pngIconCleanupWrapped=true;
+    window[name]=wrapped;
+    try{globalThis[name]=wrapped;}catch(e){}
+  }
+});
 
 </script>
 </body>
