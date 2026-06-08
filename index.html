@@ -574,7 +574,7 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .diag-overlay.open{display:flex;}
 .diag-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .diag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.diag-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.diag-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
 .diag-close{background:var(--bg3);border:none;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--muted2);}
 .diag-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .diag-stat{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center;}
@@ -2412,7 +2412,7 @@ body.theme-light .disclaimer-list li{background:linear-gradient(180deg,#ffffff,#
 <div class="diag-overlay" id="diagOverlay" onclick="diagCloseOutside(event)">
   <div class="diag-box">
     <div class="diag-header">
-      <div class="diag-title">📊 Діагностика капіталу</div>
+      <div class="diag-title"><img class="app-png-icon" src="section-icons/section-diagnostics.png?v=1" alt=""> <span>Діагностика капіталу</span></div>
       <button class="diag-close" onclick="closeDiagnostics()">✕</button>
     </div>
     <div id="diagContent"></div>
@@ -2789,7 +2789,7 @@ const EXTRA_I18N={
   'Сума платежу (₴)':{uk:'Сума платежу (₴)',ru:'Сумма платежа (₴)',en:'Payment amount (₴)',de:'Zahlungsbetrag (₴)',zh:'付款金额 (₴)'},
   'Дата':{uk:'Дата',ru:'Дата',en:'Date',de:'Datum',zh:'日期'},
   'Погасити':{uk:'Погасити',ru:'Погасить',en:'Repay',de:'Tilgen',zh:'还款'},
-  '📊 Діагностика капіталу':{uk:'📊 Діагностика капіталу',ru:'📊 Диагностика капитала',en:'📊 Capital diagnostics',de:'📊 Kapitaldiagnose',zh:'📊 资本诊断'},
+  'Діагностика капіталу':{uk:'Діагностика капіталу',ru:'Диагностика капитала',en:'Capital diagnostics',de:'Kapitaldiagnose',zh:'资本诊断'},
   '✦ БЕЗКОШТОВНИЙ ДОСТУП':{uk:'✦ БЕЗКОШТОВНИЙ ДОСТУП',ru:'✦ БЕСПЛАТНЫЙ ДОСТУП',en:'✦ FREE ACCESS',de:'✦ KOSTENLOSER ZUGANG',zh:'✦ 免费访问'},
   '📅 Прогноз/місяць':{uk:'📅 Прогноз/місяць',ru:'Прогноз/месяц',en:'Forecast/month',de:'Prognose/Monat',zh:'预测/月'},
   '💰 Проценти':{uk:'💰 Проценти',ru:'Проценты',en:'Interest',de:'Zinsen',zh:'利息'},
