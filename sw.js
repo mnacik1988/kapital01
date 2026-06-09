@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-card-border-only-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-bottom-nav-outline-v1';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_24.html',
