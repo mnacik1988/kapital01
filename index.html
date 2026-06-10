@@ -3197,7 +3197,7 @@ let chartPeriod = '30d';
 let chartExpanded = true;
 
 // ── DEPOSIT SLIDES ───────────────────────────
-let deposits=[{id:'dep0',name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:'',amountMode:'initial'}];
+let deposits=[{id:'dep0',name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:'',amountMode:'current'}];
 let currentDepSlide=0;
 let liveIntervals={};
 
@@ -3244,15 +3244,7 @@ function getDepositHtml(dep,idx){
       <div class="dep-calc-body" id="depCalcBody_${dep.id}">
         <div style="padding-top:14px;">
         <div class="field-group">
-          <div class="field-label">${lang.depAmountType||'Тип суми'}</div>
-          <select class="field-input" id="depAmountMode_${dep.id}"
-            onchange="setDepositAmountMode('${dep.id}',${idx},this.value)">
-            <option value="initial" ${getDepositAmountMode(dep)==='initial'?'selected':''}>${lang.depAmountInitial||'Початкова сума'}</option>
-            <option value="current" ${getDepositAmountMode(dep)==='current'?'selected':''}>${lang.depAmountCurrent||'Сума на депозиті'}</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <div class="field-label">${getDepositFieldLabel(getDepositAmountMode(dep)==='current'?(lang.depAmountCurrent||lang.depPrincipalLbl):lang.depPrincipalLbl,dep)}</div>
+          <div class="field-label">${getDepositFieldLabel(lang.depPrincipalLbl,dep)}</div>
           <div style="display:flex;gap:6px;">
             <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}" style="flex:1;"
               oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
@@ -3269,14 +3261,14 @@ function getDepositHtml(dep,idx){
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">${getDepositAmountMode(dep)==='current'?(lang.depStartAuto||lang.depStart):lang.depStart}</div>
-            <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" required lang="${currentLang}" id="depStartDate_${dep.id}" value="${getDepositStartInputValue(dep)}" ${getDepositAmountMode(dep)==='current'?'readonly':''}
-              oninput="deposits[${idx}].startDate=this.value;updateAll();startLiveTicker('${dep.id}')"></div>
+            <div class="field-label">${lang.depStart}</div>
+            <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" required lang="${currentLang}" id="depStartDate_${dep.id}" value="${getDepositStartInputValue(dep)}"
+              oninput="deposits[${idx}].startDate=this.value;updateAll();startLiveTicker('${dep.id}');saveData()"></div>
           </div>
           <div class="field-group">
             <div class="field-label">${lang.depEnd}</div>
             <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" required lang="${currentLang}" id="depEndDate_${dep.id}" value="${dep.endDate}"
-              oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;syncDerivedDepositStart(deposits[${idx}]);updateDepositStartInput('${dep.id}',deposits[${idx}]);updateAll();startLiveTicker('${dep.id}');saveData()"></div>
+              oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;updateDepositStartInput('${dep.id}',deposits[${idx}]);updateAll();startLiveTicker('${dep.id}');saveData()"></div>
             <div id="depDateError_${dep.id}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);margin-top:4px;display:none;">⚠ Невірна дата</div>
           </div>
         </div>
@@ -3319,7 +3311,7 @@ function getDepositHtml(dep,idx){
             <div class="field-group">
               <div class="field-label">${lang.termMon}</div>
               <input class="field-input" type="text" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
-                oninput="deposits[${idx}].months=this.value;syncDerivedDepositStart(deposits[${idx}]);updateDepositStartInput('${dep.id}',deposits[${idx}]);calcDeposit('${dep.id}');updateAll();saveData()">
+                oninput="deposits[${idx}].months=this.value;updateDepositStartInput('${dep.id}',deposits[${idx}]);calcDeposit('${dep.id}');updateAll();saveData()">
             </div>
             <div class="field-group">
               <div class="field-label">${lang.capitaliz}</div>
@@ -3395,7 +3387,7 @@ function syncDepositSliderHeight(){
 function _addDepositSlideCore(){
   if(deposits.length>=3){alert(t('maxDep'));return;}
   const id='dep'+Date.now();
-  deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:'',amountMode:'initial',registeredDate:new Date().toISOString().split('T')[0]});
+  deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',startDate:'',endDate:'',amountMode:'current',registeredDate:new Date().toISOString().split('T')[0]});
   renderDeposits(); goToSlide(deposits.length-1); saveData();
 }
 function addDepositSlide(){
@@ -3448,7 +3440,7 @@ function normalizeDepositMode(mode){
   return mode==='separate'?'separate':'body';
 }
 function getDepositAmountMode(dep){
-  return dep?.amountMode==='current'?'current':'initial';
+  return 'current';
 }
 function depAddMonthsSafe(date, months){
   const d=depLocalDate(date);
@@ -3459,32 +3451,29 @@ function depAddMonthsSafe(date, months){
   return target;
 }
 function getDepositDerivedStart(dep){
-  if(getDepositAmountMode(dep)==='current'&&dep?.endDate){
+  if(dep?.startDate)return depLocalDate(dep.startDate);
+  if(dep?.endDate){
     const months=parseInputNumber(dep.months)||0;
     if(months>0)return depAddMonthsSafe(dep.endDate,-months);
   }
-  return dep?.startDate?depLocalDate(dep.startDate):depLocalDate(new Date());
+  return depLocalDate(new Date());
 }
 function getDepositStartInputValue(dep){
   return depDateKey(getDepositDerivedStart(dep));
 }
 function syncDerivedDepositStart(dep){
   if(!dep)return;
-  if(getDepositAmountMode(dep)==='current')dep.startDate=getDepositStartInputValue(dep);
 }
 function setDepositAmountMode(depId,idx,mode){
   const dep=deposits[idx]||deposits.find(d=>d.id===depId);
   if(!dep)return;
-  dep.amountMode=mode==='current'?'current':'initial';
+  dep.amountMode='current';
   if(!dep.registeredDate)dep.registeredDate=depDateKey(new Date());
-  syncDerivedDepositStart(dep);
-  renderDeposits();
   updateAll();
   startLiveTicker(depId);
   saveData();
 }
 function getDepositAccountingStart(dep,realStart,end){
-  if(getDepositAmountMode(dep)!=='current')return depLocalDate(realStart);
   const reg=dep?.registeredDate?depLocalDate(dep.registeredDate):depLocalDate(new Date());
   if(reg<realStart)return depLocalDate(realStart);
   if(reg>end)return depLocalDate(end);
@@ -3558,7 +3547,7 @@ function simulateDeposit(dep,opts={}){
   let taxFreeLeft=parseInputNumber(opts.taxFree??dep?.taxFree);
   const startDay=realStart.getDate();
   const accountingStart=getDepositAccountingStart(dep,realStart,end);
-  const simStart=getDepositAmountMode(dep)==='current'?getDepositLastCapBefore(accountingStart,realStart,startDay):realStart;
+  const simStart=accountingStart;
   const oneDay=1000*60*60*24;
   if(!P||stop<=simStart||end<=realStart){
     return {principal:P||0,bodyBalance:P||0,separateNet:0,totalValue:P||0,totalGross:0,totalTax:0,totalNet:0,capitalizedNet:0,completedCaps:0,currentMode:normalizeDepositMode(dep?.interestTo),dailyGross:0,dailyNet:0,realStart,accountingStart,simStart};
@@ -3568,7 +3557,7 @@ function simulateDeposit(dep,opts={}){
     const amount=parseInputNumber(tp.amount);
     if(!amount||!tp.date)return;
     const date=depAddDays(tp.date,1);
-    if(getDepositAmountMode(dep)==='current'&&date<accountingStart)return;
+    if(date<accountingStart)return;
     events.push({date,type:'topup',amount});
   });
   getDepositCapDates(realStart,stop,startDay).forEach(date=>{
@@ -3688,7 +3677,8 @@ function calcDeposit(depId){
   const end=dep.endDate?depLocalDate(dep.endDate):depAddMonthsSafe(start,months);
   const sim=simulateDeposit(dep,{start,end,until:end});
   const taxBase=Math.max(0,sim.totalGross-parseInputNumber(dep.taxFree));
-  const eff=P&&months?((sim.totalNet/P)/(months/12)*100):0;
+  const effDays=Math.max(1,(end-sim.accountingStart)/(1000*60*60*24));
+  const eff=P?((sim.totalNet/P)/(effDays/365)*100):0;
   setText('r-total_'+depId,   fmtN(Math.round(sim.totalValue))+' '+depSym);
   setText('r-interest_'+depId,'+'+fmtN(Math.round(sim.totalGross))+' '+depSym);
   setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' '+depSym);
@@ -6144,8 +6134,7 @@ function migrateDeposit(dep,index){
   out.depCurrency=String(out.depCurrency).toUpperCase();
   out.topups=ensureArray(out.topups).map(tp=>({amount:parseInputNumber(tp?.amount),date:tp?.date||new Date().toISOString().split('T')[0]}));
   out.interestTo=normalizeDepositMode(out.interestTo);
-  out.amountMode=out.amountMode==='current'?'current':'initial';
-  if(out.amountMode==='current')syncDerivedDepositStart(out);
+  out.amountMode='current';
   out.interestModeHistory=getDepositModeHistory(out);
   if(!out.registeredDate)out.registeredDate=out.startDate||new Date().toISOString().split('T')[0];
   return out;
@@ -6274,7 +6263,7 @@ function loadData(){
     if(Array.isArray(d.deposits)&&d.deposits.length)deposits=d.deposits;
     // Ensure all deposits have registeredDate (for existing data without it)
     const todayStr=new Date().toISOString().split('T')[0];
-    deposits.forEach(dep=>{if(!dep.registeredDate)dep.registeredDate=todayStr;if(!dep.amountMode)dep.amountMode='initial';if(dep.amountMode==='current')syncDerivedDepositStart(dep);});
+    deposits.forEach(dep=>{if(!dep.registeredDate)dep.registeredDate=todayStr;dep.amountMode='current';});
     sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('cryptoCost',d.cryptoCost);
     sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
     sv('cashAmount',d.cashAmount);sv('cashNote',d.cashNote);
