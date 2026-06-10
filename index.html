@@ -3677,8 +3677,12 @@ function calcDeposit(depId){
   const end=dep.endDate?depLocalDate(dep.endDate):depAddMonthsSafe(start,months);
   const sim=simulateDeposit(dep,{start,end,until:end});
   const taxBase=Math.max(0,sim.totalGross-parseInputNumber(dep.taxFree));
-  const effDays=Math.max(1,(end-sim.accountingStart)/(1000*60*60*24));
-  const eff=P?((sim.totalNet/P)/(effDays/365)*100):0;
+  // The deposit is monitored from the app registration date, but the bank yield
+  // belongs to the full contract period. Keep the effective rate contractual.
+  const contractDep={...dep,registeredDate:depDateKey(start)};
+  const contractSim=simulateDeposit(contractDep,{start,end,until:end});
+  const contractDays=Math.max(1,(end-start)/(1000*60*60*24));
+  const eff=P?((contractSim.totalNet/P)/(contractDays/365)*100):0;
   setText('r-total_'+depId,   fmtN(Math.round(sim.totalValue))+' '+depSym);
   setText('r-interest_'+depId,'+'+fmtN(Math.round(sim.totalGross))+' '+depSym);
   setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' '+depSym);
