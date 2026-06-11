@@ -3664,8 +3664,12 @@ function getDepositFieldLabel(label,d){
 function getDepositPrincipalUah(d){
   return getDepositAmountUah(d,getDepositPrincipalNative(d));
 }
+function getDepositRealizedNetNative(d){
+  const sim=simulateDeposit(d);
+  return (sim.totalNet||0)-(sim.pendingNet||0);
+}
 function getDepositMonthlyAccruedNative(d){
-  return simulateDeposit(d).totalNet;
+  return getDepositRealizedNetNative(d);
 }
 function getDepositMonthlyAccrued(d){
   return getDepositAmountUah(d,getDepositMonthlyAccruedNative(d));
@@ -3685,7 +3689,9 @@ function calcDeposit(depId){
   dep.taxFree=$('depTaxFree_'+depId)?.value||dep.taxFree;
   const months=parseInputNumber(dep.months)||12;
   const start=getDepositContractStart(dep);
-  const end=getDepositContractEnd(dep,start);
+  // Calculator result is based on the selected term, not on extra calendar days
+  // that may remain before the chosen closing date.
+  const end=depAddMonthsSafe(start,months,getDepositOpenDay(dep));
   const sim=simulateDeposit(dep,{start,end,until:end});
   const taxBase=Math.max(0,sim.totalGross-parseInputNumber(dep.taxFree));
   const eff=P&&months?((sim.totalNet/P)/(months/12)*100):0;
@@ -7438,7 +7444,7 @@ function getDepositTotalWithTopups(d){
 }
 
 function getDepositMonthlyAccruedNativeWithTopups(d){
-  return simulateDeposit(d).totalNet;
+  return getDepositRealizedNetNative(d);
 }
 function getDepositMonthlyAccruedWithTopups(d){
   return getDepositAmountUah(d,getDepositMonthlyAccruedNativeWithTopups(d));
