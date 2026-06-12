@@ -3063,6 +3063,7 @@ function startAutoI18nObserver(){
 let currentLang='uk';
 function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LANGS['uk'][key]||key;}
 const UI_TEXT={
+  depOpenDay:{uk:'Число відкриття',ru:'Число открытия',en:'Opening day',de:'Eröffnungstag',zh:'开户日'},
   stockSaleCash:{uk:'Кошти від продажів акцій',ru:'Деньги от продажи акций',en:'Stock sale cash',de:'Geld aus Aktienverkäufen',zh:'股票卖出资金'},
   stockSaleCashShort:{uk:'Кошти від продажів',ru:'Деньги от продаж',en:'Sale cash',de:'Verkaufserlöse',zh:'卖出资金'},
   stockSaleCashHint:{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
@@ -3299,7 +3300,7 @@ function getDepositHtml(dep,idx){
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">${lang.depOpenDay||'Число відкриття'}</div>
+            <div class="field-label">${uiText('depOpenDay')||lang.depOpenDay||'Число відкриття'}</div>
             <input class="field-input" type="text" id="depOpenDay_${dep.id}" placeholder="1-31" value="${getDepositOpenDayValue(dep)}" inputmode="numeric"
               oninput="deposits[${idx}].openDay=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
           </div>
@@ -4939,7 +4940,6 @@ function getSecCardHtml(s,idx){
         </div>
         <div id="workerUrlStatus_${s.id}" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;"></div>
       </div>
-      <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeSecCard('${s.id}')">${lang.removeSection}</button>
     </div></div>
   </div>`;
 }
