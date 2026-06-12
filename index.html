@@ -3808,8 +3808,9 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   // Use midnight-to-midnight for accurate day counting
   const msNorm=new Date(monitorStart.getFullYear(),monitorStart.getMonth(),monitorStart.getDate());
   const nowNorm=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const daysMonitored=Math.max(0,Math.round((nowNorm-msNorm)/(1000*60*60*24)));
-  const count=Math.min(daysMonitored,30);
+  const rawDays=Math.floor((nowNorm-msNorm)/(1000*60*60*24));
+  const daysMonitored=rawDays>0?rawDays:(now>=monitorStart?1:0);
+  const count=Math.min(Math.max(0,daysMonitored),30);
   if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">'+(t('monitoringTomorrow')||'Моніторинг почнеться завтра')+'</div>';return;}
 
   // Helper: date to YYYY-MM-DD string (avoids timezone issues)
@@ -8732,39 +8733,18 @@ function renderDiagnostics(){
   const weekStats=getPeriodChangeStats(total,7);
   const monthStats=getPeriodChangeStats(total,30);
 
-  // Daily deposit income: balance × rate / 365 × (1 - tax)
+  // Daily deposit income: use the current deposit engine, including the opening-day model.
   let dailyDepIncome=0;
   let dailyDepIncomeGross=0;
   deposits.forEach(d=>{
-    if(!d.startDate||!d.endDate||!d.principal)return;
-    const P=getDepositPrincipalUah(d);
-    const topups=getDepositAmountUah(d,getDepositTopupsNative(d));
-    const totalP=P+topups;
-    const rAnn=(parseFloat(d.rate)||16)/100;
-    const n=parseFloat(d.freq)||12;
-    const depTax=(parseFloat(d.tax)||0)/100;
-    const start=new Date(d.startDate),end=new Date(d.endDate),now=new Date();
+    if(!d||!d.endDate||!d.principal)return;
+    const start=getDepositMonitoringStart(d);
+    const end=depLocalDate(d.endDate);
+    const now=new Date();
     if(now<start||end<=start)return;
-    // Simulate monthly capitalizations with NET interest
-    const startDay=start.getDate();
-    let cm=0,chk=new Date(start);
-    while(true){
-      chk=new Date(chk.getFullYear(),chk.getMonth()+1,startDay);
-      if(chk>now||chk>end)break;
-      cm++;
-    }
-    let bal=totalP;
-    let simD=new Date(start);
-    for(let mo=0;mo<cm;mo++){
-      const ms=new Date(simD.getFullYear(),simD.getMonth()+mo,startDay);
-      const me=new Date(simD.getFullYear(),simD.getMonth()+mo+1,startDay);
-      const dim=Math.round((me-ms)/(1000*60*60*24));
-      const gm=bal*rAnn*dim/365;
-      bal+=gm*(1-depTax);
-    }
-    const grossPerDay=bal*rAnn/365;
-    dailyDepIncomeGross+=grossPerDay;
-    dailyDepIncome+=grossPerDay*(1-depTax);
+    const sim=simulateDeposit(d,{start,end,until:now});
+    dailyDepIncomeGross+=getDepositAmountUah(d,sim.dailyGross||0);
+    dailyDepIncome+=getDepositAmountUah(d,sim.dailyNet||0);
   });
 
   // Securities stats
