@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-deposit-daily-diag-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-pretty-income-dropdown-v1';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_24.html',
