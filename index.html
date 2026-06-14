@@ -190,6 +190,11 @@ select.field-input option{background:var(--bg3);color:var(--text);}
 .pretty-select-option{width:100%;border:0;border-radius:12px;background:transparent;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;font-weight:700;text-align:left;padding:11px 12px;cursor:pointer;transition:background .14s,color .14s,transform .14s;}
 .pretty-select-option:hover{background:#4ecb8d18;color:var(--green2);}
 .pretty-select-option.active{background:linear-gradient(135deg,#4ecb8d32,#e8c97a1f);color:var(--gold2);}
+.pretty-native{min-width:0;}
+.pretty-native.compact{min-width:78px;}
+.pretty-native .pretty-select-btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pretty-hidden-select{position:absolute!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important;left:-9999px!important;top:auto!important;}
+.pretty-native .pretty-select-menu{max-height:260px;overflow:auto;}
 body.theme-light .pretty-select-btn{background:linear-gradient(135deg,#ffffff,#eef5ff);border-color:#c8d5e4;color:#263047;}
 body.theme-light .pretty-select-menu{background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(237,245,255,.98));border-color:#9bc8ba;box-shadow:0 18px 38px rgba(70,94,123,.22);}
 body.theme-light .pretty-select-option{color:#263047;}
@@ -4744,6 +4749,77 @@ function selectSecurityIncomePeriod(ev,secId,period){
   setSecurityIncomePeriod(secId,period);
 }
 document.addEventListener('click',()=>closeSecurityIncomeDropdowns());
+function prettySelectLabel(sel){
+  const opt=sel.options&&sel.options[sel.selectedIndex];
+  return opt?opt.textContent.trim():(sel.value||'');
+}
+function closePrettyNativeSelects(except){
+  document.querySelectorAll('.pretty-native.open').forEach(el=>{if(el!==except)el.classList.remove('open');});
+}
+function rebuildPrettyNativeSelect(sel){
+  const wrap=sel.closest('.pretty-native');
+  if(!wrap)return;
+  const btn=wrap.querySelector('.pretty-select-btn');
+  const menu=wrap.querySelector('.pretty-select-menu');
+  if(btn)btn.textContent=prettySelectLabel(sel);
+  if(!menu)return;
+  menu.innerHTML='';
+  Array.from(sel.options||[]).forEach(opt=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='pretty-select-option'+(opt.selected?' active':'');
+    b.textContent=opt.textContent.trim();
+    b.addEventListener('click',ev=>{
+      ev.stopPropagation();
+      sel.value=opt.value;
+      sel.dispatchEvent(new Event('change',{bubbles:true}));
+      rebuildPrettyNativeSelect(sel);
+      closePrettyNativeSelects();
+    });
+    menu.appendChild(b);
+  });
+}
+function enhancePrettyNativeSelects(root){
+  const scope=root&&root.querySelectorAll?root:document;
+  scope.querySelectorAll('select:not([data-pretty-enhanced])').forEach(sel=>{
+    if(sel.closest('.pretty-native')||sel.closest('.native-select-keep'))return;
+    sel.dataset.prettyEnhanced='1';
+    const wrap=document.createElement('div');
+    wrap.className='pretty-select pretty-native';
+    const inlineWidth=(sel.style&&sel.style.width)||'';
+    if(inlineWidth){
+      wrap.style.width=inlineWidth;
+      wrap.classList.add('compact');
+    }
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='pretty-select-btn';
+    btn.addEventListener('click',ev=>{
+      ev.stopPropagation();
+      const open=!wrap.classList.contains('open');
+      closePrettyNativeSelects(wrap);
+      wrap.classList.toggle('open',open);
+      rebuildPrettyNativeSelect(sel);
+    });
+    const menu=document.createElement('div');
+    menu.className='pretty-select-menu';
+    sel.parentNode.insertBefore(wrap,sel);
+    wrap.appendChild(sel);
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+    sel.classList.add('pretty-hidden-select');
+    sel.addEventListener('change',()=>rebuildPrettyNativeSelect(sel));
+    rebuildPrettyNativeSelect(sel);
+  });
+}
+document.addEventListener('click',()=>closePrettyNativeSelects());
+document.addEventListener('DOMContentLoaded',()=>enhancePrettyNativeSelects(document));
+if(window.MutationObserver){
+  let prettySelectTimer=null;
+  new MutationObserver(()=>{clearTimeout(prettySelectTimer);prettySelectTimer=setTimeout(()=>enhancePrettyNativeSelects(document),30);}).observe(document.documentElement,{childList:true,subtree:true});
+}else{
+  setInterval(()=>enhancePrettyNativeSelects(document),1000);
+}
 function securityIncomePeriodMonths(period){
   return {monthly:1,quarterly:3,halfyear:6,yearly:12}[period]||0;
 }
