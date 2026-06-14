@@ -180,6 +180,21 @@ input[type="number"].field-input{-webkit-appearance:none;appearance:none;}
 .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
 select.field-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;appearance:none;-webkit-appearance:none;}
 select.field-input option{background:var(--bg3);color:var(--text);}
+.pretty-select{position:relative;width:100%;font-family:'DM Mono',monospace;}
+.pretty-select-btn{width:100%;min-height:44px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(135deg,var(--bg3),var(--bg2));color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:700;text-align:left;padding:12px 42px 12px 14px;cursor:pointer;outline:none;transition:border-color .16s,box-shadow .16s,transform .16s,background .16s;}
+.pretty-select-btn::after{content:'▾';position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--gold2);font-size:12px;transition:transform .16s;}
+.pretty-select.open .pretty-select-btn{border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d22,0 10px 28px #0004;}
+.pretty-select.open .pretty-select-btn::after{transform:translateY(-50%) rotate(180deg);}
+.pretty-select-menu{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:40;display:none;padding:6px;border:1px solid rgba(78,203,141,.42);border-radius:16px;background:linear-gradient(180deg,rgba(29,31,45,.98),rgba(18,20,31,.98));box-shadow:0 18px 40px rgba(0,0,0,.42);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);overflow:hidden;}
+.pretty-select.open .pretty-select-menu{display:block;}
+.pretty-select-option{width:100%;border:0;border-radius:12px;background:transparent;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;font-weight:700;text-align:left;padding:11px 12px;cursor:pointer;transition:background .14s,color .14s,transform .14s;}
+.pretty-select-option:hover{background:#4ecb8d18;color:var(--green2);}
+.pretty-select-option.active{background:linear-gradient(135deg,#4ecb8d32,#e8c97a1f);color:var(--gold2);}
+body.theme-light .pretty-select-btn{background:linear-gradient(135deg,#ffffff,#eef5ff);border-color:#c8d5e4;color:#263047;}
+body.theme-light .pretty-select-menu{background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(237,245,255,.98));border-color:#9bc8ba;box-shadow:0 18px 38px rgba(70,94,123,.22);}
+body.theme-light .pretty-select-option{color:#263047;}
+body.theme-light .pretty-select-option:hover{background:#0ea47212;color:#087653;}
+body.theme-light .pretty-select-option.active{background:linear-gradient(135deg,#0ea4721c,#d99a0018);color:#9a6a00;}
 
 /* RESULT BOX */
 .result-box{background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-top:12px;}
@@ -3067,6 +3082,18 @@ const UI_TEXT={
   stockSaleCash:{uk:'Кошти від продажів акцій',ru:'Деньги от продажи акций',en:'Stock sale cash',de:'Geld aus Aktienverkäufen',zh:'股票卖出资金'},
   stockSaleCashShort:{uk:'Кошти від продажів',ru:'Деньги от продаж',en:'Sale cash',de:'Verkaufserlöse',zh:'卖出资金'},
   stockSaleCashHint:{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
+  stockDividendBalance:{uk:'Нараховані дивіденди',ru:'Начисленные дивиденды',en:'Accrued dividends',de:'Aufgelaufene Dividenden',zh:'已计股息'},
+  stockDividendBalanceShort:{uk:'Дивіденди',ru:'Дивиденды',en:'Dividends',de:'Dividenden',zh:'股息'},
+  stockDividendHint:{uk:'Баланс фактично отриманих дивідендів. Додається до загального капіталу.',ru:'Баланс фактически полученных дивидендов. Добавляется в общий капитал.',en:'Balance of actually received dividends. Included in total capital.',de:'Saldo tatsächlich erhaltener Dividenden. Wird zum Gesamtkapital gezählt.',zh:'实际收到的股息余额，计入总资产。'},
+  incomePayoutPeriod:{uk:'Період виплат',ru:'Период выплат',en:'Payout period',de:'Auszahlungsperiode',zh:'支付周期'},
+  incomePayoutOff:{uk:'Не нараховувати',ru:'Не начислять',en:'Do not accrue',de:'Nicht erfassen',zh:'不计入'},
+  incomePayoutMonthly:{uk:'Щомісяця',ru:'Ежемесячно',en:'Monthly',de:'Monatlich',zh:'每月'},
+  incomePayoutQuarterly:{uk:'Щокварталу',ru:'Ежеквартально',en:'Quarterly',de:'Vierteljährlich',zh:'每季度'},
+  incomePayoutHalfYear:{uk:'Раз на 6 місяців',ru:'Раз в 6 месяцев',en:'Every 6 months',de:'Alle 6 Monate',zh:'每6个月'},
+  incomePayoutYearly:{uk:'Раз на рік',ru:'Раз в год',en:'Yearly',de:'Jährlich',zh:'每年'},
+  bondCouponBalance:{uk:'Нараховані купони',ru:'Начисленные купоны',en:'Accrued coupons',de:'Aufgelaufene Kupons',zh:'已计票息'},
+  bondCouponBalanceShort:{uk:'Купони',ru:'Купоны',en:'Coupons',de:'Kupons',zh:'票息'},
+  bondCouponHint:{uk:'Баланс фактично отриманих купонів. Додається до загального капіталу.',ru:'Баланс фактически полученных купонов. Добавляется в общий капитал.',en:'Balance of actually received coupons. Included in total capital.',de:'Saldo tatsächlich erhaltener Kupons. Wird zum Gesamtkapital gezählt.',zh:'实际收到的票息余额，计入总资产。'},
   bondCash:{uk:'💵 Кошти від продажу / погашення',ru:'💵 Деньги от продажи / погашения',en:'💵 Sale / redemption cash',de:'💵 Geld aus Verkauf / Rückzahlung',zh:'💵 卖出 / 赎回资金'},
   bondCashShort:{uk:'💵 Продаж / погашення',ru:'💵 Продажа / погашение',en:'💵 Sale / redemption',de:'💵 Verkauf / Rückzahlung',zh:'💵 卖出 / 赎回'},
   bondCashHint:{uk:'Можна вносити кошти після продажу або погашення облігацій',ru:'Можно вносить деньги после продажи или погашения облигаций',en:'Use for cash after bond sale or maturity redemption',de:'Für Erlöse nach Verkauf oder Rückzahlung von Anleihen',zh:'用于债券卖出或到期赎回后的资金'},
@@ -4584,7 +4611,7 @@ function addSecuritiesCard(type){
   }
   const id='sec_'+type+'_'+Date.now();
   const stockCashCurrency=(displayCurrency||'uah').toUpperCase();
-  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency,hidden:false});
+  securitiesSections.push({id,type,name:names[type],icon:icons[type],items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency,incomeAmount:0,incomeCurrency:stockCashCurrency,incomePeriod:'off',hidden:false});
   renderSecuritiesCards();
   saveData(); updateAll();
 }
@@ -4670,6 +4697,113 @@ function getStockCurrencySymbol(cur){
 }
 function getStockCashAmount(section){return stockNum(section?.stockCashAmount);}
 function getStockCashTotalUah(section){return getStockCashAmount(section)*getStockCurrencyRate(getStockCashCurrency(section));}
+const SECURITY_INCOME_PERIODS=['off','monthly','quarterly','halfyear','yearly'];
+function getSecurityIncomeCurrency(section){
+  const cur=String(section?.incomeCurrency||section?.stockCashCurrency||'UAH').toUpperCase();
+  return STOCK_CASH_CURRENCIES.includes(cur)?cur:'UAH';
+}
+function getSecurityIncomeAmount(section){return stockNum(section?.incomeAmount);}
+function getSecurityIncomeTotalUah(section){return getSecurityIncomeAmount(section)*getStockCurrencyRate(getSecurityIncomeCurrency(section));}
+function getSecurityIncomePeriod(section){
+  const p=String(section?.incomePeriod||'off').toLowerCase();
+  return SECURITY_INCOME_PERIODS.includes(p)?p:'off';
+}
+function securityIncomePeriodLabel(period){
+  const map={off:'incomePayoutOff',monthly:'incomePayoutMonthly',quarterly:'incomePayoutQuarterly',halfyear:'incomePayoutHalfYear',yearly:'incomePayoutYearly'};
+  return uiText(map[period]||'incomePayoutOff');
+}
+function securityIncomePeriodOptions(selected){
+  return SECURITY_INCOME_PERIODS.map(p=>'<option value="'+p+'" '+(selected===p?'selected':'')+'>'+securityIncomePeriodLabel(p)+'</option>').join('');
+}
+function securityIncomeDropdownHtml(secId,selected){
+  const safeId=String(secId||'').replace(/'/g,'');
+  const opts=SECURITY_INCOME_PERIODS.map(p=>
+    '<button type="button" class="pretty-select-option '+(selected===p?'active':'')+'" onclick="selectSecurityIncomePeriod(event,\''+safeId+'\',\''+p+'\')">'+securityIncomePeriodLabel(p)+'</button>'
+  ).join('');
+  return '<div class="pretty-select" id="secIncomePretty_'+safeId+'">'+
+    '<button type="button" class="pretty-select-btn" onclick="toggleSecurityIncomeDropdown(event,\''+safeId+'\')">'+securityIncomePeriodLabel(selected)+'</button>'+
+    '<div class="pretty-select-menu">'+opts+'</div>'+
+  '</div>';
+}
+function closeSecurityIncomeDropdowns(exceptId){
+  document.querySelectorAll('.pretty-select.open').forEach(el=>{
+    if(!exceptId||el.id!=='secIncomePretty_'+exceptId)el.classList.remove('open');
+  });
+}
+function toggleSecurityIncomeDropdown(ev,secId){
+  if(ev)ev.stopPropagation();
+  const el=document.getElementById('secIncomePretty_'+secId);
+  if(!el)return;
+  const willOpen=!el.classList.contains('open');
+  closeSecurityIncomeDropdowns(secId);
+  el.classList.toggle('open',willOpen);
+}
+function selectSecurityIncomePeriod(ev,secId,period){
+  if(ev)ev.stopPropagation();
+  closeSecurityIncomeDropdowns();
+  setSecurityIncomePeriod(secId,period);
+}
+document.addEventListener('click',()=>closeSecurityIncomeDropdowns());
+function securityIncomePeriodMonths(period){
+  return {monthly:1,quarterly:3,halfyear:6,yearly:12}[period]||0;
+}
+function securityDateKey(d){
+  const x=new Date(d);
+  return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+}
+function addMonthsSafe(date,months){
+  const d=new Date(date);
+  const day=d.getDate();
+  const next=new Date(d.getFullYear(),d.getMonth()+months,1);
+  const maxDay=new Date(next.getFullYear(),next.getMonth()+1,0).getDate();
+  next.setDate(Math.min(day,maxDay));
+  return next;
+}
+function getSecurityProjectedAnnualIncome(section){
+  if(!section)return 0;
+  return isBondSection(section)?getBondSectionStats(section).couponAnnual:getStockSectionStats(section).totalDiv;
+}
+function processSecurityIncomeAccruals(){
+  let changed=false;
+  const now=new Date();
+  (securitiesSections||[]).forEach(sec=>{
+    if(!sec||sec.hidden)return;
+    const period=getSecurityIncomePeriod(sec);
+    const months=securityIncomePeriodMonths(period);
+    if(!months){
+      if(sec.lastIncomeAccrualDate){sec.lastIncomeAccrualDate='';changed=true;}
+      return;
+    }
+    if(!sec.lastIncomeAccrualDate){
+      sec.lastIncomeAccrualDate=securityDateKey(now);
+      changed=true;
+      return;
+    }
+    let last=new Date(sec.lastIncomeAccrualDate);
+    if(!Number.isFinite(last.getTime())){
+      sec.lastIncomeAccrualDate=securityDateKey(now);
+      changed=true;
+      return;
+    }
+    let guard=0;
+    while(guard<24){
+      const next=addMonthsSafe(last,months);
+      if(next>now)break;
+      const annual=getSecurityProjectedAnnualIncome(sec);
+      const addUah=annual>0?annual/(12/months):0;
+      if(addUah>0){
+        const cur=getSecurityIncomeCurrency(sec);
+        sec.incomeAmount=roundMoney(getSecurityIncomeAmount(sec)+(addUah/getStockCurrencyRate(cur)));
+        if(!sec.incomeCurrency)sec.incomeCurrency=cur;
+      }
+      last=next;
+      sec.lastIncomeAccrualDate=securityDateKey(last);
+      changed=true;
+      guard++;
+    }
+  });
+  if(changed)saveData();
+}
 function isBondSection(section){return section&&(section.type==='bonds'||section.type==='ovdp');}
 function bondItemCurrency(it){const cur=String(it?.currency||'UAH').toUpperCase();return STOCK_CASH_CURRENCIES.includes(cur)?cur:'UAH';}
 function getBondItemStats(it){
@@ -4692,10 +4826,11 @@ function getBondSectionStats(section){
   const rows=items.map((it,idx)=>({it,idx,...getBondItemStats(it)}));
   const holdingsTotal=rows.reduce((sum,r)=>sum+r.marketValue,0);
   const cashTotal=getStockCashTotalUah(section);
+  const incomeTotal=getSecurityIncomeTotalUah(section);
   const couponAnnual=rows.reduce((sum,r)=>sum+r.couponAnnual,0);
   const maturityValue=rows.reduce((sum,r)=>sum+r.maturityValue,0);
   const pnl=rows.reduce((sum,r)=>sum+r.pnl,0);
-  return {rows,holdingsTotal,cashTotal,total:holdingsTotal+cashTotal,couponAnnual,maturityValue,pnl};
+  return {rows,holdingsTotal,cashTotal,incomeTotal,total:holdingsTotal+cashTotal+incomeTotal,couponAnnual,maturityValue,pnl};
 }
 function setSecCashAmount(secId,value){
   const sec=securitiesSections.find(s=>s.id===secId);
@@ -4714,6 +4849,33 @@ function setSecCashCurrency(secId,value){
     sec.stockCashAmount=roundMoney((prevAmount*getStockCurrencyRate(prevCur))/getStockCurrencyRate(nextCur));
   }
   sec.stockCashCurrency=nextCur;
+  renderSecuritiesCards();updateAll();saveData();
+}
+function setSecurityIncomeAmount(secId,value){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  if(!sec)return;
+  sec.incomeAmount=roundMoney(parseInputNumber(value));
+  updateAll();saveData();
+}
+function setSecurityIncomeCurrency(secId,value){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  if(!sec)return;
+  const nextCur=String(value||'UAH').toUpperCase();
+  if(!STOCK_CASH_CURRENCIES.includes(nextCur))return;
+  const prevCur=getSecurityIncomeCurrency(sec);
+  const prevAmount=getSecurityIncomeAmount(sec);
+  if(prevAmount>0&&prevCur!==nextCur){
+    sec.incomeAmount=roundMoney((prevAmount*getStockCurrencyRate(prevCur))/getStockCurrencyRate(nextCur));
+  }
+  sec.incomeCurrency=nextCur;
+  renderSecuritiesCards();updateAll();saveData();
+}
+function setSecurityIncomePeriod(secId,value){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  if(!sec)return;
+  const p=String(value||'off').toLowerCase();
+  sec.incomePeriod=SECURITY_INCOME_PERIODS.includes(p)?p:'off';
+  sec.lastIncomeAccrualDate=sec.incomePeriod==='off'?'':securityDateKey(new Date());
   renderSecuritiesCards();updateAll();saveData();
 }
 function addStockSaleCash(section,amount,currency){
@@ -4791,11 +4953,13 @@ function getStockSectionStats(section){
   const vals=Object.values(visibleGroups);
   const holdingsTotal=vals.reduce((sum,g)=>sum+g.currentValue,0);
   const cashTotal=getStockCashTotalUah(section);
+  const incomeTotal=getSecurityIncomeTotalUah(section);
   return {
     groups:visibleGroups,
     holdingsTotal,
     cashTotal,
-    total:holdingsTotal+cashTotal,
+    incomeTotal,
+    total:holdingsTotal+cashTotal+incomeTotal,
     totalDivPct:vals.reduce((sum,g)=>sum+g.divAnnualPct,0),
     totalDivAbs:vals.reduce((sum,g)=>sum+g.divAnnualAbs,0),
     totalDiv:vals.reduce((sum,g)=>sum+g.divAnnual,0)
@@ -4832,6 +4996,10 @@ function getSecCardHtml(s,idx){
   const stockCashCur=getStockCashCurrency(s);
   const stockCashAmount=getStockCashAmount(s);
   const stockCashTotal=stats.cashTotal;
+  const incomeCur=getSecurityIncomeCurrency(s);
+  const incomeAmount=getSecurityIncomeAmount(s);
+  const incomeTotal=stats.incomeTotal;
+  const incomePeriod=getSecurityIncomePeriod(s);
   const totalDiv=stats.totalDiv;
   const totalDivAbs=stats.totalDivAbs;
   const hasTickers=s.items.some(it=>it.ticker);
@@ -4879,6 +5047,7 @@ function getSecCardHtml(s,idx){
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(holdingsTotal))+'</span></div>'+
     (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockSaleCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
+    (incomeAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockDividendBalanceShort')+'</span><span class="result-val gold">'+getStockCurrencySymbol(incomeCur)+fmtMax2(incomeAmount)+' · '+sym+fmtN(toDisplayCurr(incomeTotal))+'</span></div>':'')+
     '</div>'+
     (hasTickers?`<div class="auto-refresh-bar">
       <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?'Оновл. '+s.lastRefresh:'Ціни не оновлювались'}</span>
@@ -4914,7 +5083,7 @@ function getSecCardHtml(s,idx){
         </div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('stockSaleCashHint')}</div>
       </div>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+      <div style="background:linear-gradient(135deg,#e8c97a14,#4ecb8d0c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div class="sec-cash-title" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('dividend','app-png-icon')} ${cleanIconText(uiText('stockDividendBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('≈ '+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('stockDividendHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
         <div class="ticker-search-row">
           <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="${t('secTicker')}">
@@ -4953,6 +5122,10 @@ function getBondCardHtml(s,idx){
   const stockCashCur=getStockCashCurrency(s);
   const stockCashAmount=getStockCashAmount(s);
   const stockCashTotal=stats.cashTotal;
+  const incomeCur=getSecurityIncomeCurrency(s);
+  const incomeAmount=getSecurityIncomeAmount(s);
+  const incomeTotal=stats.incomeTotal;
+  const incomePeriod=getSecurityIncomePeriod(s);
   const themeClass='card-stocks';
   const rows=stats.rows.length?(
     '<div class="ticker-cards">'+
@@ -4983,6 +5156,7 @@ function getBondCardHtml(s,idx){
     '<div class="result-box" style="margin-top:10px">'+
     '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(stats.holdingsTotal))+'</span></div>'+
     (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
+    (incomeAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCouponBalanceShort')+'</span><span class="result-val gold">'+getStockCurrencySymbol(incomeCur)+fmtMax2(incomeAmount)+' · '+sym+fmtN(toDisplayCurr(incomeTotal))+'</span></div>':'')+
     '</div>'
   ):'';
 
@@ -5014,7 +5188,7 @@ function getBondCardHtml(s,idx){
         </div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('bondCashHint')}</div>
       </div>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+      <div style="background:linear-gradient(135deg,#e8c97a14,#5b9cf60c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('percent','app-png-icon')} ${cleanIconText(uiText('bondCouponBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('≈ '+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('bondCouponHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${uiText('bondAddTitle')}</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:10px;">${uiText('bondManualMode')}</div>
         <div class="field-group">
@@ -5288,6 +5462,7 @@ function _updateAllNow(){
   const cash=hiddenCards['cash']?0:getCashVal();
   const other=hiddenCards['other']?0:getOtherVal();
   const custom=getCustomTotal();
+  processSecurityIncomeAccruals();
   const securities=getSecuritiesTotal();
   const metals=getMetalsTotalUah();
   const total=dep+crypto+usd+forex+cash+other+custom+securities+metals;
@@ -6201,6 +6376,10 @@ function migrateSecuritySection(sec,index){
   out.items=ensureArray(out.items).map((it,j)=>({...ensureObject(it),id:it?.id||'sec_item_'+Date.now()+'_'+index+'_'+j}));
   out.stockCashAmount=roundMoney(parseInputNumber(out.stockCashAmount));
   out.stockCashCurrency=getStockCashCurrency(out);
+  out.incomeAmount=roundMoney(parseInputNumber(out.incomeAmount));
+  out.incomeCurrency=getSecurityIncomeCurrency(out);
+  out.incomePeriod=getSecurityIncomePeriod(out);
+  out.lastIncomeAccrualDate=out.lastIncomeAccrualDate||'';
   out.hidden=!!out.hidden;
   return out;
 }
@@ -6851,7 +7030,7 @@ function getTotalInCurrency(totalUah){
 
 // ── DEFAULT SECTION ON FIRST LOAD ────────────────────────
 function addDefaultSecuritiesCard(){
-  securitiesSections.push({id:'sec_stocks_default',type:'stocks',name:'Акції',icon:'📈',items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency:'UAH'});
+  securitiesSections.push({id:'sec_stocks_default',type:'stocks',name:'Акції',icon:'📈',items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency:'UAH',incomeAmount:0,incomeCurrency:'UAH',incomePeriod:'off'});
 }
 
 // ── PRECIOUS METALS ───────────────────────────────────────
