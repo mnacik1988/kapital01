@@ -1,7 +1,10 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-pretty-all-selects-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-main-counter-live-style-v2';
 const APP_SHELL = [
   './',
   './Depozit_v0_0_24.html',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './privacy-policy.html',
   './terms-disclaimer.html',
   './panel-icons/1.png?v=4',
@@ -62,7 +65,7 @@ self.addEventListener('fetch', event => {
         const copy = res.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
         return res;
-      }).catch(() => caches.match('./Depozit_v0_0_21.html')))
+      }).catch(() => caches.match('./Depozit_v0_0_24.html')))
     );
     return;
   }
@@ -71,3 +74,11 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
+
+
+
+
+
+
+
+
