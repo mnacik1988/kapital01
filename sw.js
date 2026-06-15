@@ -1,6 +1,7 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-main-counter-live-style-v2';
+const CACHE_NAME = 'kapital-app-v0-0-24-pwa-start-url-v1';
 const APP_SHELL = [
   './',
+  './index.html',
   './Depozit_v0_0_24.html',
   './manifest.json',
   './icons/icon-192.png',
@@ -65,7 +66,7 @@ self.addEventListener('fetch', event => {
         const copy = res.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
         return res;
-      }).catch(() => caches.match('./Depozit_v0_0_24.html')))
+      }).catch(() => caches.match('./index.html').then(cached => cached || caches.match('./Depozit_v0_0_24.html'))))
     );
     return;
   }
@@ -74,6 +75,8 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
+
+
 
 
 
