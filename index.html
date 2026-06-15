@@ -1719,6 +1719,93 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
   body.modern-mockup #chartSection:not(.expanded) .chart-card{min-height:90px;}
 }
 
+
+
+/* Adaptive bottom navigation and signed main-counter values */
+@media (min-width:430px){
+  .bottom-nav{
+    width:min(456px,calc(100vw - 24px));
+    height:calc(68px + env(safe-area-inset-bottom));
+    grid-template-columns:1fr 1fr 64px 1fr 1fr;
+    padding:8px 10px calc(6px + env(safe-area-inset-bottom));
+  }
+  .bottom-nav-btn{height:47px;}
+  .bottom-nav-btn .bn-icon,
+  .bottom-nav-icon{width:64px;height:64px;}
+  .bottom-nav-btn.center{height:58px;margin-top:-18px;}
+  .bottom-nav-btn.center .bn-icon,
+  .bottom-nav-btn.center .bottom-nav-icon{width:66px;height:66px;}
+  .bottom-nav-btn .bn-label{font-size:7px;}
+  .bottom-nav-btn.center .bn-label{font-size:6.8px;}
+}
+@media (min-width:500px){
+  .bottom-nav{
+    width:min(492px,calc(100vw - 32px));
+    height:calc(72px + env(safe-area-inset-bottom));
+    grid-template-columns:1fr 1fr 68px 1fr 1fr;
+    padding:9px 12px calc(7px + env(safe-area-inset-bottom));
+  }
+  .bottom-nav-btn{height:50px;}
+  .bottom-nav-btn .bn-icon,
+  .bottom-nav-icon{width:68px;height:68px;}
+  .bottom-nav-btn.center{height:62px;margin-top:-20px;}
+  .bottom-nav-btn.center .bn-icon,
+  .bottom-nav-btn.center .bottom-nav-icon{width:70px;height:70px;}
+  .bottom-nav-btn .bn-label{font-size:7.4px;}
+}
+.main-counter-metric-value .green,
+.main-counter-metric-value.green{color:var(--green2)!important;font-weight:700;}
+.main-counter-metric-value .red,
+.main-counter-metric-value.red{color:var(--red)!important;font-weight:700;}
+.main-counter-metric-value .neutral,
+.main-counter-metric-value.neutral{color:var(--muted2)!important;font-weight:600;}
+
+
+
+/* Current visual mode bottom-nav scaling */
+@media (min-width:430px){
+  body.modern-mockup .bottom-nav,
+  body.dashboard-mockup .bottom-nav{
+    width:min(456px,calc(100vw - 24px))!important;
+    height:calc(68px + env(safe-area-inset-bottom))!important;
+    grid-template-columns:1fr 1fr 64px 1fr 1fr!important;
+    padding:8px 10px calc(6px + env(safe-area-inset-bottom))!important;
+  }
+  body.modern-mockup .bottom-nav-btn,
+  body.dashboard-mockup .bottom-nav-btn{height:47px!important;}
+  body.modern-mockup .bottom-nav-btn .bn-icon,
+  body.modern-mockup .bottom-nav-icon,
+  body.dashboard-mockup .bottom-nav-btn .bn-icon,
+  body.dashboard-mockup .bottom-nav-icon{width:64px!important;height:64px!important;}
+  body.modern-mockup .bottom-nav-btn.center,
+  body.dashboard-mockup .bottom-nav-btn.center{height:58px!important;margin-top:-18px!important;}
+  body.modern-mockup .bottom-nav-btn.center .bn-icon,
+  body.modern-mockup .bottom-nav-btn.center .bottom-nav-icon,
+  body.dashboard-mockup .bottom-nav-btn.center .bn-icon,
+  body.dashboard-mockup .bottom-nav-btn.center .bottom-nav-icon{width:66px!important;height:66px!important;}
+}
+@media (min-width:500px){
+  body.modern-mockup .bottom-nav,
+  body.dashboard-mockup .bottom-nav{
+    width:min(492px,calc(100vw - 32px))!important;
+    height:calc(72px + env(safe-area-inset-bottom))!important;
+    grid-template-columns:1fr 1fr 68px 1fr 1fr!important;
+    padding:9px 12px calc(7px + env(safe-area-inset-bottom))!important;
+  }
+  body.modern-mockup .bottom-nav-btn,
+  body.dashboard-mockup .bottom-nav-btn{height:50px!important;}
+  body.modern-mockup .bottom-nav-btn .bn-icon,
+  body.modern-mockup .bottom-nav-icon,
+  body.dashboard-mockup .bottom-nav-btn .bn-icon,
+  body.dashboard-mockup .bottom-nav-icon{width:68px!important;height:68px!important;}
+  body.modern-mockup .bottom-nav-btn.center,
+  body.dashboard-mockup .bottom-nav-btn.center{height:62px!important;margin-top:-20px!important;}
+  body.modern-mockup .bottom-nav-btn.center .bn-icon,
+  body.modern-mockup .bottom-nav-btn.center .bottom-nav-icon,
+  body.dashboard-mockup .bottom-nav-btn.center .bn-icon,
+  body.dashboard-mockup .bottom-nav-btn.center .bottom-nav-icon{width:70px!important;height:70px!important;}
+}
+
 </style>
 </head>
 <body class="modern-mockup">
@@ -10614,13 +10701,14 @@ function resolveMainCounterMode(){
   return 'empty';
 }
 function mainCounterDeltaHtml(delta){
-  if(!delta)return '<span style="color:var(--muted2)">'+mainCounterTxt('noHistory')+'</span>';
+  if(!delta)return '<span class="neutral">'+mainCounterTxt('noHistory')+'</span>';
   const sym=getCurrSym();
   const change=Number(delta.change)||0;
   const pct=Number(delta.pct)||0;
-  const cls=change>=0?'green':'red';
-  const sign=change>=0?'+':'';
-  return '<span class="'+cls+'">'+sign+fmtN(toDisplayCurr(change))+' '+sym+' <span style="opacity:.75">('+sign+pct.toFixed(1)+'%)</span></span>';
+  const cls=change>0?'green':change<0?'red':'neutral';
+  const sign=change>0?'+':change<0?'-':'';
+  const pctSign=pct>0?'+':pct<0?'-':'';
+  return '<span class="'+cls+'">'+sign+fmtN(toDisplayCurr(Math.abs(change)))+' '+sym+' <span style="opacity:.75">('+pctSign+Math.abs(pct).toFixed(1)+'%)</span></span>';
 }
 function getMainCounterStats(type){
   const current=getSectionPerformanceSnapshot();
