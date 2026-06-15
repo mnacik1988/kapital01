@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-main-counter-choices-compact-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-chart-card-align-v3';
 const APP_SHELL = [
   './',
   './index.html',
