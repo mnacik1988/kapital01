@@ -1687,6 +1687,38 @@ body.theme-light .main-counter-choice{background:#f8fbff;}
   .main-counter-choice-title{font-size:8px;}
 }
 
+
+
+/* Align collapsed capital dynamics card with regular asset cards */
+body.modern-mockup .chart-section{
+  padding:0 14px;
+  margin-bottom:14px;
+}
+body.modern-mockup .chart-card{
+  margin:0!important;
+  border-radius:20px!important;
+  background:var(--card)!important;
+  box-sizing:border-box;
+}
+body.modern-mockup #chartSection:not(.expanded) .chart-card{
+  min-height:90px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:16px 18px!important;
+}
+body.modern-mockup #chartSection:not(.expanded) .chart-header{
+  margin-bottom:0;
+}
+body.modern-mockup #chartSection:not(.expanded) .chart-body,
+body.modern-mockup #chartSection:not(.expanded) .chart-stats{
+  display:none!important;
+}
+@media(max-width:520px){
+  body.modern-mockup .chart-section{padding:0 14px;}
+  body.modern-mockup #chartSection:not(.expanded) .chart-card{min-height:90px;}
+}
+
 </style>
 </head>
 <body class="modern-mockup">
@@ -8939,14 +8971,17 @@ window.refreshFromBottomNav=async function(event){
 };
 function toggleChart(){
   chartExpanded = !chartExpanded;
+  const section = document.getElementById('chartSection');
   const body = document.getElementById('chartBody');
   const arrow = document.getElementById('chartToggleArrow');
   const tabs = document.getElementById('chartPeriodTabs');
+  if(section){section.classList.toggle('expanded', chartExpanded);}
   if(body){body.style.display = chartExpanded ? 'block' : 'none';}
   if(arrow){arrow.style.transform = chartExpanded ? '' : 'rotate(-90deg)';}
   if(tabs){tabs.style.display = chartExpanded ? 'flex' : 'none';}
   localStorage.setItem('chartExpanded', chartExpanded ? '1' : '0');
 }
+document.getElementById('chartSection')?.classList.toggle('expanded', chartExpanded);
 // Restore collapse state
 const _savedChartExp = localStorage.getItem('chartExpanded');
 if(_savedChartExp === '0'){
