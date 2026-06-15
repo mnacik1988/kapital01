@@ -1,0 +1,15 @@
+﻿{
+  "name": "Kapital",
+  "short_name": "Kapital",
+  "description": "Personal finance asset tracker for deposits, stocks, crypto, currencies, metals and liabilities.",
+  "start_url": "./Depozit_v0_0_24.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
