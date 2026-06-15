@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-chart-card-align-v3';
+const CACHE_NAME = 'kapital-app-v0-0-24-bottom-nav-counter-colors-v1';
 const APP_SHELL = [
   './',
   './index.html',
