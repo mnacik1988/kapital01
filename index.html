@@ -3553,7 +3553,7 @@ function getDepositHtml(dep,idx){
           <div class="field-label">${getDepositFieldLabel(lang.depPrincipalLbl,dep)}</div>
           <div style="display:flex;gap:6px;">
             <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}" style="flex:1;"
-              oninput="deposits[${idx}].principal=this.value;updateAll();startLiveTicker('${dep.id}')">
+              oninput="deposits[${idx}].principal=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             <select class="field-input" id="depCurrency_${dep.id}" style="width:72px;padding:10px 4px;"
               onchange="deposits[${idx}].depCurrency=this.value;renderDeposits();updateAll();startLiveTicker('${dep.id}');saveData()">
               <option value="UAH" ${dep.depCurrency==='UAH'||!dep.depCurrency?'selected':''}>₴</option>
@@ -3574,7 +3574,7 @@ function getDepositHtml(dep,idx){
           <div class="field-group">
             <div class="field-label">${lang.depEnd}</div>
             <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" required lang="${currentLang}" id="depEndDate_${dep.id}" value="${dep.endDate}"
-              oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;updateAll();startLiveTicker('${dep.id}')"></div>
+              oninput="validateDepDate('${dep.id}',this);deposits[${idx}].endDate=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()"></div>
             <div id="depDateError_${dep.id}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--red);margin-top:4px;display:none;">⚠ Невірна дата</div>
           </div>
         </div>
@@ -3611,18 +3611,18 @@ function getDepositHtml(dep,idx){
           <div class="field-group">
             <div class="field-label">${lang.annualRate}</div>
             <input class="field-input" type="text" id="depRate_${dep.id}" placeholder="16" value="${dep.rate}" inputmode="decimal"
-              oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}');saveData()">
+              oninput="deposits[${idx}].rate=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
           </div>
           <div class="row2">
             <div class="field-group">
               <div class="field-label">${lang.termMon}</div>
               <input class="field-input" type="text" id="depMonths_${dep.id}" placeholder="12" value="${dep.months}" inputmode="numeric"
-                oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}');saveData()">
+                oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             </div>
             <div class="field-group">
               <div class="field-label">${lang.capitaliz}</div>
               <select class="field-input" id="depFreq_${dep.id}"
-                onchange="deposits[${idx}].freq=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}')">
+                onchange="deposits[${idx}].freq=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
                 <option value="12" ${dep.freq=='12'?'selected':''}>${lang.monthly}</option>
                 <option value="4" ${dep.freq=='4'?'selected':''}>${lang.quarterly}</option>
                 <option value="2" ${dep.freq=='2'?'selected':''}>${lang.every6m}</option>
@@ -3634,12 +3634,12 @@ function getDepositHtml(dep,idx){
             <div class="field-group">
               <div class="field-label">${lang.taxPct}</div>
               <input class="field-input" type="text" id="depTax_${dep.id}" placeholder="0" value="${dep.tax}" inputmode="decimal"
-                oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}');saveData()">
+                oninput="deposits[${idx}].tax=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             </div>
             <div class="field-group">
               <div class="field-label">${lang.taxFree}</div>
               <input class="field-input" type="text" id="depTaxFree_${dep.id}" placeholder="0" value="${dep.taxFree}" inputmode="decimal"
-                oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');startLiveTicker('${dep.id}');saveData()">
+                oninput="deposits[${idx}].taxFree=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             </div>
           </div>
           <div class="result-box">
