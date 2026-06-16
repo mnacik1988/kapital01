@@ -1612,15 +1612,19 @@ body.modern-mockup.theme-light .bottom-nav{
 
 /* ── SMART MAIN COUNTER TEST ───────────────────────── */
 .main-counter-mode-select{
-  min-width:88px;
-  border:1px solid var(--border);
-  border-radius:999px;
+  min-width:92px;
+  height:28px;
+  border:1px dashed var(--border2);
+  border-radius:8px;
   background:var(--bg3);
-  color:var(--text);
-  padding:7px 24px 7px 10px;
+  color:var(--blue);
+  padding:0 24px 0 10px;
   font-family:'DM Mono',monospace;
-  font-size:9px;
+  font-size:11px;
+  line-height:28px;
   outline:none;
+  cursor:pointer;
+  white-space:nowrap;
 }
 .main-counter-alt{margin-top:10px;}
 .main-counter-card{
@@ -1678,7 +1682,7 @@ body.theme-light .main-counter-card{background:linear-gradient(135deg,#ffffff,#f
 body.theme-light .main-counter-metric{background:#eef4fb;}
 body.theme-light .main-counter-choice{background:#f8fbff;}
 @media(max-width:420px){
-  .main-counter-mode-select{min-width:74px;font-size:8px;padding:6px 20px 6px 8px;}
+  .main-counter-mode-select{min-width:84px;height:28px;font-size:10px;padding:0 22px 0 8px;}
   .main-counter-metrics{grid-template-columns:1fr;}
   .main-counter-empty{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
   .main-counter-choice{min-height:68px;padding:8px 4px;border-radius:12px;}
@@ -2130,7 +2134,7 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
         <div class="card-value" id="otherDisplay">0 ₴</div>
         <div class="card-pct" id="otherPct">0% від капіталу</div>
       </div>
-      <div class="card-sparkline" id="spark_account" data-spark-key="cash"></div>
+      <div class="card-sparkline" id="spark_account" data-spark-key="account"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('other')" title="Видалити">✕</button>
         <div class="card-toggle" onclick="toggleCard('other')">▼</div>
@@ -8539,7 +8543,8 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const businessValue=customSections.filter(s=>s.sectionType==='business').reduce((sum,s)=>sum+(parseFloat(s.amount)||parseFloat(s.principal)||0),0);
   const otherCustomValue=customSections.filter(s=>!['startup','business'].includes(s.sectionType)).reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
   const forexValue=hiddenCards['forex']?0:getForexVal();
-  const cashValue=(hiddenCards['cash']?0:getCashVal())+(hiddenCards['other']?0:getOtherVal());
+  const cashValue=hiddenCards['cash']?0:getCashVal();
+  const accountValue=hiddenCards['other']?0:getOtherVal();
   const debtValue=getLiabilitiesTotal();
   const sections={
     deposits:makePerfItem('Депозити','🏦',depValue,depBasis,depValue-depBasis,'pnl'),
@@ -8552,7 +8557,8 @@ function getSectionPerformanceSnapshot(totalOverride=null){
     startups:makePerfItem('Стартапи','🚀',startupStats.value,startupStats.basis,startupStats.pnl,'pnl'),
     business:makePerfItem('Бізнес','💼',businessValue,null,businessValue,'value'),
     custom:makePerfItem('Інше','✏️',otherCustomValue,null,otherCustomValue,'value'),
-    cash:makePerfItem('Гроші / рахунки','💴',cashValue,null,cashValue,'value'),
+    cash:makePerfItem('Готівка','💴',cashValue,null,cashValue,'value'),
+    account:makePerfItem('Поточний рахунок','💳',accountValue,null,accountValue,'value'),
     debts:makePerfItem('Кредити','⚠️',debtValue,null,-debtValue,'debt')
   };
   const total=totalOverride!==null&&totalOverride!==undefined?Number(totalOverride)||0:Object.values(sections).reduce((sum,x)=>sum+(x.value||0),0);
