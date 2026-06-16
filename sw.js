@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-counter-select-pretty-exclude-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-deposit-total-handlers-v1';
 const APP_SHELL = [
   './',
   './index.html',
