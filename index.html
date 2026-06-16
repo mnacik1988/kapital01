@@ -6757,6 +6757,18 @@ const DATA_MIGRATIONS=[
     d.lastMigratedAppVersion=APP_VERSION;
   }}
 ];
+function backupHasDepositAssets(d){
+  return ensureArray(d&&d.deposits).some(dep=>{
+    const principal=parseInputNumber(dep&&dep.principal);
+    const topups=ensureArray(dep&&dep.topups).reduce((sum,tp)=>sum+parseInputNumber(tp&&tp.amount),0);
+    return principal>0||topups>0;
+  });
+}
+function restoreVisibleCardsForStoredAssets(d){
+  d.hiddenCards=ensureObject(d&&d.hiddenCards);
+  if(backupHasDepositAssets(d))d.hiddenCards.deposit=false;
+  return d;
+}
 function migrateStoragePayload(d){
   if(!d||typeof d!=='object')return null;
   const fromVersion=Number(d.storageSchemaVersion)||1;
@@ -6775,6 +6787,7 @@ function migrateStoragePayload(d){
   }else{
     recordMigration(fromVersion,STORAGE_SCHEMA_VERSION,applied);
   }
+  restoreVisibleCardsForStoredAssets(d);
   return d;
 }
 function _saveDataNow(){
