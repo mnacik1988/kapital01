@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-import-hidden-deposit-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-portfolio-counter-v1';
 const APP_SHELL = [
   './',
   './index.html',
