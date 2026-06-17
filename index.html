@@ -1880,6 +1880,7 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
       <select class="main-counter-mode-select" id="mainCounterModeSelect" onchange="setMainCounterMode(this.value)" title="Live counter mode">
         <option value="portfolio">Portfolio</option>
         <option value="deposit">Deposit</option>
+        <option value="hidden">Hide</option>
       </select>
       <div class="deposits-dots" id="depDots"></div>
       <div class="deposits-nav">
@@ -10740,6 +10741,8 @@ function mainCounterTxt(key){
   const dict={
     portfolio:{uk:'Загальний',ru:'Общий',en:'Portfolio',de:'Portfolio',zh:'组合'},
     deposit:{uk:'Депозит',ru:'Депозит',en:'Deposit',de:'Einlage',zh:'存款'},
+    hidden:{uk:'Сховати',ru:'Скрыть',en:'Hide',de:'Ausblenden',zh:'隐藏'},
+    totalIncome:{uk:'Дохід всього',ru:'Доход всего',en:'Total income',de:'Gesamtertrag',zh:'总收入'},
     stocks:{uk:'Акції',ru:'Акции',en:'Stocks',de:'Aktien',zh:'股票'},
     crypto:{uk:'Крипто',ru:'Крипто',en:'Crypto',de:'Krypto',zh:'加密货币'},
     today:{uk:'Сьогодні',ru:'Сегодня',en:'Today',de:'Heute',zh:'今天'},
@@ -10755,7 +10758,9 @@ function mainCounterTxt(key){
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
 }
 function normalizeMainCounterMode(mode){
-  return mode==='deposit'?'deposit':'portfolio';
+  if(mode==='deposit')return 'deposit';
+  if(mode==='hidden')return 'hidden';
+  return 'portfolio';
 }
 function saveMainCounterPrefs(){
   try{
@@ -10843,6 +10848,18 @@ function getPortfolioDepositIncome(){
   });
   return {daily,month:daily*30.44};
 }
+function getPortfolioTotalIncome(){
+  let stocksPnl=0;
+  visibleSecuritiesSections().filter(s=>s.type==='stocks').forEach(sec=>{
+    const stats=getStockSectionStats(sec);
+    Object.values(stats.groups||{}).forEach(g=>{stocksPnl+=Number(g.pnl)||0;});
+    stocksPnl+=getSecurityIncomeTotalUah(sec);
+  });
+  const cryptoStats=getCryptoPortfolioStats();
+  const cryptoPnl=((Number(cryptoStats.portfolioUsd)||0)-(Number(cryptoStats.remainingCostUsd)||0))*getCryptoRate();
+  const depositIncome=deposits.reduce((sum,d)=>sum+getDepositMonthlyAccruedWithTopups(d),0);
+  return stocksPnl+cryptoPnl+depositIncome;
+}
 function getPortfolioLeader(dayStats){
   const items=[
     {key:'stocks',label:mainCounterTxt('stocks'),delta:dayStats.stocks},
@@ -10869,6 +10886,7 @@ function getPortfolioMainCounterHtml(){
     week:combineMainCounterDeltas([sectionStats.stocks.week,sectionStats.crypto.week]),
     month:combineMainCounterDeltas([sectionStats.stocks.month,sectionStats.crypto.month])
   };
+  const totalIncome=getPortfolioTotalIncome();
   const dividendsMonth=getPortfolioDividendsMonth();
   const depIncome=getPortfolioDepositIncome();
   const leader=getPortfolioLeader(sectionStats);
@@ -10876,6 +10894,7 @@ function getPortfolioMainCounterHtml(){
   return '<div class="main-counter-card main-counter-live green"><div class="main-counter-inner">'
     +'<div class="main-counter-top"><div class="main-counter-title">'+mainCounterIconHtml('portfolio')+' '+mainCounterTxt('portfolio')+'</div><div class="live-price-badge"><span class="live-price-dot"></span> Online</div></div>'
     +'<div class="main-counter-portfolio-summary">'
+      +'<div class="main-counter-metric"><span class="main-counter-metric-label">'+mainCounterTxt('totalIncome')+'</span><span class="main-counter-metric-value">'+mainCounterMoneyHtml(totalIncome)+'</span></div>'
       +mainCounterPeriodRow(mainCounterTxt('today'),totals.day,sectionStats.stocks.day,sectionStats.crypto.day)
       +mainCounterPeriodRow(mainCounterTxt('week'),totals.week,sectionStats.stocks.week,sectionStats.crypto.week)
       +mainCounterPeriodRow(mainCounterTxt('month'),totals.month,sectionStats.stocks.month,sectionStats.crypto.month)
@@ -10889,8 +10908,8 @@ function renderMainCounter(){
   mainCounterMode=normalizeMainCounterMode(mainCounterMode);
   const select=document.getElementById('mainCounterModeSelect');
   if(select){
-    if(![...select.options].some(opt=>opt.value==='portfolio')){
-      select.innerHTML='<option value="portfolio">Portfolio</option><option value="deposit">Deposit</option>';
+    if(![...select.options].some(opt=>opt.value==='portfolio')||![...select.options].some(opt=>opt.value==='hidden')){
+      select.innerHTML='<option value="portfolio">Portfolio</option><option value="deposit">Deposit</option><option value="hidden">Hide</option>';
     }
     select.value=mainCounterMode;
     [...select.options].forEach(opt=>{opt.textContent=mainCounterTxt(opt.value);});
@@ -10900,6 +10919,13 @@ function renderMainCounter(){
   const dots=document.getElementById('depDots');
   const nav=document.querySelector('.deposits-nav');
   if(!alt||!slider)return;
+  if(mainCounterMode==='hidden'){
+    alt.style.display='none';
+    slider.style.display='none';
+    if(dots)dots.style.display='none';
+    if(nav)nav.style.display='none';
+    return;
+  }
   if(mainCounterMode==='deposit'){
     alt.style.display='none';
     slider.style.display='';
