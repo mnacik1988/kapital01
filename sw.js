@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-compound-calc-fix-v1';
+const CACHE_NAME = 'kapital-app-v0-0-24-drag-counter-icons-v1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -22,6 +22,7 @@ const APP_SHELL = [
   './section-icons/section-metals.png?v=1',
   './section-icons/section-settings.png?v=1',
   './section-icons/section-bonds.png?v=1',
+  './section-icons/section-credit.png?v=1',
   './section-icons/section-family.png?v=1',
   './section-icons/section-startups.png?v=1',
   './section-icons/section-forex.png?v=1',
@@ -34,7 +35,8 @@ const APP_SHELL = [
   './section-icons/ui-clock.png?v=1',
   './section-icons/ui-net-profit.png?v=1',
   './section-icons/ui-tax.png?v=1',
-  './section-icons/ui-accrued.png?v=1'
+  './section-icons/ui-accrued.png?v=1',
+  './section-icons/ui-dividend-income.png?v=1'
 ];
 
 self.addEventListener('install', event => {
