@@ -2452,11 +2452,11 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
     <!-- COMPOUND INTEREST -->
     <div class="calc-panel" id="calcPanel_compound">
       <div class="calc-field-row">
-        <div class="calc-field"><label id="cp_sum_label">Сума (₴)</label><input type="text" inputmode="decimal" id="cp_sum" placeholder="100 000" oninput="runCompound()"></div>
-        <div class="calc-field"><label id="cp_rate_label">Ставка % / рік</label><input type="text" inputmode="decimal" id="cp_rate" placeholder="16" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_sum_label">Сума (₴)</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_amount" id="cp_sum" placeholder="" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_rate_label">Ставка % / рік</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_rate" id="cp_rate" placeholder="" oninput="runCompound()"></div>
       </div>
       <div class="calc-field-row">
-        <div class="calc-field"><label id="cp_months_label">Термін (міс)</label><input type="text" inputmode="decimal" id="cp_months" placeholder="12" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_months_label">Термін (міс)</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_months" id="cp_months" placeholder="" oninput="runCompound()"></div>
         <div class="calc-field"><label id="cp_capitaliz_label">Капіталізація</label>
           <select id="cp_freq" onchange="runCompound()">
             <option value="12">Щомісяця</option>
@@ -2467,8 +2467,8 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
         </div>
       </div>
       <div class="calc-field-row">
-        <div class="calc-field"><label id="cp_tax_label">Податок на прибуток (%)</label><input type="text" inputmode="decimal" id="cp_tax" placeholder="0" oninput="runCompound()"></div>
-        <div class="calc-field"><label id="cp_taxfree_label">Без податку = 0%</label><input type="text" inputmode="decimal" id="cp_taxfree" placeholder="Необл. мінімум ₴" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_tax_label">Податок на прибуток (%)</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_tax" id="cp_tax" placeholder="" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_taxfree_label">Без податку = 0%</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_taxfree" id="cp_taxfree" placeholder="" oninput="runCompound()"></div>
       </div>
       <div class="calc-res" id="cp_result" style="display:none"></div>
     </div>
@@ -7699,8 +7699,8 @@ function runCompound(){
   const annualRate=parseInputNumber(document.getElementById('cp_rate')?.value);
   const months=Math.max(0,parseInputNumber(document.getElementById('cp_months')?.value));
   const freq=parseInt(document.getElementById('cp_freq')?.value||'12',10);
-  const taxPct=parseInputNumber(document.getElementById('cp_tax')?.value);
-  const taxFree=parseInputNumber(document.getElementById('cp_taxfree')?.value);
+  const taxPct=Math.max(0,parseInputNumber(document.getElementById('cp_tax')?.value));
+  const taxFree=Math.max(0,parseInputNumber(document.getElementById('cp_taxfree')?.value));
   const box=document.getElementById('cp_result');
   if(!box)return;
   if(!principal||!months){
@@ -7710,31 +7710,62 @@ function runCompound(){
 
   const annual=annualRate/100;
   const years=months/12;
+  const taxRate=taxPct/100;
   let grossInterest=0;
-  let finalAmount=principal;
+  let tax=0;
+  let netInterest=0;
+  let netFinal=principal;
 
   if(freq>0&&annualRate){
-    finalAmount=principal*Math.pow(1+annual/freq,freq*years);
-    grossInterest=finalAmount-principal;
+    const periods=freq*years;
+    const wholePeriods=Math.round(periods);
+    if(Math.abs(periods-wholePeriods)<0.000001){
+      let balance=principal;
+      let taxFreeLeft=taxFree;
+      for(let i=0;i<wholePeriods;i++){
+        const gross=balance*(annual/freq);
+        const freePart=Math.min(Math.max(0,taxFreeLeft),gross);
+        taxFreeLeft=Math.max(0,taxFreeLeft-freePart);
+        const periodTax=Math.max(0,gross-freePart)*taxRate;
+        const net=gross-periodTax;
+        grossInterest+=gross;
+        tax+=periodTax;
+        balance+=net;
+      }
+      netFinal=balance;
+      netInterest=netFinal-principal;
+    }else{
+      grossInterest=principal*(Math.pow(1+annual/freq,periods)-1);
+      const effectivePeriodRate=(annual/freq)*(1-taxRate);
+      netFinal=principal*Math.pow(1+effectivePeriodRate,periods);
+      netInterest=netFinal-principal;
+      tax=Math.max(0,grossInterest-taxFree)-netInterest;
+      if(tax<0)tax=0;
+      netInterest=grossInterest-tax;
+      netFinal=principal+netInterest;
+    }
   }else{
     grossInterest=principal*annual*years;
-    finalAmount=principal+grossInterest;
+    tax=Math.max(0,grossInterest-taxFree)*taxRate;
+    netInterest=grossInterest-tax;
+    netFinal=principal+netInterest;
   }
 
-  const taxable=Math.max(0,grossInterest-taxFree);
-  const tax=taxable*(taxPct/100);
-  const netInterest=grossInterest-tax;
-  const netFinal=principal+netInterest;
   const effective=principal>0&&years>0?(Math.pow(netFinal/principal,1/years)-1)*100:0;
   const sym=getCurrSym();
   const money=v=>sym+fmtN(toDisplayCurr(v));
+  const calcLabel=(key,fallback)=>{
+    const val=t(key);
+    return val&&val!==key?val:fallback;
+  };
 
   box.style.display='block';
   box.innerHTML=
-    '<div class="calc-res-row"><span class="calc-res-key">'+(t('finalAmount')||'Фінальна сума')+'</span><span class="calc-res-val blue">'+money(netFinal)+'</span></div>'+
-    '<div class="calc-res-row"><span class="calc-res-key">'+(t('interestLabel')||'Проценти')+'</span><span class="calc-res-val green">+'+money(netInterest)+'</span></div>'+
-    '<div class="calc-res-row"><span class="calc-res-key">'+(t('taxLabel')||'Податок')+'</span><span class="calc-res-val red">-'+money(tax)+'</span></div>'+
-    '<div class="calc-res-row"><span class="calc-res-key">'+(t('effectiveRate')||'Реальна ставка')+'</span><span class="calc-res-val">'+effective.toFixed(2)+'% '+(t('perYear')||'річних')+'</span></div>';
+    '<div class="calc-res-row"><span class="calc-res-key">'+calcLabel('finalAmt','Підсумкова сума')+'</span><span class="calc-res-val blue">'+money(netFinal)+'</span></div>'+
+    '<div class="calc-res-row"><span class="calc-res-key">'+calcLabel('accrued','Нараховано %')+'</span><span class="calc-res-val green">+'+money(grossInterest)+'</span></div>'+
+    '<div class="calc-res-row"><span class="calc-res-key">'+calcLabel('taxPDFO','Податок')+'</span><span class="calc-res-val red">-'+money(tax)+'</span></div>'+
+    '<div class="calc-res-row"><span class="calc-res-key">'+calcLabel('netProfit','Чистий прибуток')+'</span><span class="calc-res-val green">+'+money(netInterest)+'</span></div>'+
+    '<div class="calc-res-row"><span class="calc-res-key">'+calcLabel('effRate','Ефективна ставка')+'</span><span class="calc-res-val">'+effective.toFixed(2)+'% '+calcLabel('perYear','річних')+'</span></div>';
 }
 
 function fillCurrencyFields(){
