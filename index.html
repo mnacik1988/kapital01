@@ -766,11 +766,11 @@ body.theme-light .trial-box > div[style*="color:#fff"]{color:var(--text)!importa
 .stock-detail-stat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);text-transform:uppercase;margin-top:2px;letter-spacing:0.05em;}
 .stock-detail-trades{margin-top:12px;}
 .stock-detail-section-icon{
-  width:22px;
-  height:22px;
+  width:30px;
+  height:30px;
   object-fit:contain;
-  vertical-align:-6px;
-  margin-right:7px;
+  vertical-align:-9px;
+  margin-right:8px;
   filter:drop-shadow(0 2px 5px #00000055);
 }
 .stock-detail-section-icon.big{
@@ -1514,6 +1514,17 @@ body.modern-mockup #chartSection:not(.expanded) .chart-card{
 }
 body.modern-mockup #chartSection:not(.expanded) .chart-header{
   margin-bottom:0;
+}
+body.modern-mockup #chartSection:not(.expanded) .chart-title .ui-inline-icon,
+body.modern-mockup #chartSection:not(.expanded) .chart-title .section-png-icon,
+body.modern-mockup #chartSection:not(.expanded) .chart-title img{
+  width:32px!important;
+  height:32px!important;
+  max-width:32px!important;
+  max-height:32px!important;
+  object-fit:contain;
+  margin-right:8px;
+  vertical-align:-9px;
 }
 body.modern-mockup #chartSection:not(.expanded) .chart-body,
 body.modern-mockup #chartSection:not(.expanded) .chart-stats{
@@ -2500,7 +2511,7 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">КАПІТАЛ</span><span id="footerVersion"> · v0.0.24</span></div>
+<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.26</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2572,7 +2583,7 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
 
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
-const APP_VERSION = 'v0.0.24';
+const APP_VERSION = 'v0.0.26';
 const APP_BUILD_DATE = '2026-06-08';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -2830,7 +2841,7 @@ const EXTRA_I18N={
 'на місяць':{uk:'на місяць',ru:'в месяц',en:'per month',de:'pro Monat',zh:'每月'},
   'на рік · економія 30%':{uk:'на рік · економія 30%',ru:'в год · экономия 30%',en:'per year · save 30%',de:'pro Jahr · 30% sparen',zh:'每年 · 节省 30%'},
   'Після 30 днів можна обрати зручний тариф':{uk:'Після 30 днів можна обрати зручний тариф',ru:'После 30 дней можно выбрать удобный тариф',en:'After 30 days, choose the plan that suits you',de:'Nach 30 Tagen wählen Sie den passenden Tarif',zh:'30 天后可选择适合您的方案'},
-'Капітал':{uk:'Капітал',ru:'Капитал',en:'Capital',de:'Kapital',zh:'资本'},
+'Капітал':{uk:'InveStory',ru:'InveStory',en:'InveStory',de:'InveStory',zh:'InveStory'},
   '📉 ДИНАМІКА КАПІТАЛУ':{uk:'📉 ДИНАМІКА КАПІТАЛУ',ru:'📉 ДИНАМИКА КАПИТАЛА',en:'📉 CAPITAL DYNAMICS',de:'📉 KAPITALENTWICKLUNG',zh:'📉 资本动态'},
   'Мін':{uk:'Мін',ru:'Мин',en:'Min',de:'Min.',zh:'最低'},
   'Макс':{uk:'Макс',ru:'Макс',en:'Max',de:'Max.',zh:'最高'},
@@ -6098,7 +6109,14 @@ function subtractForex(i){
     renderForex();updateAll();saveData();
   });
 }
-function removeForex(i){forexItems.splice(i,1);renderForex();updateAll();saveData();}
+function removeForex(i){
+  const f=forexItems[i];
+  const cur=(f&&f.cur?f.cur:'').toUpperCase();
+  customConfirm((t('confirmDelete')||'Видалити?')+(cur?' '+cur:''), function(){
+    forexItems.splice(i,1);
+    renderForex();updateAll();saveData();
+  });
+}
 function renderForex(){
   const el=$('forexRows');if(!el)return;
   const sym=getCurrSym();
@@ -6865,7 +6883,7 @@ const PRIVACY_I18N={
     updated:'Оновлено: 27 травня 2026',
     note:'Перед публікацією в магазинах додайте публічну URL-адресу цієї політики та контакт розробника.',
     sections:[
-      ['Хто ми','Kapital — застосунок для обліку особистих фінансових активів: депозитів, валют, криптовалют, акцій, кредитів, дорогоцінних металів та інших розділів.'],
+      ['Хто ми','InveStory — застосунок для обліку особистих фінансових активів: депозитів, валют, криптовалют, акцій, кредитів, дорогоцінних металів та інших розділів.'],
       ['Які дані ви вводите','Ви можете вводити суми, назви активів, дати, ставки, нотатки, історію поповнень, дані кредитів та іншу фінансову інформацію. Ці дані потрібні тільки для роботи функцій застосунку.'],
       ['Де зберігаються дані','Основні дані зберігаються локально на вашому пристрої у сховищі застосунку. Ми не створюємо обліковий запис і не передаємо вашу локальну фінансову базу на наш сервер.'],
       ['Онлайн-функції','Якщо ви використовуєте онлайн-курси валют, ціни криптовалют або акцій, застосунок може звертатися до зовнішніх сервісів за курсами та цінами. Такі запити можуть містити тикер, валютну пару, технічні дані запиту та IP-адресу, які обробляються відповідним зовнішнім сервісом.'],
@@ -6874,7 +6892,7 @@ const PRIVACY_I18N={
       ['Аналітика та реклама','У поточній версії застосунок не використовує рекламні трекери та не збирає аналітику поведінки користувача. Якщо це зміниться, політика буде оновлена до публікації такої версії.'],
       ['Безпека','Ви відповідаєте за безпеку пристрою та файлів резервних копій. Рекомендуємо використовувати блокування екрана та зберігати резервні копії тільки у довірених місцях.'],
       ['Ваші права','Ви можете видалити дані через налаштування застосунку або видаливши застосунок з пристрою. Ви також можете експортувати резервну копію перед видаленням.'],
-      ['Важливо','Kapital не є фінансовим радником. Розрахунки, курси та прогнози мають інформаційний характер і можуть відрізнятися від фактичних банківських або біржових значень.']
+      ['Важливо','InveStory не є фінансовим радником. Розрахунки, курси та прогнози мають інформаційний характер і можуть відрізнятися від фактичних банківських або біржових значень.']
     ]
   },
   ru:{
@@ -6882,7 +6900,7 @@ const PRIVACY_I18N={
     updated:'Обновлено: 27 мая 2026',
     note:'Перед публикацией в магазинах добавьте публичный URL этой политики и контакт разработчика.',
     sections:[
-      ['Кто мы','Kapital — приложение для учёта личных финансовых активов: депозитов, валют, криптовалют, акций, кредитов, драгоценных металлов и других разделов.'],
+      ['Кто мы','InveStory — приложение для учёта личных финансовых активов: депозитов, валют, криптовалют, акций, кредитов, драгоценных металлов и других разделов.'],
       ['Какие данные вы вводите','Вы можете вводить суммы, названия активов, даты, ставки, заметки, историю пополнений, данные кредитов и другую финансовую информацию. Эти данные нужны только для работы функций приложения.'],
       ['Где хранятся данные','Основные данные хранятся локально на вашем устройстве в хранилище приложения. Мы не создаём аккаунт и не передаём вашу локальную финансовую базу на наш сервер.'],
       ['Онлайн-функции','Если вы используете онлайн-курсы валют, цены криптовалют или акций, приложение может обращаться к внешним сервисам за курсами и ценами. Такие запросы могут содержать тикер, валютную пару, технические данные запроса и IP-адрес, которые обрабатываются соответствующим внешним сервисом.'],
@@ -6891,7 +6909,7 @@ const PRIVACY_I18N={
       ['Аналитика и реклама','В текущей версии приложение не использует рекламные трекеры и не собирает аналитику поведения пользователя. Если это изменится, политика будет обновлена до публикации такой версии.'],
       ['Безопасность','Вы отвечаете за безопасность устройства и файлов резервных копий. Рекомендуем использовать блокировку экрана и хранить резервные копии только в доверенных местах.'],
       ['Ваши права','Вы можете удалить данные через настройки приложения или удалив приложение с устройства. Вы также можете экспортировать резервную копию перед удалением.'],
-      ['Важно','Kapital не является финансовым советником. Расчёты, курсы и прогнозы носят информационный характер и могут отличаться от фактических банковских или биржевых значений.']
+      ['Важно','InveStory не является финансовым советником. Расчёты, курсы и прогнозы носят информационный характер и могут отличаться от фактических банковских или биржевых значений.']
     ]
   },
   en:{
@@ -6899,7 +6917,7 @@ const PRIVACY_I18N={
     updated:'Updated: May 27, 2026',
     note:'Before store release, publish this policy at a public URL and add the developer contact.',
     sections:[
-      ['Who we are','Kapital is an app for tracking personal financial assets, including deposits, currencies, crypto, stocks, loans, precious metals and custom sections.'],
+      ['Who we are','InveStory is an app for tracking personal financial assets, including deposits, currencies, crypto, stocks, loans, precious metals and custom sections.'],
       ['Data you enter','You may enter amounts, asset names, dates, rates, notes, top-up history, loan details and other financial information. This data is used only to provide the app features.'],
       ['Where data is stored','Core data is stored locally on your device in the app storage. We do not create an account and do not upload your local financial database to our server.'],
       ['Online features','If you use online exchange rates, crypto prices or stock prices, the app may contact external services to request rates and prices. These requests may include a ticker, currency pair, technical request data and IP address processed by the relevant external service.'],
@@ -6908,7 +6926,7 @@ const PRIVACY_I18N={
       ['Analytics and advertising','The current version does not use advertising trackers and does not collect user behaviour analytics. If this changes, this policy will be updated before that version is released.'],
       ['Security','You are responsible for protecting your device and backup files. We recommend using screen lock and storing backups only in trusted locations.'],
       ['Your choices','You can delete data in the app settings or by removing the app from your device. You can also export a backup before deletion.'],
-      ['Important','Kapital is not a financial advisor. Calculations, rates and forecasts are informational and may differ from actual bank or market values.']
+      ['Important','InveStory is not a financial advisor. Calculations, rates and forecasts are informational and may differ from actual bank or market values.']
     ]
   },
   de:{
@@ -6916,7 +6934,7 @@ const PRIVACY_I18N={
     updated:'Aktualisiert: 27. Mai 2026',
     note:'Vor der Veröffentlichung im Store veröffentlichen Sie diese Richtlinie unter einer öffentlichen URL und ergänzen den Entwicklerkontakt.',
     sections:[
-      ['Wer wir sind','Kapital ist eine App zur Verwaltung persönlicher Finanzwerte wie Einlagen, Währungen, Kryptowährungen, Aktien, Kredite, Edelmetalle und eigene Bereiche.'],
+      ['Wer wir sind','InveStory ist eine App zur Verwaltung persönlicher Finanzwerte wie Einlagen, Währungen, Kryptowährungen, Aktien, Kredite, Edelmetalle und eigene Bereiche.'],
       ['Welche Daten Sie eingeben','Sie können Beträge, Namen von Vermögenswerten, Daten, Zinssätze, Notizen, Aufstockungen, Kreditdaten und andere Finanzinformationen eingeben. Diese Daten werden nur für die Funktionen der App verwendet.'],
       ['Wo Daten gespeichert werden','Die Hauptdaten werden lokal auf Ihrem Gerät im App-Speicher gespeichert. Wir erstellen kein Konto und übertragen Ihre lokale Finanzdatenbank nicht auf unseren Server.'],
       ['Online-Funktionen','Wenn Sie Online-Wechselkurse, Kryptopreise oder Aktienpreise nutzen, kann die App externe Dienste für Kurse und Preise anfragen. Solche Anfragen können Ticker, Währungspaare, technische Anfragedaten und IP-Adresse enthalten, die vom jeweiligen externen Dienst verarbeitet werden.'],
@@ -6925,7 +6943,7 @@ const PRIVACY_I18N={
       ['Analyse und Werbung','Die aktuelle Version verwendet keine Werbe-Tracker und erhebt keine Verhaltensanalysen. Falls sich dies ändert, wird diese Richtlinie vor Veröffentlichung aktualisiert.'],
       ['Sicherheit','Sie sind für den Schutz Ihres Geräts und Ihrer Sicherungsdateien verantwortlich. Wir empfehlen Bildschirmsperre und Speicherung von Backups nur an vertrauenswürdigen Orten.'],
       ['Ihre Möglichkeiten','Sie können Daten in den App-Einstellungen oder durch Entfernen der App löschen. Vor dem Löschen können Sie eine Sicherung exportieren.'],
-      ['Wichtig','Kapital ist kein Finanzberater. Berechnungen, Kurse und Prognosen dienen nur zur Information und können von tatsächlichen Bank- oder Marktdaten abweichen.']
+      ['Wichtig','InveStory ist kein Finanzberater. Berechnungen, Kurse und Prognosen dienen nur zur Information und können von tatsächlichen Bank- oder Marktdaten abweichen.']
     ]
   },
   zh:{
@@ -6933,7 +6951,7 @@ const PRIVACY_I18N={
     updated:'更新日期：2026年5月27日',
     note:'发布到应用商店前，请将本政策放在公开 URL，并添加开发者联系方式。',
     sections:[
-      ['我们是谁','Kapital 是一款用于记录个人金融资产的应用，包括存款、货币、加密货币、股票、贷款、贵金属和自定义部分。'],
+      ['我们是谁','InveStory 是一款用于记录个人金融资产的应用，包括存款、货币、加密货币、股票、贷款、贵金属和自定义部分。'],
       ['您输入的数据','您可以输入金额、资产名称、日期、利率、备注、追加记录、贷款信息和其他财务信息。这些数据仅用于提供应用功能。'],
       ['数据存储位置','核心数据保存在您设备上的应用本地存储中。我们不创建账户，也不会将您的本地财务数据库上传到我们的服务器。'],
       ['在线功能','如果您使用在线汇率、加密货币价格或股票价格，应用可能会请求外部服务获取价格。这些请求可能包含代码、货币对、技术请求数据和 IP 地址，并由相应外部服务处理。'],
@@ -6942,7 +6960,7 @@ const PRIVACY_I18N={
       ['分析和广告','当前版本不使用广告跟踪器，也不收集用户行为分析。如果未来发生变化，本政策会在发布前更新。'],
       ['安全','您需要自行保护设备和备份文件。建议使用屏幕锁，并仅将备份存放在可信位置。'],
       ['您的选择','您可以在应用设置中删除数据，或从设备上删除应用。删除前也可以导出备份。'],
-      ['重要说明','Kapital 不是财务顾问。计算、汇率和预测仅供参考，可能与实际银行或市场数据不同。']
+      ['重要说明','InveStory 不是财务顾问。计算、汇率和预测仅供参考，可能与实际银行或市场数据不同。']
     ]
   }
 };
@@ -6969,7 +6987,7 @@ function privacyCloseOutside(e){
 
 const LEGAL_I18N={
   uk:{title:'Умови використання та відмова від відповідальності',updated:'Оновлено: 27 травня 2026',note:'Перед публікацією додайте контакт розробника, юридичну назву власника застосунку та публічну URL-адресу цього документа.',sections:[
-    ['Інформаційний характер','Kapital призначений для особистого обліку активів, боргів, доходів і орієнтовних розрахунків. Застосунок не є банком, брокером, податковим консультантом або фінансовим радником.'],
+    ['Інформаційний характер','InveStory призначений для особистого обліку активів, боргів, доходів і орієнтовних розрахунків. Застосунок не є банком, брокером, податковим консультантом або фінансовим радником.'],
     ['Не фінансова порада','Будь-які розрахунки, графіки, доходність, курси валют, ціни акцій або криптовалют та прогнози є довідковими. Вони не є рекомендацією купувати, продавати, інвестувати, брати кредит або розміщувати депозит.'],
     ['Відповідальність користувача','Ви самостійно приймаєте фінансові рішення та несете відповідальність за перевірку даних у банку, брокера, біржі або офіційного джерела перед будь-якою дією з грошима.'],
     ['Точність даних','Ми прагнемо робити розрахунки корисними, але не гарантуємо абсолютну точність. Банківські умови, податки, комісії, курси та біржові ціни можуть відрізнятися від значень у застосунку.'],
@@ -6979,7 +6997,7 @@ const LEGAL_I18N={
     ['Зміни умов','Ці умови можуть оновлюватися. Продовження використання застосунку після оновлення означає прийняття актуальної редакції.']
   ]},
   ru:{title:'Условия использования и отказ от ответственности',updated:'Обновлено: 27 мая 2026',note:'Перед публикацией добавьте контакт разработчика, юридическое имя владельца приложения и публичный URL этого документа.',sections:[
-    ['Информационный характер','Kapital предназначен для личного учёта активов, долгов, доходов и ориентировочных расчётов. Приложение не является банком, брокером, налоговым консультантом или финансовым советником.'],
+    ['Информационный характер','InveStory предназначен для личного учёта активов, долгов, доходов и ориентировочных расчётов. Приложение не является банком, брокером, налоговым консультантом или финансовым советником.'],
     ['Не финансовая рекомендация','Любые расчёты, графики, доходность, курсы валют, цены акций или криптовалют и прогнозы являются справочной информацией. Они не являются рекомендацией покупать, продавать, инвестировать, брать кредит или размещать депозит.'],
     ['Ответственность пользователя','Вы самостоятельно принимаете финансовые решения и отвечаете за проверку данных в банке, у брокера, на бирже или в официальном источнике перед любым действием с деньгами.'],
     ['Точность данных','Мы стремимся делать расчёты полезными, но не гарантируем абсолютную точность. Банковские условия, налоги, комиссии, курсы и биржевые цены могут отличаться от значений в приложении.'],
@@ -6989,7 +7007,7 @@ const LEGAL_I18N={
     ['Изменения условий','Эти условия могут обновляться. Продолжение использования приложения после обновления означает принятие актуальной редакции.']
   ]},
   en:{title:'Terms of Use and Disclaimer',updated:'Updated: May 27, 2026',note:'Before store release, add the developer contact, legal owner name and a public URL for this document.',sections:[
-    ['Informational purpose','Kapital is intended for personal tracking of assets, debts, income and approximate calculations. The app is not a bank, broker, tax advisor or financial advisor.'],
+    ['Informational purpose','InveStory is intended for personal tracking of assets, debts, income and approximate calculations. The app is not a bank, broker, tax advisor or financial advisor.'],
     ['Not financial advice','Any calculations, charts, yields, exchange rates, stock or crypto prices and forecasts are informational only. They are not a recommendation to buy, sell, invest, borrow money or open a deposit.'],
     ['User responsibility','You make financial decisions independently and are responsible for verifying data with a bank, broker, exchange or official source before taking any action with money.'],
     ['Accuracy of data','We aim to make calculations useful, but we do not guarantee absolute accuracy. Bank terms, taxes, fees, rates and market prices may differ from values shown in the app.'],
@@ -6999,7 +7017,7 @@ const LEGAL_I18N={
     ['Changes to terms','These terms may be updated. Continued use of the app after an update means acceptance of the current version.']
   ]},
   de:{title:'Nutzungsbedingungen und Haftungsausschluss',updated:'Aktualisiert: 27. Mai 2026',note:'Vor der Veröffentlichung ergänzen Sie Entwicklerkontakt, rechtlichen Inhaber und eine öffentliche URL dieses Dokuments.',sections:[
-    ['Informationszweck','Kapital dient der persönlichen Erfassung von Vermögenswerten, Schulden, Einkommen und ungefähren Berechnungen. Die App ist keine Bank, kein Broker, kein Steuerberater und kein Finanzberater.'],
+    ['Informationszweck','InveStory dient der persönlichen Erfassung von Vermögenswerten, Schulden, Einkommen und ungefähren Berechnungen. Die App ist keine Bank, kein Broker, kein Steuerberater und kein Finanzberater.'],
     ['Keine Finanzberatung','Berechnungen, Diagramme, Renditen, Wechselkurse, Aktien- oder Kryptopreise und Prognosen dienen nur zur Information. Sie sind keine Empfehlung zum Kaufen, Verkaufen, Investieren, Kreditaufnehmen oder Anlegen.'],
     ['Verantwortung des Nutzers','Sie treffen Finanzentscheidungen selbständig und sind dafür verantwortlich, Daten vor Handlungen mit Geld bei Bank, Broker, Börse oder offizieller Quelle zu prüfen.'],
     ['Genauigkeit der Daten','Wir bemühen uns um nützliche Berechnungen, garantieren jedoch keine absolute Genauigkeit. Bankbedingungen, Steuern, Gebühren, Kurse und Marktpreise können von den App-Werten abweichen.'],
@@ -7009,7 +7027,7 @@ const LEGAL_I18N={
     ['Änderungen','Diese Bedingungen können aktualisiert werden. Die weitere Nutzung nach einer Aktualisierung gilt als Annahme der aktuellen Fassung.']
   ]},
   zh:{title:'使用条款与免责声明',updated:'更新日期：2026年5月27日',note:'发布前请添加开发者联系方式、应用所有者法律名称以及本文件的公开 URL。',sections:[
-    ['信息用途','Kapital 用于个人记录资产、债务、收入和近似计算。本应用不是银行、券商、税务顾问或财务顾问。'],
+    ['信息用途','InveStory 用于个人记录资产、债务、收入和近似计算。本应用不是银行、券商、税务顾问或财务顾问。'],
     ['非财务建议','任何计算、图表、收益率、汇率、股票或加密货币价格及预测仅供参考，不构成买卖、投资、借贷或存款建议。'],
     ['用户责任','您自行做出财务决定，并有责任在进行任何资金操作前向银行、券商、交易所或官方来源核实数据。'],
     ['数据准确性','我们努力提供有用的计算，但不保证绝对准确。银行条款、税费、手续费、汇率和市场价格可能与应用显示值不同。'],
@@ -7045,7 +7063,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Експорт, імпорт та офлайн',items:['Експортувати backup і переконатися, що файл відкривається як JSON.','Імпортувати backup на чисті дані і перевірити всі розділи.','Увімкнути офлайн-режим і перевірити використання cached/manual курсів.','Перевірити rollback snapshot перед імпортом.']},
     {title:'Інтерфейс та мобільна верстка',items:['Перевірити темну і світлу тему на вузькому екрані.','Перевірити, що великі суми не обрізаються.','Перевірити модальні вікна, свайп депозитів і нижні кнопки.','Перевірити переклади кнопок і порожніх станів у всіх мовах.']},
     {title:'Paywall та юридичні екрани',items:['Перевірити 30 днів безкоштовно, ціни $2.99/міс і $24.99/рік.','Перевірити Privacy Policy та Terms & Disclaimer у застосунку.','Переконатися, що немає текстів про старі ліміти.','Перевірити, що фінансовий disclaimer показаний зрозуміло.']},
-    {title:'Публікація',items:['Перевірити іконку, назву Kapital, splash screen і версію.','Перевірити Android/iOS build на реальному пристрої.','Підготувати скріншоти, опис, privacy URL і support URL.','Перед релізом зробити фінальний backup тестових даних.']}
+    {title:'Публікація',items:['Перевірити іконку, назву InveStory, splash screen і версію.','Перевірити Android/iOS build на реальному пристрої.','Підготувати скріншоти, опис, privacy URL і support URL.','Перед релізом зробити фінальний backup тестових даних.']}
   ]},
   ru:{title:'Тестовый чек-лист',updated:'Перед релизом в App Store / Play Market',progress:'Готово',reset:'Сбросить чек-лист',sections:[
     {title:'Данные и миграции',items:['Обновить приложение со старыми данными и проверить, что активы не исчезли.','Проверить схему v4, дату миграции и pre-migration backup в хранилище.','Создать депозит, кредит, валюту, металл и акцию, перезагрузить приложение.','Проверить сброс trial без потери основных данных.']},
@@ -7053,7 +7071,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Экспорт, импорт и офлайн',items:['Экспортировать backup и убедиться, что файл открывается как JSON.','Импортировать backup на чистые данные и проверить все разделы.','Включить офлайн-режим и проверить cached/manual курсы.','Проверить rollback snapshot перед импортом.']},
     {title:'Интерфейс и мобильная вёрстка',items:['Проверить тёмную и светлую тему на узком экране.','Проверить, что большие суммы не обрезаются.','Проверить модальные окна, свайп депозитов и нижние кнопки.','Проверить переводы кнопок и пустых состояний на всех языках.']},
     {title:'Paywall и юридические экраны',items:['Проверить 30 дней бесплатно, цены $2.99/мес и $24.99/год.','Проверить Privacy Policy и Terms & Disclaimer в приложении.','Убедиться, что нет текстов про старые лимиты.','Проверить, что финансовый disclaimer показан понятно.']},
-    {title:'Публикация',items:['Проверить иконку, название Kapital, splash screen и версию.','Проверить Android/iOS build на реальном устройстве.','Подготовить скриншоты, описание, privacy URL и support URL.','Перед релизом сделать финальный backup тестовых данных.']}
+    {title:'Публикация',items:['Проверить иконку, название InveStory, splash screen и версию.','Проверить Android/iOS build на реальном устройстве.','Подготовить скриншоты, описание, privacy URL и support URL.','Перед релизом сделать финальный backup тестовых данных.']}
   ]},
   en:{title:'Test Checklist',updated:'Before App Store / Play Market release',progress:'Done',reset:'Reset checklist',sections:[
     {title:'Data and migrations',items:['Update the app with old data and confirm assets are still present.','Check schema v4, migration date, and pre-migration backup in storage.','Create a deposit, loan, currency, metal, and stock, then reload the app.','Check trial reset without losing core data.']},
@@ -7061,7 +7079,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Export, import, and offline',items:['Export a backup and confirm the file opens as JSON.','Import a backup into clean data and verify every section.','Enable offline mode and check cached/manual rates.','Check rollback snapshot before import.']},
     {title:'UI and mobile layout',items:['Check dark and light themes on a narrow screen.','Check that large amounts are not clipped.','Check modals, deposit swipes, and bottom buttons.','Check button and empty-state translations in every language.']},
     {title:'Paywall and legal screens',items:['Check 30 days free, $2.99/month and $24.99/year prices.','Check Privacy Policy and Terms & Disclaimer inside the app.','Confirm there are no old limit texts.','Check that the financial disclaimer is clear.']},
-    {title:'Publishing',items:['Check icon, Kapital name, splash screen, and version.','Check Android/iOS build on a real device.','Prepare screenshots, description, privacy URL, and support URL.','Make a final backup of test data before release.']}
+    {title:'Publishing',items:['Check icon, InveStory name, splash screen, and version.','Check Android/iOS build on a real device.','Prepare screenshots, description, privacy URL, and support URL.','Make a final backup of test data before release.']}
   ]},
   de:{title:'Test-Checkliste',updated:'Vor dem Release im App Store / Play Market',progress:'Erledigt',reset:'Checkliste zurücksetzen',sections:[
     {title:'Daten und Migrationen',items:['App mit alten Daten aktualisieren und prüfen, dass Vermögenswerte erhalten bleiben.','Schema v4, Migrationsdatum und Pre-Migration-Backup im Speicher prüfen.','Einlage, Kredit, Währung, Metall und Aktie erstellen, danach App neu laden.','Trial-Reset ohne Verlust der Kerndaten prüfen.']},
@@ -7069,7 +7087,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Export, Import und Offline',items:['Backup exportieren und prüfen, dass die Datei als JSON geöffnet wird.','Backup in leere Daten importieren und alle Bereiche prüfen.','Offline-Modus aktivieren und cached/manual Kurse prüfen.','Rollback-Snapshot vor dem Import prüfen.']},
     {title:'UI und mobiles Layout',items:['Dunkles und helles Design auf schmalem Bildschirm prüfen.','Prüfen, dass große Summen nicht abgeschnitten werden.','Modale Fenster, Einlagen-Swipe und untere Buttons prüfen.','Übersetzungen von Buttons und leeren Zuständen in allen Sprachen prüfen.']},
     {title:'Paywall und Rechtliches',items:['30 Tage kostenlos, Preise $2.99/Monat und $24.99/Jahr prüfen.','Privacy Policy und Terms & Disclaimer in der App prüfen.','Sicherstellen, dass keine alten Limit-Texte vorhanden sind.','Prüfen, dass der Finanz-Disclaimer klar ist.']},
-    {title:'Veröffentlichung',items:['Icon, Name Kapital, Splash Screen und Version prüfen.','Android/iOS Build auf echtem Gerät prüfen.','Screenshots, Beschreibung, Privacy URL und Support URL vorbereiten.','Vor Release ein finales Backup der Testdaten erstellen.']}
+    {title:'Veröffentlichung',items:['Icon, Name InveStory, Splash Screen und Version prüfen.','Android/iOS Build auf echtem Gerät prüfen.','Screenshots, Beschreibung, Privacy URL und Support URL vorbereiten.','Vor Release ein finales Backup der Testdaten erstellen.']}
   ]},
   zh:{title:'测试清单',updated:'发布到 App Store / Play Market 前',progress:'已完成',reset:'重置清单',sections:[
     {title:'数据和迁移',items:['使用旧数据更新应用，并确认资产没有丢失。','检查 schema v4、迁移日期和 pre-migration backup。','创建存款、贷款、货币、金属和股票，然后重新加载应用。','检查重置 trial 时不会丢失核心数据。']},
@@ -7077,7 +7095,7 @@ const TEST_CHECKLIST_I18N={
     {title:'导出、导入和离线',items:['导出 backup，并确认文件可以作为 JSON 打开。','把 backup 导入到空数据中，并检查所有部分。','开启离线模式并检查 cached/manual 汇率。','检查导入前的 rollback snapshot。']},
     {title:'界面和移动布局',items:['在窄屏上检查深色和浅色主题。','检查大金额不会被裁切。','检查弹窗、存款滑动和底部按钮。','检查所有语言中的按钮和空状态翻译。']},
     {title:'Paywall 和法律页面',items:['检查 30 天免费、$2.99/月 和 $24.99/年价格。','检查应用内 Privacy Policy 和 Terms & Disclaimer。','确认没有旧限制文本。','检查金融免责声明是否清楚。']},
-    {title:'发布',items:['检查图标、Kapital 名称、启动屏和版本。','在真实设备上检查 Android/iOS build。','准备截图、描述、privacy URL 和 support URL。','发布前备份最终测试数据。']}
+    {title:'发布',items:['检查图标、InveStory 名称、启动屏和版本。','在真实设备上检查 Android/iOS build。','准备截图、描述、privacy URL 和 support URL。','发布前备份最终测试数据。']}
   ]}
 };
 function getTestChecklistData(){return TEST_CHECKLIST_I18N[currentLang]||TEST_CHECKLIST_I18N.en;}
@@ -8870,7 +8888,7 @@ function exportPDF(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download='Kapital_'+new Date().toISOString().split('T')[0]+'.html';
+  a.download='InveStory_'+new Date().toISOString().split('T')[0]+'.html';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -9891,7 +9909,7 @@ function collectBackupPayload(){
   });
   const main=storage.kapital_v6?JSON.parse(storage.kapital_v6):null;
   return {
-    app:'Kapital',
+    app:'InveStory',
     appVersion:APP_VERSION,
     buildDate:APP_BUILD_DATE,
     storageSchemaVersion:STORAGE_SCHEMA_VERSION,
@@ -9913,7 +9931,7 @@ function createRollbackSnapshot(){
       if(val!==null)storage[key]=val;
     });
     const rollback={
-      app:'Kapital',
+      app:'InveStory',
       appVersion:APP_VERSION,
       buildDate:APP_BUILD_DATE,
       storageSchemaVersion:STORAGE_SCHEMA_VERSION,
@@ -9932,7 +9950,7 @@ function normalizeBackupPayload(raw){
   if(raw&&raw.backupVersion&&raw.storage&&raw.storage.kapital_v6)return raw;
   if(raw&&raw.backupVersion&&raw.data&&!raw.storage){
     return {
-      app:raw.app||'Kapital',
+      app:raw.app||'InveStory',
       appVersion:raw.appVersion||'',
       backupVersion:raw.backupVersion,
       storageSchemaVersion:raw.storageSchemaVersion||1,
@@ -9945,7 +9963,7 @@ function normalizeBackupPayload(raw){
   }
   if(raw&&(raw.deposits||raw.coins||raw.forexItems||raw.customSections||raw.securitiesSections||raw.liabilities||raw.metalsSections)){
     return {
-      app:'Kapital',
+      app:'InveStory',
       backupVersion:1,
       storageSchemaVersion:1,
       importedLegacy:true,
@@ -9983,7 +10001,7 @@ function backupExport(){
     const a=document.createElement('a');
     const stamp=new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
     a.href=url;
-    a.download='Kapital_backup_'+stamp+'.json';
+    a.download='InveStory_backup_'+stamp+'.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
