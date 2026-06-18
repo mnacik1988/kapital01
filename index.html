@@ -765,6 +765,20 @@ body.theme-light .trial-box > div[style*="color:#fff"]{color:var(--text)!importa
 .stock-detail-stat-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;}
 .stock-detail-stat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);text-transform:uppercase;margin-top:2px;letter-spacing:0.05em;}
 .stock-detail-trades{margin-top:12px;}
+.stock-detail-section-icon{
+  width:22px;
+  height:22px;
+  object-fit:contain;
+  vertical-align:-6px;
+  margin-right:7px;
+  filter:drop-shadow(0 2px 5px #00000055);
+}
+.stock-detail-section-icon.big{
+  width:30px;
+  height:30px;
+  vertical-align:-9px;
+  margin-right:8px;
+}
 .stock-detail-trade{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
 .stock-detail-trade:last-child{border-bottom:none;}
 
@@ -1430,7 +1444,16 @@ body.modern-mockup.theme-light .bottom-nav{
   height:44px!important;
   max-width:44px!important;
   max-height:44px!important;
-  margin-right:10px;
+  margin-right:6px;
+}
+.main-counter-card.portfolio .main-counter-title{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  color:#fff;
+  font-size:14px;
+  letter-spacing:.08em;
+  font-weight:800;
 }
 .main-counter-subrow-icon{
   width:18px;
@@ -4624,7 +4647,7 @@ function sectionIconKey(section){
   return null;
 }
 function uiIconHtml(key, cls='ui-inline-icon'){
-  const map={accrued:'ui-accrued',tax:'ui-tax',net:'ui-net-profit',clock:'ui-clock',period:'ui-period-stats',percent:'ui-percent',usdt:'ui-usdt',pnl:'ui-pnl',dividend:'ui-dividend-income'};
+  const map={accrued:'ui-accrued',tax:'ui-tax',net:'ui-net-profit',clock:'ui-clock',period:'ui-period-stats',percent:'ui-percent',usdt:'ui-usdt',pnl:'ui-pnl',dividend:'ui-dividend-income',trade:'ui-trade',sold:'ui-sold'};
   const file=map[key];
   return file?'<img class="'+cls+'" src="section-icons/'+file+'.png?v=1" alt="">':'';
 }
@@ -5748,7 +5771,7 @@ function cryptoDetailTxt(key){
     trades:{uk:'Угоди',ru:'Сделки',en:'Trades',de:'Transaktionen',zh:'交易'},
     buy:{uk:'Купівля',ru:'Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
     sell:{uk:'Продаж',ru:'Продажа',en:'Sale',de:'Verkauf',zh:'卖出'},
-    sellTitle:{uk:'Продати',ru:'Продать',en:'Sell',de:'Verkaufen',zh:'卖出'},
+    sellTitle:{uk:'Продано',ru:'Продано',en:'Sold',de:'Verkauft',zh:'已卖出'},
     qtyLabel:{uk:'Кількість',ru:'Количество',en:'Quantity',de:'Menge',zh:'数量'},
     priceUsd:{uk:'Ціна ($)',ru:'Цена ($)',en:'Price ($)',de:'Preis ($)',zh:'价格 ($)'},
     confirm:{uk:'Підтвердити продаж',ru:'Подтвердить продажу',en:'Confirm sale',de:'Verkauf bestätigen',zh:'确认卖出'},
@@ -5790,7 +5813,7 @@ function openCryptoDetail(coinKey){
     '</div>';
 
   // Collapsible trades
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('period','tiny-png-icon')+' '+cryptoDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon big')+' '+cryptoDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=parseFloat(t.qty)||0;
@@ -5859,12 +5882,12 @@ function stockDetailTxt(key){
     price:{uk:'Ціна',ru:'Цена',en:'Price',de:'Preis',zh:'价格'},
     avg:{uk:'Ø Середня',ru:'Ø Средняя',en:'Ø Average',de:'Ø Durchschnitt',zh:'Ø 平均'},
     divMonth:{uk:'Дивід./міс',ru:'Дивид./мес',en:'Div./mo',de:'Div./Monat',zh:'股息/月'},
-    trades:{uk:'📋 Угоди',ru:'📋 Сделки',en:'📋 Trades',de:'📋 Transaktionen',zh:'📋 交易'},
-    buy:{uk:'📈 Купівля',ru:'📈 Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
-    sell:{uk:'📉 Продаж',ru:'📉 Продажа',en:'📉 Sale',de:'📉 Verkauf',zh:'📉 卖出'},
-    sellTitle:{uk:'📉 Продати',ru:'📉 Продать',en:'📉 Sell',de:'📉 Verkaufen',zh:'📉 卖出'},
+    trades:{uk:'Угоди',ru:'Сделки',en:'Trades',de:'Transaktionen',zh:'交易'},
+    buy:{uk:'Купівля',ru:'Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
+    sell:{uk:'Продаж',ru:'Продажа',en:'Sale',de:'Verkauf',zh:'卖出'},
+    sellTitle:{uk:'Продано',ru:'Продано',en:'Sold',de:'Verkauft',zh:'已卖出'},
     saleCurrency:{uk:'Валюта продажу',ru:'Валюта продажи',en:'Sale currency',de:'Verkaufswährung',zh:'卖出货币'},
-    confirmSale:{uk:'📉 Підтвердити продаж',ru:'📉 Подтвердить продажу',en:'📉 Confirm sale',de:'📉 Verkauf bestätigen',zh:'📉 确认卖出'},
+    confirmSale:{uk:'Скільки продано',ru:'Сколько продано',en:'Amount sold',de:'Verkaufte Menge',zh:'已卖出数量'},
     cancel:{uk:'Скасувати',ru:'Отмена',en:'Cancel',de:'Abbrechen',zh:'取消'},
     specifySellQty:{uk:'Вкажіть кількість для продажу',ru:'Укажите количество для продажи',en:'Enter quantity to sell',de:'Verkaufsmenge eingeben',zh:'输入卖出数量'},
     cannotSellMore:{uk:'Не можна продати більше ніж є',ru:'Нельзя продать больше, чем есть',en:'Cannot sell more than owned',de:'Mehr verkaufen als vorhanden ist nicht möglich',zh:'不能卖出超过持有数量'},
@@ -5908,7 +5931,7 @@ function openStockDetail(secId, tickerKey){
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('divMonth')+'</div></div>'+
     '</div>';
 
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon')+' '+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=stockNum(t.qty);
@@ -5923,14 +5946,14 @@ function openStockDetail(secId, tickerKey){
   html+='</div>'; // close collapsible trades
 
   html+='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
-    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">'+stockDetailTxt('sellTitle')+'</div>'+
+    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">'+uiIconHtml('sold','stock-detail-section-icon')+' '+stockDetailTxt('sellTitle')+'</div>'+
     '<div class="row2"><div class="field-group"><div class="field-label">'+stockDetailTxt('qty')+'</div>'+
     '<input class="field-input" type="text" id="sellQty_detail" placeholder="'+fmtMax2(totalQty)+'" inputmode="decimal" value="'+fmtMax2(totalQty)+'"></div>'+
     '<div class="field-group"><div class="field-label">'+stockDetailTxt('price')+' (₴)</div>'+
     '<input class="field-input" type="text" id="sellPrice_detail" placeholder="'+fmtMax2(curPrice)+'" inputmode="decimal" value="'+fmtMax2(curPrice)+'"></div></div>'+
     '<div class="field-group"><div class="field-label">'+stockDetailTxt('saleCurrency')+'</div>'+
     '<select class="field-input" id="sellCurrency_detail">'+saleCurrencyOptions+'</select></div>'+
-    '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">'+stockDetailTxt('confirmSale')+'</button>'+
+    '<button onclick="sellStock(\''+secId+'\',\''+tickerKey.replace(/'/g,"\\'")+'\','+group[0].origIdx+')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">'+uiIconHtml('sold','stock-detail-section-icon')+' '+stockDetailTxt('confirmSale')+'</button>'+
     '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">'+stockDetailTxt('cancel')+'</button></div>';
 
   document.getElementById('stockDetailContent').innerHTML=html;
@@ -10610,9 +10633,9 @@ function getPortfolioLeader(dayStats){
   const items=[
     {key:'stocks',label:mainCounterTxt('stocks'),delta:dayStats.stocks},
     {key:'crypto',label:mainCounterTxt('crypto'),delta:dayStats.crypto}
-  ].filter(x=>x.delta);
+  ].filter(x=>x.delta&&Math.abs(Number(x.delta.change)||0)>0.000001);
   if(!items.length)return {label:'—',delta:null};
-  items.sort((a,b)=>(Number(b.delta.change)||0)-(Number(a.delta.change)||0));
+  items.sort((a,b)=>Math.abs(Number(b.delta.change)||0)-Math.abs(Number(a.delta.change)||0));
   return items[0];
 }
 function mainCounterLabelIcon(label){
