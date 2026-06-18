@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kapital-app-v0-0-24-trade-icons-v1';
+const CACHE_NAME = 'investory-app-v0-0-26';
 const APP_SHELL = [
   './',
   './index.html',
