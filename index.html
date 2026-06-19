@@ -2354,22 +2354,8 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
         <button class="settings-theme-btn" id="theme-light" onclick="setAppTheme('light')">☀ Light</button>
       </div>
     </div>
-    <!-- DEV TOOLS -->
+    <!-- BACKUP -->
     <div class="settings-section" style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
-      <div class="settings-label" style="color:var(--orange2);">🛠 Розробник</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);">Статус:</span>
-        <span id="devProStatus" style="font-family:'DM Mono',monospace;font-size:12px;font-weight:700;"></span>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="devSetPro(true)" id="devBtnPro" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--green);background:#4ecb8d15;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;font-weight:600;">👑 PRO ON</button>
-        <button onclick="devSetPro(false)" id="devBtnFree" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--red);background:#f8717115;font-family:'DM Mono',monospace;font-size:11px;color:var(--red);cursor:pointer;font-weight:600;">🔒 FREE</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button onclick="devResetTrial()" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border2);background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);cursor:pointer;">↺ Скинути тріал</button>
-        <button onclick="devResetAll()" style="flex:1;padding:8px;border-radius:10px;border:1px solid #f8717140;background:transparent;font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;">🗑 Скинути все дані</button>
-      </div>
-      <div class="divider"></div>
       <div class="settings-group-title">💾 РЕЗЕРВНЕ КОПІЮВАННЯ</div>
       <div style="display:flex;gap:8px;">
         <button onclick="backupExport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #4ecb8d40;background:#4ecb8d10;font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">📤 Експорт даних</button>
@@ -2511,7 +2497,7 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.26</span></div>
+<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.30</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2583,8 +2569,8 @@ body.modern-mockup #chartSection:not(.expanded) .chart-stats{
 
 
 // ── FREEMIUM STATE (declared first so all functions can access) ──
-const APP_VERSION = 'v0.0.26';
-const APP_BUILD_DATE = '2026-06-08';
+const APP_VERSION = 'v0.0.30';
+const APP_BUILD_DATE = '2026-06-19';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -2877,10 +2863,6 @@ const EXTRA_I18N={
   'Відображення суми':{uk:'Відображення суми',ru:'Отображение суммы',en:'Display currency',de:'Anzeigewährung',zh:'显示货币'},
   '🛠 Розробник':{uk:'🛠 Розробник',ru:'🛠 Разработчик',en:'🛠 Developer',de:'🛠 Entwickler',zh:'🛠 开发者'},
   'Статус:':{uk:'Статус:',ru:'Статус:',en:'Status:',de:'Status:',zh:'状态：'},
-  '👑 PRO ON':{uk:'👑 PRO ON',ru:'👑 PRO ВКЛ',en:'👑 PRO ON',de:'👑 PRO AN',zh:'👑 PRO 开'},
-  '🔒 FREE':{uk:'🔒 FREE',ru:'🔒 FREE',en:'🔒 FREE',de:'🔒 FREE',zh:'🔒 免费'},
-  '↺ Скинути тріал':{uk:'↺ Скинути тріал',ru:'↺ Сбросить триал',en:'↺ Reset trial',de:'↺ Testversion zurücksetzen',zh:'↺ 重置试用'},
-  '🗑 Скинути все дані':{uk:'🗑 Скинути все дані',ru:'🗑 Сбросить все данные',en:'🗑 Reset all data',de:'🗑 Alle Daten löschen',zh:'🗑 重置所有数据'},
   '💾 РЕЗЕРВНЕ КОПІЮВАННЯ':{uk:'💾 РЕЗЕРВНЕ КОПІЮВАННЯ',ru:'💾 РЕЗЕРВНОЕ КОПИРОВАНИЕ',en:'💾 BACKUP',de:'💾 SICHERUNG',zh:'💾 备份'},
   '📤 Експорт даних':{uk:'📤 Експорт даних',ru:'📤 Экспорт данных',en:'📤 Export data',de:'📤 Daten exportieren',zh:'📤 导出数据'},
   '📥 Імпорт даних':{uk:'📥 Імпорт даних',ru:'📥 Импорт данных',en:'📥 Import data',de:'📥 Daten importieren',zh:'📥 导入数据'},
@@ -3168,8 +3150,6 @@ const UI_TEXT={
   startupNotePh:{uk:'Опис, роль, умови...',ru:'Описание, роль, условия...',en:'Description, role, terms...',de:'Beschreibung, Rolle, Bedingungen...',zh:'描述、角色、条款...'},
   startupCurrentShare:{uk:'Ваша частка',ru:'Ваша доля',en:'Your share',de:'Ihr Anteil',zh:'您的份额'},
   startupTotalValue:{uk:'Загальна вартість',ru:'Общая стоимость',en:'Total value',de:'Gesamtwert',zh:'总价值'}
-  ,workerLabel:{uk:'⚙️ Cloudflare Worker URL (для GitHub Pages / App)',ru:'⚙️ Cloudflare Worker URL (для GitHub Pages / App)',en:'⚙️ Cloudflare Worker URL (for GitHub Pages / App)',de:'⚙️ Cloudflare Worker URL (für GitHub Pages / App)',zh:'⚙️ Cloudflare Worker URL（用于 GitHub Pages / App）'}
-  ,workerHint:{uk:'Розгорніть stock-worker.js на workers.cloudflare.com та вставте URL нижче',ru:'Разверните stock-worker.js на workers.cloudflare.com и вставьте URL ниже',en:'Deploy stock-worker.js on workers.cloudflare.com and paste the URL below',de:'Stellen Sie stock-worker.js auf workers.cloudflare.com bereit und fügen Sie die URL unten ein',zh:'在 workers.cloudflare.com 部署 stock-worker.js，然后在下方粘贴 URL'}
   ,save:{uk:'💾 Зберегти',ru:'💾 Сохранить',en:'💾 Save',de:'💾 Speichern',zh:'💾 保存'}
 };
 function uiText(key){const rec=UI_TEXT[key];return rec?(rec[currentLang]||rec.uk||key):key;}
@@ -4189,10 +4169,9 @@ function updateNetworkStatusUI(mode){
 }
 loadLiveRatesCache();
 
-// ── CONFIG ────────────────────────────────────────────────────
-// Ваш Cloudflare Worker URL (після деплою stock-worker.js)
-// Залиште '' щоб використовувати вбудований Claude API (тільки Claude.ai)
-let WORKER_URL = localStorage.getItem('worker_url') || 'https://plain-bread-df6d.mnacik1988.workers.dev';
+// ── API CONFIG ─────────────────────────────────────────────────
+// Public proxy endpoint only. Provider secrets must stay inside the Worker.
+const WORKER_URL = 'https://plain-bread-df6d.mnacik1988.workers.dev';
 
 // ── Source 1: Власний Cloudflare Worker (працює скрізь) ───────
 async function workerGetStock(tickers){
@@ -4207,44 +4186,6 @@ async function workerGetStock(tickers){
   if(d.error) throw new Error('Worker: ' + d.error);
   return d; // { usdUah, stocks: { AAPL: {...} } }
   }catch(e){window._workerFailedAt=Date.now();console.error('workerGetStock:',e.message);throw e;}
-}
-
-// ── Source 2: Anthropic Claude API (працює в Claude.ai) ───────
-async function claudeGetStockData(tickers){
-  try{
-  const apiKey=window.ANTHROPIC_API_KEY||'';
-  if(!apiKey) throw new Error('Claude API key not configured; use Worker URL');
-  const tickerList=tickers.map(t=>t.toUpperCase()).join(', ');
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1500,
-      system:'You are a financial data API. Respond with raw JSON only — no markdown, no backticks, no text outside JSON.',
-      tools:[{type:'web_search_20250305',name:'web_search'}],
-      messages:[{role:'user',content:
-        'Search current stock prices for: '+tickerList+'. Also find current USD to UAH rate. '+
-        'Return ONLY JSON: {"usdUah":44.0,"stocks":{"AAPL":{"price":213.5,"change":1.2,"changePct":0.57,"divYield":0.52,"divAbs":1.0,"name":"Apple Inc","currency":"USD"}}}'
-      }]
-    })
-  });
-  if(!resp.ok){
-    const t=await resp.text();
-    if(resp.status===429) throw new Error('Забагато запитів — зачекайте 30 сек і спробуйте ще раз');
-    throw new Error('Claude API '+resp.status+': '+t.slice(0,80));
-  }
-  const data=await resp.json();
-  const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-  let jsonStr=null;
-  const fenced=text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  if(fenced)jsonStr=fenced[1];
-  else{let d=0,s=-1,e=-1;for(let i=0;i<text.length;i++){if(text[i]==='{'){if(!d)s=i;d++;}else if(text[i]==='}'){d--;if(!d){e=i;break;}}}if(s>=0&&e>s)jsonStr=text.slice(s,e+1);}
-  if(!jsonStr)throw new Error('No JSON: '+text.slice(0,120));
-  const parsed=JSON.parse(jsonStr);
-  if(parsed.stocks){const n={};Object.entries(parsed.stocks).forEach(([k,v])=>n[k.toUpperCase()]=v);parsed.stocks=n;}
-  return parsed;
-  }catch(e){console.error('claudeGetStock:',e);throw e;}
 }
 
 async function fetchUsdUahRate(forceFresh=false){
@@ -4406,19 +4347,8 @@ async function fetchStockPrice(ticker){
     result=await workerGetStock([ticker]);
   }catch(e1){errors.push('Worker: '+e1.message);}
 
-  // 2. Claude API fallback only works when the host page provides a key.
-  if(!result){
-    if(window.ANTHROPIC_API_KEY){
-      try{result=await claudeGetStockData([ticker]);}
-      catch(e2){errors.push('Claude: '+e2.message);}
-    } else {
-      errors.push('Claude: API key not configured; use Worker URL');
-    }
-  }
-
   if(!result){
     stockLastError=errors.join(' | ');
-    if(!WORKER_URL) stockLastError+=' | 💡 Налаштуйте Cloudflare Worker для роботи поза Claude.ai';
     return null;
   }
   if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
@@ -4475,16 +4405,6 @@ async function fetchMultipleStocks(tickers){
   }));
   stockLastError=Object.keys(results).length?'':'Worker returned no stock prices';
   return results;
-}
-
-function saveWorkerUrl(secId){
-  const input=document.getElementById('workerUrlInput_'+secId);
-  const url=(input?.value||'').trim().replace(/\/$/,'');
-  WORKER_URL=url;
-  localStorage.setItem('worker_url',url);
-  const status=document.getElementById('workerUrlStatus_'+secId);
-  if(status)status.textContent=url?'✓ Worker URL збережено. Спробуйте отримати ціну.':' URL очищено.';
-  document.querySelectorAll('[id^="workerUrlInput_"]').forEach(el=>el.value=url);
 }
 
 async function fetchTickerForInput(secId){
@@ -5183,21 +5103,6 @@ function getSecCardHtml(s,idx){
         </div>
         <input type="hidden" id="secTradeType_${s.id}" value="buy">
       </div>
-      <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;color:var(--blue2);text-transform:uppercase;margin-bottom:6px;">${uiText('workerLabel')}</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:8px;">
-          ${uiText('workerHint')}
-        </div>
-        <div style="display:flex;gap:6px;">
-          <input type="text" id="workerUrlInput_${s.id}" placeholder="https://your-worker.workers.dev" 
-            style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);outline:none;"
-            value="${WORKER_URL||''}">
-          <button onclick="saveWorkerUrl('${s.id}')" style="background:#5b9cf620;border:1px solid #5b9cf640;border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;white-space:nowrap;">
-            ${uiText('save')}
-          </button>
-        </div>
-        <div id="workerUrlStatus_${s.id}" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;"></div>
-      </div>
     </div></div>
   </div>`;
 }
@@ -5717,12 +5622,15 @@ function renderCoins(){
   const groups={};
   coins.forEach((c,i)=>{
     const key=c.name.toUpperCase();
-    if(!groups[key])groups[key]={trades:[],totalQty:0,totalCost:0,curPrice:0,change24h:0,name:key};
+    if(!groups[key])groups[key]={trades:[],totalQty:0,buyQty:0,buyCost:0,curPrice:0,change24h:0,name:key};
     const g=groups[key];
     const qty=parseFloat(c.qty)||0;
     g.trades.push({...c,idx:i,qty});
     g.totalQty+=qty;
-    g.totalCost+=Math.abs(qty)*(c.buyPrice||0);
+    if(qty>0){
+      g.buyQty+=qty;
+      g.buyCost+=qty*(c.buyPrice||0);
+    }
     if(c.curPrice)g.curPrice=c.curPrice;
     if(c.change24h)g.change24h=c.change24h;
   });
@@ -5732,7 +5640,7 @@ function renderCoins(){
   
   Object.entries(groups).forEach(([key,g])=>{
     if(g.totalQty<=0)return; // skip sold-out coins
-    const avgBuy=g.totalQty>0&&g.totalCost>0?g.totalCost/g.totalQty:0;
+    const avgBuy=g.buyQty>0&&g.buyCost>0?g.buyCost/g.buyQty:0;
     const value=g.totalQty*g.curPrice;
     const cost=g.totalQty*avgBuy;
     const pnl=cost>0?value-cost:0;
@@ -5803,10 +5711,18 @@ function openCryptoDetail(coinKey){
   const group=coins.map((c,i)=>({...c,idx:i})).filter(c=>c.name.toUpperCase()===coinKey);
   if(!group.length)return;
   const totalQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
-  const totalCost=group.reduce((s,t)=>s+Math.abs(parseFloat(t.qty)||0)*(t.buyPrice||0),0);
+  const buyQty=group.reduce((s,t)=>{
+    const qty=parseFloat(t.qty)||0;
+    return qty>0?s+qty:s;
+  },0);
+  const buyCost=group.reduce((s,t)=>{
+    const qty=parseFloat(t.qty)||0;
+    return qty>0?s+qty*(t.buyPrice||0):s;
+  },0);
   const curPrice=group.find(c=>c.curPrice)?.curPrice||0;
-  const avgBuy=totalQty>0&&totalCost>0?totalCost/totalQty:0;
+  const avgBuy=buyQty>0&&buyCost>0?buyCost/buyQty:0;
   const curVal=totalQty*curPrice;
+  const totalCost=Math.max(0,totalQty)*avgBuy;
   const pnl=totalCost>0?curVal-totalCost:0;
   const pnlPct=totalCost>0?((curVal/totalCost-1)*100):0;
   const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
@@ -9821,8 +9737,10 @@ getCustomTotal=function(){
   },0);
 };
 
-// ── DEV TOOLS ─────────────────────────────────────────────
+// ── RELEASE-GUARDED TOOLS ─────────────────────────────────
+const ENABLE_DEV_TOOLS = false;
 function devSetPro(state){
+  if(!ENABLE_DEV_TOOLS)return;
   isPro=state;
   localStorage.setItem('kapital_pro', state?'true':'false');
   if(!state) localStorage.removeItem('kapital_pro');
@@ -9844,6 +9762,7 @@ function devSetPro(state){
 }
 
 function devResetTrial(){
+  if(!ENABLE_DEV_TOOLS)return;
   localStorage.removeItem('trial_start');
   localStorage.removeItem('trial_shown');
   isPro=false;
@@ -9872,13 +9791,20 @@ const BACKUP_STORAGE_KEYS = [
   'kapital_test_checklist',
   'live_rates_cache',
   'chartExpanded',
-  'trial_start',
-  'trial_shown',
-  'onboarded',
-  'kapital_pro',
-  'trial_expired_paywall_shown',
-  'worker_url'
+  'onboarded'
 ];
+
+// Access rights and trial dates are intentionally excluded from backups.
+const MAX_BACKUP_FILE_BYTES = 10 * 1024 * 1024;
+const MAX_BACKUP_STORAGE_VALUE_BYTES = 6 * 1024 * 1024;
+const MAX_BACKUP_TOTAL_NODES = 250000;
+const MAX_BACKUP_ARRAY_ITEMS = 50000;
+const MAX_BACKUP_COLLECTION_ITEMS = 5000;
+const FORBIDDEN_BACKUP_KEYS = new Set(['__proto__','prototype','constructor']);
+const BACKUP_JSON_KEYS = new Set([
+  'kapital_v6','kapital_v6_prev','cap_history','section_hourly_history',
+  'kapital_migration_log','kapital_pre_migration_backup','kapital_test_checklist','live_rates_cache'
+]);
 
 function backupTxt(key){
   const dict={
@@ -9893,7 +9819,9 @@ function backupTxt(key){
     records:{uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'},
     replaceWarn:{uk:'⚠️ Поточні дані будуть замінені!',ru:'⚠️ Текущие данные будут заменены!',en:'⚠️ Current data will be replaced!',de:'⚠️ Aktuelle Daten werden ersetzt!',zh:'⚠️ 当前数据将被替换！'},
     imported:{uk:'✅ Дані імпортовано! Перезавантаження...',ru:'✅ Данные импортированы! Перезагрузка...',en:'✅ Data imported! Reloading...',de:'✅ Daten importiert! Wird neu geladen...',zh:'✅ 数据已导入！正在重新加载...'},
-    readErr:{uk:'❌ Помилка читання файлу: ',ru:'❌ Ошибка чтения файла: ',en:'❌ File read error: ',de:'❌ Fehler beim Lesen der Datei: ',zh:'❌ 文件读取错误：'}
+    readErr:{uk:'❌ Помилка читання файлу: ',ru:'❌ Ошибка чтения файла: ',en:'❌ File read error: ',de:'❌ Fehler beim Lesen der Datei: ',zh:'❌ 文件读取错误：'},
+    tooLarge:{uk:'❌ Файл бекапу завеликий. Максимум 10 МБ.',ru:'❌ Файл резервной копии слишком большой. Максимум 10 МБ.',en:'❌ Backup file is too large. Maximum size is 10 MB.',de:'❌ Die Sicherungsdatei ist zu groß. Maximal 10 MB.',zh:'❌ 备份文件过大，最大为 10 MB。'},
+    unsafe:{uk:'❌ Бекап містить пошкоджені або небезпечні дані: ',ru:'❌ Резервная копия содержит повреждённые или небезопасные данные: ',en:'❌ Backup contains damaged or unsafe data: ',de:'❌ Die Sicherung enthält beschädigte oder unsichere Daten: ',zh:'❌ 备份包含损坏或不安全的数据：'}
   };
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
 }
@@ -9975,20 +9903,115 @@ function normalizeBackupPayload(raw){
   return null;
 }
 
+function isPlainBackupObject(value){
+  if(!value||typeof value!=='object'||Array.isArray(value))return false;
+  const proto=Object.getPrototypeOf(value);
+  return proto===Object.prototype||proto===null;
+}
+
+function validateBackupTree(value,state,depth){
+  if(depth>30)throw new Error('data nesting is too deep');
+  state.nodes++;
+  if(state.nodes>MAX_BACKUP_TOTAL_NODES)throw new Error('too many data elements');
+  if(typeof value==='string'){
+    if(value.length>500000)throw new Error('text field is too long');
+    return;
+  }
+  if(value===null||typeof value==='boolean')return;
+  if(typeof value==='number'){
+    if(!Number.isFinite(value))throw new Error('invalid number');
+    return;
+  }
+  if(Array.isArray(value)){
+    if(value.length>MAX_BACKUP_ARRAY_ITEMS)throw new Error('array is too large');
+    value.forEach(item=>validateBackupTree(item,state,depth+1));
+    return;
+  }
+  if(!isPlainBackupObject(value))throw new Error('invalid object');
+  const keys=Object.keys(value);
+  if(keys.length>2000)throw new Error('object has too many fields');
+  keys.forEach(key=>{
+    if(FORBIDDEN_BACKUP_KEYS.has(key))throw new Error('forbidden field: '+key);
+    if(key.length>200)throw new Error('field name is too long');
+    validateBackupTree(value[key],state,depth+1);
+  });
+}
+
+function validateMainBackupData(data){
+  if(!isPlainBackupObject(data))throw new Error('main data object is missing');
+  const collections=['deposits','coins','forexItems','cardOrder','customSections','securitiesSections','liabilities','metalsSections'];
+  collections.forEach(key=>{
+    if(data[key]!==undefined&&!Array.isArray(data[key]))throw new Error(key+' must be an array');
+    if(Array.isArray(data[key])&&data[key].length>MAX_BACKUP_COLLECTION_ITEMS)throw new Error(key+' has too many items');
+  });
+  if(data.hiddenCards!==undefined&&!isPlainBackupObject(data.hiddenCards))throw new Error('hiddenCards must be an object');
+  if(data.currentLang!==undefined&&!['uk','ru','en','de','zh'].includes(data.currentLang))throw new Error('unsupported language');
+  if(data.appTheme!==undefined&&!['dark','light'].includes(data.appTheme))throw new Error('unsupported theme');
+}
+
+function validateBackupPayload(payload){
+  if(!payload||!isPlainBackupObject(payload)||!isPlainBackupObject(payload.storage))throw new Error('invalid backup container');
+  const state={nodes:0};
+  validateBackupTree(payload,state,0);
+
+  let totalBytes=0;
+  Object.entries(payload.storage).forEach(([key,value])=>{
+    if(!BACKUP_STORAGE_KEYS.includes(key))return;
+    if(typeof value!=='string')throw new Error(key+' must be text');
+    const bytes=new Blob([value]).size;
+    totalBytes+=bytes;
+    if(bytes>MAX_BACKUP_STORAGE_VALUE_BYTES)throw new Error(key+' is too large');
+    if(BACKUP_JSON_KEYS.has(key)&&value){
+      try{JSON.parse(value);}catch(e){throw new Error(key+' contains invalid JSON');}
+    }
+  });
+  if(totalBytes>MAX_BACKUP_FILE_BYTES)throw new Error('backup data is too large');
+
+  let main;
+  try{main=JSON.parse(payload.storage.kapital_v6);}catch(e){throw new Error('main data JSON is invalid');}
+  validateMainBackupData(main);
+
+  if(payload.capitalHistory!==undefined&&!Array.isArray(payload.capitalHistory))throw new Error('capital history must be an array');
+  return true;
+}
+
+function captureImportStorage(){
+  const snapshot={};
+  BACKUP_STORAGE_KEYS.forEach(key=>{
+    const value=localStorage.getItem(key);
+    if(value!==null)snapshot[key]=value;
+  });
+  return snapshot;
+}
+
+function restoreImportStorageSnapshot(snapshot){
+  BACKUP_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
+  Object.entries(snapshot||{}).forEach(([key,value])=>localStorage.setItem(key,value));
+}
+
 function restoreBackupPayload(payload){
   if(!payload||!payload.storage||!payload.storage.kapital_v6)return false;
-  createRollbackSnapshot();
-  window._kapitalImportInProgress=true;
-  if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
-  BACKUP_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
-  Object.entries(payload.storage).forEach(([key,val])=>{
-    if(BACKUP_STORAGE_KEYS.includes(key)&&typeof val==='string')localStorage.setItem(key,val);
-  });
-  if(payload.capitalHistory&&!payload.storage.cap_history){
-    localStorage.setItem('cap_history',JSON.stringify(payload.capitalHistory));
+  const before=captureImportStorage();
+  try{
+    validateBackupPayload(payload);
+    createRollbackSnapshot();
+    window._kapitalImportInProgress=true;
+    if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
+    BACKUP_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
+    Object.entries(payload.storage).forEach(([key,val])=>{
+      if(BACKUP_STORAGE_KEYS.includes(key)&&typeof val==='string')localStorage.setItem(key,val);
+    });
+    if(payload.capitalHistory&&!payload.storage.cap_history){
+      localStorage.setItem('cap_history',JSON.stringify(payload.capitalHistory));
+    }
+    localStorage.setItem('kapital_import_pending_reload','true');
+    return true;
+  }catch(error){
+    console.error('Backup restore failed:',error);
+    try{restoreImportStorageSnapshot(before);}catch(rollbackError){console.error('Import rollback failed:',rollbackError);}
+    window._kapitalImportInProgress=false;
+    return false;
   }
-  localStorage.setItem('kapital_import_pending_reload','true');
-  return true;
 }
 
 function backupExport(){
@@ -10023,6 +10046,11 @@ function handleBackupFile(input){
     input.value='';
     return;
   }
+  if(file.size>MAX_BACKUP_FILE_BYTES){
+    alert(backupTxt('tooLarge'));
+    input.value='';
+    return;
+  }
   const reader=new FileReader();
   reader.onload=function(e){
     try{
@@ -10030,6 +10058,9 @@ function handleBackupFile(input){
       const payload=normalizeBackupPayload(raw);
       if(!payload){
         alert(backupTxt('badFormat'));return;
+      }
+      try{validateBackupPayload(payload);}catch(validationError){
+        alert(backupTxt('unsafe')+validationError.message);return;
       }
       const historyCount=(payload.capitalHistory||[]).length;
       const importedAt=payload.exportedAt?new Date(payload.exportedAt).toLocaleString():file.name;
@@ -10042,11 +10073,13 @@ function handleBackupFile(input){
       });
     }catch(err){alert(backupTxt('readErr')+err.message);}
   };
+  reader.onerror=function(){alert(backupTxt('readErr')+(reader.error?.message||'unknown error'));};
   reader.readAsText(file);
   input.value='';
 }
 
 function devResetAll(){
+  if(!ENABLE_DEV_TOOLS)return;
   customConfirm('⚠️ Видалити ВСІ дані? Це незворотна дія!', function(){
     customConfirm('Точно видалити? Всі депозити, акції, налаштування будуть втрачені.', function(){
       localStorage.clear();
@@ -10067,11 +10100,6 @@ function devUpdateStatus(){
     el.style.color='var(--red)';
   }
   
-  // Highlight active button
-  const btnPro=document.getElementById('devBtnPro');
-  const btnFree=document.getElementById('devBtnFree');
-  if(btnPro)btnPro.style.opacity=isPro?'1':'0.4';
-  if(btnFree)btnFree.style.opacity=isPro?'0.4':'1';
   
 }
 
