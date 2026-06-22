@@ -1157,7 +1157,7 @@ body.modern-mockup.theme-light .bottom-nav{
 body.modern-mockup.theme-light .bottom-nav-btn .bn-label{color:#475467;}
 body.modern-mockup.theme-light .bottom-nav-btn.center .bn-label{color:#172033;}
 @media(max-width:390px){
-  body.modern-mockup .header{padding:54px 16px 21px;}
+  body.modern-mockup .header{padding:calc(14px + env(safe-area-inset-top)) 16px 21px;}
   body.modern-mockup .total-amount{font-size:clamp(34px,12vw,46px);}
   body.modern-mockup .cards,
   body.modern-mockup #customCardsContainer{padding:0 12px;gap:11px;}
@@ -2676,7 +2676,7 @@ body.modern-mockup.theme-light .total-currency{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.38</span></div>
+<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.39</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2745,7 +2745,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.38';
+const APP_VERSION = 'v0.0.39';
 const APP_BUILD_DATE = '2026-06-20';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
