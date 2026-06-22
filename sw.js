@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-38';
+const CACHE_NAME = 'investory-app-v0-0-39';
 const APP_SHELL = [
   './',
   './index.html',
