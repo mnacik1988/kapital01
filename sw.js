@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-39';
+const CACHE_NAME = 'investory-app-v0-0-41-test';
 const APP_SHELL = [
   './',
   './index.html',
@@ -79,13 +79,4 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
-
-
-
-
-
-
-
-
-
 
