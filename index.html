@@ -480,6 +480,12 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .settings-curr-btn{flex:1;font-family:'DM Mono',monospace;font-size:11px;padding:10px 8px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;text-align:center;transition:all .15s;}
 .settings-curr-btn.active{background:var(--blue2);border-color:var(--blue2);color:#fff;font-weight:700;}
 .settings-theme-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.test-build-panel{border:1px solid #f0b42966;background:#f0b42910;border-radius:12px;padding:12px;}
+.test-build-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--gold2);margin-bottom:9px;text-transform:uppercase;}
+.test-build-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.test-build-btn{padding:10px 8px;border-radius:10px;border:1px solid #4ecb8d55;background:#4ecb8d12;color:var(--green2);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;}
+.test-build-btn.off{border-color:#ff646455;background:#ff64640d;color:var(--red);}
+.test-build-status{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:9px;text-align:center;}
 .settings-theme-btn{font-family:'DM Mono',monospace;font-size:11px;padding:10px 8px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;text-align:center;transition:all .15s;}
 .settings-theme-btn.active{background:var(--gold2);border-color:var(--gold2);color:#0a0a0f;font-weight:700;}
 .settings-link-btn{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px;}
@@ -2304,6 +2310,7 @@ body.modern-mockup.theme-light .total-currency{
     <div class="price-note">Після 30 днів можна обрати зручний тариф</div>
     <button class="paywall-btn" id="pw_btn" onclick="handlePaywallPrimary()">Почати 30 днів безкоштовно</button>
     <button class="paywall-restore" id="pw_restore" onclick="handlePaywallRestore()">Відновити покупку</button>
+    <button class="paywall-restore" id="testAccessPaywallBtn" onclick="activateTestAccess()" style="margin-top:8px;border-color:#f0b42966;color:var(--gold2);">🧪 Увімкнути тестовий доступ</button>
   </div>
 </div>
 
@@ -2533,6 +2540,14 @@ body.modern-mockup.theme-light .total-currency{
         <button class="settings-theme-btn" id="theme-light" onclick="setAppTheme('light')">☀ Light</button>
       </div>
     </div>
+    <div class="settings-section test-build-panel" id="testBuildPanel">
+      <div class="test-build-label" id="testBuildTitle">Тестова збірка</div>
+      <div class="test-build-actions">
+        <button class="test-build-btn" id="testAccessEnableBtn" onclick="activateTestAccess()">Увімкнути доступ</button>
+        <button class="test-build-btn off" id="testAccessDisableBtn" onclick="deactivateTestAccess()">Вимкнути доступ</button>
+      </div>
+      <div class="test-build-status" id="testAccessStatus"></div>
+    </div>
     <!-- BACKUP -->
     <div class="settings-section" style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
       <div class="settings-group-title">💾 РЕЗЕРВНЕ КОПІЮВАННЯ</div>
@@ -2676,7 +2691,7 @@ body.modern-mockup.theme-light .total-currency{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.39</span></div>
+<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.41-test</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2745,8 +2760,8 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.39';
-const APP_BUILD_DATE = '2026-06-20';
+const APP_VERSION = 'v0.0.41-test';
+const APP_BUILD_DATE = '2026-06-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -2754,10 +2769,13 @@ const STORAGE_ROLLBACK_KEY = 'kapital_import_rollback';
 const STORAGE_MIGRATION_BACKUP_KEY = 'kapital_pre_migration_backup';
 const TRIAL_DAYS = 30;
 const SUBSCRIPTION_KEY = 'investory_subscription_active';
+const TEST_BUILD = true;
+const TEST_ACCESS_KEY = 'investory_test_access_active';
 const ACCESS_STATES = Object.freeze({TRIAL:'trial', SUBSCRIBED:'subscribed', LOCKED:'locked'});
 
 function hasActiveSubscription(){
-  return localStorage.getItem(SUBSCRIPTION_KEY)==='true';
+  return localStorage.getItem(SUBSCRIPTION_KEY)==='true'
+    || (TEST_BUILD&&localStorage.getItem(TEST_ACCESS_KEY)==='true');
 }
 function getTrialDaysLeft(){
   const trialStart=Number(localStorage.getItem('trial_start'));
@@ -6854,6 +6872,23 @@ const SETTINGS_I18N={
   de:{title:'Einstellungen',langLbl:'Sprache / Language',currLbl:'Währungsanzeige',themeLbl:'Design',themeDark:'🌙 Dunkel',themeLight:'☀ Hell',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test-Checkliste',legalLbl:'Rechtliches',privacyBtn:'🔐 Datenschutzrichtlinie',termsBtn:'⚖️ Nutzungsbedingungen & Haftungsausschluss'},
   zh:{title:'设置',langLbl:'语言 / Language',currLbl:'显示货币',themeLbl:'主题',themeDark:'🌙 深色',themeLight:'☀ 浅色',qaLbl:'QA / Release',testChecklistBtn:'🧪 测试清单',legalLbl:'法律文件',privacyBtn:'🔐 隐私政策',termsBtn:'⚖️ 条款与免责声明'},
 };
+const TEST_BUILD_I18N={
+  uk:{title:'Тестова збірка',enable:'Увімкнути доступ',disable:'Вимкнути доступ',active:'Тестовий доступ активний',inactive:'Тестовий доступ вимкнений',paywall:'🧪 Увімкнути тестовий доступ'},
+  ru:{title:'Тестовая сборка',enable:'Включить доступ',disable:'Отключить доступ',active:'Тестовый доступ активен',inactive:'Тестовый доступ выключен',paywall:'🧪 Включить тестовый доступ'},
+  en:{title:'Test build',enable:'Enable access',disable:'Disable access',active:'Test access is active',inactive:'Test access is disabled',paywall:'🧪 Enable test access'},
+  de:{title:'Testversion',enable:'Zugang aktivieren',disable:'Zugang deaktivieren',active:'Testzugang ist aktiv',inactive:'Testzugang ist deaktiviert',paywall:'🧪 Testzugang aktivieren'},
+  zh:{title:'测试版本',enable:'启用访问',disable:'停用访问',active:'测试访问已启用',inactive:'测试访问已停用',paywall:'🧪 启用测试访问'}
+};
+function updateTestBuildUI(){
+  if(!TEST_BUILD)return;
+  const txt=TEST_BUILD_I18N[currentLang]||TEST_BUILD_I18N.uk;
+  const active=localStorage.getItem(TEST_ACCESS_KEY)==='true';
+  setText('testBuildTitle',txt.title);
+  setText('testAccessEnableBtn',txt.enable);
+  setText('testAccessDisableBtn',txt.disable);
+  setText('testAccessStatus',active?txt.active:txt.inactive);
+  setText('testAccessPaywallBtn',txt.paywall);
+}
 function applyAppTheme(theme=appTheme){
   appTheme=theme==='light'?'light':'dark';
   document.body.classList.toggle('theme-light',appTheme==='light');
@@ -6896,6 +6931,7 @@ function openSettings(){
   if(privacyBtn){const sp=privacyBtn.querySelector('span'); if(sp)sp.textContent=si.privacyBtn;}
   const termsBtn=document.getElementById('termsPolicyBtn');
   if(termsBtn){const sp=termsBtn.querySelector('span'); if(sp)sp.textContent=si.termsBtn;}
+  updateTestBuildUI();
   updateAppVersionUI();
   updateStorageHealthUI();
   document.querySelectorAll('.settings-lang-btn').forEach(b=>{
@@ -9455,6 +9491,27 @@ function skipTrial(){
   openPaywall(accessTxt('required'));
 }
 
+function activateTestAccess(){
+  if(!TEST_BUILD)return;
+  localStorage.setItem(TEST_ACCESS_KEY,'true');
+  refreshAccessState();
+  updateAccessUI();
+  updateTestBuildUI();
+  document.getElementById('trialOverlay')?.style.setProperty('display','none');
+  document.getElementById('paywallOverlay')?.classList.remove('open');
+}
+function deactivateTestAccess(){
+  if(!TEST_BUILD)return;
+  localStorage.removeItem(TEST_ACCESS_KEY);
+  refreshAccessState();
+  updateAccessUI();
+  updateTestBuildUI();
+  if(!hasAppAccess())openPaywall(accessTxt('expired'));
+}
+window.activateTestAccess=activateTestAccess;
+window.deactivateTestAccess=deactivateTestAccess;
+
+updateTestBuildUI();
 checkTrial();
 
 // ── CRYPTO ONLINE PRICE MONITORING ───────────────────────
@@ -9960,6 +10017,72 @@ const BACKUP_STORAGE_KEYS = [
 ];
 
 // Access rights and trial dates are intentionally excluded from backups.
+const PROTECTED_ACCESS_STORAGE_KEYS = new Set([
+  'trial_start',
+  'trial_shown',
+  SUBSCRIPTION_KEY,
+  'kapital_pro',
+  'subscription_status',
+  'purchase_receipt',
+  'store_entitlement',
+  TEST_ACCESS_KEY
+]);
+
+function isProtectedAccessStorageKey(key){
+  const normalized=String(key||'').trim().toLowerCase();
+  return PROTECTED_ACCESS_STORAGE_KEYS.has(normalized)
+    || normalized.startsWith('trial_')
+    || normalized.includes('subscription')
+    || normalized.includes('entitlement')
+    || normalized.includes('purchase_receipt');
+}
+
+function captureProtectedAccessState(){
+  const state={};
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key&&isProtectedAccessStorageKey(key))state[key]=localStorage.getItem(key);
+  }
+  return state;
+}
+
+function restoreProtectedAccessState(state){
+  const toRemove=[];
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key&&isProtectedAccessStorageKey(key))toRemove.push(key);
+  }
+  toRemove.forEach(key=>localStorage.removeItem(key));
+  Object.entries(state||{}).forEach(([key,value])=>{
+    if(isProtectedAccessStorageKey(key)&&typeof value==='string')localStorage.setItem(key,value);
+  });
+}
+
+function sanitizeBackupAccessState(payload){
+  if(!payload||typeof payload!=='object')return payload;
+  if(payload.storage&&typeof payload.storage==='object'){
+    Object.keys(payload.storage).forEach(key=>{
+      if(isProtectedAccessStorageKey(key))delete payload.storage[key];
+    });
+  }
+  const cleanMain=function(main){
+    if(!main||typeof main!=='object'||Array.isArray(main))return main;
+    Object.keys(main).forEach(key=>{
+      if(isProtectedAccessStorageKey(key))delete main[key];
+    });
+    return main;
+  };
+  cleanMain(payload.data);
+  if(payload.storage&&typeof payload.storage.kapital_v6==='string'){
+    try{
+      const main=cleanMain(JSON.parse(payload.storage.kapital_v6));
+      payload.storage.kapital_v6=JSON.stringify(main);
+      payload.data=main;
+    }catch(e){}
+  }
+  return payload;
+}
+
 const MAX_BACKUP_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_BACKUP_STORAGE_VALUE_BYTES = 6 * 1024 * 1024;
 const MAX_BACKUP_TOTAL_NODES = 250000;
@@ -10157,7 +10280,9 @@ function restoreImportStorageSnapshot(snapshot){
 function restoreBackupPayload(payload){
   if(!payload||!payload.storage||!payload.storage.kapital_v6)return false;
   const before=captureImportStorage();
+  const protectedAccessBefore=captureProtectedAccessState();
   try{
+    payload=sanitizeBackupAccessState(payload);
     validateBackupPayload(payload);
     createRollbackSnapshot();
     window._kapitalImportInProgress=true;
@@ -10169,11 +10294,13 @@ function restoreBackupPayload(payload){
     if(payload.capitalHistory&&!payload.storage.cap_history){
       localStorage.setItem('cap_history',JSON.stringify(payload.capitalHistory));
     }
+    restoreProtectedAccessState(protectedAccessBefore);
     localStorage.setItem('kapital_import_pending_reload','true');
     return true;
   }catch(error){
     console.error('Backup restore failed:',error);
     try{restoreImportStorageSnapshot(before);}catch(rollbackError){console.error('Import rollback failed:',rollbackError);}
+    try{restoreProtectedAccessState(protectedAccessBefore);}catch(accessRollbackError){console.error('Access-state rollback failed:',accessRollbackError);}
     window._kapitalImportInProgress=false;
     return false;
   }
@@ -10220,7 +10347,7 @@ function handleBackupFile(input){
   reader.onload=function(e){
     try{
       const raw=JSON.parse(e.target.result);
-      const payload=normalizeBackupPayload(raw);
+      const payload=sanitizeBackupAccessState(normalizeBackupPayload(raw));
       if(!payload){
         alert(backupTxt('badFormat'));return;
       }
