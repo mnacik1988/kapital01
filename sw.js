@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-41-test';
+const CACHE_NAME = 'investory-app-v0-0-44-crypto-average';
 const APP_SHELL = [
   './',
   './index.html',
