@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-48-ui-symbol-fix-v2';
+const CACHE_NAME = 'investory-app-v0-0-49-card-controls-fix';
 const APP_SHELL = [
   './',
   './index.html',
