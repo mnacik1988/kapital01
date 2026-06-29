@@ -89,7 +89,8 @@ body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd
 .card.drag-over{border-color:var(--gold)!important;transform:scale(1.01);}
 .card.expanded{border-color:var(--border2);}
 .card-header{padding:16px 18px 14px;display:flex;align-items:center;gap:12px;user-select:none;}
-.drag-handle{font-size:18px;color:var(--muted);cursor:grab;padding:4px 2px;touch-action:none;flex-shrink:0;line-height:1;}
+.drag-handle{width:14px;height:24px;color:var(--muted);cursor:grab;padding:4px 2px;touch-action:none;flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center;}
+.drag-dot-grid{width:4px;height:18px;display:block;background:radial-gradient(circle,currentColor 1.45px,transparent 1.75px) 0 0/4px 6px;opacity:.85;}
 .card-header,.card-header *,.drag-handle,.card-del-btn,.card-toggle,.card-sparkline{
   -webkit-user-select:none;
   user-select:none;
@@ -1875,7 +1876,7 @@ body.modern-mockup.theme-light .total-currency{
           <button class="chart-ptab" onclick="setChartPeriod('90d',this)" id="cpt_90d">90Д</button>
           <button class="chart-ptab" onclick="setChartPeriod('1y',this)" id="cpt_1y">1Р</button>
         </div>
-        <div id="chartToggleArrow" style="font-size:11px;color:var(--muted);transition:transform .2s;">Ў</div>
+        <div id="chartToggleArrow" style="font-size:11px;color:var(--muted);transition:transform .2s;">▼</div>
       </div>
     </div>
     <div id="chartBody">
@@ -1914,7 +1915,7 @@ body.modern-mockup.theme-light .total-currency{
   <!-- DEPOSIT CARD -->
   <div class="card card-deposit" id="card-deposit" draggable="true" data-card="deposit">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-deposit.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('deposit')">
         <div class="card-name" data-i18n="depositAll">Депозит (всього)</div>
@@ -1924,7 +1925,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-sparkline" id="spark_deposits" data-spark-key="deposits"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('deposit')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('deposit')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('deposit')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -1936,7 +1937,7 @@ body.modern-mockup.theme-light .total-currency{
   <!-- CRYPTO -->
   <div class="card card-crypto" id="card-crypto" draggable="true" data-card="crypto">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-crypto.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('crypto')">
         <div class="card-name" data-i18n="cryptoName">Крипто</div>
@@ -1946,7 +1947,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-sparkline" id="spark_crypto" data-spark-key="crypto"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('crypto')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('crypto')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('crypto')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -1990,7 +1991,7 @@ body.modern-mockup.theme-light .total-currency{
   <!-- USD -->
   <div class="card card-usd" id="card-usd" draggable="true" data-card="usd" style="display:none;">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon">??</div>
       <div class="card-info" onclick="toggleCard('usd')">
         <div class="card-name" data-i18n="usdName">USD · Доларові заощадження</div>
@@ -1999,8 +2000,8 @@ body.modern-mockup.theme-light .total-currency{
       </div>
       <div class="card-sparkline" id="spark_usd" data-spark-key="forex"></div>
       <div class="card-actions">
-        <button class="card-del-btn" onclick="deleteBuiltinCard('usd')" title="Видалити">?</button>
-        <div class="card-toggle" onclick="toggleCard('usd')">Ў</div>
+        <button class="card-del-btn" onclick="deleteBuiltinCard('usd')" title="Видалити">×</button>
+        <div class="card-toggle" onclick="toggleCard('usd')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2029,7 +2030,7 @@ body.modern-mockup.theme-light .total-currency{
   <!-- FOREX -->
   <div class="card card-forex" id="card-forex" draggable="true" data-card="forex">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-forex.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('forex')">
         <div class="card-name" data-i18n="forexName">Валютні накопичення</div>
@@ -2039,7 +2040,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-sparkline" id="spark_forex" data-spark-key="forex"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('forex')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('forex')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('forex')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2080,7 +2081,7 @@ body.modern-mockup.theme-light .total-currency{
   <!-- CASH -->
   <div class="card card-cash" id="card-cash" draggable="true" data-card="cash">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-cash.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('cash')">
         <div class="card-name" data-i18n="cashName">Готівка (?)</div>
@@ -2090,7 +2091,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-sparkline" id="spark_cash" data-spark-key="cash"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('cash')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('cash')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('cash')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2119,7 +2120,7 @@ body.modern-mockup.theme-light .total-currency{
   <!-- CURRENT ACCOUNT -->
   <div class="card card-other" id="card-other" draggable="true" data-card="other">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-account.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('other')">
         <div class="card-name" data-i18n="currentAcc">Поточний рахунок</div>
@@ -2129,7 +2130,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-sparkline" id="spark_account" data-spark-key="account"></div>
       <div class="card-actions">
         <button class="card-del-btn" onclick="deleteBuiltinCard('other')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('other')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('other')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2766,7 +2767,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // -- SUBSCRIPTION ACCESS STATE -----------------------------
-const APP_VERSION = 'v0.0.48-test';
+const APP_VERSION = 'v0.0.49-test';
 const APP_BUILD_DATE = '2026-06-29';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3500,14 +3501,14 @@ function getDepositHtml(dep,idx){
         <div class="daily-section">
           <div class="daily-toggle" id="dailyToggle_${dep.id}" onclick="toggleDailyLog('${dep.id}')">
             <div class="daily-title" style="margin-bottom:0">${uiIconHtml('period')} ${cleanIconText(lang.incomeDays)}</div>
-            <div class="daily-toggle-arrow" id="dailyArrow_${dep.id}">Ў</div>
+            <div class="daily-toggle-arrow" id="dailyArrow_${dep.id}">▼</div>
           </div>
           <div class="daily-scroll" id="dailyLog_${dep.id}"></div>
         </div>
       </div>
       <div class="dep-calc-toggle" id="depCalcToggle_${dep.id}" onclick="toggleDepCalc('${dep.id}')">
         <span class="dep-calc-toggle-label">${lang.depSettings}</span>
-        <span class="dep-calc-toggle-icon">Ў</span>
+        <span class="dep-calc-toggle-icon">▼</span>
       </div>
       <div class="dep-calc-body" id="depCalcBody_${dep.id}">
         <div style="padding-top:14px;">
@@ -3554,7 +3555,7 @@ function getDepositHtml(dep,idx){
         ${(dep.topups&&dep.topups.length)?`<div style="margin-bottom:8px;">
           <div class="daily-toggle" onclick="this.classList.toggle('collapsed');this.nextElementSibling.style.display=this.classList.contains('collapsed')?'none':'block'">
             <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">?? ${t('topupHistory')||'Історія поповнень'} (${dep.topups.length})</div>
-            <div class="daily-toggle-arrow">Ў</div>
+            <div class="daily-toggle-arrow">▼</div>
           </div>
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:4px;">
             ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
@@ -4176,7 +4177,7 @@ function getCustomCardHtml(s,idx){
   const lang=LANGS[currentLang];
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon">${sectionIconHtml(s,s.icon)}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${escHtml(s.name)}</div>
@@ -4186,7 +4187,7 @@ function getCustomCardHtml(s,idx){
       ${getCardSparklineHtml(getCustomSparklineKey(s))}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">?</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -5278,7 +5279,7 @@ function getSecCardHtml(s,idx){
 
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon">${sectionIconHtml(s,s.icon)}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
@@ -5288,7 +5289,7 @@ function getSecCardHtml(s,idx){
       ${getCardSparklineHtml('stocks')}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeSecCard('${s.id}')">?</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -5368,7 +5369,7 @@ function getBondCardHtml(s,idx){
 
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon">${sectionIconHtml(s,s.icon||'??')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
@@ -5378,7 +5379,7 @@ function getBondCardHtml(s,idx){
       ${getCardSparklineHtml(s.type==='ovdp'?'ovdp':'bonds')}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeSecCard('${s.id}')">?</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -5870,7 +5871,7 @@ function renderCoins(){
         <span class="ticker-card-sym" style="color:var(--purple2)">${key}</span>
         <span class="ticker-card-qty">${g.totalQty}</span>
       </div>
-      <div class="ticker-card-name">$${g.curPrice>0?fmtD(g.curPrice,2):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'^':'Ў'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
+      <div class="ticker-card-name">$${g.curPrice>0?fmtD(g.curPrice,2):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'↗':'↘'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
       <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(toDisplayCurr(valUah))} ${sym}</div>
       <div class="ticker-card-pnl" style="color:${pnlCol}">${cost>0?(pnl>=0?'+':'')+fmtN(toDisplayCurr(pnlUah))+' '+sym+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
       ${avgBuy>0?`<div class="ticker-card-div">O $${fmtD(avgBuy,2)}</div>`:''}
@@ -5954,7 +5955,7 @@ function openCryptoDetail(coinKey){
     '</div>';
 
   // Collapsible trades
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'Ў\';}else{el.style.display=\'none\';a.textContent=\'?\';}">'+uiIconHtml('trade','stock-detail-section-icon big')+' '+cryptoDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">?</span></div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon big')+' '+cryptoDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=parseFloat(t.qty)||0;
@@ -6072,7 +6073,7 @@ function openStockDetail(secId, tickerKey){
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('divMonth')+'</div></div>'+
     '</div>';
 
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'Ў\';}else{el.style.display=\'none\';a.textContent=\'?\';}">'+uiIconHtml('trade','stock-detail-section-icon')+' '+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">?</span></div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon')+' '+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=stockNum(t.qty);
@@ -7499,7 +7500,7 @@ function getMetalsCardHtml(s){
   }).join('');
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle">?</div>
+      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
       <div class="card-icon">${sectionIconHtml({sectionType:'metals'},'??')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${t('metalsBtn')||'Дорогоцінні метали'}</div>
@@ -7509,7 +7510,7 @@ function getMetalsCardHtml(s){
       ${getCardSparklineHtml('metals')}
       <div class="card-actions">
         <button class="card-del-btn" onclick="removeMetalsCard('${s.id}')">?</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -8231,7 +8232,7 @@ function renderLiabilities(){
           <div class="liab-card-amount">-${sym}${fmtN(toDisplayCurr(remaining))}</div>
           <div class="liab-card-sub">${sym}${fmtN(toDisplayCurr(payment))}${liabPerMonthUnit()} · ${schedule.months} ${liabMonthUnit()} · ${schedule.rate}%</div>
         </div>
-        <div class="liab-card-toggle">Ў</div>
+        <div class="liab-card-toggle">▼</div>
       </div>
       <div class="liab-card-body">
         <!-- PROGRESS BAR -->
@@ -9160,7 +9161,7 @@ function sectionPerfTxt(key){
     profitLoss:{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'??'},
     dayResult:{uk:'Сьогодні',ru:'Сегодня',en:'Today',de:'Heute',zh:'??'},
     upPrice:{uk:'^ ріст ціни',ru:'^ рост цены',en:'^ price up',de:'^ Preis steigt',zh:'^ ????'},
-    downPrice:{uk:'Ў падіння ціни',ru:'Ў падение цены',en:'Ў price down',de:'Ў Preis fallt',zh:'Ў ????'},
+    downPrice:{uk:'↘ падіння ціни',ru:'↘ падение цены',en:'↘ price down',de:'↘ Preis fällt',zh:'↘ 价格下跌'},
     flatPrice:{uk:'— без змін',ru:'— без изменений',en:'— no change',de:'— unverandert',zh:'— ???'}
   };
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
@@ -9892,7 +9893,7 @@ getCustomCardHtml=function(s,idx){
     
     return `<div class="card card-startup" id="card-${s.id}" draggable="true" data-card="${s.id}">
       <div class="card-header">
-        <div class="drag-handle">?</div>
+        <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
         <div class="card-icon">${sectionIconHtml(s,'??')}</div>
         <div class="card-info" onclick="toggleCard('${s.id}')">
           <div class="card-name">${escapeHtml(startupTitle)}</div>
@@ -9902,7 +9903,7 @@ getCustomCardHtml=function(s,idx){
         ${getCardSparklineHtml('startups')}
         <div class="card-actions">
           <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">?</button>
-          <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
+          <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
         </div>
       </div>
       <div class="card-body"><div class="card-inner">
