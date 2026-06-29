@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-46-stock-dividend-date';
+const CACHE_NAME = 'investory-app-v0-0-48-ui-symbol-fix-v2';
 const APP_SHELL = [
   './',
   './index.html',
