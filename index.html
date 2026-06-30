@@ -89,8 +89,7 @@ body.theme-light .header{background:linear-gradient(180deg,#f2fafff7 0%,#e8f6ffd
 .card.drag-over{border-color:var(--gold)!important;transform:scale(1.01);}
 .card.expanded{border-color:var(--border2);}
 .card-header{padding:16px 18px 14px;display:flex;align-items:center;gap:12px;user-select:none;}
-.drag-handle{width:14px;height:24px;color:var(--muted);cursor:grab;padding:4px 2px;touch-action:none;flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center;}
-.drag-dot-grid{width:4px;height:18px;display:block;background:radial-gradient(circle,currentColor 1.45px,transparent 1.75px) 0 0/4px 6px;opacity:.85;}
+.drag-handle{font-size:18px;color:var(--muted);cursor:grab;padding:4px 2px;touch-action:none;flex-shrink:0;line-height:1;}
 .card-header,.card-header *,.drag-handle,.card-del-btn,.card-toggle,.card-sparkline{
   -webkit-user-select:none;
   user-select:none;
@@ -195,7 +194,7 @@ select.field-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
 select.field-input option{background:var(--bg3);color:var(--text);}
 .pretty-select{position:relative;width:100%;font-family:'DM Mono',monospace;}
 .pretty-select-btn{width:100%;min-height:44px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(135deg,var(--bg3),var(--bg2));color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:700;text-align:left;padding:12px 42px 12px 14px;cursor:pointer;outline:none;transition:border-color .16s,box-shadow .16s,transform .16s,background .16s;}
-.pretty-select-btn::after{content:'▼';position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--gold2);font-size:12px;transition:transform .16s;}
+.pretty-select-btn::after{content:'?';position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--gold2);font-size:12px;transition:transform .16s;}
 .pretty-select.open .pretty-select-btn{border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d22,0 10px 28px #0004;}
 .pretty-select.open .pretty-select-btn::after{transform:translateY(-50%) rotate(180deg);}
 .pretty-select-menu{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:40;display:none;padding:6px;border:1px solid rgba(78,203,141,.42);border-radius:16px;background:linear-gradient(180deg,rgba(29,31,45,.98),rgba(18,20,31,.98));box-shadow:0 18px 40px rgba(0,0,0,.42);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);overflow:hidden;}
@@ -389,7 +388,6 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .subscription-badge{display:inline-flex;align-items:center;gap:3px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 7px;border-radius:20px;background:linear-gradient(135deg,#e8c97a22,#f5dfa022);border:1px solid #e8c97a40;color:var(--gold2);text-transform:uppercase;vertical-align:middle;margin-left:5px;}
 .paywall-overlay{position:fixed;inset:0;background:#000000cc;z-index:500;display:none;align-items:flex-end;}
 .paywall-overlay.open{display:flex;}
-.paywall-overlay:not(.open){visibility:hidden;pointer-events:none;}
 .paywall-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:28px 24px 48px;width:100%;position:relative;z-index:501;}
 .paywall-crown{font-size:48px;text-align:center;margin-bottom:12px;}
 .paywall-title{font-size:22px;font-weight:800;text-align:center;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
@@ -406,10 +404,6 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .price-card.featured{background:linear-gradient(160deg,#4ecb8d22,#2dd4bf12 55%,#171721);border:2px solid var(--green);box-shadow:0 0 0 1px #4ecb8d22,0 18px 44px #4ecb8d16;}
 .price-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--green);color:#07110d;font-family:'DM Mono',monospace;font-size:8px;font-weight:800;letter-spacing:.08em;padding:3px 9px;border-radius:999px;white-space:nowrap;}
 .price-period{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
-.paywall-overlay:not(.open) .price-cards,
-.trial-overlay[style*="display:none"] .price-cards{display:none!important;}
-.paywall-overlay:not(.open) *,
-.trial-overlay[style*="display:none"] *{visibility:hidden!important;}
 .price-value{font-family:'Inter',sans-serif;font-size:30px;line-height:1;font-weight:800;letter-spacing:0;color:#fff;margin:7px 0 6px;text-shadow:0 0 14px #ffffff14;}
 .price-card.featured .price-value{color:var(--green2);text-shadow:0 0 22px #4ecb8d35;}
 .price-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);}
@@ -671,7 +665,6 @@ body.theme-light .diag-passive-banner .diag-stat-lbl{color:#667085;}
 
 /* -- TRIAL BANNER -- */
 .trial-overlay{position:fixed;inset:0;background:#0c0c0fee;z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 20px;}
-.trial-overlay[style*="display:none"]{visibility:hidden;pointer-events:none;}
 .trial-box{width:100%;max-width:400px;text-align:center;}
 .trial-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;background:linear-gradient(135deg,#4ecb8d20,#2dd4bf20);border:1px solid #4ecb8d40;color:var(--green2);margin-bottom:16px;letter-spacing:0.1em;}
 .trial-days{font-family:'Inter',sans-serif;font-size:48px;font-weight:900;background:linear-gradient(135deg,var(--green),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
@@ -1815,13 +1808,13 @@ body.modern-mockup.theme-light .total-currency{
   <div class="header-top-row">
     <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
     <div style="display:flex;gap:6px;align-items:center;">
-      <button class="diag-btn header-diag-btn" onclick="openDiagnostics()" title="Діагностика">▣</button>
+      <button class="diag-btn header-diag-btn" onclick="openDiagnostics()" title="Діагностика">??</button>
       <button class="gear-btn" onclick="openSettings()" title="Налаштування"><img class="settings-png-icon" src="section-icons/section-settings.png?v=1" alt=""></button>
     </div>
   </div>
   <div class="total-wrap">
     <div class="total-amount" id="totalAmount">0</div>
-    <div class="total-currency" id="totalCurrSym">₴</div>
+    <div class="total-currency" id="totalCurrSym">?</div>
   </div>
   <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
@@ -1866,7 +1859,7 @@ body.modern-mockup.theme-light .total-currency{
     <div class="chart-header" onclick="toggleChart()" style="cursor:pointer;">
       <div>
         <div class="chart-title" id="chart_title_lbl"><img class="ui-inline-icon" src="section-icons/section-diagnostics.png?v=1" alt=""> ДИНАМІКА КАПІТАЛУ</div>
-        <div class="chart-total" id="chartCurrentTotal">0 ₴</div>
+        <div class="chart-total" id="chartCurrentTotal">0 ?</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="chart-period-tabs" id="chartPeriodTabs" onclick="event.stopPropagation()">
@@ -1876,7 +1869,7 @@ body.modern-mockup.theme-light .total-currency{
           <button class="chart-ptab" onclick="setChartPeriod('90d',this)" id="cpt_90d">90Д</button>
           <button class="chart-ptab" onclick="setChartPeriod('1y',this)" id="cpt_1y">1Р</button>
         </div>
-        <div id="chartToggleArrow" style="font-size:11px;color:var(--muted);transition:transform .2s;">▼</div>
+        <div id="chartToggleArrow" style="font-size:11px;color:var(--muted);transition:transform .2s;">Ў</div>
       </div>
     </div>
     <div id="chartBody">
@@ -1915,17 +1908,17 @@ body.modern-mockup.theme-light .total-currency{
   <!-- DEPOSIT CARD -->
   <div class="card card-deposit" id="card-deposit" draggable="true" data-card="deposit">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-deposit.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('deposit')">
         <div class="card-name" data-i18n="depositAll">Депозит (всього)</div>
-        <div class="card-value" id="depositDisplay">0 ₴</div>
+        <div class="card-value" id="depositDisplay">0 ?</div>
         <div class="card-pct" id="depositPct">0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_deposits" data-spark-key="deposits"></div>
       <div class="card-actions">
-        <button class="card-del-btn" onclick="deleteBuiltinCard('deposit')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('deposit')">▼</div>
+        <button class="card-del-btn" onclick="deleteBuiltinCard('deposit')" title="Видалити">?</button>
+        <div class="card-toggle" onclick="toggleCard('deposit')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -1937,17 +1930,17 @@ body.modern-mockup.theme-light .total-currency{
   <!-- CRYPTO -->
   <div class="card card-crypto" id="card-crypto" draggable="true" data-card="crypto">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-crypto.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('crypto')">
         <div class="card-name" data-i18n="cryptoName">Крипто</div>
-        <div class="card-value" id="cryptoDisplay">0 ₴</div>
+        <div class="card-value" id="cryptoDisplay">0 ?</div>
         <div class="card-pct" id="cryptoPct">0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_crypto" data-spark-key="crypto"></div>
       <div class="card-actions">
-        <button class="card-del-btn" onclick="deleteBuiltinCard('crypto')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('crypto')">▼</div>
+        <button class="card-del-btn" onclick="deleteBuiltinCard('crypto')" title="Видалити">?</button>
+        <div class="card-toggle" onclick="toggleCard('crypto')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -1960,27 +1953,27 @@ body.modern-mockup.theme-light .total-currency{
           <div class="usdt-balance-info">
             <div class="usdt-balance-title"><img class="ui-inline-icon" src="section-icons/ui-usdt.png?v=1" alt=""> <span id="usdtBalanceCardTitle">USDT баланс</span></div>
             <div class="usdt-balance-main" id="usdtBalanceCardAmount">0 USDT</div>
-            <div class="usdt-balance-equiv" id="cryptoUahVal">0 ₴</div>
+            <div class="usdt-balance-equiv" id="cryptoUahVal">0 ?</div>
           </div>
           <div class="usdt-balance-rate" id="usdtBalanceCardRate">1 USDT = 41 ?</div>
         </div>
         <div class="usdt-balance-actions">
-          <button class="usdt-balance-btn" id="usdtSubtractBtn" onclick="changeUsdtBalance(-1)">−</button>
+          <button class="usdt-balance-btn" id="usdtSubtractBtn" onclick="changeUsdtBalance(-1)">?</button>
           <button class="usdt-balance-btn" id="usdtAddBtn" onclick="changeUsdtBalance(1)">+</button>
-          <button class="usdt-balance-btn rate" id="usdtRateBtn" onclick="setCustomUsdtRate()">⇄</button>
+          <button class="usdt-balance-btn rate" id="usdtRateBtn" onclick="setCustomUsdtRate()">?</button>
         </div>
       </div>
       <!-- COINS AS TICKER CARDS -->
       <div id="cryptoRows" style="margin-top:4px"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
         <span class="crypto-live-badge" id="cryptoRefreshStatus"><span class="live-dot" style="width:5px;height:5px;"></span> Онлайн ціни</span>
-        <button class="refresh-btn" onclick="refreshCryptoPrices(true)" id="cryptoRefreshBtn" style="font-family:'DM Mono',monospace;font-size:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;color:var(--purple2);cursor:pointer;">↻ Оновити</button>
+        <button class="refresh-btn" onclick="refreshCryptoPrices(true)" id="cryptoRefreshBtn" style="font-family:'DM Mono',monospace;font-size:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;color:var(--purple2);cursor:pointer;">? Оновити</button>
       </div>
       <div style="margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
         <div class="calc-title" data-i18n="addCoinTitle">+ Додати монету</div>
         <div class="ticker-search-row">
           <input class="ticker-search-input field-input" type="text" id="newCoinName" placeholder="BTC, ETH, SOL..." style="text-transform:uppercase">
-          <button class="ticker-fetch-btn" onclick="fetchCoinPrice()">🔍 Отримати ціну</button>
+          <button class="ticker-fetch-btn" onclick="fetchCoinPrice()">?? Отримати ціну</button>
         </div>
         <div id="cryptoLivePreview" style="display:none;margin:8px 0;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;"></div>
         <button class="add-btn" onclick="openCoinAddPopup()" data-i18n="addCoinBtn">+ Додати монету</button>
@@ -1991,17 +1984,17 @@ body.modern-mockup.theme-light .total-currency{
   <!-- USD -->
   <div class="card card-usd" id="card-usd" draggable="true" data-card="usd" style="display:none;">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon">??</div>
       <div class="card-info" onclick="toggleCard('usd')">
         <div class="card-name" data-i18n="usdName">USD · Доларові заощадження</div>
-        <div class="card-value" id="usdDisplay">0 ₴</div>
+        <div class="card-value" id="usdDisplay">0 ?</div>
         <div class="card-pct" id="usdPct">0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_usd" data-spark-key="forex"></div>
       <div class="card-actions">
-        <button class="card-del-btn" onclick="deleteBuiltinCard('usd')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('usd')">▼</div>
+        <button class="card-del-btn" onclick="deleteBuiltinCard('usd')" title="Видалити">?</button>
+        <div class="card-toggle" onclick="toggleCard('usd')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2012,7 +2005,7 @@ body.modern-mockup.theme-light .total-currency{
       </div>
       <div class="row2">
         <div class="field-group">
-          <div class="field-label" data-i18n="rateUsdUah">Курс USD / ₴</div>
+          <div class="field-label" data-i18n="rateUsdUah">Курс USD / ?</div>
           <input class="field-input" type="text" id="usdUah" placeholder="41" value="41" inputmode="decimal" oninput="updateAll()">
         </div>
         <div class="field-group">
@@ -2021,7 +2014,7 @@ body.modern-mockup.theme-light .total-currency{
         </div>
       </div>
       <div class="result-box">
-        <div class="result-row"><span class="result-key" data-i18n="convUah">?? Конвертація > ?</span><span class="result-val blue" id="usdToUah">0 ₴</span></div>
+        <div class="result-row"><span class="result-key" data-i18n="convUah">?? Конвертація > ?</span><span class="result-val blue" id="usdToUah">0 ?</span></div>
         <div class="result-row"><span class="result-key" data-i18n="inTotal">Входить у загальний рахунок</span><span class="result-val green">? <span data-i18n="yes">Так</span></span></div>
       </div>
     </div></div>
@@ -2030,17 +2023,17 @@ body.modern-mockup.theme-light .total-currency{
   <!-- FOREX -->
   <div class="card card-forex" id="card-forex" draggable="true" data-card="forex">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-forex.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('forex')">
         <div class="card-name" data-i18n="forexName">Валютні накопичення</div>
-        <div class="card-value" id="forexDisplay">0 ₴</div>
+        <div class="card-value" id="forexDisplay">0 ?</div>
         <div class="card-pct" id="forexPct">0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_forex" data-spark-key="forex"></div>
       <div class="card-actions">
-        <button class="card-del-btn" onclick="deleteBuiltinCard('forex')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('forex')">▼</div>
+        <button class="card-del-btn" onclick="deleteBuiltinCard('forex')" title="Видалити">?</button>
+        <div class="card-toggle" onclick="toggleCard('forex')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2052,13 +2045,13 @@ body.modern-mockup.theme-light .total-currency{
           <select class="field-input" id="newForexCur" onchange="autoFillForexRate()">
             <option value="USD">$ USD</option>
             <option value="EUR">€ EUR</option>
-            <option value="GBP">£ GBP</option>
+            <option value="GBP">? GBP</option>
             <option value="PLN">zl PLN</option>
             <option value="CHF">Fr CHF</option>
             <option value="CZK">Kc CZK</option>
-            <option value="RUB">₽ RUB</option>
-            <option value="CNY">¥ CNY</option>
-            <option value="KZT">₸ KZT</option>
+            <option value="RUB">? RUB</option>
+            <option value="CNY">? CNY</option>
+            <option value="KZT">? KZT</option>
             <option value="OTHER" data-i18n="other">Інша</option>
           </select>
         </div>
@@ -2067,13 +2060,13 @@ body.modern-mockup.theme-light .total-currency{
           <input class="field-input" type="text" id="newForexAmt" placeholder="0" inputmode="decimal">
         </div>
         <div class="field-group">
-          <div class="field-label" data-i18n="rateUah">Курс / ₴</div>
+          <div class="field-label" data-i18n="rateUah">Курс / ?</div>
           <input class="field-input" type="text" id="newForexRate" placeholder="43" inputmode="decimal">
         </div>
       </div>
       <button class="add-btn" onclick="addForex()" data-i18n="addCurrency">+ Додати валюту</button>
       <div class="result-box">
-        <div class="result-row"><span class="result-key" data-i18n="totalUah">Усього у ₴</span><span class="result-val orange" id="forexTotal">0 ₴</span></div>
+        <div class="result-row"><span class="result-key" data-i18n="totalUah">Усього у ?</span><span class="result-val orange" id="forexTotal">0 ?</span></div>
       </div>
     </div></div>
   </div>
@@ -2081,17 +2074,17 @@ body.modern-mockup.theme-light .total-currency{
   <!-- CASH -->
   <div class="card card-cash" id="card-cash" draggable="true" data-card="cash">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-cash.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('cash')">
-        <div class="card-name" data-i18n="cashName">Готівка (₴)</div>
-        <div class="card-value" id="cashDisplay">0 ₴</div>
+        <div class="card-name" data-i18n="cashName">Готівка (?)</div>
+        <div class="card-value" id="cashDisplay">0 ?</div>
         <div class="card-pct" id="cashPct">0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_cash" data-spark-key="cash"></div>
       <div class="card-actions">
-        <button class="card-del-btn" onclick="deleteBuiltinCard('cash')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('cash')">▼</div>
+        <button class="card-del-btn" onclick="deleteBuiltinCard('cash')" title="Видалити">?</button>
+        <div class="card-toggle" onclick="toggleCard('cash')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2101,12 +2094,12 @@ body.modern-mockup.theme-light .total-currency{
         <div style="display:flex;gap:6px;">
           <input class="field-input" type="text" id="cashAmount" placeholder="0" inputmode="decimal" oninput="updateAll()" style="flex:1;">
           <select class="field-input" id="cashCurrency" style="width:72px;padding:10px 4px;" onchange="updateAll();saveData()">
-            <option value="UAH">₴ UAH</option>
+            <option value="UAH">? UAH</option>
             <option value="USD">$ USD</option>
             <option value="EUR">€ EUR</option>
-            <option value="RUB">₽ RUB</option>
-            <option value="GBP">£ GBP</option>
-            <option value="CNY">¥ CNY</option>
+            <option value="RUB">? RUB</option>
+            <option value="GBP">? GBP</option>
+            <option value="CNY">? CNY</option>
           </select>
         </div>
       </div>
@@ -2120,17 +2113,17 @@ body.modern-mockup.theme-light .total-currency{
   <!-- CURRENT ACCOUNT -->
   <div class="card card-other" id="card-other" draggable="true" data-card="other">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-account.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('other')">
         <div class="card-name" data-i18n="currentAcc">Поточний рахунок</div>
-        <div class="card-value" id="otherDisplay">0 ₴</div>
+        <div class="card-value" id="otherDisplay">0 ?</div>
         <div class="card-pct" id="otherPct">0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_account" data-spark-key="account"></div>
       <div class="card-actions">
-        <button class="card-del-btn" onclick="deleteBuiltinCard('other')" title="Видалити">×</button>
-        <div class="card-toggle" onclick="toggleCard('other')">▼</div>
+        <button class="card-del-btn" onclick="deleteBuiltinCard('other')" title="Видалити">?</button>
+        <div class="card-toggle" onclick="toggleCard('other')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -2176,11 +2169,11 @@ body.modern-mockup.theme-light .total-currency{
   <div id="liabNetBanner" style="display:none;" class="liab-net-banner">
     <div>
       <div class="liab-net-label" id="liab_net_label">НЕТТО-КАПІТАЛ</div>
-      <div class="liab-net-val" id="liabNetAmount" style="color:var(--green2)">0 ₴</div>
+      <div class="liab-net-val" id="liabNetAmount" style="color:var(--green2)">0 ?</div>
     </div>
     <div style="text-align:right;">
       <div class="liab-net-label" id="liab_debt_label">ЗАГАЛЬНИЙ БОРГ</div>
-      <div class="liab-net-val" id="liabTotalDebtAmount" style="color:var(--red)">0 ₴</div>
+      <div class="liab-net-val" id="liabTotalDebtAmount" style="color:var(--red)">0 ?</div>
     </div>
   </div>
   <button class="add-one-btn" style="border-color:var(--red);color:var(--red);background:#f8717108;margin-top:12px;" onclick="openLiabModal()">
@@ -2194,8 +2187,8 @@ body.modern-mockup.theme-light .total-currency{
 <div class="picker-overlay" id="pickerOverlay" onclick="pickerCloseOutside(event)">
   <div class="picker-box">
     <div class="picker-head">
-      <span id="picker_title">+ Новий розділ</span>
-      <button class="picker-close" onclick="closeSectionPicker()">×</button>
+      <span id="picker_title">? Новий розділ</span>
+      <button class="picker-close" onclick="closeSectionPicker()">?</button>
     </div>
     <div class="picker-grid">
       <div class="picker-item" onclick="pickerAdd('stocks')">
@@ -2284,20 +2277,20 @@ body.modern-mockup.theme-light .total-currency{
 <!-- PAYWALL -->
 <div class="paywall-overlay" id="paywallOverlay" onclick="closePaywallIfOutside(event)">
   <div class="paywall-box">
-    <div class="paywall-crown">PRO</div>
+    <div class="paywall-crown">??</div>
     <div class="paywall-title" id="pw_title">30 днів безкоштовно</div>
     <div class="paywall-sub" id="pw_sub">Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.</div>
     <div class="paywall-features">
       <div class="paywall-feature">
-        <div class="paywall-feature-icon">▣</div>
+        <div class="paywall-feature-icon">??</div>
         <div><div class="paywall-feature-text" id="pw_b1">30 днів безкоштовної версії</div><div class="paywall-feature-sub" id="pw_b1sub">Без обмежень під час пробного періоду</div></div>
       </div>
       <div class="paywall-feature">
-        <div class="paywall-feature-icon">⚡</div>
+        <div class="paywall-feature-icon">??</div>
         <div><div class="paywall-feature-text" id="pw_b2">Контроль усіх активів в одному місці</div><div class="paywall-feature-sub" id="pw_b2sub">Депозити, валюта, крипто, акції, кредити та метали</div></div>
       </div>
       <div class="paywall-feature">
-        <div class="paywall-feature-icon">🔒</div>
+        <div class="paywall-feature-icon">??</div>
         <div><div class="paywall-feature-text" id="pw_b3">Локальне збереження даних</div><div class="paywall-feature-sub" id="pw_b3sub">Ваші фінансові дані залишаються на пристрої</div></div>
       </div>
     </div>
@@ -2317,7 +2310,7 @@ body.modern-mockup.theme-light .total-currency{
     <div class="price-note">Після 30 днів можна обрати зручний тариф</div>
     <button class="paywall-btn" id="pw_btn" onclick="handlePaywallPrimary()">Почати 30 днів безкоштовно</button>
     <button class="paywall-restore" id="pw_restore" onclick="handlePaywallRestore()">Відновити покупку</button>
-    <button class="paywall-restore" id="testAccessPaywallBtn" onclick="activateTestAccess()" style="margin-top:8px;border-color:#f0b42966;color:var(--gold2);">Тестовий доступ</button>
+    <button class="paywall-restore" id="testAccessPaywallBtn" onclick="activateTestAccess()" style="margin-top:8px;border-color:#f0b42966;color:var(--gold2);">?? Увімкнути тестовий доступ</button>
   </div>
 </div>
 
@@ -2378,7 +2371,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="calc-box">
     <div class="calc-head">
       <div class="calc-head-title" id="calc_title"><img class="calc-title-icon" src="panel-icons/4.png?v=4" alt=""> Калькулятор</div>
-      <button class="calc-head-close" onclick="closeCalc()">×</button>
+      <button class="calc-head-close" onclick="closeCalc()">?</button>
     </div>
     <div class="calc-tabs">
       <button class="calc-tab active" id="calc_tab_simple" onclick="switchCalc('simple',this)">Простий</button>
@@ -2415,7 +2408,7 @@ body.modern-mockup.theme-light .total-currency{
     <!-- COMPOUND INTEREST -->
     <div class="calc-panel" id="calcPanel_compound">
       <div class="calc-field-row">
-        <div class="calc-field"><label id="cp_sum_label">Сума (₴)</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_amount" id="cp_sum" placeholder="" oninput="runCompound()"></div>
+        <div class="calc-field"><label id="cp_sum_label">Сума (?)</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_amount" id="cp_sum" placeholder="" oninput="runCompound()"></div>
         <div class="calc-field"><label id="cp_rate_label">Ставка % / рік</label><input type="text" inputmode="decimal" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" name="kapital_calc_rate" id="cp_rate" placeholder="" oninput="runCompound()"></div>
       </div>
       <div class="calc-field-row">
@@ -2440,26 +2433,26 @@ body.modern-mockup.theme-light .total-currency{
     <div class="calc-panel" id="calcPanel_currency">
       <div class="calc-field-row">
         <div class="calc-field"><label id="cur_sum_label">Сума</label><input type="text" inputmode="decimal" id="cur_sum" placeholder="1000" oninput="runCurrencyWithRates()"></div>
-        <div class="calc-field"><label id="cur_rate_label">Курс USD/₴</label><input type="text" inputmode="decimal" id="cur_rate" placeholder="41" oninput="runCurrencyWithRates()"></div>
+        <div class="calc-field"><label id="cur_rate_label">Курс USD/?</label><input type="text" inputmode="decimal" id="cur_rate" placeholder="41" oninput="runCurrencyWithRates()"></div>
       </div>
       <div class="calc-field-row">
-        <div class="calc-field"><label id="cur_eur_label">Євро/₴</label><input type="text" inputmode="decimal" id="cur_eur" placeholder="45" oninput="runCurrencyWithRates()"></div>
-        <div class="calc-field"><label id="cur_rub_label">₽ Рубль/₴</label><input type="text" inputmode="decimal" id="cur_rub" placeholder="0.59" oninput="runCurrencyWithRates()"></div>
+        <div class="calc-field"><label id="cur_eur_label">Євро/?</label><input type="text" inputmode="decimal" id="cur_eur" placeholder="45" oninput="runCurrencyWithRates()"></div>
+        <div class="calc-field"><label id="cur_rub_label">? Рубль/?</label><input type="text" inputmode="decimal" id="cur_rub" placeholder="0.59" oninput="runCurrencyWithRates()"></div>
       </div>
       <div class="calc-field-row">
-        <div class="calc-field"><label id="cur_cny_label">¥ Юань/₴</label><input type="text" inputmode="decimal" id="cur_cny" placeholder="5.7" oninput="runCurrencyWithRates()"></div>
+        <div class="calc-field"><label id="cur_cny_label">? Юань/?</label><input type="text" inputmode="decimal" id="cur_cny" placeholder="5.7" oninput="runCurrencyWithRates()"></div>
         <div class="calc-field"><label>Конвертую з</label>
           <select id="cur_from" onchange="runCurrencyWithRates()">
-            <option value="uah">₴ Гривня</option>
+            <option value="uah">? Гривня</option>
             <option value="usd">$ Долар</option>
             <option value="eur">€ Євро</option>
-            <option value="rub">₽ Рубль</option>
-            <option value="cny">¥ Юань</option>
+            <option value="rub">? Рубль</option>
+            <option value="cny">? Юань</option>
           </select>
         </div>
       </div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;" id="cur_rate_source"></div>
-      <button onclick="fetchUsdUahRate(true).then(()=>fillCurrencyFields())" style="display:block;margin:8px auto 0;padding:6px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">Оновити курси онлайн</button>
+      <button onclick="fetchUsdUahRate(true).then(()=>fillCurrencyFields())" style="display:block;margin:8px auto 0;padding:6px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">? Оновити курси онлайн</button>
       <div class="calc-res" id="cur_result" style="display:none"></div>
     </div>
   </div>
@@ -2476,7 +2469,7 @@ body.modern-mockup.theme-light .total-currency{
         <div class="stock-add-title" id="stockAddTitle">Додати позицію</div>
         <div class="stock-add-sub" id="stockAddTicker">AAPL, MSFT...</div>
       </div>
-      <button class="stock-add-close" onclick="closeSecAddPopup()">×</button>
+      <button class="stock-add-close" onclick="closeSecAddPopup()">?</button>
     </div>
     <div id="stockAddFields"></div>
   </div>
@@ -2490,7 +2483,7 @@ body.modern-mockup.theme-light .total-currency{
         <div class="crypto-add-title" data-i18n="addCoinTitle">Додати монету</div>
         <div class="crypto-add-sub" id="cryptoAddCoinName">BTC, ETH, SOL...</div>
       </div>
-      <button class="crypto-add-close" onclick="closeCoinAddPopup()">×</button>
+      <button class="crypto-add-close" onclick="closeCoinAddPopup()">?</button>
     </div>
     <div class="row2">
       <div class="field-group">
@@ -2518,32 +2511,32 @@ body.modern-mockup.theme-light .total-currency{
   <div class="settings-box">
     <div class="settings-title">
       <span><img class="settings-png-icon" src="section-icons/section-settings.png?v=1" alt=""> <span id="settingsTitleText">Налаштування</span></span>
-      <button class="settings-close" onclick="closeSettings()">×</button>
+      <button class="settings-close" onclick="closeSettings()">?</button>
     </div>
     <div class="settings-section">
       <div class="settings-label" id="set_lang_label">Мова / Language</div>
       <div class="settings-langs">
-        <button class="settings-lang-btn" id="slang-en" onclick="setLangFromSettings('en')">GB Eng</button>
-        <button class="settings-lang-btn active" id="slang-uk" onclick="setLangFromSettings('uk')">UA Укр</button>
-        <button class="settings-lang-btn" id="slang-ru" onclick="setLangFromSettings('ru')">RU Рус</button>
-        <button class="settings-lang-btn" id="slang-de" onclick="setLangFromSettings('de')">DE Deu</button>
-        <button class="settings-lang-btn" id="slang-zh" onclick="setLangFromSettings('zh')">CN 中文</button>
+        <button class="settings-lang-btn" id="slang-en" onclick="setLangFromSettings('en')">???? Eng</button>
+        <button class="settings-lang-btn active" id="slang-uk" onclick="setLangFromSettings('uk')">???? Укр</button>
+        <button class="settings-lang-btn" id="slang-ru" onclick="setLangFromSettings('ru')">???? Рус</button>
+        <button class="settings-lang-btn" id="slang-de" onclick="setLangFromSettings('de')">???? Deu</button>
+        <button class="settings-lang-btn" id="slang-zh" onclick="setLangFromSettings('zh')">???? ??</button>
       </div>
     </div>
     <div class="settings-section">
       <div class="settings-label" id="set_curr_label">Відображення суми</div>
       <div class="settings-currency-row">
-        <button class="settings-curr-btn active" id="scurr-uah" onclick="setDisplayCurrency('uah')">₴ UAH</button>
+        <button class="settings-curr-btn active" id="scurr-uah" onclick="setDisplayCurrency('uah')">? UAH</button>
         <button class="settings-curr-btn" id="scurr-usd" onclick="setDisplayCurrency('usd')">$ USD</button>
         <button class="settings-curr-btn" id="scurr-eur" onclick="setDisplayCurrency('eur')">€ EUR</button>
-        <button class="settings-curr-btn" id="scurr-rub" onclick="setDisplayCurrency('rub')">₽ RUB</button>
-        <button class="settings-curr-btn" id="scurr-cny" onclick="setDisplayCurrency('cny')">¥ CNY</button>
+        <button class="settings-curr-btn" id="scurr-rub" onclick="setDisplayCurrency('rub')">? RUB</button>
+        <button class="settings-curr-btn" id="scurr-cny" onclick="setDisplayCurrency('cny')">? CNY</button>
       </div>
     </div>
     <div class="settings-section">
       <div class="settings-label" id="set_theme_label">Тема</div>
       <div class="settings-theme-row">
-        <button class="settings-theme-btn active" id="theme-dark" onclick="setAppTheme('dark')">Темна</button>
+        <button class="settings-theme-btn active" id="theme-dark" onclick="setAppTheme('dark')">?? Dark</button>
         <button class="settings-theme-btn" id="theme-light" onclick="setAppTheme('light')">? Light</button>
       </div>
     </div>
@@ -2557,17 +2550,17 @@ body.modern-mockup.theme-light .total-currency{
     </div>
     <!-- BACKUP -->
     <div class="settings-section" style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
-      <div class="settings-group-title">РЕЗЕРВНЕ КОПІЮВАННЯ</div>
+      <div class="settings-group-title">?? РЕЗЕРВНЕ КОПІЮВАННЯ</div>
       <div style="display:flex;gap:8px;">
-        <button onclick="backupExport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #4ecb8d40;background:#4ecb8d10;font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">Експорт даних</button>
-        <button onclick="backupImport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #5b9cf640;background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;">Імпорт даних</button>
+        <button onclick="backupExport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #4ecb8d40;background:#4ecb8d10;font-family:'DM Mono',monospace;font-size:10px;color:var(--green2);cursor:pointer;">?? Експорт даних</button>
+        <button onclick="backupImport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #5b9cf640;background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;">?? Імпорт даних</button>
       </div>
       <div id="storageHealthInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
       <input class="backup-file-input" type="file" id="backupFileInput" accept=".json,application/json" onchange="handleBackupFile(this)">
       </div>
       <div class="app-version-card">
         <span class="app-version-label" id="appVersionLabel">Версія застосунку</span>
-        <span class="app-version-value" id="appVersionValue">v0.0.56-test</span>
+        <span class="app-version-value" id="appVersionValue">v0.0.22</span>
       </div>
       <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
         <div class="settings-label" id="set_qa_label">QA / Release</div>
@@ -2593,7 +2586,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="privacy-box">
     <div class="privacy-head">
       <div class="privacy-title" id="privacyTitle">Privacy Policy</div>
-      <button class="privacy-close" onclick="closePrivacyPolicy()">×</button>
+      <button class="privacy-close" onclick="closePrivacyPolicy()">?</button>
     </div>
     <div class="privacy-updated" id="privacyUpdated"></div>
     <div id="privacyContent"></div>
@@ -2603,7 +2596,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="privacy-box">
     <div class="privacy-head">
       <div class="privacy-title" id="legalTitle">Terms & Disclaimer</div>
-      <button class="privacy-close" onclick="closeLegalPolicy()">×</button>
+      <button class="privacy-close" onclick="closeLegalPolicy()">?</button>
     </div>
     <div class="privacy-updated" id="legalUpdated"></div>
     <div id="legalContent"></div>
@@ -2613,7 +2606,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="privacy-box">
     <div class="privacy-head">
       <div class="privacy-title" id="testChecklistTitle">Test checklist</div>
-      <button class="privacy-close" onclick="closeTestChecklist()">×</button>
+      <button class="privacy-close" onclick="closeTestChecklist()">?</button>
     </div>
     <div class="privacy-updated" id="testChecklistUpdated"></div>
     <div id="testChecklistContent"></div>
@@ -2623,7 +2616,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="picker-box">
     <div class="picker-head">
       <span id="topup_title">+ Поповнити депозит</span>
-      <button class="picker-close" onclick="closeTopUpModal()">×</button>
+      <button class="picker-close" onclick="closeTopUpModal()">?</button>
     </div>
     <input type="hidden" id="topup_dep_id" value="">
     <div style="margin-bottom:12px;">
@@ -2644,7 +2637,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="picker-box" style="max-height:90vh;overflow-y:auto;">
     <div class="picker-head">
       <span id="liab_modal_title">? Новий кредит</span>
-      <button class="picker-close" onclick="closeLiabModal()">×</button>
+      <button class="picker-close" onclick="closeLiabModal()">?</button>
     </div>
     <div class="calc-field-row">
       <div class="calc-field">
@@ -2682,7 +2675,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="picker-box">
     <div class="picker-head">
       <span id="partial_pay_title">?? Часткове погашення</span>
-      <button class="picker-close" onclick="closePartialPayModal()">×</button>
+      <button class="picker-close" onclick="closePartialPayModal()">?</button>
     </div>
     <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);margin-bottom:12px;" id="partial_pay_info"></div>
     <input type="hidden" id="partial_pay_liab_id">
@@ -2698,7 +2691,7 @@ body.modern-mockup.theme-light .total-currency{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.56-test</span></div>
+<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.45-test</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2707,7 +2700,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="stock-detail-box">
     <div class="stock-detail-header">
       <div class="stock-detail-title" id="stockDetailTitle">—</div>
-      <button class="stock-detail-close" onclick="closeStockDetail()">×</button>
+      <button class="stock-detail-close" onclick="closeStockDetail()">?</button>
     </div>
     <div id="stockDetailContent"></div>
   </div>
@@ -2716,7 +2709,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="diag-box">
     <div class="diag-header">
       <div class="diag-title"><img class="app-png-icon" src="section-icons/section-diagnostics.png?v=1" alt=""> <span>Діагностика капіталу</span></div>
-      <button class="diag-close" onclick="closeDiagnostics()">×</button>
+      <button class="diag-close" onclick="closeDiagnostics()">?</button>
     </div>
     <div id="diagContent"></div>
   </div>
@@ -2767,8 +2760,8 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // -- SUBSCRIPTION ACCESS STATE -----------------------------
-const APP_VERSION = 'v0.0.56-test';
-const APP_BUILD_DATE = '2026-06-30';
+const APP_VERSION = 'v0.0.45-test';
+const APP_BUILD_DATE = '2026-06-28';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -2824,13 +2817,13 @@ const LANGS={
   uk:{
     totalCapital:'Загальний капітал',enterData:'введіть дані',sectionLabel:'Активи · утримай та перетягни для сортування',
     liveCnt:'Живий лічильник',deposit:'Депозит',depositAll:'Депозит (всього)',
-    cryptoName:'Крипто',totalUsdtInv:'Загальна сума вкладень в USDT',rateUsdtUah:'Курс USDT / ₴',
+    cryptoName:'Крипто',totalUsdtInv:'Загальна сума вкладень в USDT',rateUsdtUah:'Курс USDT / ?',
     costPrice:'Собівартість (?)',uahEquiv:'Еквівалент у ?',addCoinTitle:'Додати монету',
     coinName:'Назва монети',coinQty:'Кількість',coinBuyPrice:'Ціна купівлі (USDT)',coinCurPrice:'Поточна ціна (USDT)',addCoinBtn:'+ Додати монету',
-    usdName:'USD · Доларові заощадження',usdAmount:'Сума в доларах ($)',rateUsdUah:'Курс USD / ₴',
+    usdName:'USD · Доларові заощадження',usdAmount:'Сума в доларах ($)',rateUsdUah:'Курс USD / ?',
     note:'Нотатка',convUah:'?? Конвертація > ?',inTotal:'Входить у загальний рахунок',yes:'Так',
-    forexName:'Валютні накопичення',currency:'Валюта',amount:'Сума',rateUah:'Курс / ₴',other:'Інша',addCurrency:'+ Додати валюту',totalUah:'Усього у ₴',
-    cashName:'Готівка (₴)',amountUah:'Сума (₴)',whereStored:'Де зберігається',
+    forexName:'Валютні накопичення',currency:'Валюта',amount:'Сума',rateUah:'Курс / ?',other:'Інша',addCurrency:'+ Додати валюту',totalUah:'Усього у ?',
+    cashName:'Готівка (?)',amountUah:'Сума (?)',whereStored:'Де зберігається',
     currentAcc:'Поточний рахунок',balanceUah:'Баланс (?)',bank:'Банк',
     stocksBtn:'Акції',bondsBtn:'Облігації',ovdpBtn:'ОВДП',goldBtn:'Золото',silverBtn:'Срібло',businessBtn:'Бізнес',addCustom:'Власний розділ',
     newSection:'Новий розділ',newSectionSub:'Як депозит — з відсотками та датами',
@@ -2846,7 +2839,7 @@ const LANGS={
     liabNetCapital:'Нетто-капітал (з урахуванням боргів)',liabGrossCapital:'Брутто-капітал',
     liabTotalDebt:'Загальний борг',liabExtraPayment:'Якщо платити +X на місяць',liabSaveMonths:'Заощадить місяців',
     liabAddBtn:'Додати',liabDeleteBtn:'Видалити кредит',liabTotalPaid:'Всього виплат',liabPartialPayments:'Часткові погашення',liabPartialTotal:'Разом погашено',monitoringTomorrow:'Моніторинг почнеться завтра',
-    topupBtn:'+ Поповнити',topupTitle:'Поповнення депозиту',topupAmount:'Сума поповнення',topupDate:'Дата поповнення',topupAdd:'Додати поповнення',topupHistory:'Історія поповнень',topupTotal:'Загалом поповнено',topupDelete:'Видалити',depSettings:'Налаштування депозиту',depPrincipalLbl:'Сума депозиту (₴)',depStart:'Дата відкриття',depOpenDay:'Число відкриття',depEnd:'Дата закінчення',
+    topupBtn:'+ Поповнити',topupTitle:'Поповнення депозиту',topupAmount:'Сума поповнення',topupDate:'Дата поповнення',topupAdd:'Додати поповнення',topupHistory:'Історія поповнень',topupTotal:'Загалом поповнено',topupDelete:'Видалити',depSettings:'Налаштування депозиту',depPrincipalLbl:'Сума депозиту (?)',depStart:'Дата відкриття',depOpenDay:'Число відкриття',depEnd:'Дата закінчення',
     compCalc:'Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
     taxPct:'Податок (%)',taxFree:'Без податку (?)',
@@ -2859,19 +2852,19 @@ const LANGS={
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
-    calcTitle:'Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ?',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Ваші фінансові дані залишаються на пристрої',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',
-    secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'Отримати ціну',secRefreshBtn:'Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'+ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
+    calcTitle:'Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (?)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ?',calcCurSum:'Сума',calcCurUsd:'Курс USD/?',calcCurEur:'Євро/?',calcCurRub:'? Рубль/?',calcCurCny:'? Юань/?',calcCurFrom:'Конвертую з',calcCurFromUah:'? Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'? Рубль',calcCurFromCny:'? Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Ваші фінансові дані залишаються на пристрої',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',
+    secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (?)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'?? Отримати ціну',secRefreshBtn:'? Оновити',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (?/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (?)',pickerTitle:'? Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
     totalCapital:'Общий капитал',enterData:'введите данные',sectionLabel:'Активы · удерживай и перетаскивай для сортировки',
     liveCnt:'Живой счётчик',deposit:'Депозит',depositAll:'Депозит (всего)',
-    cryptoName:'Крипто',totalUsdtInv:'Общая сумма вложений в USDT',rateUsdtUah:'Курс USDT / ₴',
+    cryptoName:'Крипто',totalUsdtInv:'Общая сумма вложений в USDT',rateUsdtUah:'Курс USDT / ?',
     costPrice:'Себестоимость (?)',uahEquiv:'Эквивалент в ?',addCoinTitle:'Добавить монету',
     coinName:'Название монеты',coinQty:'Количество',coinBuyPrice:'Цена покупки (USDT)',coinCurPrice:'Текущая цена (USDT)',addCoinBtn:'+ Добавить монету',
-    usdName:'USD · Долларовые сбережения',usdAmount:'Сумма в долларах ($)',rateUsdUah:'Курс USD / ₴',
+    usdName:'USD · Долларовые сбережения',usdAmount:'Сумма в долларах ($)',rateUsdUah:'Курс USD / ?',
     note:'Заметка',convUah:'?? Конвертация > ?',inTotal:'Входит в общий счёт',yes:'Да',
-    forexName:'Валютные накопления',currency:'Валюта',amount:'Сумма',rateUah:'Курс / ₴',other:'Другая',addCurrency:'+ Добавить валюту',totalUah:'Итого в ₴',
-    cashName:'Наличные (₴)',amountUah:'Сумма (₴)',whereStored:'Где хранится',
+    forexName:'Валютные накопления',currency:'Валюта',amount:'Сумма',rateUah:'Курс / ?',other:'Другая',addCurrency:'+ Добавить валюту',totalUah:'Итого в ?',
+    cashName:'Наличные (?)',amountUah:'Сумма (?)',whereStored:'Где хранится',
     currentAcc:'Текущий счёт',balanceUah:'Баланс (?)',bank:'Банк',
     stocksBtn:'Акции',bondsBtn:'Облигации',ovdpBtn:'ОВГЗ',goldBtn:'Золото',silverBtn:'Серебро',businessBtn:'Бизнес',addCustom:'Свой раздел',
     newSection:'Новый раздел',newSectionSub:'Как депозит — с процентами и датами',
@@ -2887,7 +2880,7 @@ const LANGS={
     liabNetCapital:'Нетто-капитал (с учётом долгов)',liabGrossCapital:'Брутто-капитал',
     liabTotalDebt:'Общий долг',liabExtraPayment:'Если платить +X в месяц',liabSaveMonths:'Сэкономит месяцев',
     liabAddBtn:'Добавить',liabDeleteBtn:'Удалить кредит',liabTotalPaid:'Всего выплат',liabPartialPayments:'Частичные погашения',liabPartialTotal:'Всего погашено',monitoringTomorrow:'Мониторинг начнётся завтра',
-    topupBtn:'+ Пополнить',topupTitle:'Пополнение депозита',topupAmount:'Сумма пополнения',topupDate:'Дата пополнения',topupAdd:'Добавить пополнение',topupHistory:'История пополнений',topupTotal:'Итого пополнено',topupDelete:'Удалить',depSettings:'Настройки депозита',depPrincipalLbl:'Сумма депозита (₴)',depStart:'Дата открытия',depOpenDay:'Число открытия',depEnd:'Дата окончания',
+    topupBtn:'+ Пополнить',topupTitle:'Пополнение депозита',topupAmount:'Сумма пополнения',topupDate:'Дата пополнения',topupAdd:'Добавить пополнение',topupHistory:'История пополнений',topupTotal:'Итого пополнено',topupDelete:'Удалить',depSettings:'Настройки депозита',depPrincipalLbl:'Сумма депозита (?)',depStart:'Дата открытия',depOpenDay:'Число открытия',depEnd:'Дата окончания',
     compCalc:'Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
     taxPct:'Налог (%)',taxFree:'Без налога (?)',
@@ -2900,8 +2893,8 @@ const LANGS={
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
-    calcTitle:'Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ?',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Ваши финансовые данные остаются на устройстве',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',
-    secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'Получить цену',secRefreshBtn:'Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'+ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
+    calcTitle:'Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (?)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ?',calcCurSum:'Сумма',calcCurUsd:'Курс USD/?',calcCurEur:'Евро/?',calcCurRub:'? Рубль/?',calcCurCny:'? Юань/?',calcCurFrom:'Конвертирую из',calcCurFromUah:'? Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'? Рубль',calcCurFromCny:'? Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Ваши финансовые данные остаются на устройстве',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',
+    secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (?)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'?? Получить цену',secRefreshBtn:'? Обновить',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (?/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (?)',pickerTitle:'? Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
     totalCapital:'Total Capital',enterData:'enter data',sectionLabel:'Assets · hold and drag to sort',
@@ -2911,8 +2904,8 @@ const LANGS={
     coinName:'Coin Name',coinQty:'Quantity',coinBuyPrice:'Buy Price (USDT)',coinCurPrice:'Current Price (USDT)',addCoinBtn:'+ Add Coin',
     usdName:'USD · Dollar Savings',usdAmount:'Amount in USD ($)',rateUsdUah:'USD / ? Rate',
     note:'Note',convUah:'?? Convert > ?',inTotal:'Included in total',yes:'Yes',
-    forexName:'Forex Savings',currency:'Currency',amount:'Amount',rateUah:'Rate / ₴',other:'Other',addCurrency:'+ Add Currency',totalUah:'Total in ₴',
-    cashName:'Cash (₴)',amountUah:'Amount (₴)',whereStored:'Where stored',
+    forexName:'Forex Savings',currency:'Currency',amount:'Amount',rateUah:'Rate / ?',other:'Other',addCurrency:'+ Add Currency',totalUah:'Total in ?',
+    cashName:'Cash (?)',amountUah:'Amount (?)',whereStored:'Where stored',
     currentAcc:'Current Account',balanceUah:'Balance (?)',bank:'Bank',
     stocksBtn:'Stocks',bondsBtn:'Bonds',ovdpBtn:'Gov. Bonds',goldBtn:'Gold',silverBtn:'Silver',businessBtn:'Business',addCustom:'Custom Section',
     newSection:'New Section',newSectionSub:'Like a deposit — with rates and dates',
@@ -2928,7 +2921,7 @@ const LANGS={
     liabNetCapital:'Net capital (after debts)',liabGrossCapital:'Gross capital',
     liabTotalDebt:'Total debt',liabExtraPayment:'If paying +X/month',liabSaveMonths:'Months saved',
     liabAddBtn:'Add',liabDeleteBtn:'Delete loan',liabTotalPaid:'Total paid',liabPartialPayments:'Partial repayments',liabPartialTotal:'Total repaid',monitoringTomorrow:'Monitoring starts tomorrow',
-    topupBtn:'+ Top Up',topupTitle:'Deposit Top-Up',topupAmount:'Top-up amount',topupDate:'Top-up date',topupAdd:'Add top-up',topupHistory:'Top-up history',topupTotal:'Total topped up',topupDelete:'Delete',depSettings:'Deposit Settings',depPrincipalLbl:'Deposit Amount (₴)',depStart:'Start Date',depOpenDay:'Opening day',depEnd:'End Date',
+    topupBtn:'+ Top Up',topupTitle:'Deposit Top-Up',topupAmount:'Top-up amount',topupDate:'Top-up date',topupAdd:'Add top-up',topupHistory:'Top-up history',topupTotal:'Total topped up',topupDelete:'Delete',depSettings:'Deposit Settings',depPrincipalLbl:'Deposit Amount (?)',depStart:'Start Date',depOpenDay:'Opening day',depEnd:'End Date',
     compCalc:'Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
     monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
     taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
@@ -2941,24 +2934,24 @@ const LANGS={
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-    calcTitle:'Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your financial data stays on your device',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',
-    secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'Get price',secRefreshBtn:'Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'+ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
+    calcTitle:'Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (?)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/? rate',calcCurEur:'EUR/?',calcCurRub:'? RUB/?',calcCurCny:'? CNY/?',calcCurFrom:'Convert from',calcCurFromUah:'? Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'? Ruble',calcCurFromCny:'? Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your financial data stays on your device',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',
+    secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (?)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'?? Get price',secRefreshBtn:'? Refresh',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (?/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (?)',pickerTitle:'? New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
     totalCapital:'Gesamtkapital',enterData:'Daten eingeben',sectionLabel:'Vermogen · Halten & Ziehen zum Sortieren',
     liveCnt:'Live-Zahler',addDeposit:'+ Einlage',deleteDep:'Einlage loschen?',maxDep:'Max. 3 Einlagen',
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt loschen?',removeSection:'? Loschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschaft',addCustom:'Eigener Abschnitt',
-    calcTitle:'Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Wahrung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljahrlich',calcYearly:'Jahrlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfugbar. Wahlen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschrankungen wahrend der Testphase',pwB2:'Alle Vermogenswerte an einem Ort',pwB2sub:'Einlagen, Wahrungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerat',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',
-    secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jahrlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'Preis abrufen',secRefreshBtn:'Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufugen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'+ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermogenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
+    calcTitle:'Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Wahrung',calcSum:'Betrag (?)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/? Kurs',calcCurEur:'EUR/?',calcCurRub:'? RUB/?',calcCurCny:'? CNY/?',calcCurFrom:'Umrechnen von',calcCurFromUah:'? Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'? Rubel',calcCurFromCny:'? Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljahrlich',calcYearly:'Jahrlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfugbar. Wahlen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschrankungen wahrend der Testphase',pwB2:'Alle Vermogenswerte an einem Ort',pwB2sub:'Einlagen, Wahrungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerat',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',
+    secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (?)',secDivPct:'Dividenden (% jahrlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'?? Preis abrufen',secRefreshBtn:'? Aktualisieren',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (?/g)',metalAdd:'+ Metall hinzufugen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (?)',pickerTitle:'? Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermogenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
-    cryptoName:'Krypto',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
+    cryptoName:'Krypto',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/? Kurs',
     costPrice:'Einstandspreis (?)',uahEquiv:'UAH-Aquivalent',addCoinTitle:'Munze hinzufugen',
     coinName:'Munzname',coinQty:'Menge',coinBuyPrice:'Kaufpreis (USDT)',coinCurPrice:'Aktueller Preis (USDT)',addCoinBtn:'+ Hinzufugen',
-    usdName:'USD · Dollar-Ersparnisse',usdAmount:'Betrag in USD ($)',rateUsdUah:'USD/₴ Kurs',
+    usdName:'USD · Dollar-Ersparnisse',usdAmount:'Betrag in USD ($)',rateUsdUah:'USD/? Kurs',
     note:'Notiz',convUah:'?? Umrechnen > ?',inTotal:'Im Gesamt enthalten',yes:'Ja',
-    forexName:'Forex-Ersparnisse',currency:'Wahrung',amount:'Betrag',rateUah:'Kurs/?',other:'Sonstige',addCurrency:'+ Wahrung',totalUah:'Gesamt ₴',
-    cashName:'Bargeld (₴)',amountUah:'Betrag (₴)',whereStored:'Wo aufbewahrt',
+    forexName:'Forex-Ersparnisse',currency:'Wahrung',amount:'Betrag',rateUah:'Kurs/?',other:'Sonstige',addCurrency:'+ Wahrung',totalUah:'Gesamt ?',
+    cashName:'Bargeld (?)',amountUah:'Betrag (?)',whereStored:'Wo aufbewahrt',
     currentAcc:'Girokonto',balanceUah:'Kontostand (?)',bank:'Bank',
     depSetup:'Startdatum, Betrag und Zinssatz eingeben',
     familyBtn:'Familienausgaben',familyTitle:'Familienausgaben',familyCommunal:'Nebenkosten',familyFood:'Lebensmittel',familyEntertain:'Unterhaltung',familyMed:'Gesundheit',familyKids:'Kinder',familyOther:'Sonstige Ausgaben',familyAlimony:'Unterhalt',familyTotal:'Gesamtausgaben',bizRent:'Miete',bizSalary:'Gehalt',bizTax:'Steuer',bizExpense:'Ausgaben',bizProfit:'Umsatz',bizTotal:'Nettogewinn',bizIncome:'Einnahmen',partialPayBtn:'Teilzahlung',partialPayTitle:'Teilruckzahlung',partialPayAmount:'Zahlungsbetrag',liabSection:'Verbindlichkeiten',liabBtn:'+ Kredit hinzufugen',liabTitle:'Kredite & Hypotheken',
@@ -2990,7 +2983,7 @@ const LANGS={
     liveCnt:'?????',addDeposit:'+ ??',deleteDep:'?????',maxDep:'??3???',
     deposit:'??',depositAll:'??(??)',confirmDelete:'??????',removeSection:'? ??',
     stocksBtn:'??',bondsBtn:'??',ovdpBtn:'??',businessBtn:'??',addCustom:'?????',
-    calcTitle:'???',calcSimple:'??',calcCompound:'?? %',calcCurrency:'??',calcSum:'?? (?)',calcRate:'??? %',calcMonths:'??(?)',calcCapitaliz:'????',calcTax:'??? (%)',calcTaxFree:'?? = 0%',calcTaxFreePh:'?????',calcCurSum:'??',calcCurUsd:'USD/???',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'???????',calcCurFromUah:'? ????',calcCurFromUsd:'$ ??',calcCurFromEur:'€ ??',calcCurFromRub:'? ??',calcCurFromCny:'? ???',calcMonthly:'??',calcQuarterly:'???',calcYearly:'??',calcNoCapitaliz:'???',pwTitle:'???? 30 ?',pwSub:'????????????????????,?????????',pwB1:'30 ????',pwB1sub:'????????',pwB2:'???????????',pwB2sub:'????????????????????',pwB3:'??????',pwB3sub:'????????????',pwPerMonth:'/ ?',pwPerYear:'/ ?',pwBtn:'?? 30 ?????',pwRestore:'????',
+    calcTitle:'???',calcSimple:'??',calcCompound:'?? %',calcCurrency:'??',calcSum:'?? (?)',calcRate:'??? %',calcMonths:'??(?)',calcCapitaliz:'????',calcTax:'??? (%)',calcTaxFree:'?? = 0%',calcTaxFreePh:'?????',calcCurSum:'??',calcCurUsd:'USD/???',calcCurEur:'EUR/?',calcCurRub:'? RUB/?',calcCurCny:'? CNY/?',calcCurFrom:'???????',calcCurFromUah:'? ????',calcCurFromUsd:'$ ??',calcCurFromEur:'€ ??',calcCurFromRub:'? ??',calcCurFromCny:'? ???',calcMonthly:'??',calcQuarterly:'???',calcYearly:'??',calcNoCapitaliz:'???',pwTitle:'???? 30 ?',pwSub:'????????????????????,?????????',pwB1:'30 ????',pwB1sub:'????????',pwB2:'???????????',pwB2sub:'????????????????????',pwB3:'??????',pwB3sub:'????????????',pwPerMonth:'/ ?',pwPerYear:'/ ?',pwBtn:'?? 30 ?????',pwRestore:'????',
     secQtyShares:'????',secPriceAuto:'??',secPriceCurrent:'????(?)',secDivPct:'??(?%)',secTicker:'??: AAPL, MSFT...',secFetchBtn:'?? ????',secRefreshBtn:'? ??',metalType:'??',metalGrams:'??(?)',metalPrice:'????(?/?)',metalAdd:'+ ????',metalTotalValue:'???',metalTotalGrams:'???',metalGramsUnit:'?',secBuyPrice:'????(?)',pickerTitle:'? ???',metalStocksDesc:'???,????,??',metalBondsDesc:'??????',metalOvdpDesc:'?????',metalMetalsDesc:'????????',metalBizDesc:'?????????',metalCustomDesc:'??????',metalsBtn:'???',perYear:'/?',divMonthly:'??',divAbs:'????($/?)',divAnnual:'???(???)',divIncome:'????',newSection:'???',newSectionSub:'?????——??????',
     sectionNameLabel:'????',iconLabel:'??',createSection:'??',cancel:'??',
     cryptoName:'????',totalUsdtInv:'USDT???',rateUsdtUah:'USDT/???',
@@ -3042,10 +3035,10 @@ const EXTRA_I18N={
   'Зміна':{uk:'Зміна',ru:'Изменение',en:'Change',de:'Anderung',zh:'??'},
   'Зростання':{uk:'Зростання',ru:'Рост',en:'Growth',de:'Wachstum',zh:'??'},
   'Онлайн ціни':{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'????'},
-  'Оновити':{uk:'Оновити',ru:'Обновить',en:'Refresh',de:'Aktualisieren',zh:'? ??'},
-  'Оновити курси онлайн':{uk:'Оновити курси онлайн',ru:'Обновить курсы онлайн',en:'Refresh online rates',de:'? Online-Kurse aktualisieren',zh:'? ??????'},
-  'Отримати ціну':{uk:'Отримати ціну',ru:'Получить цену',en:'Get price',de:'Preis abrufen',zh:'?? ????'},
-  '+ Новий розділ':{uk:'+ Новий розділ',ru:'+ Новый раздел',en:'+ New section',de:'? Neuer Bereich',zh:'? ????'},
+  '? Оновити':{uk:'? Оновити',ru:'? Обновить',en:'? Refresh',de:'? Aktualisieren',zh:'? ??'},
+  '? Оновити курси онлайн':{uk:'? Оновити курси онлайн',ru:'? Обновить курсы онлайн',en:'? Refresh online rates',de:'? Online-Kurse aktualisieren',zh:'? ??????'},
+  '?? Отримати ціну':{uk:'?? Отримати ціну',ru:'?? Получить цену',en:'?? Get price',de:'?? Preis abrufen',zh:'?? ????'},
+  '? Новий розділ':{uk:'? Новий розділ',ru:'? Новый раздел',en:'? New section',de:'? Neuer Bereich',zh:'? ????'},
   'Стартап':{uk:'Стартап',ru:'Стартап',en:'Startup',de:'Startup',zh:'????'},
   'Вкладення в стартап':{uk:'Вкладення в стартап',ru:'Вложения в стартап',en:'Startup investment',de:'Startup-Investition',zh:'??????'},
   'Готівка':{uk:'Готівка',ru:'Наличные',en:'Cash',de:'Bargeld',zh:'??'},
@@ -3108,7 +3101,7 @@ const EXTRA_I18N={
   '? Помилка':{uk:'? Помилка',ru:'? Ошибка',en:'? Error',de:'? Fehler',zh:'? ??'},
   '?? Купівля':{uk:'?? Купівля',ru:'?? Покупка',en:'?? Buy',de:'?? Kauf',zh:'?? ??'},
   '?? Продаж':{uk:'?? Продаж',ru:'?? Продажа',en:'?? Sell',de:'?? Verkauf',zh:'?? ??'},
-  'Ціна купівлі (₴)':{uk:'Ціна купівлі (₴)',ru:'Цена покупки (₴)',en:'Buy price (₴)',de:'Kaufpreis (₴)',zh:'??? (?)'},
+  'Ціна купівлі (?)':{uk:'Ціна купівлі (?)',ru:'Цена покупки (?)',en:'Buy price (?)',de:'Kaufpreis (?)',zh:'??? (?)'},
   'Ціна':{uk:'Ціна',ru:'Цена',en:'Price',de:'Preis',zh:'??'},
   'Кількість':{uk:'Кількість',ru:'Количество',en:'Quantity',de:'Menge',zh:'??'},
   'Вартість':{uk:'Вартість',ru:'Стоимость',en:'Value',de:'Wert',zh:'??'},
@@ -3171,10 +3164,10 @@ Object.assign(EXTRA_I18N,{
 
 Object.assign(EXTRA_I18N,{
   '?? USDT баланс':{uk:'USDT баланс',ru:'USDT баланс',en:'USDT balance',de:'USDT-Guthaben',zh:'USDT ??'},
-  'Курс USDT/₴':{uk:'Курс USDT/₴',ru:'Курс USDT/₴',en:'USDT/₴ rate',de:'USDT/₴ Kurs',zh:'USDT/? ??'},
+  'Курс USDT/?':{uk:'Курс USDT/?',ru:'Курс USDT/?',en:'USDT/? rate',de:'USDT/? Kurs',zh:'USDT/? ??'},
   'Еквівалент у ?':{uk:'Еквівалент у ?',ru:'Эквивалент в ?',en:'? equivalent',de:'? Gegenwert',zh:'? ??'},
   'Онлайн ціни':{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'????'},
-  'Оновити':{uk:'Оновити',ru:'Обновить',en:'Refresh',de:'Aktualisieren',zh:'? ??'},
+  '? Оновити':{uk:'? Оновити',ru:'? Обновить',en:'? Refresh',de:'? Aktualisieren',zh:'? ??'},
   'автоматично':{uk:'автоматично',ru:'автоматически',en:'automatic',de:'automatisch',zh:'??'},
   'авто':{uk:'авто',ru:'авто',en:'auto',de:'auto',zh:'??'},
   'Вдома, сейф...':{uk:'Вдома, сейф...',ru:'Дома, сейф...',en:'Home, safe...',de:'Zuhause, Safe...',zh:'??????...'},
@@ -3285,9 +3278,6 @@ const UI_TEXT={
   stockDividendBalance:{uk:'Нараховані дивіденди',ru:'Начисленные дивиденды',en:'Accrued dividends',de:'Aufgelaufene Dividenden',zh:'????'},
   stockDividendBalanceShort:{uk:'Дивіденди',ru:'Дивиденды',en:'Dividends',de:'Dividenden',zh:'??'},
   stockDividendHint:{uk:'Баланс фактично отриманих дивідендів. Додається до загального капіталу.',ru:'Баланс фактически полученных дивидендов. Добавляется в общий капитал.',en:'Balance of actually received dividends. Included in total capital.',de:'Saldo tatsachlich erhaltener Dividenden. Wird zum Gesamtkapital gezahlt.',zh:'?????????,??????'},
-  stockDividendNext:{uk:'Наступна виплата',ru:'Следующая выплата',en:'Next payout',de:'Nachste Auszahlung',zh:'????'},
-  stockDividendLast:{uk:'Остання виплата',ru:'Последняя выплата',en:'Last payout',de:'Letzte Auszahlung',zh:'????'},
-  stockDividendDateUnknown:{uk:'Дата виплати ще не оголошена',ru:'Дата выплаты ещё не объявлена',en:'Payout date not announced yet',de:'Auszahlungsdatum noch nicht bekannt',zh:'???????'},
   incomePayoutPeriod:{uk:'Період виплат',ru:'Период выплат',en:'Payout period',de:'Auszahlungsperiode',zh:'????'},
   incomePayoutOff:{uk:'Не нараховувати',ru:'Не начислять',en:'Do not accrue',de:'Nicht erfassen',zh:'???'},
   incomePayoutMonthly:{uk:'Щомісяця',ru:'Ежемесячно',en:'Monthly',de:'Monatlich',zh:'??'},
@@ -3320,10 +3310,10 @@ const UI_TEXT={
   stockRemoveAction:{uk:'?? Убрати',ru:'?? Убрать',en:'?? Remove',de:'?? Entfernen',zh:'?? ??'},
   cryptoPortfolio:{uk:'Портфель (монети)',ru:'Портфель (монеты)',en:'Portfolio (coins)',de:'Portfolio (Coins)',zh:'????(??)'},
   onlinePrices:{uk:'Онлайн ціни',ru:'Онлайн цены',en:'Online prices',de:'Online-Preise',zh:'????'},
-  refresh:{uk:'Оновити',ru:'Обновить',en:'Refresh',de:'Aktualisieren',zh:'? ??'},
+  refresh:{uk:'? Оновити',ru:'? Обновить',en:'? Refresh',de:'? Aktualisieren',zh:'? ??'},
   refreshing:{uk:'? ...',ru:'? ...',en:'? ...',de:'? ...',zh:'? ...'},
   usdtBalance:{uk:'USDT баланс',ru:'USDT баланс',en:'USDT balance',de:'USDT-Guthaben',zh:'USDT ??'},
-  usdtRate:{uk:'Курс USDT/₴',ru:'Курс USDT/₴',en:'USDT/₴ rate',de:'USDT/₴ Kurs',zh:'USDT/? ??'},
+  usdtRate:{uk:'Курс USDT/?',ru:'Курс USDT/?',en:'USDT/? rate',de:'USDT/? Kurs',zh:'USDT/? ??'},
   uahEquivalent:{uk:'Еквівалент у ?',ru:'Эквивалент в ?',en:'? equivalent',de:'? Gegenwert',zh:'? ??'},
   noTaxMinimum:{uk:'Неоподатк. мінімум ?',ru:'Необл. минимум ?',en:'Tax-free minimum ?',de:'Steuerfreier Mindestbetrag ?',zh:'????? ?'},
   monitoring:{uk:'Моніторинг',ru:'Мониторинг',en:'Monitoring',de:'Uberwachung',zh:'??'},
@@ -3501,14 +3491,14 @@ function getDepositHtml(dep,idx){
         <div class="daily-section">
           <div class="daily-toggle" id="dailyToggle_${dep.id}" onclick="toggleDailyLog('${dep.id}')">
             <div class="daily-title" style="margin-bottom:0">${uiIconHtml('period')} ${cleanIconText(lang.incomeDays)}</div>
-            <div class="daily-toggle-arrow" id="dailyArrow_${dep.id}">▼</div>
+            <div class="daily-toggle-arrow" id="dailyArrow_${dep.id}">Ў</div>
           </div>
           <div class="daily-scroll" id="dailyLog_${dep.id}"></div>
         </div>
       </div>
       <div class="dep-calc-toggle" id="depCalcToggle_${dep.id}" onclick="toggleDepCalc('${dep.id}')">
         <span class="dep-calc-toggle-label">${lang.depSettings}</span>
-        <span class="dep-calc-toggle-icon">▼</span>
+        <span class="dep-calc-toggle-icon">Ў</span>
       </div>
       <div class="dep-calc-body" id="depCalcBody_${dep.id}">
         <div style="padding-top:14px;">
@@ -3519,12 +3509,12 @@ function getDepositHtml(dep,idx){
               oninput="deposits[${idx}].principal=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             <select class="field-input" id="depCurrency_${dep.id}" style="width:72px;padding:10px 4px;"
               onchange="deposits[${idx}].depCurrency=this.value;renderDeposits();updateAll();startLiveTicker('${dep.id}');saveData()">
-              <option value="UAH" ${dep.depCurrency==='UAH'||!dep.depCurrency?'selected':''}>₴</option>
+              <option value="UAH" ${dep.depCurrency==='UAH'||!dep.depCurrency?'selected':''}>?</option>
               <option value="USD" ${dep.depCurrency==='USD'?'selected':''}>$</option>
               <option value="EUR" ${dep.depCurrency==='EUR'?'selected':''}>€</option>
-              <option value="GBP" ${dep.depCurrency==='GBP'?'selected':''}>£</option>
-              <option value="RUB" ${dep.depCurrency==='RUB'?'selected':''}>₽</option>
-              <option value="CNY" ${dep.depCurrency==='CNY'?'selected':''}>¥</option>
+              <option value="GBP" ${dep.depCurrency==='GBP'?'selected':''}>?</option>
+              <option value="RUB" ${dep.depCurrency==='RUB'?'selected':''}>?</option>
+              <option value="CNY" ${dep.depCurrency==='CNY'?'selected':''}>?</option>
             </select>
           </div>
         </div>
@@ -3555,7 +3545,7 @@ function getDepositHtml(dep,idx){
         ${(dep.topups&&dep.topups.length)?`<div style="margin-bottom:8px;">
           <div class="daily-toggle" onclick="this.classList.toggle('collapsed');this.nextElementSibling.style.display=this.classList.contains('collapsed')?'none':'block'">
             <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">?? ${t('topupHistory')||'Історія поповнень'} (${dep.topups.length})</div>
-            <div class="daily-toggle-arrow">▼</div>
+            <div class="daily-toggle-arrow">Ў</div>
           </div>
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:4px;">
             ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
@@ -4177,17 +4167,17 @@ function getCustomCardHtml(s,idx){
   const lang=LANGS[currentLang];
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon">${sectionIconHtml(s,s.icon)}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${escHtml(s.name)}</div>
-        <div class="card-value" id="customDisplay_${s.id}">0 ₴</div>
+        <div class="card-value" id="customDisplay_${s.id}">0 ?</div>
         <div class="card-pct" id="customPct_${s.id}">0% ${lang.pctOfCapital}</div>
       </div>
       ${getCardSparklineHtml(getCustomSparklineKey(s))}
       <div class="card-actions">
-        <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">×</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+        <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">?</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -4267,7 +4257,7 @@ function getCustomCardHtml(s,idx){
           </div>`).join('')}
         <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${t('familyTotal')||'Загальні витрати'}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--red);" id="family_total_${s.id}">0 ₴</span>
+          <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--red);" id="family_total_${s.id}">0 ?</span>
         </div>
       </div>`:''}
       ${s.sectionType==='business'?`
@@ -4283,7 +4273,7 @@ function getCustomCardHtml(s,idx){
           </div>`).join('')}
         <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${t('bizTotal')||'Чистий прибуток'}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;" id="biz_net_${s.id}" style="">0 ₴</span>
+          <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;" id="biz_net_${s.id}" style="">0 ?</span>
         </div>
       </div>`:''}
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">${lang.removeSection}</button>
@@ -4635,7 +4625,7 @@ async function fetchTickerForInput(secId){
   stockLastError='';
   let data=null;
   try{ data=await fetchStockPrice(ticker); }catch(e){stockLastError=e.message;}
-  if(btn){btn.className='ticker-fetch-btn';btn.textContent='Отримати ціну';}
+  if(btn){btn.className='ticker-fetch-btn';btn.textContent='?? Отримати ціну';}
   if(!data){
     const errMsg=stockLastError||'Обидва джерела недоступні';
     if(info){info.className='stock-price-info visible';info.innerHTML=
@@ -4649,12 +4639,6 @@ async function fetchTickerForInput(secId){
   }
   const priceUah=data.currency==='UAH'?data.price:(data.price*getStockCurrencyRate(data.currency));
   const divYieldAbs=(data.divAbs||0)*getStockCurrencyRate(data.currency);
-  const divDate=data.nextDividendDate||data.lastDividendDate||'';
-  const divDateLabel=data.nextDividendDate?uiText('stockDividendNext'):(data.lastDividendDate?uiText('stockDividendLast'):uiText('stockDividendDateUnknown'));
-  const divDateText=divDate?formatMarketDate(divDate):uiText('stockDividendDateUnknown');
-  const divDateAmount=Number(data.nextDividendAmount||data.lastDividendAmount||0);
-  const divDateCurrency=data.nextDividendCurrency||data.lastDividendCurrency||data.currency||'';
-  const divDateSuffix=divDateAmount>0?` · ${fmtD(divDateAmount,2)} ${escHtml(divDateCurrency)}`:'';
   const priceField=$('secPrice_'+secId);
   if(priceField)priceField.value=priceUah.toFixed(2);
   const divField=$('secDiv_'+secId);
@@ -4667,13 +4651,12 @@ async function fetchTickerForInput(secId){
     info.innerHTML=`
       <div class="spi-name">${escHtml(data.name)} <span style="color:var(--muted);font-size:10px">${escHtml(ticker)} · ${escHtml(data.currency)}</span></div>
       <div>
-        <span class="spi-price">${data.currency==='USD'?'$'+data.price.toFixed(2):fmtN(Math.round(priceUah))+' ₴'}</span>
-        ${data.currency==='USD'?`<span style="color:var(--muted);font-size:10px">≈ ${fmtN(Math.round(priceUah))} ₴</span>`:''}
+        <span class="spi-price">${data.currency==='USD'?'$'+data.price.toFixed(2):fmtN(Math.round(priceUah))+' ?'}</span>
+        ${data.currency==='USD'?`<span style="color:var(--muted);font-size:10px"> ? ${fmtN(Math.round(priceUah))} ?</span>`:''}
         <span class="spi-change ${changeClass}">${changeSign}${ch.toFixed(2)} (${changeSign}${chp.toFixed(2)}%)</span>
       </div>
-      <div class="spi-meta">Курс USD/₴: ${usdUahRate.toFixed(2)} · Оновлено: ${new Date().toLocaleTimeString('uk-UA')}</div>
-      ${data.divYield>0?`<div class="spi-div">Дивіденди: ${data.divYield.toFixed(2)}% річних · ≈${fmtD(divYieldAbs,2)} $/акція/рік</div>`:'<div class="spi-div" style="color:var(--muted)">Дивіденди не виплачуються</div>'}
-      <div class="spi-div" style="color:${divDate?'var(--gold2)':'var(--muted)'}">Дата виплати: ${escHtml(divDateText)}${divDateSuffix}</div>
+      <div class="spi-meta">Курс USD/?: ${usdUahRate.toFixed(2)} · Оновлено: ${new Date().toLocaleTimeString('uk-UA')}</div>
+      ${data.divYield>0?`<div class="spi-div">?? Дивіденди: ${data.divYield.toFixed(2)}% річних · ?${fmtD(divYieldAbs,2)} ?/акція/рік</div>`:'<div class="spi-div" style="color:var(--muted)">— Дивіденди не виплачуються</div>'}
     `;
   }
   }catch(e){console.error('fetchTicker:',e);const info=$('stockInfo_'+secId);if(info)info.innerHTML='<div style="color:var(--red);font-size:10px">? Помилка</div>';}
@@ -4694,7 +4677,7 @@ async function refreshAllStockPrices(secId){
   if(btn)btn.textContent='? ...';
   if(status)status.textContent='Оновлення онлайн-цін...';
   const tickers=[...new Set(sec.items.filter(it=>it.ticker).map(it=>it.ticker))];
-  if(!tickers.length){if(btn)btn.textContent='Оновити';return;}
+  if(!tickers.length){if(btn)btn.textContent='? Оновити';return;}
   const stocks=await fetchMultipleStocks(tickers);
   let updated=0;
   for(let it of sec.items){
@@ -4712,10 +4695,10 @@ async function refreshAllStockPrices(secId){
   }
   sec.lastRefresh=new Date().toLocaleTimeString('uk-UA');
   renderSecuritiesCards();updateAll();saveData();
-  if(btn)btn.textContent='Оновити';
+  if(btn)btn.textContent='? Оновити';
   const st=$('refreshStatus_'+secId);
   if(st)st.textContent=updated?`Оновл. ${sec.lastRefresh}`:'Помилка оновлення';
-  }catch(e){console.error('refreshAll:',e);const btn=$('refreshAllBtn_'+secId);if(btn)btn.textContent='Оновити';}
+  }catch(e){console.error('refreshAll:',e);const btn=$('refreshAllBtn_'+secId);if(btn)btn.textContent='? Оновити';}
 }
 
 let autoRefreshInterval=null;
@@ -4731,8 +4714,8 @@ function startAutoRefresh(){
 function addSimpleCard(type){
   /* access is controlled globally */
   const cfg={
-    gold:{icon:sectionIconImg('stocks'),uk:'Золото',ru:'Золото',en:'Gold'},
-    silver:{icon:sectionIconImg('stocks'),uk:'Срібло',ru:'Серебро',en:'Silver'},
+    gold:{icon:'??',uk:'Золото',ru:'Золото',en:'Gold'},
+    silver:{icon:'??',uk:'Срібло',ru:'Серебро',en:'Silver'},
     business:{icon:'business',uk:'Бізнес',ru:'Бизнес',en:'Business',de:'Geschaft',zh:'??'},
     family:{icon:'family',uk:'Сімейні витрати',ru:'Семейные расходы',en:'Family expenses',de:'Familienausgaben',zh:'????'}
   }[type];
@@ -4844,8 +4827,7 @@ function getStockCashCurrency(section){
   return STOCK_CASH_CURRENCIES.includes(cur)?cur:'UAH';
 }
 function getStockCurrencySymbol(cur){
-  const code=String(cur||'UAH').toUpperCase();
-  return {UAH:'₴',USD:'$',EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',CNY:'¥',USDT:'$'}[code]||code;
+  return {UAH:'?',USD:'$',EUR:'€',GBP:'?',PLN:'zl',CHF:'Fr',CZK:'Kc',RUB:'?',CNY:'?'}[String(cur||'UAH').toUpperCase()]||cur;
 }
 function getStockCashAmount(section){return stockNum(section?.stockCashAmount);}
 function getStockCashTotalUah(section){return getStockCashAmount(section)*getStockCurrencyRate(getStockCashCurrency(section));}
@@ -5280,7 +5262,7 @@ function getSecCardHtml(s,idx){
 
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
+      <div class="drag-handle">?</div>
       <div class="card-icon">${sectionIconHtml(s,s.icon)}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
@@ -5289,8 +5271,8 @@ function getSecCardHtml(s,idx){
       </div>
       ${getCardSparklineHtml('stocks')}
       <div class="card-actions">
-        <button class="card-del-btn" onclick="removeSecCard('${s.id}')">×</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+        <button class="card-del-btn" onclick="removeSecCard('${s.id}')">?</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -5306,7 +5288,7 @@ function getSecCardHtml(s,idx){
         </div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('? '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('stockSaleCashHint')}</div>
       </div>
-      <div style="background:linear-gradient(135deg,#e8c97a14,#4ecb8d0c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div class="sec-cash-title" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('dividend','app-png-icon')} ${cleanIconText(uiText('stockDividendBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?(''+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('stockDividendHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+      <div style="background:linear-gradient(135deg,#e8c97a14,#4ecb8d0c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div class="sec-cash-title" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('dividend','app-png-icon')} ${cleanIconText(uiText('stockDividendBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('? '+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('stockDividendHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
         <div class="ticker-search-row">
           <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="${t('secTicker')}">
@@ -5370,8 +5352,8 @@ function getBondCardHtml(s,idx){
 
   return `<div class="card ${themeClass}" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
-      <div class="card-icon">${sectionIconHtml(s,s.icon||sectionIconImg('bonds'))}</div>
+      <div class="drag-handle">?</div>
+      <div class="card-icon">${sectionIconHtml(s,s.icon||'??')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${s.name}</div>
         <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(stats.total))}</div>
@@ -5379,8 +5361,8 @@ function getBondCardHtml(s,idx){
       </div>
       ${getCardSparklineHtml(s.type==='ovdp'?'ovdp':'bonds')}
       <div class="card-actions">
-        <button class="card-del-btn" onclick="removeSecCard('${s.id}')">×</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+        <button class="card-del-btn" onclick="removeSecCard('${s.id}')">?</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -5396,7 +5378,7 @@ function getBondCardHtml(s,idx){
         </div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('? '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('bondCashHint')}</div>
       </div>
-      <div style="background:linear-gradient(135deg,#e8c97a14,#5b9cf60c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('percent','app-png-icon')} ${cleanIconText(uiText('bondCouponBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?(''+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('bondCouponHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+      <div style="background:linear-gradient(135deg,#e8c97a14,#5b9cf60c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('percent','app-png-icon')} ${cleanIconText(uiText('bondCouponBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('? '+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('bondCouponHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${uiText('bondAddTitle')}</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:10px;">${uiText('bondManualMode')}</div>
         <div class="field-group">
@@ -5872,7 +5854,7 @@ function renderCoins(){
         <span class="ticker-card-sym" style="color:var(--purple2)">${key}</span>
         <span class="ticker-card-qty">${g.totalQty}</span>
       </div>
-      <div class="ticker-card-name">$${g.curPrice>0?fmtD(g.curPrice,2):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'↗':'↘'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
+      <div class="ticker-card-name">$${g.curPrice>0?fmtD(g.curPrice,2):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'^':'Ў'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
       <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(toDisplayCurr(valUah))} ${sym}</div>
       <div class="ticker-card-pnl" style="color:${pnlCol}">${cost>0?(pnl>=0?'+':'')+fmtN(toDisplayCurr(pnlUah))+' '+sym+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
       ${avgBuy>0?`<div class="ticker-card-div">O $${fmtD(avgBuy,2)}</div>`:''}
@@ -5956,7 +5938,7 @@ function openCryptoDetail(coinKey){
     '</div>';
 
   // Collapsible trades
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon big')+' '+cryptoDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'Ў\';}else{el.style.display=\'none\';a.textContent=\'?\';}">'+uiIconHtml('trade','stock-detail-section-icon big')+' '+cryptoDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">?</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=parseFloat(t.qty)||0;
@@ -6015,8 +5997,8 @@ function sellCrypto(coinKey){
 }
 
 // -- FOREX -------------------------------------
-const FFLAGS={UAH:'UA',USD:'US',EUR:'EU',GBP:'GB',PLN:'PL',CHF:'CH',CZK:'CZ',RUB:'RU',KZT:'KZ',CNY:'CN',USDT:'US',OTHER:'FX'};
-const FSYM={UAH:'₴',USD:'$',EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',CNY:'¥',USDT:'$',OTHER:'¤'};
+const FFLAGS={EUR:'????',GBP:'????',PLN:'????',CHF:'????',CZK:'????',RUB:'????',KZT:'????',OTHER:'??'};
+const FSYM  ={EUR:'€',GBP:'?',PLN:'zl',CHF:'Fr',CZK:'Kc',RUB:'?',KZT:'?',OTHER:'?'};
 // -- STOCK DETAIL MODAL ------------------------
 function stockDetailTxt(key){
   const dict={
@@ -6074,7 +6056,7 @@ function openStockDetail(secId, tickerKey){
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('divMonth')+'</div></div>'+
     '</div>';
 
-  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon')+' '+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
+  html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'Ў\';}else{el.style.display=\'none\';a.textContent=\'?\';}">'+uiIconHtml('trade','stock-detail-section-icon')+' '+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">?</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
     const qty=stockNum(t.qty);
@@ -6124,7 +6106,7 @@ function sellStock(secId,tickerKey,refIdx){
     }
     closeStockDetail();renderSecuritiesCards();updateAll();saveData();
     if(totalProfit>0){
-      alert(stockDetailTxt('sold')+' '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(totalProfit)+'\n\n?? '+stockDetailTxt('addedCash'));
+      alert('?? '+stockDetailTxt('sold')+' '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(totalProfit)+'\n\n?? '+stockDetailTxt('addedCash'));
     }
   });
 }
@@ -6268,7 +6250,7 @@ function renderForex(){
     const isLive=(liveRates[cur]&&liveRates[cur]>0);
     return `<div class="balance-list-card">
       <div class="balance-list-head">
-        <span class="balance-list-flag">${FFLAGS[f.cur]||'FX'}</span>
+        <span class="balance-list-flag">${FFLAGS[f.cur]||'??'}</span>
         <span class="balance-list-code">${FSYM[f.cur]||''} ${cur}</span>
       </div>
       <div class="balance-list-amount">${fmtD(amount)} ${cur}</div>
@@ -7005,19 +6987,18 @@ function setLangFromSettings(lang){
   });
 }
 
-function getCurrSym(){
-  const cur=(displayCurrency||'uah').toUpperCase();
-  return {UAH:'₴',USD:'$',EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',CNY:'¥'}[cur]||cur;
+function getCurrSym(){return {'uah':'?','usd':'$','eur':'€','rub':'?','cny':'?'}[displayCurrency]||'?';}
+function getCurrRate(){
+  const cur=displayCurrency.toUpperCase();
+  if(cur==='UAH')return 1;
+  const rateUahPerCur=liveRates[cur];
+  if(rateUahPerCur&&rateUahPerCur>0)return 1/rateUahPerCur; // UAH > currency
+  // Fallback
+  return {'usd':1/(usdUahRate||41),'eur':1/((usdUahRate||41)*1.08),'rub':1/((usdUahRate||41)*0.009),'cny':1/((usdUahRate||41)/7.3)}[displayCurrency]||1;
 }
 function toDisplayCurr(uah){return Math.round(uah*getCurrRate());}
 function toDisplayCurrExact(uah){return (Number(uah)||0)*getCurrRate();}
 function fmtDisplayMoney2(uah){return fmtMax2(toDisplayCurrExact(uah));}
-function formatMarketDate(value){
-  if(!value)return '';
-  const d=new Date(String(value).slice(0,10)+'T00:00:00');
-  if(Number.isNaN(d.getTime()))return '';
-  return d.toLocaleDateString(appLocale(),{day:'2-digit',month:'short',year:'numeric'});
-}
 
 function setDisplayCurrency(cur){
   displayCurrency=cur;
@@ -7304,13 +7285,13 @@ function resetTestChecklist(){
 }
 
 function getTotalInCurrency(totalUah){
-  if(displayCurrency==='uah')return fmtN(Math.round(totalUah))+' ₴';
+  if(displayCurrency==='uah')return fmtN(Math.round(totalUah))+' ?';
   return getCurrSym()+fmtN(toDisplayCurr(totalUah));
 }
 
 // -- DEFAULT SECTION ON FIRST LOAD ------------------------
 function addDefaultSecuritiesCard(){
-  securitiesSections.push({id:'sec_stocks_default',type:'stocks',name:'Акції',icon:sectionIconImg('stocks'),items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency:'UAH',incomeAmount:0,incomeCurrency:'UAH',incomePeriod:'off'});
+  securitiesSections.push({id:'sec_stocks_default',type:'stocks',name:'Акції',icon:'??',items:[],lastRefresh:null,stockCashAmount:0,stockCashCurrency:'UAH',incomeAmount:0,incomeCurrency:'UAH',incomePeriod:'off'});
 }
 
 // -- PRECIOUS METALS ---------------------------------------
@@ -7496,8 +7477,8 @@ function getMetalsCardHtml(s){
   }).join('');
   return `<div class="card card-custom" id="card-${s.id}" draggable="true" data-card="${s.id}">
     <div class="card-header">
-      <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
-      <div class="card-icon">${sectionIconHtml({sectionType:'metals'},sectionIconImg('metals'))}</div>
+      <div class="drag-handle">?</div>
+      <div class="card-icon">${sectionIconHtml({sectionType:'metals'},'??')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${t('metalsBtn')||'Дорогоцінні метали'}</div>
         <div class="card-value">${sym}${fmtN(toDisplayCurr(totalCur))}</div>
@@ -7505,8 +7486,8 @@ function getMetalsCardHtml(s){
       </div>
       ${getCardSparklineHtml('metals')}
       <div class="card-actions">
-        <button class="card-del-btn" onclick="removeMetalsCard('${s.id}')">×</button>
-        <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+        <button class="card-del-btn" onclick="removeMetalsCard('${s.id}')">?</button>
+        <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
@@ -8228,14 +8209,14 @@ function renderLiabilities(){
           <div class="liab-card-amount">-${sym}${fmtN(toDisplayCurr(remaining))}</div>
           <div class="liab-card-sub">${sym}${fmtN(toDisplayCurr(payment))}${liabPerMonthUnit()} · ${schedule.months} ${liabMonthUnit()} · ${schedule.rate}%</div>
         </div>
-        <div class="liab-card-toggle">▼</div>
+        <div class="liab-card-toggle">Ў</div>
       </div>
       <div class="liab-card-body">
         <!-- PROGRESS BAR -->
         <div class="liab-progress-wrap">
           <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;margin-bottom:4px;">
-            <span style="color:var(--green2)">${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,schedule.paidPrincipal)))}</span>
-            <span style="color:var(--red)">${t('liabLeft')}: ${sym}${fmtN(toDisplayCurr(remaining))}</span>
+            <span style="color:var(--green2)">? ${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,schedule.paidPrincipal)))}</span>
+            <span style="color:var(--red)">? ${t('liabLeft')}: ${sym}${fmtN(toDisplayCurr(remaining))}</span>
           </div>
           <div class="liab-progress-bar-bg">
             <div class="liab-progress-bar-fill" style="width:${progress.toFixed(1)}%"></div>
@@ -9157,7 +9138,7 @@ function sectionPerfTxt(key){
     profitLoss:{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'??'},
     dayResult:{uk:'Сьогодні',ru:'Сегодня',en:'Today',de:'Heute',zh:'??'},
     upPrice:{uk:'^ ріст ціни',ru:'^ рост цены',en:'^ price up',de:'^ Preis steigt',zh:'^ ????'},
-    downPrice:{uk:'↘ падіння ціни',ru:'↘ падение цены',en:'↘ price down',de:'↘ Preis fällt',zh:'↘ 价格下跌'},
+    downPrice:{uk:'Ў падіння ціни',ru:'Ў падение цены',en:'Ў price down',de:'Ў Preis fallt',zh:'Ў ????'},
     flatPrice:{uk:'— без змін',ru:'— без изменений',en:'— no change',de:'— unverandert',zh:'— ???'}
   };
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
@@ -9319,13 +9300,13 @@ function renderDiagnostics(){
   const assets=[
     {name:sectionPerfTxt('deposits'),val:dep,color:'var(--blue2)',icon:diagIconHtml('deposit','??')},
     {name:sectionPerfTxt('crypto'),val:crypto,color:'var(--purple2)',icon:diagIconHtml('crypto','?')},
-    {name:'USD',val:usd,color:'var(--teal2)',icon:sectionIconImg('stocks')},
+    {name:'USD',val:usd,color:'var(--teal2)',icon:'??'},
     {name:sectionPerfTxt('currency'),val:forex,color:'var(--orange2)',icon:diagIconHtml('forex','??')},
     {name:sectionPerfTxt('cash'),val:cash,color:'var(--gold2)',icon:diagIconHtml('cash','??')},
     {name:sectionPerfTxt('account'),val:other,color:'var(--green2)',icon:diagIconHtml('account','??')},
     {name:sectionPerfTxt('stocks'),val:securities,color:'var(--green2)',icon:diagIconHtml('stocks','??')},
     {name:sectionPerfTxt('metals'),val:metals,color:'var(--gold2)',icon:diagIconHtml('metals','??')},
-    {name:sectionPerfTxt('other'),val:custom,color:'var(--purple2)',icon:sectionIconImg('stocks')},
+    {name:sectionPerfTxt('other'),val:custom,color:'var(--purple2)',icon:'??'},
   ].filter(a=>a.val>0).sort((a,b)=>b.val-a.val);
 
   const fmtChange=(stat,pMaybe)=>{
@@ -9889,8 +9870,8 @@ getCustomCardHtml=function(s,idx){
     
     return `<div class="card card-startup" id="card-${s.id}" draggable="true" data-card="${s.id}">
       <div class="card-header">
-        <div class="drag-handle"><span class="drag-dot-grid" aria-hidden="true"></span></div>
-        <div class="card-icon">${sectionIconHtml(s,sectionIconImg('startups'))}</div>
+        <div class="drag-handle">?</div>
+        <div class="card-icon">${sectionIconHtml(s,'??')}</div>
         <div class="card-info" onclick="toggleCard('${s.id}')">
           <div class="card-name">${escapeHtml(startupTitle)}</div>
           <div class="card-value" id="customDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(st.total))}</div>
@@ -9898,8 +9879,8 @@ getCustomCardHtml=function(s,idx){
         </div>
         ${getCardSparklineHtml('startups')}
         <div class="card-actions">
-          <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">×</button>
-          <div class="card-toggle" onclick="toggleCard('${s.id}')">▼</div>
+          <button class="card-del-btn" onclick="removeCustomSection('${s.id}')">?</button>
+          <div class="card-toggle" onclick="toggleCard('${s.id}')">Ў</div>
         </div>
       </div>
       <div class="card-body"><div class="card-inner">
@@ -11034,7 +11015,7 @@ setTimeout(()=>renderMainCounter(),600);
 
 // -- PNG ICON LABEL CLEANUP -----------------------------
 function stripLegacyIconGlyphs(text){
-  return String(text||'').trimStart();
+  return String(text||'').replace(/^[\s???????????????????????%??????!]+/u,'').trimStart();
 }
 function cleanupPngIconLabels(root){
   const scope=root&&root.querySelectorAll?root:document;
@@ -11054,7 +11035,7 @@ function cleanupPngIconLabels(root){
   scope.querySelectorAll(selectors).forEach(el=>{
     if(!el.querySelector('img'))return;
     el.childNodes.forEach(node=>{
-      if(node.nodeType===3)node.nodeValue=node.nodeValue.trimStart();
+      if(node.nodeType===3)node.nodeValue=node.nodeValue.replace(/[???????????????????????]/gu,'');
       if(node.nodeType===1&&!node.querySelector('img'))node.textContent=stripLegacyIconGlyphs(node.textContent);
     });
   });
