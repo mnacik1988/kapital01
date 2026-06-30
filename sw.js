@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-43-subscription-only';
+const CACHE_NAME = 'investory-app-v0-0-44-remove-tax-note';
 const APP_SHELL = [
   './',
   './index.html',
