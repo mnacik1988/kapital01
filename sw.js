@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-57-safe-import';
+const CACHE_NAME = 'investory-app-v0-0-43-subscription-only';
 const APP_SHELL = [
   './',
   './index.html',
