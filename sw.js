@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-49-card-controls-fix';
+const CACHE_NAME = 'investory-app-v0-0-56-symbol-cleanup';
 const APP_SHELL = [
   './',
   './index.html',
