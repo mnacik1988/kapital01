@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-55-ai-chat';
+﻿const CACHE_NAME = 'investory-app-v0-0-56-ai-serverkey';
 const APP_SHELL = [
   './',
   './index.html',

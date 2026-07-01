@@ -20,7 +20,7 @@ export default {
     const url = new URL(request.url);
 
     // AI proxy — POST only, handled before GET-only guard
-    if (url.pathname === '/ai') return handleAI(request, origin);
+    if (url.pathname === '/ai') return handleAI(request, origin, env);
 
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
 
@@ -161,10 +161,10 @@ async function getStock(ticker, env) {
   });
 }
 
-async function handleAI(request, origin) {
+async function handleAI(request, origin, env) {
   if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
-  const apiKey = request.headers.get('X-Claude-Key') || '';
-  if (!apiKey.startsWith('sk-ant-')) return json({ error: 'Invalid API key' }, 401, origin);
+  const apiKey = env.CLAUDE_KEY || '';
+  if (!apiKey) return json({ error: 'AI not configured' }, 503, origin);
 
   let body;
   try { body = await request.json(); } catch { return json({ error: 'Invalid request body' }, 400, origin); }
@@ -296,7 +296,7 @@ function responseHeaders(origin, maxAge) {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Claude-Key',
+    'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
     'Cache-Control': maxAge ? 'public, max-age=' + maxAge : 'no-store',
     'Vary': 'Origin',
