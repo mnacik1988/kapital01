@@ -173,24 +173,27 @@ async function handleAI(request, origin, env) {
     return json({ error: 'messages required' }, 400, origin);
   }
 
+  const reqBody = {
+    model: 'claude-sonnet-5',
+    max_tokens: Math.min(Number(body.max_tokens) || 1024, 2048),
+    system: String(body.system || '').slice(0, 4000),
+    messages: body.messages.slice(-20).map(m => ({ role: String(m.role), content: String(m.content) }))
+  };
   const claudeResp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey,
+      'x-api-key': apiKey.trim(),
       'anthropic-version': '2023-06-01'
     },
-    body: JSON.stringify({
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: Math.min(Number(body.max_tokens) || 1024, 2048),
-      system: String(body.system || ''),
-      messages: body.messages.slice(-20)
-    })
+    body: JSON.stringify(reqBody)
   }).catch(e => { throw new Error('Anthropic unreachable: ' + e.message); });
 
-  const data = await claudeResp.json().catch(() => ({}));
+  const rawText = await claudeResp.text().catch(() => '');
+  let data = {};
+  try { data = JSON.parse(rawText); } catch {}
   if (!claudeResp.ok) {
-    return json({ error: data?.error?.message || 'Claude API error ' + claudeResp.status }, claudeResp.status, origin);
+    return json({ error: data?.error?.message || ('Claude error ' + claudeResp.status) }, 200, origin, 0);
   }
   const content = data?.content?.[0]?.text || '';
   return json({ content }, 200, origin, 0);
