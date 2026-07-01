@@ -100,15 +100,13 @@ async function getStock(ticker, env) {
     const base = 'https://finnhub.io/api/v1/';
     const token = encodeURIComponent(env.FINNHUB_KEY);
     const symbol = encodeURIComponent(ticker);
-    const [quoteRes, profileRes, metricsRes, divRes] = await Promise.all([
+    const [quoteRes, profileRes, metricsRes] = await Promise.all([
       providerFetch(base + 'quote?symbol=' + symbol + '&token=' + token),
       providerFetch(base + 'stock/profile2?symbol=' + symbol + '&token=' + token),
-      providerFetch(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token),
-      providerFetch(base + 'stock/dividend2?symbol=' + symbol + '&token=' + token).catch(() => null)
+      providerFetch(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token)
     ]);
-    const [quote, profile, metrics, divData] = await Promise.all([
-      quoteRes.json(), profileRes.json(), metricsRes.json(),
-      divRes ? divRes.json().catch(() => null) : Promise.resolve(null)
+    const [quote, profile, metrics] = await Promise.all([
+      quoteRes.json(), profileRes.json(), metricsRes.json()
     ]);
     if (!Number(quote?.c)) throw new Error('Ticker not found');
 
@@ -116,14 +114,31 @@ async function getStock(ticker, env) {
     const previous = Number(quote.pc) || price;
     const change = price - previous;
 
-    const today = new Date().toISOString().slice(0, 10);
-    const divList = Array.isArray(divData?.data) ? divData.data : [];
-    // Find next upcoming dividend (future ex-date), fall back to most recent past
-    const upcoming = divList.filter(d => d.exDate && d.exDate >= today)
-      .sort((a, b) => a.exDate.localeCompare(b.exDate))[0];
-    const lastPast = divList.filter(d => d.exDate && d.exDate < today)
-      .sort((a, b) => b.exDate.localeCompare(a.exDate))[0];
-    const divEntry = upcoming || lastPast || null;
+    // Fetch dividend events from Yahoo Finance chart (range=1y includes announced future dates)
+    let exDate = '', payDate = '', divIsFuture = false;
+    try {
+      const yahooResp = await fetch(
+        'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker) +
+        '?range=1y&interval=1mo&events=div',
+        { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } }
+      );
+      if (yahooResp.ok) {
+        const yahooData = await yahooResp.json().catch(() => null);
+        const divEvents = yahooData?.chart?.result?.[0]?.events?.dividends || {};
+        const todayTs = Math.floor(Date.now() / 1000);
+        const tsToIso = ts => ts ? new Date(ts * 1000).toISOString().slice(0, 10) : '';
+        // Find nearest upcoming ex-date, fallback to most recent past ex-date
+        const tsList = Object.keys(divEvents).map(Number).sort((a, b) => a - b);
+        const future = tsList.filter(ts => ts >= todayTs);
+        const past = tsList.filter(ts => ts < todayTs);
+        const pick = future.length ? future[0] : (past.length ? past[past.length - 1] : 0);
+        if (pick) {
+          exDate = tsToIso(pick);
+          payDate = tsToIso(divEvents[String(pick)]?.date);
+          divIsFuture = pick >= todayTs;
+        }
+      }
+    } catch(_) {}
 
     return {
       ticker,
@@ -134,10 +149,9 @@ async function getStock(ticker, env) {
       divYield: round(Number(metrics?.metric?.dividendYieldIndicatedAnnual) || 0, 4),
       divAbs: round(Number(metrics?.metric?.dividendsPerShareAnnual) || 0, 4),
       currency: profile?.currency || 'USD',
-      exDate: divEntry?.exDate || '',
-      payDate: divEntry?.paymentDate || '',
-      divEntryAmt: round(Number(divEntry?.amount) || 0, 4),
-      divIsFuture: !!(upcoming)
+      exDate,
+      payDate,
+      divIsFuture
     };
   });
 }
