@@ -197,7 +197,8 @@ async function handleAI(request, origin, env) {
   if (!claudeResp.ok) {
     return json({ error: data?.error?.message || ('Claude error ' + claudeResp.status) }, 200, origin, 0);
   }
-  const content = data?.content?.[0]?.text || '';
+  const textBlock = (data?.content || []).find(b => b.type === 'text');
+  const content = textBlock?.text || '';
   return json({ content }, 200, origin, 0);
 }
 
