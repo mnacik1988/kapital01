@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-49-metal-dropdown-fix';
+﻿const CACHE_NAME = 'investory-app-v0-0-50-audit-fixes';
 const APP_SHELL = [
   './',
   './index.html',
@@ -41,7 +41,8 @@ const APP_SHELL = [
   './section-icons/ui-sold.png?v=1',
   './section-icons/Gold.png',
   './section-icons/Silver.png',
-  './section-icons/Platinum.png'
+  './section-icons/Platinum.png',
+  'https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@400;600;700;800&display=swap'
 ];
 
 self.addEventListener('install', event => {
@@ -82,5 +83,6 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
+
 
 
