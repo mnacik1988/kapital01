@@ -424,7 +424,7 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .bottom-nav-btn:active{transform:translateY(1px) scale(.97);background:var(--bg3);}
 .bottom-nav-btn .bn-icon{width:58px;height:58px;line-height:1;display:flex;align-items:center;justify-content:center;filter:saturate(.95);}
 .bottom-nav-icon{width:58px;height:58px;display:block;object-fit:contain;filter:drop-shadow(0 2px 5px #00000055);}
-.bottom-nav-btn .bn-label{font-family:'DM Mono',monospace;font-size:6.6px;line-height:1.05;letter-spacing:0;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.bottom-nav-btn .bn-label{display:none;}
 .bottom-nav-btn.primary{color:var(--green2);}
 .bottom-nav-btn.center{height:54px;align-self:start;margin-top:-17px;color:#fff;gap:2px;padding-top:0;}
 .bottom-nav-btn.center .bn-icon{width:60px;height:60px;border-radius:18px;background:transparent;display:flex;align-items:center;justify-content:center;box-shadow:0 9px 22px #00000042;}
@@ -2769,7 +2769,7 @@ const STORAGE_ROLLBACK_KEY = 'kapital_import_rollback';
 const STORAGE_MIGRATION_BACKUP_KEY = 'kapital_pre_migration_backup';
 const TRIAL_DAYS = 30;
 const SUBSCRIPTION_KEY = 'investory_subscription_active';
-const TEST_BUILD = true;
+const TEST_BUILD = false;
 const TEST_ACCESS_KEY = 'investory_test_access_active';
 const ACCESS_STATES = Object.freeze({TRIAL:'trial', SUBSCRIBED:'subscribed', LOCKED:'locked'});
 
@@ -3993,7 +3993,8 @@ function calcLive(depId){
   const currentBalance=sim.bodyBalance;
   const perSec=sim.dailyNet/86400;
   const perDay=sim.dailyNet;
-  const perMonth=sim.dailyNet*30.44;
+  const daysThisMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const perMonth=sim.dailyNet*daysThisMonth;
   const displayA=sim.totalValue;
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
@@ -4629,7 +4630,7 @@ async function fetchTickerForInput(secId){
     const errMsg=stockLastError||'Обидва джерела недоступні';
     if(info){info.className='stock-price-info visible';info.innerHTML=
       `<div class="spi-name" style="color:var(--red)">⚠ Не вдалося отримати дані для "${ticker}"</div>`+
-      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${errMsg}</div>`+
+      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${escHtml(errMsg)}</div>`+
       `<div style="display:flex;gap:8px;margin-top:8px;">
         <button onclick="fetchTickerForInput('${secId}')" style="flex:1;background:#4ecb8d20;border:1px solid #4ecb8d40;border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;">↺ Спробувати ще раз</button>
         <button onclick="document.getElementById('stockInfo_${secId}').className='stock-price-info'" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);cursor:pointer;">Ввести вручну</button>
@@ -6161,8 +6162,8 @@ function customPrompt(msg, defVal, cb){
   const ov=document.createElement('div');
   ov.className='custom-dialog-overlay';
   ov.innerHTML=`<div class="custom-dialog-box">
-    <div class="custom-dialog-title">${msg}</div>
-    <input id="_cpInput" class="custom-dialog-input" type="text" inputmode="decimal" value="${defVal||''}">
+    <div class="custom-dialog-title">${escHtml(msg)}</div>
+    <input id="_cpInput" class="custom-dialog-input" type="text" inputmode="decimal" value="${escHtml(defVal||'')}">
     <div class="custom-dialog-actions">
       <button class="custom-dialog-cancel" onclick="this.closest('.custom-dialog-overlay').remove()">${t('cancel')||'Скасувати'}</button>
       <button id="_cpOk" class="custom-dialog-ok">OK</button>
@@ -6179,7 +6180,7 @@ window.alert=function(msg){
   const ov=document.createElement('div');
   ov.className='custom-dialog-overlay';
   ov.innerHTML=`<div class="custom-dialog-box">
-    <div class="custom-dialog-message">${msg}</div>
+    <div class="custom-dialog-message">${escHtml(msg)}</div>
     <button onclick="this.closest('.custom-dialog-overlay').remove()" class="custom-dialog-ok" style="width:100%;">OK</button>
   </div>`;
   document.body.appendChild(ov);
@@ -6198,7 +6199,7 @@ function customConfirm(msg, onYes, onNo){
   const ov=document.createElement('div');
   ov.className='custom-dialog-overlay';
   ov.innerHTML=`<div class="custom-dialog-box">
-    <div class="custom-dialog-message">${msg}</div>
+    <div class="custom-dialog-message">${escHtml(msg)}</div>
     <div class="custom-dialog-actions">
       <button id="_ccNo" class="custom-dialog-cancel">${t('cancel')||'Скасувати'}</button>
       <button id="_ccYes" class="custom-dialog-ok">${customDialogConfirmText()}</button>
