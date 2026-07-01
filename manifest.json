@@ -1,6 +1,6 @@
 {
-  "name": "Kapital",
-  "short_name": "Kapital",
+  "name": "InveStory",
+  "short_name": "InveStory",
   "description": "Personal finance asset tracker for deposits, stocks, crypto, currencies, metals and liabilities.",
   "start_url": "./index.html",
   "scope": "./",

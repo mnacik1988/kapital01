@@ -100,11 +100,10 @@ async function getStock(ticker, env) {
     const base = 'https://finnhub.io/api/v1/';
     const token = encodeURIComponent(env.FINNHUB_KEY);
     const symbol = encodeURIComponent(ticker);
-    const [quoteRes, profileRes, metricsRes, dividendInfo] = await Promise.all([
+    const [quoteRes, profileRes, metricsRes] = await Promise.all([
       providerFetch(base + 'quote?symbol=' + symbol + '&token=' + token),
       providerFetch(base + 'stock/profile2?symbol=' + symbol + '&token=' + token),
-      providerFetch(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token),
-      getDividendInfo(ticker, env).catch(() => ({}))
+      providerFetch(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token)
     ]);
     const [quote, profile, metrics] = await Promise.all([
       quoteRes.json(), profileRes.json(), metricsRes.json()
@@ -122,94 +121,9 @@ async function getStock(ticker, env) {
       changePct: round(previous ? change / previous * 100 : 0, 4),
       divYield: round(Number(metrics?.metric?.dividendYieldIndicatedAnnual) || 0, 4),
       divAbs: round(Number(metrics?.metric?.dividendsPerShareAnnual) || 0, 4),
-      currency: profile?.currency || 'USD',
-      ...dividendInfo
+      currency: profile?.currency || 'USD'
     };
   });
-}
-
-async function getDividendInfo(ticker, env) {
-  if (!env.FINNHUB_KEY) return {};
-  return memoize('dividend:' + ticker, async () => {
-    const base = 'https://finnhub.io/api/v1/';
-    const token = encodeURIComponent(env.FINNHUB_KEY);
-    const symbol = encodeURIComponent(ticker);
-    const now = new Date();
-    const today = formatISODate(now);
-    const nextYear = new Date(now);
-    nextYear.setFullYear(nextYear.getFullYear() + 1);
-    const twoYearsAgo = new Date(now);
-    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-
-    let events = [];
-    try {
-      const calendarRes = await providerFetch(
-        base + 'calendar/dividends?from=' + today +
-        '&to=' + formatISODate(nextYear) +
-        '&symbol=' + symbol +
-        '&token=' + token
-      );
-      const calendar = await calendarRes.json();
-      events = normalizeDividendEvents(calendar?.dividends || calendar, ticker);
-    } catch {}
-
-    if (!events.length) {
-      try {
-        const historyRes = await providerFetch(
-          base + 'stock/dividend?symbol=' + symbol +
-          '&from=' + formatISODate(twoYearsAgo) +
-          '&to=' + formatISODate(nextYear) +
-          '&token=' + token
-        );
-        const history = await historyRes.json();
-        events = normalizeDividendEvents(history, ticker);
-      } catch {}
-    }
-
-    if (!events.length) return {};
-    const todayTime = Date.parse(today + 'T00:00:00Z');
-    const future = events
-      .filter(item => Date.parse((item.paymentDate || item.date) + 'T00:00:00Z') >= todayTime)
-      .sort((a, b) => Date.parse((a.paymentDate || a.date) + 'T00:00:00Z') - Date.parse((b.paymentDate || b.date) + 'T00:00:00Z'))[0];
-    const latest = events
-      .filter(item => Date.parse((item.paymentDate || item.date) + 'T00:00:00Z') < todayTime)
-      .sort((a, b) => Date.parse((b.paymentDate || b.date) + 'T00:00:00Z') - Date.parse((a.paymentDate || a.date) + 'T00:00:00Z'))[0];
-    const source = future || latest;
-    if (!source) return {};
-    const prefix = future ? 'next' : 'last';
-    return {
-      [prefix + 'DividendDate']: source.paymentDate || source.date || '',
-      [prefix + 'DividendAmount']: round(Number(source.amount) || 0, 4),
-      [prefix + 'DividendCurrency']: source.currency || ''
-    };
-  });
-}
-
-function normalizeDividendEvents(payload, ticker) {
-  const rows = Array.isArray(payload) ? payload : [];
-  const wanted = String(ticker || '').toUpperCase();
-  return rows
-    .filter(item => {
-      const symbol = String(item?.symbol || item?.ticker || wanted).toUpperCase();
-      return !wanted || symbol === wanted;
-    })
-    .map(item => ({
-      date: normalizeDate(item?.date || item?.exDate || item?.recordDate || item?.declarationDate),
-      paymentDate: normalizeDate(item?.paymentDate || item?.payDate || item?.payableDate),
-      amount: Number(item?.amount || item?.adjustedAmount || item?.dividend || 0),
-      currency: item?.currency || item?.dividendCurrency || ''
-    }))
-    .filter(item => item.date || item.paymentDate);
-}
-
-function normalizeDate(value) {
-  if (!value) return '';
-  const text = String(value).slice(0, 10);
-  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : '';
-}
-
-function formatISODate(date) {
-  return date.toISOString().slice(0, 10);
 }
 
 async function handleRates(origin) {

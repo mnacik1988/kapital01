@@ -223,13 +223,6 @@ body.theme-light .pretty-select-option.active{background:linear-gradient(135deg,
 .result-val.red{color:var(--red);}
 .result-val.blue{color:var(--blue2);}
 .result-val.orange{color:var(--orange2);}
-.eff-info-btn{width:14px;height:14px;border-radius:50%;border:1px solid var(--muted);background:transparent;color:var(--muted);font-size:9px;font-weight:700;cursor:pointer;margin-left:5px;padding:0;vertical-align:middle;line-height:14px;display:inline-flex;align-items:center;justify-content:center;}
-.eff-info-btn.active{border-color:var(--gold2);color:var(--gold2);}
-.eff-info-box{display:none;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin:2px 0 6px;}
-.eff-info-box.open{display:block;}
-.eff-info-title{font-size:10px;font-weight:600;color:var(--text);margin-bottom:6px;}
-.eff-info-formula{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);background:var(--bg3);border-radius:6px;padding:6px 8px;margin-bottom:6px;text-align:center;}
-.eff-info-note{font-size:10px;color:var(--muted2);line-height:1.55;}
 
 /* CALC */
 .calc-section{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:6px;}
@@ -431,7 +424,7 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .bottom-nav-btn:active{transform:translateY(1px) scale(.97);background:var(--bg3);}
 .bottom-nav-btn .bn-icon{width:58px;height:58px;line-height:1;display:flex;align-items:center;justify-content:center;filter:saturate(.95);}
 .bottom-nav-icon{width:58px;height:58px;display:block;object-fit:contain;filter:drop-shadow(0 2px 5px #00000055);}
-.bottom-nav-btn .bn-label{display:none;}
+.bottom-nav-btn .bn-label{font-family:'DM Mono',monospace;font-size:6.6px;line-height:1.05;letter-spacing:0;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .bottom-nav-btn.primary{color:var(--green2);}
 .bottom-nav-btn.center{height:54px;align-self:start;margin-top:-17px;color:#fff;gap:2px;padding-top:0;}
 .bottom-nav-btn.center .bn-icon{width:60px;height:60px;border-radius:18px;background:transparent;display:flex;align-items:center;justify-content:center;box-shadow:0 9px 22px #00000042;}
@@ -2567,7 +2560,7 @@ body.modern-mockup.theme-light .total-currency{
       </div>
       <div class="app-version-card">
         <span class="app-version-label" id="appVersionLabel">Версія застосунку</span>
-        <span class="app-version-value" id="appVersionValue">v0.0.44-test</span>
+        <span class="app-version-value" id="appVersionValue">v0.0.22</span>
       </div>
       <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
         <div class="settings-label" id="set_qa_label">QA / Release</div>
@@ -2698,7 +2691,7 @@ body.modern-mockup.theme-light .total-currency{
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.44-test</span></div>
+<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.41-test</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -2767,8 +2760,8 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.44-test';
-const APP_BUILD_DATE = '2026-06-25';
+const APP_VERSION = 'v0.0.41-test';
+const APP_BUILD_DATE = '2026-06-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -2776,7 +2769,7 @@ const STORAGE_ROLLBACK_KEY = 'kapital_import_rollback';
 const STORAGE_MIGRATION_BACKUP_KEY = 'kapital_pre_migration_backup';
 const TRIAL_DAYS = 30;
 const SUBSCRIPTION_KEY = 'investory_subscription_active';
-const TEST_BUILD = false;
+const TEST_BUILD = true;
 const TEST_ACCESS_KEY = 'investory_test_access_active';
 const ACCESS_STATES = Object.freeze({TRIAL:'trial', SUBSCRIBED:'subscribed', LOCKED:'locked'});
 
@@ -2850,7 +2843,7 @@ const LANGS={
     compCalc:'Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
     taxPct:'Податок (%)',taxFree:'Без податку (₴)',
-    finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',effRateInfoTitle:'Як розраховується ефективна ставка?',effRateInfoFormula:'Чистий прибуток ÷ Сума ÷ Роки × 100',effRateInfoNote:'Показує реальний річний дохід після всіх податків. Може відрізнятись від ставки банку через різні методики розрахунку.',
+    finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',
     incomeDays:'Дохід по днях (перші 30 днів)',yield:'⚡ Дохідність',
     secName:'Назва',secQty:'Кількість',secPrice:'Ціна (₴)',secDiv:'Дивіденди (%)',secTotal:'Вартість',secActions:'Дія',
     addSecItem:'+ Додати позицію',removeSection:'✕ Видалити розділ',
@@ -2891,7 +2884,7 @@ const LANGS={
     compCalc:'Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
     taxPct:'Налог (%)',taxFree:'Без налога (₴)',
-    finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',effRateInfoTitle:'Как рассчитывается эффективная ставка?',effRateInfoFormula:'Чистая прибыль ÷ Сумма ÷ Лет × 100',effRateInfoNote:'Показывает реальный годовой доход после всех налогов. Может отличаться от ставки банка из-за разных методик расчёта.',
+    finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',
     incomeDays:'Доход по дням (первые 30 дней)',yield:'⚡ Доходность',
     secName:'Название',secQty:'Количество',secPrice:'Цена (₴)',secDiv:'Дивиденды (%)',secTotal:'Стоимость',secActions:'Действие',
     addSecItem:'+ Добавить позицию',removeSection:'✕ Удалить раздел',
@@ -2932,7 +2925,7 @@ const LANGS={
     compCalc:'Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
     monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
     taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
-    finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',effRateInfoTitle:'How is the effective rate calculated?',effRateInfoFormula:'Net Profit ÷ Principal ÷ Years × 100',effRateInfoNote:'Shows the real annual return after all taxes. May differ from your bank\'s rate due to different calculation methods.',
+    finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',
     incomeDays:'Daily Income (first 30 days)',yield:'⚡ Yield',
     secName:'Name',secQty:'Qty',secPrice:'Price (₴)',secDiv:'Dividends (%)',secTotal:'Value',secActions:'Action',
     addSecItem:'+ Add Position',removeSection:'✕ Delete Section',
@@ -2973,7 +2966,7 @@ const LANGS={
     rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxPct:'Steuer (%)',taxFree:'Steuerfrei (€)',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
     monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
     compCalc:'Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
-    finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',effRateInfoTitle:'Wie wird der effektive Zinssatz berechnet?',effRateInfoFormula:'Nettogewinn ÷ Betrag ÷ Jahre × 100',effRateInfoNote:'Zeigt den realen Jahresertrag nach allen Steuern. Kann von der Bankrate aufgrund unterschiedlicher Berechnungsmethoden abweichen.',
+    finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',
     incomeDays:'Tageseinkommen (erste 30 Tage)',
     calcTitle:'Zinseszinsrechner',totalSum:'Gesamtbetrag',taxBase:'Steuerbasis',
     perSecond:'Pro Sekunde',perDay:'Pro Tag',perSec:'Pro Sekunde',
@@ -3014,7 +3007,7 @@ const LANGS={
     rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxPct:'税率 (%)',taxFree:'免税额 (¥)',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
     monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
     compCalc:'复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
-    finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',effRateInfoTitle:'实际利率如何计算？',effRateInfoFormula:'净利润 ÷ 本金 ÷ 年数 × 100',effRateInfoNote:'显示扣除所有税款后的实际年化收益。由于计算方法不同，可能与银行利率有所差异。',
+    finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',
     incomeDays:'每日收入（前30天）',
     calcTitle:'复利计算器',totalSum:'总金额',
     perSecond:'每秒',perDay:'每天',perSec:'每秒',
@@ -3164,8 +3157,10 @@ Object.assign(EXTRA_I18N,{
   'Вартість покупки':{uk:'Вартість покупки',ru:'Стоимость покупки',en:'Purchase cost',de:'Kaufwert',zh:'买入成本'},
   'Прибуток / Збиток':{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'盈利 / 亏损'},
   '💹 Середня ціна покупки':{uk:'💹 Середня ціна покупки',ru:'💹 Средняя цена покупки',en:'💹 Average purchase price',de:'💹 Durchschnittlicher Kaufpreis',zh:'💹 平均买入价'},
+  '🏛 Податки (депозити)':{uk:'🏛 Податки (депозити)',ru:'🏛 Налоги (депозиты)',en:'🏛 Taxes (deposits)',de:'🏛 Steuern (Einlagen)',zh:'🏛 税费（存款）'},
   'Депозит':{uk:'Депозит',ru:'Депозит',en:'Deposit',de:'Einlage',zh:'存款'},
-  'Без податку':{uk:'Без податку',ru:'Без налога',en:'Tax-free',de:'Steuerfrei',zh:'免税'}
+  'Без податку':{uk:'Без податку',ru:'Без налога',en:'Tax-free',de:'Steuerfrei',zh:'免税'},
+  '💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.':{uk:'💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.',ru:'💡 В Украине налог на депозиты: 18% + 1.5% военный сбор = 19.5%. Укажите в настройках депозита.',en:'💡 In Ukraine, deposit tax is 18% + 1.5% military levy = 19.5%. Set it in deposit settings.',de:'💡 In der Ukraine beträgt die Steuer auf Einlagen 18% + 1,5% Militärabgabe = 19,5%. In den Einlageneinstellungen festlegen.',zh:'💡 在乌克兰，存款税为 18% + 1.5% 军费 = 19.5%。请在存款设置中填写。'}
 });
 
 Object.assign(EXTRA_I18N,{
@@ -3607,17 +3602,7 @@ function getDepositHtml(dep,idx){
             <div class="result-row"><span class="result-key">${lang.taxBase}</span><span class="result-val" id="r-taxbase_${dep.id}">—</span></div>
             <div class="result-row"><span class="result-key">${lang.taxPDFO} <span class="tag tag-tax">ПДФО</span></span><span class="result-val red" id="r-tax_${dep.id}">—</span></div>
             <div class="result-row"><span class="result-key">${lang.netProfit} <span class="tag tag-net">${lang.taxPDFO.toLowerCase()}</span></span><span class="result-val green" id="r-net_${dep.id}">—</span></div>
-            <div class="result-row" style="align-items:flex-start;flex-direction:column;gap:0;">
-              <div style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:5px 0;">
-                <span class="result-key">${lang.effRate} <button class="eff-info-btn" onclick="toggleEffInfo('${dep.id}')" aria-label="info">i</button></span>
-                <span class="result-val" id="r-eff_${dep.id}">—</span>
-              </div>
-              <div class="eff-info-box" id="eff-info_${dep.id}">
-                <div class="eff-info-title">${lang.effRateInfoTitle||'How is the effective rate calculated?'}</div>
-                <div class="eff-info-formula">${lang.effRateInfoFormula||'Net Profit ÷ Principal ÷ Years × 100'}</div>
-                <div class="eff-info-note">${lang.effRateInfoNote||'Shows the real annual return after all taxes.'}</div>
-              </div>
-            </div>
+            <div class="result-row"><span class="result-key">${lang.effRate}</span><span class="result-val" id="r-eff_${dep.id}">—</span></div>
           </div>
         </div>
         </div>
@@ -4010,8 +3995,7 @@ function calcLive(depId){
   const currentBalance=sim.bodyBalance;
   const perSec=sim.dailyNet/86400;
   const perDay=sim.dailyNet;
-  const daysThisMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  const perMonth=sim.dailyNet*daysThisMonth;
+  const perMonth=sim.dailyNet*30.44;
   const displayA=sim.totalValue;
   const intPart=Math.floor(displayA).toLocaleString('uk-UA');
   const decPart=(displayA%1).toFixed(2).slice(1);
@@ -4647,7 +4631,7 @@ async function fetchTickerForInput(secId){
     const errMsg=stockLastError||'Обидва джерела недоступні';
     if(info){info.className='stock-price-info visible';info.innerHTML=
       `<div class="spi-name" style="color:var(--red)">⚠ Не вдалося отримати дані для "${ticker}"</div>`+
-      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${escHtml(errMsg)}</div>`+
+      `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${errMsg}</div>`+
       `<div style="display:flex;gap:8px;margin-top:8px;">
         <button onclick="fetchTickerForInput('${secId}')" style="flex:1;background:#4ecb8d20;border:1px solid #4ecb8d40;border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;">↺ Спробувати ще раз</button>
         <button onclick="document.getElementById('stockInfo_${secId}').className='stock-price-info'" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);cursor:pointer;">Ввести вручну</button>
@@ -6179,8 +6163,8 @@ function customPrompt(msg, defVal, cb){
   const ov=document.createElement('div');
   ov.className='custom-dialog-overlay';
   ov.innerHTML=`<div class="custom-dialog-box">
-    <div class="custom-dialog-title">${escHtml(msg)}</div>
-    <input id="_cpInput" class="custom-dialog-input" type="text" inputmode="decimal" value="${escHtml(defVal||'')}">
+    <div class="custom-dialog-title">${msg}</div>
+    <input id="_cpInput" class="custom-dialog-input" type="text" inputmode="decimal" value="${defVal||''}">
     <div class="custom-dialog-actions">
       <button class="custom-dialog-cancel" onclick="this.closest('.custom-dialog-overlay').remove()">${t('cancel')||'Скасувати'}</button>
       <button id="_cpOk" class="custom-dialog-ok">OK</button>
@@ -6197,7 +6181,7 @@ window.alert=function(msg){
   const ov=document.createElement('div');
   ov.className='custom-dialog-overlay';
   ov.innerHTML=`<div class="custom-dialog-box">
-    <div class="custom-dialog-message">${escHtml(msg)}</div>
+    <div class="custom-dialog-message">${msg}</div>
     <button onclick="this.closest('.custom-dialog-overlay').remove()" class="custom-dialog-ok" style="width:100%;">OK</button>
   </div>`;
   document.body.appendChild(ov);
@@ -6216,7 +6200,7 @@ function customConfirm(msg, onYes, onNo){
   const ov=document.createElement('div');
   ov.className='custom-dialog-overlay';
   ov.innerHTML=`<div class="custom-dialog-box">
-    <div class="custom-dialog-message">${escHtml(msg)}</div>
+    <div class="custom-dialog-message">${msg}</div>
     <div class="custom-dialog-actions">
       <button id="_ccNo" class="custom-dialog-cancel">${t('cancel')||'Скасувати'}</button>
       <button id="_ccYes" class="custom-dialog-ok">${customDialogConfirmText()}</button>
@@ -6295,14 +6279,6 @@ function openForexTopup(i){
 function toggleCard(name){
   const el=$('card-'+name);
   if(el)el.classList.toggle('expanded');
-}
-function toggleEffInfo(id){
-  const box=$('eff-info_'+id);
-  if(!box)return;
-  const open=box.classList.toggle('open');
-  const btn=box.previousElementSibling&&box.previousElementSibling.querySelector('.eff-info-btn');
-  if(btn)btn.classList.toggle('active',open);
-  setTimeout(syncDepositSliderHeight,10);
 }
 
 // ── DRAG & DROP ───────────────────────────────
@@ -6904,15 +6880,7 @@ const TEST_BUILD_I18N={
   zh:{title:'测试版本',enable:'启用访问',disable:'停用访问',active:'测试访问已启用',inactive:'测试访问已停用',paywall:'🧪 启用测试访问'}
 };
 function updateTestBuildUI(){
-  const panel=document.getElementById('testBuildPanel');
-  const paywallBtn=document.getElementById('testAccessPaywallBtn');
-  if(!TEST_BUILD){
-    if(panel)panel.style.display='none';
-    if(paywallBtn)paywallBtn.style.display='none';
-    return;
-  }
-  if(panel)panel.style.display='';
-  if(paywallBtn)paywallBtn.style.display='';
+  if(!TEST_BUILD)return;
   const txt=TEST_BUILD_I18N[currentLang]||TEST_BUILD_I18N.uk;
   const active=localStorage.getItem(TEST_ACCESS_KEY)==='true';
   setText('testBuildTitle',txt.title);
@@ -9432,6 +9400,21 @@ function renderDiagnostics(){
     </div>`;
   }
 
+  // Deposit tax info
+  if(deposits.some(d=>d.principal)){
+    html+=`<div class="diag-section">
+      <div class="diag-section-title">${diagIconHtml('tax','')} ${cleanIconText(uiText('🏛 Податки (депозити)')||'Податки (депозити)')}</div>
+      ${deposits.filter(d=>d.principal).map(d=>{
+        const tax=parseFloat(d.tax)||0;
+        const taxLabel=tax>0?tax+'% ПДФО':'Без податку';
+        return `<div class="diag-row"><span class="diag-row-key">${diagIconHtml('deposit','')} ${d.name||uiText('Депозит')||'Депозит'}</span><span class="diag-row-val" style="color:${tax>0?'var(--red)':'var(--green2)'}">${taxLabel}</span></div>`;
+      }).join('')}
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;padding:6px;background:var(--bg);border-radius:8px;">
+        💡 В Україні ПДФО на депозити: 18% + 1.5% військ. збір = 19.5%. Встановіть у налаштуваннях депозиту.
+      </div>
+    </div>`;
+  }
+
   container.innerHTML=html;
   applyAutoTranslations(container);
 }
@@ -9463,7 +9446,7 @@ function updateAccessUI(){
     trialBadge.style.display=state===ACCESS_STATES.TRIAL?'inline-flex':'none';
     if(state===ACCESS_STATES.TRIAL)trialBadge.textContent=accessTxt('trial')+': '+days+' '+accessTxt('days');
   }
-  const devStatus=document.getElementById('devAccessStatus');
+  const devStatus=document.getElementById('devProStatus');
   if(devStatus){
     devStatus.textContent=state===ACCESS_STATES.SUBSCRIBED?accessTxt('subscribed'):(state===ACCESS_STATES.TRIAL?'Trial: '+getTrialDaysLeft():accessTxt('required'));
     devStatus.style.color=state===ACCESS_STATES.LOCKED?'var(--red)':'var(--green2)';
@@ -10011,7 +9994,7 @@ function devResetTrial(){
   location.reload();
 }
 
-// ── BACKUP EXPORT / IMPORT ────────────────────
+// ── BACKUP EXPORT / IMPORT// ── BACKUP EXPORT / IMPORT ────────────────────
 const BACKUP_STORAGE_KEYS = [
   'kapital_v6',
   'kapital_v6_prev',
@@ -10049,13 +10032,9 @@ function isProtectedAccessStorageKey(key){
   const normalized=String(key||'').trim().toLowerCase();
   return PROTECTED_ACCESS_STORAGE_KEYS.has(normalized)
     || normalized.startsWith('trial_')
-    || normalized.startsWith('investory_test_')
     || normalized.includes('subscription')
     || normalized.includes('entitlement')
-    || normalized.includes('test_access')
-    || normalized.includes('purchase_receipt')
-    || normalized.includes('receipt')
-    || normalized.includes('license');
+    || normalized.includes('purchase_receipt');
 }
 
 function captureProtectedAccessState(){
@@ -10145,7 +10124,7 @@ function collectBackupPayload(){
     if(val!==null)storage[key]=val;
   });
   const main=storage.kapital_v6?JSON.parse(storage.kapital_v6):null;
-  return sanitizeBackupAccessState({
+  return {
     app:'InveStory',
     appVersion:APP_VERSION,
     buildDate:APP_BUILD_DATE,
@@ -10155,7 +10134,7 @@ function collectBackupPayload(){
     storage,
     data:main,
     capitalHistory:storage.cap_history?JSON.parse(storage.cap_history):[]
-  });
+  };
 }
 function createRollbackSnapshot(){
   try{
