@@ -4679,7 +4679,7 @@ async function fetchTickerForInput(secId){
         <span class="spi-change ${changeClass}">${changeSign}${ch.toFixed(2)} (${changeSign}${chp.toFixed(2)}%)</span>
       </div>
       <div class="spi-meta">Курс USD/₴: ${usdUahRate.toFixed(2)} · Оновлено: ${new Date().toLocaleTimeString(reportLocale())}</div>
-      ${data.divYield>0?`<div class="spi-div">💰 Дивіденди: ${data.divYield.toFixed(2)}% річних · ≈${fmtD(divYieldAbs,2)} ₴/акція/рік</div>${divDateLine}`:'<div class="spi-div" style="color:var(--muted)">— ${t('divNone')}</div>'}
+      ${data.divYield>0?`<div class="spi-div">💰 Дивіденди: ${data.divYield.toFixed(2)}% річних · ≈${fmtD(divYieldAbs,2)} ₴/акція/рік</div>${divDateLine}`:'<div class="spi-div" style="color:var(--muted)">— '+t('divNone')+'</div>'}
     `;
   }
   }catch(e){console.error('fetchTicker:',e);const info=$('stockInfo_'+secId);if(info)info.innerHTML='<div style="color:var(--red);font-size:10px">❌ Помилка</div>';}
