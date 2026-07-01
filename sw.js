@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-54-div-dates';
+﻿const CACHE_NAME = 'investory-app-v0-0-55-ai-chat';
 const APP_SHELL = [
   './',
   './index.html',

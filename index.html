@@ -442,6 +442,42 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear-gradient(180deg,#fffffffa,#eef1f8 88%);}
 .calc-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
 .calc-overlay.open{display:flex;}
+/* AI CHAT */
+.ai-chat-overlay{position:fixed;inset:0;background:#000000bb;z-index:520;display:none;align-items:flex-end;}
+.ai-chat-overlay.open{display:flex;}
+@keyframes aiSlideUp{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.ai-chat-panel{width:100%;height:82vh;background:var(--bg2);border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:aiSlideUp .32s cubic-bezier(.32,1.1,.5,1);}
+.ai-chat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--border);}
+.ai-chat-title{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--text);}
+.ai-chat-title svg{flex-shrink:0;}
+.ai-chat-close{background:var(--bg3);border:none;border-radius:50%;width:30px;height:30px;color:var(--muted2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.ai-key-section{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;gap:16px;}
+.ai-key-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);text-align:center;}
+.ai-key-desc{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);text-align:center;line-height:1.6;max-width:300px;}
+.ai-key-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;box-sizing:border-box;}
+.ai-key-input:focus{outline:none;border-color:#D4A843;}
+.ai-key-btn{background:linear-gradient(135deg,#D4A843,#C27D3A);border:none;border-radius:12px;padding:12px 24px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;}
+.ai-key-link{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:center;}
+.ai-chat-section{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.ai-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;}
+.ai-msg{display:flex;gap:8px;align-items:flex-start;}
+.ai-msg.user{flex-direction:row-reverse;}
+.ai-msg-bubble{max-width:82%;padding:10px 13px;border-radius:16px;font-family:'DM Mono',monospace;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word;}
+.ai-msg.assistant .ai-msg-bubble{background:var(--bg3);color:var(--text);border-bottom-left-radius:4px;}
+.ai-msg.user .ai-msg-bubble{background:linear-gradient(135deg,#D4A843,#C27D3A);color:#fff;border-bottom-right-radius:4px;}
+.ai-msg-avatar{width:26px;height:26px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;}
+.ai-msg.user .ai-msg-avatar{background:linear-gradient(135deg,#D4A843,#C27D3A);}
+.ai-typing{display:flex;gap:4px;align-items:center;padding:4px 0;}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--muted2);animation:aiDot 1.2s infinite;}
+.ai-typing span:nth-child(2){animation-delay:.2s;}
+.ai-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes aiDot{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.ai-input-bar{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--bg2);}
+.ai-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:22px;padding:10px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;}
+.ai-input:focus{outline:none;border-color:#D4A843;}
+.ai-send-btn{background:linear-gradient(135deg,#D4A843,#C27D3A);border:none;border-radius:50%;width:40px;height:40px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ai-send-btn:disabled{opacity:0.5;cursor:default;}
+.ai-reset-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;}
 .calc-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px 16px 44px;width:100%;max-height:88vh;overflow-y:auto;}
 .calc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .calc-head-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
@@ -2355,9 +2391,14 @@ body.modern-mockup.theme-light .total-currency{
     <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/1.png?v=4" alt=""></span>
     <span class="bn-label">Создать</span>
   </button>
-  <button class="bottom-nav-btn" onclick="openCapitalDynamicsFromNav()" title="Динаміка капіталу">
-    <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/2.png?v=4" alt=""></span>
-    <span class="bn-label">Динаміка</span>
+  <button class="bottom-nav-btn" onclick="openAIChat()" title="Claude AI">
+    <span class="bn-icon">
+      <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23 5 L25.8 16.5 L37 12 L29 23 L37 34 L25.8 29.5 L23 41 L20.2 29.5 L9 34 L17 23 L9 12 L20.2 16.5 Z" fill="#D4A843" opacity="0.9"/>
+        <circle cx="23" cy="23" r="4.5" fill="#fff" fill-opacity="0.25"/>
+      </svg>
+    </span>
+    <span class="bn-label">AI</span>
   </button>
   <button class="bottom-nav-btn center primary" onclick="openDiagnostics()" title="Діагностика капіталу">
     <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/3.png?v=4" alt=""></span>
@@ -2372,6 +2413,41 @@ body.modern-mockup.theme-light .total-currency{
     <span class="bn-label">Обновить</span>
   </button>
 </nav>
+
+<!-- AI CHAT PANEL -->
+<div class="ai-chat-overlay" id="aiChatOverlay" onclick="aiChatCloseOutside(event)">
+  <div class="ai-chat-panel" onclick="event.stopPropagation()">
+    <div class="ai-chat-header">
+      <div class="ai-chat-title">
+        <svg width="20" height="20" viewBox="0 0 46 46" fill="none"><path d="M23 5 L25.8 16.5 L37 12 L29 23 L37 34 L25.8 29.5 L23 41 L20.2 29.5 L9 34 L17 23 L9 12 L20.2 16.5 Z" fill="#D4A843" opacity="0.9"/><circle cx="23" cy="23" r="4.5" fill="#fff" fill-opacity="0.3"/></svg>
+        Claude AI
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="ai-reset-key" id="aiResetKeyBtn" onclick="resetAIKey()" style="display:none">Змінити ключ</button>
+        <button class="ai-chat-close" onclick="closeAIChat()">✕</button>
+      </div>
+    </div>
+    <!-- API key setup -->
+    <div id="aiKeySection" class="ai-key-section">
+      <svg width="48" height="48" viewBox="0 0 46 46" fill="none"><path d="M23 5 L25.8 16.5 L37 12 L29 23 L37 34 L25.8 29.5 L23 41 L20.2 29.5 L9 34 L17 23 L9 12 L20.2 16.5 Z" fill="#D4A843" opacity="0.85"/><circle cx="23" cy="23" r="4.5" fill="#fff" fill-opacity="0.3"/></svg>
+      <div class="ai-key-title">Підключи Claude AI</div>
+      <div class="ai-key-desc">Введи API ключ від Anthropic. Ключ зберігається тільки на твоєму пристрої.</div>
+      <input class="ai-key-input" id="aiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+      <button class="ai-key-btn" onclick="saveAIKey()">Підключити →</button>
+      <div class="ai-key-link">Отримати ключ: console.anthropic.com</div>
+    </div>
+    <!-- Chat -->
+    <div id="aiChatSection" class="ai-chat-section" style="display:none">
+      <div id="aiMessages" class="ai-messages"></div>
+      <div class="ai-input-bar">
+        <input class="ai-input" id="aiInput" type="text" placeholder="Питай про портфель..." autocomplete="off" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendAIMessage()">
+        <button class="ai-send-btn" id="aiSendBtn" onclick="sendAIMessage()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- CALCULATOR MODAL -->
 <div class="calc-overlay" id="calcOverlay" onclick="calcCloseOutside(event)">
@@ -2767,7 +2843,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.54';
+const APP_VERSION = 'v0.0.55';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9148,6 +9224,181 @@ window.refreshFromBottomNav=async function(event){
     setTimeout(()=>btn?.classList.remove('loading'),350);
   }
 };
+
+// ── AI CHAT ───────────────────────────────────────────────
+const AI_WORKER='https://plain-bread-df6d.mnacik1988.workers.dev/ai';
+let aiMessages=[];
+let aiTyping=false;
+
+function buildPortfolioContext(){
+  try{
+    const fmt=n=>(n||0).toLocaleString('uk-UA',{minimumFractionDigits:0,maximumFractionDigits:0});
+    const sym=getCurrSym?getCurrSym():'₴';
+    const deps=getDepositsTotal?getDepositsTotal():0;
+    const crypto=getCryptoTotal?getCryptoTotal():0;
+    const usd=getUsdTotal?getUsdTotal():0;
+    const forex=getForexTotal?getForexTotal():0;
+    const cash=getCashTotal?getCashTotal():0;
+    const other=getCurrentTotal?getCurrentTotal():0;
+    const stocks=getSecuritiesTotal?getSecuritiesTotal():0;
+    const metals=getMetalsTotalUah?getMetalsTotalUah():0;
+    const liab=getLiabilitiesTotal?getLiabilitiesTotal():0;
+    const gross=deps+crypto+usd+forex+cash+other+stocks+metals;
+    const net=gross-liab;
+    const lines=[`Портфель (${new Date().toLocaleDateString('uk-UA')}):`,
+      `Загальний капітал: ${fmt(net)} ${sym}`,`Активи: ${fmt(gross)} ${sym}`,``];
+    if(deps>0)lines.push(`• Депозити: ${fmt(deps)} ${sym}`);
+    if(stocks>0)lines.push(`• Акції/Облігації: ${fmt(stocks)} ${sym}`);
+    if(crypto>0)lines.push(`• Крипто: ${fmt(crypto)} ${sym}`);
+    if(usd>0)lines.push(`• USD заощадження: ${fmt(usd)} ${sym}`);
+    if(forex>0)lines.push(`• Валюти: ${fmt(forex)} ${sym}`);
+    if(cash>0)lines.push(`• Готівка: ${fmt(cash)} ${sym}`);
+    if(metals>0)lines.push(`• Метали: ${fmt(metals)} ${sym}`);
+    if(other>0)lines.push(`• Інше: ${fmt(other)} ${sym}`);
+    if(liab>0)lines.push(`• Зобов'язання: -${fmt(liab)} ${sym}`);
+    // Add stocks detail
+    const secDetails=[];
+    (securitiesSections||[]).forEach(sec=>{
+      (sec.items||[]).forEach(it=>{
+        if(it.ticker&&it.qty>0)secDetails.push(`  ${it.ticker}: ${it.qty} акцій`+(it.lastPrice?` @ $${it.lastPrice}`:'')+(it.divYield>0?` (дивіденди ${it.divYield}%)`:``));
+      });
+    });
+    if(secDetails.length){lines.push(``);lines.push(`Акції:`);secDetails.forEach(d=>lines.push(d));}
+    return lines.join('\n');
+  }catch{return 'Дані портфелю недоступні';}
+}
+
+function getAISystemPrompt(){
+  const lang=currentLang||'uk';
+  const langInstr=lang==='ru'?'Відповідай на русском язике.':lang==='en'?'Reply in English.':lang==='de'?'Antworte auf Deutsch.':lang==='zh'?'用中文回答。':'Відповідай українською мовою.';
+  return `Ти фінансовий AI-помічник в застосунку InveStory. ${langInstr} Ти аналізуєш особистий портфель і даєш корисні поради. Відповідай стисло та конкретно. Не використовуй markdown-заголовки з ##. Ось поточні дані:\n\n${buildPortfolioContext()}`;
+}
+
+function openAIChat(){
+  const overlay=document.getElementById('aiChatOverlay');
+  if(!overlay)return;
+  overlay.classList.add('open');
+  const key=localStorage.getItem('kapital_claude_key')||'';
+  if(!key){
+    document.getElementById('aiKeySection').style.display='';
+    document.getElementById('aiChatSection').style.display='none';
+    document.getElementById('aiResetKeyBtn').style.display='none';
+  }else{
+    _showAIChat();
+  }
+}
+
+function closeAIChat(){
+  const overlay=document.getElementById('aiChatOverlay');
+  if(overlay)overlay.classList.remove('open');
+}
+
+function aiChatCloseOutside(e){
+  if(e.target===document.getElementById('aiChatOverlay'))closeAIChat();
+}
+
+function saveAIKey(){
+  const val=(document.getElementById('aiKeyInput').value||'').trim();
+  if(!val.startsWith('sk-ant-')){
+    document.getElementById('aiKeyInput').style.borderColor='var(--red)';
+    setTimeout(()=>document.getElementById('aiKeyInput').style.borderColor='',2000);
+    return;
+  }
+  localStorage.setItem('kapital_claude_key',val);
+  _showAIChat();
+}
+
+function resetAIKey(){
+  localStorage.removeItem('kapital_claude_key');
+  aiMessages=[];
+  document.getElementById('aiMessages').innerHTML='';
+  document.getElementById('aiKeyInput').value='';
+  document.getElementById('aiKeySection').style.display='';
+  document.getElementById('aiChatSection').style.display='none';
+  document.getElementById('aiResetKeyBtn').style.display='none';
+}
+
+function _showAIChat(){
+  document.getElementById('aiKeySection').style.display='none';
+  document.getElementById('aiChatSection').style.display='';
+  document.getElementById('aiResetKeyBtn').style.display='';
+  if(aiMessages.length===0){
+    _addAIBubble('assistant','Привіт! Я Claude — твій AI-аналітик. Маю доступ до даних твого портфелю. Що хочеш дізнатися?');
+  }
+  setTimeout(()=>document.getElementById('aiInput')?.focus(),200);
+}
+
+function _addAIBubble(role,text){
+  const box=document.getElementById('aiMessages');
+  if(!box)return null;
+  const div=document.createElement('div');
+  div.className='ai-msg '+role;
+  const avatar=document.createElement('div');
+  avatar.className='ai-msg-avatar';
+  avatar.textContent=role==='user'?'👤':'✦';
+  const bubble=document.createElement('div');
+  bubble.className='ai-msg-bubble';
+  bubble.textContent=text;
+  div.appendChild(avatar);div.appendChild(bubble);
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+  return bubble;
+}
+
+function _addAITyping(){
+  const box=document.getElementById('aiMessages');
+  if(!box)return null;
+  const div=document.createElement('div');
+  div.className='ai-msg assistant';div.id='aiTypingIndicator';
+  div.innerHTML='<div class="ai-msg-avatar">✦</div><div class="ai-msg-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+  box.appendChild(div);box.scrollTop=box.scrollHeight;
+  return div;
+}
+
+async function sendAIMessage(){
+  if(aiTyping)return;
+  const input=document.getElementById('aiInput');
+  const text=(input?.value||'').trim();
+  if(!text)return;
+  const key=localStorage.getItem('kapital_claude_key')||'';
+  if(!key){openAIChat();return;}
+
+  input.value='';
+  _addAIBubble('user',text);
+  aiMessages.push({role:'user',content:text});
+  aiTyping=true;
+  const sendBtn=document.getElementById('aiSendBtn');
+  if(sendBtn)sendBtn.disabled=true;
+  const typingEl=_addAITyping();
+
+  try{
+    const resp=await fetch(AI_WORKER,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Origin':location.origin||'null','X-Claude-Key':key},
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:1024,
+        system:getAISystemPrompt(),
+        messages:aiMessages.slice(-12)
+      })
+    });
+    if(typingEl)typingEl.remove();
+    const data=await resp.json();
+    if(data.content){
+      aiMessages.push({role:'assistant',content:data.content});
+      _addAIBubble('assistant',data.content);
+    }else{
+      _addAIBubble('assistant','⚠️ '+(data.error||'Помилка. Перевір API ключ.'));
+    }
+  }catch{
+    if(typingEl)typingEl.remove();
+    _addAIBubble('assistant','❌ Помилка з\'єднання з Claude.');
+  }finally{
+    aiTyping=false;
+    if(sendBtn)sendBtn.disabled=false;
+    setTimeout(()=>input?.focus(),100);
+  }
+}
 function toggleChart(){
   chartExpanded = !chartExpanded;
   const section = document.getElementById('chartSection');

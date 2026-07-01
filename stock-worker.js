@@ -16,12 +16,17 @@ export default {
     if (!isAllowedOrigin(origin)) return json({ error: 'Origin not allowed' }, 403, origin);
 
     if (request.method === 'OPTIONS') return corsPreflight(origin);
+
+    const url = new URL(request.url);
+
+    // AI proxy — POST only, handled before GET-only guard
+    if (url.pathname === '/ai') return handleAI(request, origin);
+
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
 
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     if (!(await allowRequest(env, ip))) return json({ error: 'Too many requests' }, 429, origin, 30);
 
-    const url = new URL(request.url);
     try {
       if (url.pathname === '/') {
         return json({ status: 'ok', service: 'InveStory market data proxy', version: '2.0' }, 200, origin, 60);
@@ -156,6 +161,41 @@ async function getStock(ticker, env) {
   });
 }
 
+async function handleAI(request, origin) {
+  if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
+  const apiKey = request.headers.get('X-Claude-Key') || '';
+  if (!apiKey.startsWith('sk-ant-')) return json({ error: 'Invalid API key' }, 401, origin);
+
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'Invalid request body' }, 400, origin); }
+
+  if (!Array.isArray(body.messages) || !body.messages.length) {
+    return json({ error: 'messages required' }, 400, origin);
+  }
+
+  const claudeResp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: body.model || 'claude-haiku-4-5-20251001',
+      max_tokens: Math.min(Number(body.max_tokens) || 1024, 2048),
+      system: String(body.system || ''),
+      messages: body.messages.slice(-20)
+    })
+  }).catch(e => { throw new Error('Anthropic unreachable: ' + e.message); });
+
+  const data = await claudeResp.json().catch(() => ({}));
+  if (!claudeResp.ok) {
+    return json({ error: data?.error?.message || 'Claude API error ' + claudeResp.status }, claudeResp.status, origin);
+  }
+  const content = data?.content?.[0]?.text || '';
+  return json({ content }, 200, origin, 0);
+}
+
 async function handleRates(origin) {
   const rates = await memoize('rates:uah', async () => {
     const response = await providerFetch('https://open.er-api.com/v6/latest/UAH');
@@ -256,7 +296,7 @@ function responseHeaders(origin, maxAge) {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Claude-Key',
     'Access-Control-Max-Age': '86400',
     'Cache-Control': maxAge ? 'public, max-age=' + maxAge : 'no-store',
     'Vary': 'Origin',
