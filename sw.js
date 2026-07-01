@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-46-eff-rate-info';
+﻿const CACHE_NAME = 'investory-app-v0-0-47-metal-icons';
 const APP_SHELL = [
   './',
   './index.html',
@@ -38,7 +38,10 @@ const APP_SHELL = [
   './section-icons/ui-accrued.png?v=1',
   './section-icons/ui-dividend-income.png?v=1',
   './section-icons/ui-trade.png?v=1',
-  './section-icons/ui-sold.png?v=1'
+  './section-icons/ui-sold.png?v=1',
+  './section-icons/Gold.png',
+  './section-icons/Silver.png',
+  './section-icons/Platinum.png'
 ];
 
 self.addEventListener('install', event => {
@@ -79,4 +82,3 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
-

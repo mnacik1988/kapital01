@@ -6296,6 +6296,27 @@ function toggleCard(name){
   const el=$('card-'+name);
   if(el)el.classList.toggle('expanded');
 }
+function toggleMetalPs(id){
+  const ps=document.getElementById('metal_ps_'+id);
+  if(!ps)return;
+  const wasOpen=ps.classList.contains('open');
+  document.querySelectorAll('.pretty-select.open').forEach(el=>el.classList.remove('open'));
+  if(!wasOpen)ps.classList.add('open');
+}
+function selectMetalType(id,type,label){
+  const iconMap={gold:'Gold',silver:'Silver',platinum:'Platinum'};
+  document.getElementById('metal_type_'+id).value=type;
+  document.getElementById('metal_type_label_'+id).textContent=label;
+  document.getElementById('metal_type_icon_'+id).src='section-icons/'+iconMap[type]+'.png';
+  const ps=document.getElementById('metal_ps_'+id);
+  if(ps){
+    ps.classList.remove('open');
+    ps.querySelectorAll('.pretty-select-option').forEach(btn=>btn.classList.remove('active'));
+    const opts=ps.querySelectorAll('.pretty-select-option');
+    const idx={gold:0,silver:1,platinum:2}[type];
+    if(opts[idx])opts[idx].classList.add('active');
+  }
+}
 function toggleEffInfo(id){
   const box=$('eff-info_'+id);
   if(!box)return;
@@ -7469,7 +7490,7 @@ function getMetalsCardHtml(s){
     const mpnlSign=mpnl>=0?'+':'';
     const mpnlColor=mpnl>=0?'var(--green2)':'var(--red)';
     return `<div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;">
-      <div style="font-size:16px;margin-bottom:3px;">${m==='gold'?'🥇':m==='silver'?'🥈':'🔘'}</div>
+      <div style="margin-bottom:3px;"><img src="section-icons/${m==='gold'?'Gold':m==='silver'?'Silver':'Platinum'}.png" style="width:28px;height:28px;object-fit:contain;"></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:${color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">${names[m]}</div>
       <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${byType[m].grams.toFixed(2)}г</div>
       <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${color};margin-top:2px;">${sym}${fmtN(toDisplayCurr(byType[m].currentVal))}</div>
@@ -7542,11 +7563,17 @@ function getMetalsCardHtml(s){
         <div class="row2" style="margin-bottom:10px;">
           <div class="field-group">
             <div class="field-label">${t('metalType')}</div>
-            <select class="field-input" id="metal_type_${s.id}" style="background:var(--bg3);">
-              <option value="gold">🥇 ${names.gold}</option>
-              <option value="silver">🥈 ${names.silver}</option>
-              <option value="platinum">🔘 ${names.platinum}</option>
-            </select>
+            <input type="hidden" id="metal_type_${s.id}" value="gold">
+            <div class="pretty-select" id="metal_ps_${s.id}">
+              <button class="pretty-select-btn" type="button" onclick="toggleMetalPs('${s.id}')">
+                <img id="metal_type_icon_${s.id}" src="section-icons/Gold.png" style="width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:7px;"><span id="metal_type_label_${s.id}">${names.gold}</span>
+              </button>
+              <div class="pretty-select-menu">
+                <button class="pretty-select-option active" type="button" onclick="selectMetalType('${s.id}','gold','${names.gold}')"><img src="section-icons/Gold.png" style="width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:8px;">${names.gold}</button>
+                <button class="pretty-select-option" type="button" onclick="selectMetalType('${s.id}','silver','${names.silver}')"><img src="section-icons/Silver.png" style="width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:8px;">${names.silver}</button>
+                <button class="pretty-select-option" type="button" onclick="selectMetalType('${s.id}','platinum','${names.platinum}')"><img src="section-icons/Platinum.png" style="width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:8px;">${names.platinum}</button>
+              </div>
+            </div>
           </div>
           <div class="field-group">
             <div class="field-label">${t('metalGrams')}</div>
