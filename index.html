@@ -223,6 +223,13 @@ body.theme-light .pretty-select-option.active{background:linear-gradient(135deg,
 .result-val.red{color:var(--red);}
 .result-val.blue{color:var(--blue2);}
 .result-val.orange{color:var(--orange2);}
+.eff-info-btn{width:14px;height:14px;border-radius:50%;border:1px solid var(--muted);background:transparent;color:var(--muted);font-size:9px;font-weight:700;cursor:pointer;margin-left:5px;padding:0;vertical-align:middle;line-height:14px;display:inline-flex;align-items:center;justify-content:center;}
+.eff-info-btn.active{border-color:var(--gold2);color:var(--gold2);}
+.eff-info-box{display:none;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin:2px 0 6px;}
+.eff-info-box.open{display:block;}
+.eff-info-title{font-size:10px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.eff-info-formula{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);background:var(--bg3);border-radius:6px;padding:6px 8px;margin-bottom:6px;text-align:center;}
+.eff-info-note{font-size:10px;color:var(--muted2);line-height:1.55;}
 
 /* CALC */
 .calc-section{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:6px;}
@@ -2843,7 +2850,7 @@ const LANGS={
     compCalc:'Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
     taxPct:'Податок (%)',taxFree:'Без податку (₴)',
-    finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',
+    finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',effRateInfoTitle:'Як розраховується ефективна ставка?',effRateInfoFormula:'Чистий прибуток ÷ Сума ÷ Роки × 100',effRateInfoNote:'Показує реальний річний дохід після всіх податків. Може відрізнятись від ставки банку через різні методики розрахунку.',
     incomeDays:'Дохід по днях (перші 30 днів)',yield:'⚡ Дохідність',
     secName:'Назва',secQty:'Кількість',secPrice:'Ціна (₴)',secDiv:'Дивіденди (%)',secTotal:'Вартість',secActions:'Дія',
     addSecItem:'+ Додати позицію',removeSection:'✕ Видалити розділ',
@@ -2884,7 +2891,7 @@ const LANGS={
     compCalc:'Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
     taxPct:'Налог (%)',taxFree:'Без налога (₴)',
-    finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',
+    finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',effRateInfoTitle:'Как рассчитывается эффективная ставка?',effRateInfoFormula:'Чистая прибыль ÷ Сумма ÷ Лет × 100',effRateInfoNote:'Показывает реальный годовой доход после всех налогов. Может отличаться от ставки банка из-за разных методик расчёта.',
     incomeDays:'Доход по дням (первые 30 дней)',yield:'⚡ Доходность',
     secName:'Название',secQty:'Количество',secPrice:'Цена (₴)',secDiv:'Дивиденды (%)',secTotal:'Стоимость',secActions:'Действие',
     addSecItem:'+ Добавить позицию',removeSection:'✕ Удалить раздел',
@@ -2925,7 +2932,7 @@ const LANGS={
     compCalc:'Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
     monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
     taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
-    finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',
+    finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',effRateInfoTitle:'How is the effective rate calculated?',effRateInfoFormula:'Net Profit ÷ Principal ÷ Years × 100',effRateInfoNote:'Shows the real annual return after all taxes. May differ from your bank\'s rate due to different calculation methods.',
     incomeDays:'Daily Income (first 30 days)',yield:'⚡ Yield',
     secName:'Name',secQty:'Qty',secPrice:'Price (₴)',secDiv:'Dividends (%)',secTotal:'Value',secActions:'Action',
     addSecItem:'+ Add Position',removeSection:'✕ Delete Section',
@@ -2966,7 +2973,7 @@ const LANGS={
     rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxPct:'Steuer (%)',taxFree:'Steuerfrei (€)',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
     monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
     compCalc:'Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
-    finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',
+    finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',effRateInfoTitle:'Wie wird der effektive Zinssatz berechnet?',effRateInfoFormula:'Nettogewinn ÷ Betrag ÷ Jahre × 100',effRateInfoNote:'Zeigt den realen Jahresertrag nach allen Steuern. Kann von der Bankrate aufgrund unterschiedlicher Berechnungsmethoden abweichen.',
     incomeDays:'Tageseinkommen (erste 30 Tage)',
     calcTitle:'Zinseszinsrechner',totalSum:'Gesamtbetrag',taxBase:'Steuerbasis',
     perSecond:'Pro Sekunde',perDay:'Pro Tag',perSec:'Pro Sekunde',
@@ -3007,7 +3014,7 @@ const LANGS={
     rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxPct:'税率 (%)',taxFree:'免税额 (¥)',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
     monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
     compCalc:'复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
-    finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',
+    finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',effRateInfoTitle:'实际利率如何计算？',effRateInfoFormula:'净利润 ÷ 本金 ÷ 年数 × 100',effRateInfoNote:'显示扣除所有税款后的实际年化收益。由于计算方法不同，可能与银行利率有所差异。',
     incomeDays:'每日收入（前30天）',
     calcTitle:'复利计算器',totalSum:'总金额',
     perSecond:'每秒',perDay:'每天',perSec:'每秒',
@@ -3600,7 +3607,17 @@ function getDepositHtml(dep,idx){
             <div class="result-row"><span class="result-key">${lang.taxBase}</span><span class="result-val" id="r-taxbase_${dep.id}">—</span></div>
             <div class="result-row"><span class="result-key">${lang.taxPDFO} <span class="tag tag-tax">ПДФО</span></span><span class="result-val red" id="r-tax_${dep.id}">—</span></div>
             <div class="result-row"><span class="result-key">${lang.netProfit} <span class="tag tag-net">${lang.taxPDFO.toLowerCase()}</span></span><span class="result-val green" id="r-net_${dep.id}">—</span></div>
-            <div class="result-row"><span class="result-key">${lang.effRate}</span><span class="result-val" id="r-eff_${dep.id}">—</span></div>
+            <div class="result-row" style="align-items:flex-start;flex-direction:column;gap:0;">
+              <div style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:5px 0;">
+                <span class="result-key">${lang.effRate} <button class="eff-info-btn" onclick="toggleEffInfo('${dep.id}')" aria-label="info">i</button></span>
+                <span class="result-val" id="r-eff_${dep.id}">—</span>
+              </div>
+              <div class="eff-info-box" id="eff-info_${dep.id}">
+                <div class="eff-info-title">${lang.effRateInfoTitle||'How is the effective rate calculated?'}</div>
+                <div class="eff-info-formula">${lang.effRateInfoFormula||'Net Profit ÷ Principal ÷ Years × 100'}</div>
+                <div class="eff-info-note">${lang.effRateInfoNote||'Shows the real annual return after all taxes.'}</div>
+              </div>
+            </div>
           </div>
         </div>
         </div>
@@ -6278,6 +6295,13 @@ function openForexTopup(i){
 function toggleCard(name){
   const el=$('card-'+name);
   if(el)el.classList.toggle('expanded');
+}
+function toggleEffInfo(id){
+  const box=$('eff-info_'+id);
+  if(!box)return;
+  const open=box.classList.toggle('open');
+  const btn=box.previousElementSibling&&box.previousElementSibling.querySelector('.eff-info-btn');
+  if(btn)btn.classList.toggle('active',open);
 }
 
 // ── DRAG & DROP ───────────────────────────────
