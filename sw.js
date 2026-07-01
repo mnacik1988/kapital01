@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-52-syntax-fix';
+﻿const CACHE_NAME = 'investory-app-v0-0-53-currentlang-fix';
 const APP_SHELL = [
   './',
   './index.html',
@@ -83,6 +83,7 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
+
 
 
 

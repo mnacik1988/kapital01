@@ -9019,8 +9019,8 @@ const REPORT_I18N={
   colPayment:{uk:'Платіж/міс',ru:'Платёж/мес',en:'Payment/mo',de:'Rate/Mon.',zh:'月供'},
   depDefault:{uk:'Депозит',ru:'Депозит',en:'Deposit',de:'Einlage',zh:'存款'},
 };
-function rTxt(key){const lang=displayLang||'uk';return(REPORT_I18N[key]||{})[lang]||(REPORT_I18N[key]||{}).uk||key;}
-function reportLocale(){return{uk:'uk-UA',ru:'ru-RU',en:'en-US',de:'de-DE',zh:'zh-CN'}[displayLang||'uk']||'uk-UA';}
+function rTxt(key){const lang=currentLang||'uk';return(REPORT_I18N[key]||{})[lang]||(REPORT_I18N[key]||{}).uk||key;}
+function reportLocale(){return{uk:'uk-UA',ru:'ru-RU',en:'en-US',de:'de-DE',zh:'zh-CN'}[currentLang||'uk']||'uk-UA';}
 
 // Aliases for PDF export
 function getDepositsTotal(){return getAllDepositsTotal();}
