@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-59-ai-err';
+﻿const CACHE_NAME = 'investory-app-v0-0-60-ai-history';
 const APP_SHELL = [
   './',
   './index.html',

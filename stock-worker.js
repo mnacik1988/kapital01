@@ -177,7 +177,9 @@ async function handleAI(request, origin, env) {
     model: 'claude-sonnet-5',
     max_tokens: Math.min(Number(body.max_tokens) || 1024, 2048),
     system: String(body.system || '').slice(0, 4000),
-    messages: body.messages.slice(-20).map(m => ({ role: String(m.role), content: String(m.content) }))
+    messages: body.messages.slice(-20)
+      .map(m => ({ role: String(m.role), content: String(m.content) }))
+      .filter((m, i, arr) => i === 0 || m.role !== arr[i - 1].role)
   };
   const claudeResp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
