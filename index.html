@@ -3347,7 +3347,7 @@ const UI_TEXT={
   startupStatusFrozen:{uk:'Заморожений',ru:'Заморожен',en:'Frozen',de:'Pausiert',zh:'暂停'},
   startupStatusClosed:{uk:'Закритий',ru:'Закрыт',en:'Closed',de:'Geschlossen',zh:'已关闭'},
   startupStatusExited:{uk:'Exit / продано',ru:'Exit / продано',en:'Exit / sold',de:'Exit / verkauft',zh:'退出 / 已售'},
-  startupExitCash:{uk:'💵 Гроші від exit / продажу',ru:'💵 Деньги от exit / продажи',en:'💵 Exit / sale cash',de:'💵 Geld aus Exit / Verkauf',zh:'💵 退出 / 卖出资金'},
+  startupExitCash:{uk:'Гроші від exit / продажу',ru:'Деньги от exit / продажи',en:'Exit / sale cash',de:'Geld aus Exit / Verkauf',zh:'退出 / 卖出资金'},
   startupExitCashHint:{uk:'Сума після продажу частки, дивідендів або exit',ru:'Сумма после продажи доли, дивидендов или exit',en:'Cash after selling a stake, dividends, or exit',de:'Betrag nach Anteilsverkauf, Dividenden oder Exit',zh:'出售份额、分红或退出后的资金'},
   startupNoteLabel:{uk:'Нотатка',ru:'Заметка',en:'Note',de:'Notiz',zh:'备注'},
   startupNotePh:{uk:'Опис, роль, умови...',ru:'Описание, роль, условия...',en:'Description, role, terms...',de:'Beschreibung, Rolle, Bedingungen...',zh:'描述、角色、条款...'},
@@ -9983,7 +9983,7 @@ getCustomCardHtml=function(s,idx){
           </div>
         </div>
         <div style="background:linear-gradient(135deg,#2dd4bf12,#5b9cf610);border:1px solid #2dd4bf35;border-radius:14px;padding:14px;margin-top:12px;">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--teal2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiText('startupExitCash')}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--teal2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;"><img src="section-icons/section-cash.png" style="width:13px;height:13px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupExitCash')}</div>
           <div style="display:flex;gap:8px;align-items:center;">
             <input class="field-input" type="text" id="startupExitCash_${s.id}" value="${s.startupExitCash||''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setStartupField(${idx},'startupExitCash',this.value)">
             <select class="field-input" id="startupExitCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setStartupExitCurrency(${idx},this.value)">
@@ -9998,8 +9998,8 @@ getCustomCardHtml=function(s,idx){
             oninput="customSections[${idx}].startupNote=this.value;saveData()">
         </div>
         <div class="result-box" style="margin-top:12px;">
-          <div class="result-row"><span class="result-key">💰 ${uiText('startupInvested')}</span><span class="result-val">${nativeSym}${fmtN(st.investedNative)} · ${sym}${fmtN(toDisplayCurr(st.invested))}</span></div>
-          <div class="result-row"><span class="result-key">📊 ${uiText('startupCurrentShare')}</span><span class="result-val" style="color:var(--teal2)">${st.equity}% = ${nativeSym}${fmtN(st.activeValueNative)} · ${sym}${fmtN(toDisplayCurr(st.currentValue))}</span></div>
+          <div class="result-row"><span class="result-key"><img src="section-icons/ui-dividend-income.png" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupInvested')}</span><span class="result-val">${nativeSym}${fmtN(st.investedNative)} · ${sym}${fmtN(toDisplayCurr(st.invested))}</span></div>
+          <div class="result-row"><span class="result-key"><img src="section-icons/ui-percent.png" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupCurrentShare')}</span><span class="result-val" style="color:var(--teal2)">${st.equity}% = ${nativeSym}${fmtN(st.activeValueNative)} · ${sym}${fmtN(toDisplayCurr(st.currentValue))}</span></div>
           ${st.exitCashNative?`<div class="result-row"><span class="result-key">${uiText('startupExitCash')}</span><span class="result-val green">${exitSym}${fmtN(st.exitCashNative)} · ${sym}${fmtN(toDisplayCurr(st.exitCash))}</span></div>`:''}
           <div class="result-row"><span class="result-key">${uiText('startupTotalValue')}</span><span class="result-val blue">${sym}${fmtN(toDisplayCurr(st.total))}</span></div>
           <div class="result-row"><span class="result-key">P&L</span><span class="result-val" style="color:${pnlColor}">${st.pnl>=0?'+':'-'}${sym}${fmtN(toDisplayCurr(Math.abs(st.pnl)))} (${st.pnl>=0?'+':''}${st.pnlPct.toFixed(1)}%)</span></div>
