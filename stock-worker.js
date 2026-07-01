@@ -100,19 +100,31 @@ async function getStock(ticker, env) {
     const base = 'https://finnhub.io/api/v1/';
     const token = encodeURIComponent(env.FINNHUB_KEY);
     const symbol = encodeURIComponent(ticker);
-    const [quoteRes, profileRes, metricsRes] = await Promise.all([
+    const [quoteRes, profileRes, metricsRes, divRes] = await Promise.all([
       providerFetch(base + 'quote?symbol=' + symbol + '&token=' + token),
       providerFetch(base + 'stock/profile2?symbol=' + symbol + '&token=' + token),
-      providerFetch(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token)
+      providerFetch(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token),
+      providerFetch(base + 'stock/dividend2?symbol=' + symbol + '&token=' + token).catch(() => null)
     ]);
-    const [quote, profile, metrics] = await Promise.all([
-      quoteRes.json(), profileRes.json(), metricsRes.json()
+    const [quote, profile, metrics, divData] = await Promise.all([
+      quoteRes.json(), profileRes.json(), metricsRes.json(),
+      divRes ? divRes.json().catch(() => null) : Promise.resolve(null)
     ]);
     if (!Number(quote?.c)) throw new Error('Ticker not found');
 
     const price = Number(quote.c);
     const previous = Number(quote.pc) || price;
     const change = price - previous;
+
+    const today = new Date().toISOString().slice(0, 10);
+    const divList = Array.isArray(divData?.data) ? divData.data : [];
+    // Find next upcoming dividend (future ex-date), fall back to most recent past
+    const upcoming = divList.filter(d => d.exDate && d.exDate >= today)
+      .sort((a, b) => a.exDate.localeCompare(b.exDate))[0];
+    const lastPast = divList.filter(d => d.exDate && d.exDate < today)
+      .sort((a, b) => b.exDate.localeCompare(a.exDate))[0];
+    const divEntry = upcoming || lastPast || null;
+
     return {
       ticker,
       name: profile?.name || ticker,
@@ -121,7 +133,11 @@ async function getStock(ticker, env) {
       changePct: round(previous ? change / previous * 100 : 0, 4),
       divYield: round(Number(metrics?.metric?.dividendYieldIndicatedAnnual) || 0, 4),
       divAbs: round(Number(metrics?.metric?.dividendsPerShareAnnual) || 0, 4),
-      currency: profile?.currency || 'USD'
+      currency: profile?.currency || 'USD',
+      exDate: divEntry?.exDate || '',
+      payDate: divEntry?.paymentDate || '',
+      divEntryAmt: round(Number(divEntry?.amount) || 0, 4),
+      divIsFuture: !!(upcoming)
     };
   });
 }

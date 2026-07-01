@@ -1,0 +1,6 @@
+name = "plain-bread-df6d"
+main = "stock-worker.js"
+compatibility_date = "2024-01-01"
+
+[observability]
+enabled = true
