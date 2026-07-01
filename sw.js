@@ -1,4 +1,4 @@
-const CACHE_NAME = 'investory-app-v0-0-45-fix-monthly-forecast';
+const CACHE_NAME = 'investory-app-v0-0-46-eff-rate-info';
 const APP_SHELL = [
   './',
   './index.html',
