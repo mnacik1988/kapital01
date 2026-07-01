@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-48-startup-icons';
+﻿const CACHE_NAME = 'investory-app-v0-0-49-metal-dropdown-fix';
 const APP_SHELL = [
   './',
   './index.html',
@@ -82,4 +82,5 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
+
 
