@@ -181,7 +181,7 @@ async function handleAI(request, origin, env) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: body.model || 'claude-haiku-4-5-20251001',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: Math.min(Number(body.max_tokens) || 1024, 2048),
       system: String(body.system || ''),
       messages: body.messages.slice(-20)
