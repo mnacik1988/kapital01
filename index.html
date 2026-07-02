@@ -2831,7 +2831,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.62';
+const APP_VERSION = 'v0.0.63';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9215,8 +9215,35 @@ window.refreshFromBottomNav=async function(event){
 
 // ── AI CHAT ───────────────────────────────────────────────
 const AI_WORKER='https://plain-bread-df6d.mnacik1988.workers.dev/ai';
+const NEWS_WORKER='https://plain-bread-df6d.mnacik1988.workers.dev/news';
 let aiMessages=[];
 let aiTyping=false;
+let aiNewsContext='';
+
+async function fetchNewsContext(){
+  aiNewsContext='';
+  const tickers=[];
+  (securitiesSections||[]).forEach(sec=>{
+    (sec.items||[]).forEach(it=>{if(it.ticker&&it.qty>0)tickers.push(it.ticker);});
+  });
+  if(!tickers.length)return;
+  try{
+    const resp=await fetch(NEWS_WORKER+'?tickers='+tickers.slice(0,6).join(','));
+    if(!resp.ok)return;
+    const data=await resp.json();
+    const lines=[];
+    for(const [ticker,news] of Object.entries(data)){
+      if(Array.isArray(news)&&news.length){
+        lines.push(ticker+':');
+        news.forEach(n=>{
+          const d=n.d?new Date(n.d*1000).toLocaleDateString('uk-UA'):'';
+          lines.push('  '+(d?'['+d+'] ':'')+n.h);
+        });
+      }
+    }
+    aiNewsContext=lines.join('\n');
+  }catch{}
+}
 
 function buildPortfolioContext(){
   try{
@@ -9271,7 +9298,7 @@ STRICT RULES — never break these:
 7. Be concise — skip preambles and generic filler. Get to the point.
 8. Do not use markdown headers (## or ###).
 
-${hasData?`Portfolio data:\n${ctx}`:'The user has not added any assets to the portfolio yet. Encourage them to add their first asset.'}`;
+${hasData?`Portfolio data:\n${ctx}`:'The user has not added any assets to the portfolio yet. Encourage them to add their first asset.'}${aiNewsContext?`\n\nRecent news for portfolio stocks (last 7 days):\n${aiNewsContext}`:''}`;
 }
 
 function openAIChat(){
@@ -9279,6 +9306,7 @@ function openAIChat(){
   if(!overlay)return;
   overlay.classList.add('open');
   _showAIChat();
+  fetchNewsContext();
 }
 
 function closeAIChat(){

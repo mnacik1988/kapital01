@@ -35,6 +35,7 @@ export default {
       if (url.pathname === '/multi') return handleMulti(url, env, origin);
       if (url.pathname === '/rates') return handleRates(origin);
       if (url.pathname === '/crypto') return handleCrypto(url, origin);
+      if (url.pathname === '/news') return handleNews(url, env, origin);
       return json({ error: 'Not found' }, 404, origin);
     } catch (error) {
       console.error('Worker request failed', error);
@@ -161,6 +162,36 @@ async function getStock(ticker, env) {
   });
 }
 
+async function handleNews(url, env, origin) {
+  if (!env.FINNHUB_KEY) return json({ error: 'Not configured' }, 503, origin);
+  const raw = (url.searchParams.get('tickers') || '').split(',');
+  const tickers = [...new Set(raw.map(normalizeTicker).filter(Boolean))].slice(0, 6);
+  if (!tickers.length) return json({ error: 'tickers required' }, 400, origin);
+
+  const to = new Date().toISOString().slice(0, 10);
+  const from = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  const token = encodeURIComponent(env.FINNHUB_KEY);
+
+  const results = {};
+  await Promise.all(tickers.map(async ticker => {
+    try {
+      const resp = await fetch(
+        'https://finnhub.io/api/v1/company-news?symbol=' + encodeURIComponent(ticker) +
+        '&from=' + from + '&to=' + to + '&token=' + token,
+        { headers: { Accept: 'application/json', 'User-Agent': 'InveStory-Worker/2.0' } }
+      );
+      if (!resp.ok) return;
+      const news = await resp.json();
+      results[ticker] = (Array.isArray(news) ? news : []).slice(0, 4).map(n => ({
+        h: String(n.headline || '').slice(0, 120),
+        d: n.datetime || 0
+      }));
+    } catch {}
+  }));
+
+  return json(results, 200, origin, 1800);
+}
+
 async function handleAI(request, origin, env) {
   if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
   const apiKey = env.CLAUDE_KEY || '';
@@ -176,7 +207,7 @@ async function handleAI(request, origin, env) {
   const reqBody = {
     model: 'claude-sonnet-5',
     max_tokens: Math.min(Number(body.max_tokens) || 1024, 2048),
-    system: String(body.system || '').slice(0, 4000),
+    system: String(body.system || '').slice(0, 8000),
     messages: body.messages.slice(-20)
       .map(m => ({ role: String(m.role), content: String(m.content) }))
       .filter((m, i, arr) => i === 0 || m.role !== arr[i - 1].role)
