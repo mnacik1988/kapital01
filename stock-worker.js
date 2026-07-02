@@ -19,8 +19,12 @@ export default {
 
     const url = new URL(request.url);
 
-    // AI proxy — POST only, handled before GET-only guard
-    if (url.pathname === '/ai') return handleAI(request, origin, env);
+    // AI proxy — POST only, handled before GET-only guard (with its own stricter rate limit)
+    if (url.pathname === '/ai') {
+      const aiIp = request.headers.get('CF-Connecting-IP') || 'unknown';
+      if (!allowAIRequest(aiIp)) return json({ error: 'Забагато запитів до AI. Зачекай хвилину.' }, 200, origin, 0);
+      return handleAI(request, origin, env);
+    }
 
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
 
@@ -53,6 +57,26 @@ function isAllowedOrigin(origin) {
   } catch {
     return false;
   }
+}
+
+const AI_RATE_BUCKETS = new Map();
+const AI_LIMIT_PER_MIN = 10;
+
+function allowAIRequest(ip) {
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  const bucket = AI_RATE_BUCKETS.get(ip);
+  if (!bucket || now - bucket.startedAt >= windowMs) {
+    AI_RATE_BUCKETS.set(ip, { startedAt: now, count: 1 });
+    if (AI_RATE_BUCKETS.size > 500) {
+      for (const [key, b] of AI_RATE_BUCKETS) {
+        if (now - b.startedAt >= windowMs) AI_RATE_BUCKETS.delete(key);
+      }
+    }
+    return true;
+  }
+  bucket.count += 1;
+  return bucket.count <= AI_LIMIT_PER_MIN;
 }
 
 async function allowRequest(env, ip) {
