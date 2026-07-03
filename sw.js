@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-64-audit';
+﻿const CACHE_NAME = 'investory-app-v0-0-65-ai-icon';
 const APP_SHELL = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const APP_SHELL = [
   './panel-icons/3.png?v=4',
   './panel-icons/4.png?v=4',
   './panel-icons/5.png?v=4',
+  './section-icons/AI.png?v=1',
   './section-icons/section-crypto.png?v=1',
   './section-icons/section-stocks.png?v=1',
   './section-icons/section-account.png?v=1',
