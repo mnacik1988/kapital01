@@ -1,11 +1,10 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-63-ai-news';
+﻿const CACHE_NAME = 'investory-app-v0-0-64-audit';
 const APP_SHELL = [
   './',
   './index.html',
   './Depozit_v0_0_24.html',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
+  './icons/icon-384.png',
   './privacy-policy.html',
   './terms-disclaimer.html',
   './panel-icons/1.png?v=4',

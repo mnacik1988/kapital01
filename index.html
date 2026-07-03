@@ -2831,7 +2831,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.63';
+const APP_VERSION = 'v0.0.64';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7135,13 +7135,14 @@ function setDisplayCurrency(cur){
 const PRIVACY_I18N={
   uk:{
     title:'Політика конфіденційності',
-    updated:'Оновлено: 27 травня 2026',
+    updated:'Оновлено: 3 липня 2026',
     note:'Перед публікацією в магазинах додайте публічну URL-адресу цієї політики та контакт розробника.',
     sections:[
       ['Хто ми','InveStory — застосунок для обліку особистих фінансових активів: депозитів, валют, криптовалют, акцій, кредитів, дорогоцінних металів та інших розділів.'],
       ['Які дані ви вводите','Ви можете вводити суми, назви активів, дати, ставки, нотатки, історію поповнень, дані кредитів та іншу фінансову інформацію. Ці дані потрібні тільки для роботи функцій застосунку.'],
       ['Де зберігаються дані','Основні дані зберігаються локально на вашому пристрої у сховищі застосунку. Ми не створюємо обліковий запис і не передаємо вашу локальну фінансову базу на наш сервер.'],
       ['Онлайн-функції','Якщо ви використовуєте онлайн-курси валют, ціни криптовалют або акцій, застосунок може звертатися до зовнішніх сервісів за курсами та цінами. Такі запити можуть містити тикер, валютну пару, технічні дані запиту та IP-адресу, які обробляються відповідним зовнішнім сервісом.'],
+      ['AI-асистент','У застосунку є необов\'язковий AI-чат. Коли ви надсилаєте повідомлення, ваш текст і зведення портфелю (категорії активів, суми, тикери акцій) передаються сторонньому AI-провайдеру (наразі Anthropic) для формування відповіді. Це відбувається лише коли ви активно користуєтесь AI-чатом. Ми не зберігаємо ваші розмови на своїх серверах.'],
       ['Експорт та імпорт','Експорт створює файл резервної копії на вашому пристрої. Якщо ви самостійно передаєте цей файл у хмару, месенджер або інший сервіс, обробка цього файлу залежить від правил такого сервісу.'],
       ['Покупки та підписки','Після підключення платних функцій платежі та підписки оброблятимуться Apple App Store або Google Play. Ми не отримуємо дані вашої банківської картки.'],
       ['Аналітика та реклама','У поточній версії застосунок не використовує рекламні трекери та не збирає аналітику поведінки користувача. Якщо це зміниться, політика буде оновлена до публікації такої версії.'],
@@ -7152,13 +7153,14 @@ const PRIVACY_I18N={
   },
   ru:{
     title:'Политика конфиденциальности',
-    updated:'Обновлено: 27 мая 2026',
+    updated:'Обновлено: 3 июля 2026',
     note:'Перед публикацией в магазинах добавьте публичный URL этой политики и контакт разработчика.',
     sections:[
       ['Кто мы','InveStory — приложение для учёта личных финансовых активов: депозитов, валют, криптовалют, акций, кредитов, драгоценных металлов и других разделов.'],
       ['Какие данные вы вводите','Вы можете вводить суммы, названия активов, даты, ставки, заметки, историю пополнений, данные кредитов и другую финансовую информацию. Эти данные нужны только для работы функций приложения.'],
       ['Где хранятся данные','Основные данные хранятся локально на вашем устройстве в хранилище приложения. Мы не создаём аккаунт и не передаём вашу локальную финансовую базу на наш сервер.'],
       ['Онлайн-функции','Если вы используете онлайн-курсы валют, цены криптовалют или акций, приложение может обращаться к внешним сервисам за курсами и ценами. Такие запросы могут содержать тикер, валютную пару, технические данные запроса и IP-адрес, которые обрабатываются соответствующим внешним сервисом.'],
+      ['AI-ассистент','В приложении есть необязательный AI-чат. Когда вы отправляете сообщение, ваш текст и сводка портфеля (категории активов, суммы, тикеры акций) передаются стороннему AI-провайдеру (в настоящее время Anthropic) для формирования ответа. Это происходит только когда вы активно пользуетесь AI-чатом. Мы не храним ваши переписки на своих серверах.'],
       ['Экспорт и импорт','Экспорт создаёт файл резервной копии на вашем устройстве. Если вы самостоятельно передаёте этот файл в облако, мессенджер или другой сервис, обработка файла зависит от правил такого сервиса.'],
       ['Покупки и подписки','После подключения платных функций платежи и подписки будут обрабатываться Apple App Store или Google Play. Мы не получаем данные вашей банковской карты.'],
       ['Аналитика и реклама','В текущей версии приложение не использует рекламные трекеры и не собирает аналитику поведения пользователя. Если это изменится, политика будет обновлена до публикации такой версии.'],
@@ -7169,13 +7171,14 @@ const PRIVACY_I18N={
   },
   en:{
     title:'Privacy Policy',
-    updated:'Updated: May 27, 2026',
+    updated:'Updated: July 3, 2026',
     note:'Before store release, publish this policy at a public URL and add the developer contact.',
     sections:[
       ['Who we are','InveStory is an app for tracking personal financial assets, including deposits, currencies, crypto, stocks, loans, precious metals and custom sections.'],
       ['Data you enter','You may enter amounts, asset names, dates, rates, notes, top-up history, loan details and other financial information. This data is used only to provide the app features.'],
       ['Where data is stored','Core data is stored locally on your device in the app storage. We do not create an account and do not upload your local financial database to our server.'],
       ['Online features','If you use online exchange rates, crypto prices or stock prices, the app may contact external services to request rates and prices. These requests may include a ticker, currency pair, technical request data and IP address processed by the relevant external service.'],
+      ['AI assistant','The app includes an optional AI chat assistant. When you send a message, your message and a summary of your portfolio (asset categories, totals, stock tickers) are transmitted to a third-party AI provider (currently Anthropic) to generate a response. This happens only when you actively use the AI chat. We do not store your conversations on our servers.'],
       ['Export and import','Export creates a backup file on your device. If you choose to upload or send that file to cloud storage, a messenger or another service, that service handles the file under its own rules.'],
       ['Purchases and subscriptions','After paid features are connected, payments and subscriptions will be processed by Apple App Store or Google Play. We do not receive your payment card details.'],
       ['Analytics and advertising','The current version does not use advertising trackers and does not collect user behaviour analytics. If this changes, this policy will be updated before that version is released.'],
@@ -7186,13 +7189,14 @@ const PRIVACY_I18N={
   },
   de:{
     title:'Datenschutzrichtlinie',
-    updated:'Aktualisiert: 27. Mai 2026',
+    updated:'Aktualisiert: 3. Juli 2026',
     note:'Vor der Veröffentlichung im Store veröffentlichen Sie diese Richtlinie unter einer öffentlichen URL und ergänzen den Entwicklerkontakt.',
     sections:[
       ['Wer wir sind','InveStory ist eine App zur Verwaltung persönlicher Finanzwerte wie Einlagen, Währungen, Kryptowährungen, Aktien, Kredite, Edelmetalle und eigene Bereiche.'],
       ['Welche Daten Sie eingeben','Sie können Beträge, Namen von Vermögenswerten, Daten, Zinssätze, Notizen, Aufstockungen, Kreditdaten und andere Finanzinformationen eingeben. Diese Daten werden nur für die Funktionen der App verwendet.'],
       ['Wo Daten gespeichert werden','Die Hauptdaten werden lokal auf Ihrem Gerät im App-Speicher gespeichert. Wir erstellen kein Konto und übertragen Ihre lokale Finanzdatenbank nicht auf unseren Server.'],
       ['Online-Funktionen','Wenn Sie Online-Wechselkurse, Kryptopreise oder Aktienpreise nutzen, kann die App externe Dienste für Kurse und Preise anfragen. Solche Anfragen können Ticker, Währungspaare, technische Anfragedaten und IP-Adresse enthalten, die vom jeweiligen externen Dienst verarbeitet werden.'],
+      ['KI-Assistent','Die App enthält einen optionalen KI-Chat. Wenn Sie eine Nachricht senden, werden Ihr Text und eine Zusammenfassung Ihres Portfolios (Anlagekategorien, Beträge, Aktien-Ticker) an einen externen KI-Anbieter (derzeit Anthropic) übertragen, um eine Antwort zu erstellen. Dies geschieht nur, wenn Sie den KI-Chat aktiv nutzen. Wir speichern Ihre Unterhaltungen nicht auf unseren Servern.'],
       ['Export und Import','Der Export erstellt eine Sicherungsdatei auf Ihrem Gerät. Wenn Sie diese Datei selbst in eine Cloud, einen Messenger oder einen anderen Dienst übertragen, gelten die Regeln dieses Dienstes.'],
       ['Käufe und Abonnements','Nach Aktivierung kostenpflichtiger Funktionen werden Zahlungen und Abonnements über Apple App Store oder Google Play verarbeitet. Wir erhalten keine ZahlungsKartendaten.'],
       ['Analyse und Werbung','Die aktuelle Version verwendet keine Werbe-Tracker und erhebt keine Verhaltensanalysen. Falls sich dies ändert, wird diese Richtlinie vor Veröffentlichung aktualisiert.'],
@@ -7203,13 +7207,14 @@ const PRIVACY_I18N={
   },
   zh:{
     title:'隐私政策',
-    updated:'更新日期：2026年5月27日',
+    updated:'更新日期：2026年7月3日',
     note:'发布到应用商店前，请将本政策放在公开 URL，并添加开发者联系方式。',
     sections:[
       ['我们是谁','InveStory 是一款用于记录个人金融资产的应用，包括存款、货币、加密货币、股票、贷款、贵金属和自定义部分。'],
       ['您输入的数据','您可以输入金额、资产名称、日期、利率、备注、追加记录、贷款信息和其他财务信息。这些数据仅用于提供应用功能。'],
       ['数据存储位置','核心数据保存在您设备上的应用本地存储中。我们不创建账户，也不会将您的本地财务数据库上传到我们的服务器。'],
       ['在线功能','如果您使用在线汇率、加密货币价格或股票价格，应用可能会请求外部服务获取价格。这些请求可能包含代码、货币对、技术请求数据和 IP 地址，并由相应外部服务处理。'],
+      ['AI 助手','应用包含可选的 AI 聊天助手。当您发送消息时，您的消息和投资组合摘要（资产类别、金额、股票代码）会传输给第三方 AI 提供商（目前为 Anthropic）以生成回复。这仅在您主动使用 AI 聊天时发生。我们不会在服务器上存储您的对话。'],
       ['导出和导入','导出会在您的设备上创建备份文件。如果您自行将该文件上传或发送到云服务、聊天工具或其他服务，该服务将按照自己的规则处理该文件。'],
       ['购买和订阅','接入付费功能后，付款和订阅将由 Apple App Store 或 Google Play 处理。我们不会收到您的银行卡信息。'],
       ['分析和广告','当前版本不使用广告跟踪器，也不收集用户行为分析。如果未来发生变化，本政策会在发布前更新。'],

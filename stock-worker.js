@@ -1,3 +1,6 @@
+// 'null' is required: the Android wrapper loads file:///android_asset/index.html,
+// so its WebView sends Origin: null. Remove after migrating the wrapper to
+// WebViewAssetLoader (https://appassets.androidplatform.net) during next AAB build.
 const ALLOWED_ORIGINS = new Set([
   'https://mnacik1988.github.io',
   'null'
