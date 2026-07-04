@@ -1,9 +1,8 @@
-// 'null' is required: the Android wrapper loads file:///android_asset/index.html,
-// so its WebView sends Origin: null. Remove after migrating the wrapper to
-// WebViewAssetLoader (https://appassets.androidplatform.net) during next AAB build.
+// appassets.androidplatform.net = Android wrapper (WebViewAssetLoader since v1.0.29).
+// Origin 'null' was removed after migrating off file:///android_asset/ loading.
 const ALLOWED_ORIGINS = new Set([
   'https://mnacik1988.github.io',
-  'null'
+  'https://appassets.androidplatform.net'
 ]);
 
 const TICKER_RE = /^[A-Z0-9.\-]{1,15}$/;
