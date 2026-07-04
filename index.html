@@ -472,6 +472,9 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .ai-typing span:nth-child(2){animation-delay:.2s;}
 .ai-typing span:nth-child(3){animation-delay:.4s;}
 @keyframes aiDot{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:8px;padding:4px 12px 10px;}
+.ai-suggestion-chip{background:var(--bg3);border:1px solid #D4A84355;border-radius:16px;padding:8px 13px;color:var(--text);font-family:'DM Mono',monospace;font-size:11.5px;cursor:pointer;transition:border-color .15s,background .15s;text-align:left;}
+.ai-suggestion-chip:active{background:#D4A84322;border-color:#D4A843;}
 .ai-input-bar{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--bg2);}
 .ai-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:22px;padding:10px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;}
 .ai-input:focus{outline:none;border-color:#D4A843;}
@@ -2422,6 +2425,7 @@ body.modern-mockup.theme-light .total-currency{
     <!-- Chat -->
     <div id="aiChatSection" class="ai-chat-section">
       <div id="aiMessages" class="ai-messages"></div>
+      <div id="aiSuggestions" class="ai-suggestions"></div>
       <div class="ai-input-bar">
         <input class="ai-input" id="aiInput" type="text" placeholder="Питай про портфель..." autocomplete="off" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendAIMessage()">
         <button class="ai-send-btn" id="aiSendBtn" onclick="sendAIMessage()">
@@ -2826,7 +2830,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.65';
+const APP_VERSION = 'v0.0.66';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9318,11 +9322,49 @@ function aiChatCloseOutside(e){
   if(e.target===document.getElementById('aiChatOverlay'))closeAIChat();
 }
 
+const AI_GREETING_I18N={
+  uk:'Привіт! Я Claude — твій AI-аналітик. Маю доступ до даних твого портфелю. Що хочеш дізнатися?',
+  ru:'Привет! Я Claude — твой AI-аналитик. У меня есть доступ к данным твоего портфеля. Что хочешь узнать?',
+  en:'Hi! I\'m Claude — your AI analyst. I have access to your portfolio data. What would you like to know?',
+  de:'Hallo! Ich bin Claude — dein KI-Analyst. Ich habe Zugriff auf deine Portfoliodaten. Was möchtest du wissen?',
+  zh:'你好！我是 Claude——你的 AI 分析师。我可以访问你的投资组合数据。你想了解什么？'
+};
+const AI_SUGGESTIONS_I18N={
+  uk:['📊 Проаналізуй мій портфель','📰 Що нового по моїх акціях?','⚠️ Де в мене концентрація ризику?','💰 Як розподілені мої активи?'],
+  ru:['📊 Проанализируй мой портфель','📰 Что нового по моим акциям?','⚠️ Где у меня концентрация риска?','💰 Как распределены мои активы?'],
+  en:['📊 Analyze my portfolio','📰 Any news on my stocks?','⚠️ Where is my risk concentrated?','💰 How are my assets allocated?'],
+  de:['📊 Analysiere mein Portfolio','📰 Neuigkeiten zu meinen Aktien?','⚠️ Wo liegt mein Klumpenrisiko?','💰 Wie sind meine Anlagen verteilt?'],
+  zh:['📊 分析我的投资组合','📰 我的股票有什么新闻？','⚠️ 我的风险集中在哪里？','💰 我的资产如何分配？']
+};
+
+function _renderAISuggestions(){
+  const box=document.getElementById('aiSuggestions');
+  if(!box)return;
+  if(aiMessages.length>0){box.innerHTML='';return;}
+  const chips=AI_SUGGESTIONS_I18N[currentLang]||AI_SUGGESTIONS_I18N.uk;
+  box.innerHTML='';
+  chips.forEach(txt=>{
+    const btn=document.createElement('button');
+    btn.className='ai-suggestion-chip';
+    btn.textContent=txt;
+    btn.onclick=()=>sendAISuggestion(txt);
+    box.appendChild(btn);
+  });
+}
+
+function sendAISuggestion(txt){
+  const input=document.getElementById('aiInput');
+  if(!input)return;
+  input.value=txt.replace(/^[^\wА-Яа-яІіЇїЄєҐґ一-鿿]+/,'');
+  sendAIMessage();
+}
+
 function _showAIChat(){
   const box=document.getElementById('aiMessages');
   if(box&&box.children.length===0){
-    _addAIBubble('assistant','Привіт! Я Claude — твій AI-аналітик. Маю доступ до даних твого портфелю. Що хочеш дізнатися?');
+    _addAIBubble('assistant',AI_GREETING_I18N[currentLang]||AI_GREETING_I18N.uk);
   }
+  _renderAISuggestions();
   setTimeout(()=>document.getElementById('aiInput')?.focus(),200);
 }
 
@@ -9361,6 +9403,8 @@ async function sendAIMessage(){
   input.value='';
   _addAIBubble('user',text);
   aiMessages.push({role:'user',content:text});
+  const sugBox=document.getElementById('aiSuggestions');
+  if(sugBox)sugBox.innerHTML='';
   aiTyping=true;
   const sendBtn=document.getElementById('aiSendBtn');
   if(sendBtn)sendBtn.disabled=true;
