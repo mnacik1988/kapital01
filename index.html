@@ -2830,7 +2830,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.66';
+const APP_VERSION = 'v0.0.67';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9305,6 +9305,29 @@ STRICT RULES — never break these:
 ${hasData?`Portfolio data:\n${ctx}`:'The user has not added any assets to the portfolio yet. Encourage them to add their first asset.'}${aiNewsContext?`\n\nRecent news for portfolio stocks (last 7 days):\n${aiNewsContext}`:''}`;
 }
 
+function _aiAdjustForKeyboard(){
+  const overlay=document.getElementById('aiChatOverlay');
+  const panel=overlay?overlay.querySelector('.ai-chat-panel'):null;
+  if(!panel)return;
+  if(!overlay.classList.contains('open')){panel.style.marginBottom='';panel.style.height='';return;}
+  const vv=window.visualViewport;
+  if(!vv)return;
+  const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+  if(keyboard>60){
+    panel.style.marginBottom=keyboard+'px';
+    panel.style.height=Math.min(window.innerHeight*0.82,vv.height*0.96)+'px';
+  }else{
+    panel.style.marginBottom='';
+    panel.style.height='';
+  }
+  const box=document.getElementById('aiMessages');
+  if(box)box.scrollTop=box.scrollHeight;
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',_aiAdjustForKeyboard);
+  window.visualViewport.addEventListener('scroll',_aiAdjustForKeyboard);
+}
+
 function openAIChat(){
   const overlay=document.getElementById('aiChatOverlay');
   if(!overlay)return;
@@ -9315,7 +9338,11 @@ function openAIChat(){
 
 function closeAIChat(){
   const overlay=document.getElementById('aiChatOverlay');
-  if(overlay)overlay.classList.remove('open');
+  if(!overlay)return;
+  overlay.classList.remove('open');
+  const panel=overlay.querySelector('.ai-chat-panel');
+  if(panel){panel.style.marginBottom='';panel.style.height='';}
+  document.getElementById('aiInput')?.blur();
 }
 
 function aiChatCloseOutside(e){
@@ -9330,11 +9357,11 @@ const AI_GREETING_I18N={
   zh:'你好！我是 Claude——你的 AI 分析师。我可以访问你的投资组合数据。你想了解什么？'
 };
 const AI_SUGGESTIONS_I18N={
-  uk:['📊 Проаналізуй мій портфель','📰 Що нового по моїх акціях?','⚠️ Де в мене концентрація ризику?','💰 Як розподілені мої активи?'],
-  ru:['📊 Проанализируй мой портфель','📰 Что нового по моим акциям?','⚠️ Где у меня концентрация риска?','💰 Как распределены мои активы?'],
-  en:['📊 Analyze my portfolio','📰 Any news on my stocks?','⚠️ Where is my risk concentrated?','💰 How are my assets allocated?'],
-  de:['📊 Analysiere mein Portfolio','📰 Neuigkeiten zu meinen Aktien?','⚠️ Wo liegt mein Klumpenrisiko?','💰 Wie sind meine Anlagen verteilt?'],
-  zh:['📊 分析我的投资组合','📰 我的股票有什么新闻？','⚠️ 我的风险集中在哪里？','💰 我的资产如何分配？']
+  uk:['Проаналізуй мій портфель','Що нового по моїх акціях?','Де в мене концентрація ризику?','Як розподілені мої активи?'],
+  ru:['Проанализируй мой портфель','Что нового по моим акциям?','Где у меня концентрация риска?','Как распределены мои активы?'],
+  en:['Analyze my portfolio','Any news on my stocks?','Where is my risk concentrated?','How are my assets allocated?'],
+  de:['Analysiere mein Portfolio','Neuigkeiten zu meinen Aktien?','Wo liegt mein Klumpenrisiko?','Wie sind meine Anlagen verteilt?'],
+  zh:['分析我的投资组合','我的股票有什么新闻？','我的风险集中在哪里？','我的资产如何分配？']
 };
 
 function _renderAISuggestions(){
@@ -9355,7 +9382,7 @@ function _renderAISuggestions(){
 function sendAISuggestion(txt){
   const input=document.getElementById('aiInput');
   if(!input)return;
-  input.value=txt.replace(/^[^\wА-Яа-яІіЇїЄєҐґ一-鿿]+/,'');
+  input.value=txt;
   sendAIMessage();
 }
 

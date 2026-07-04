@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-66-ai-chips';
+﻿const CACHE_NAME = 'investory-app-v0-0-67-kbd-fix';
 const APP_SHELL = [
   './',
   './index.html',
