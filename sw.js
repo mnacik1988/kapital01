@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-68-trial-freeze';
+﻿const CACHE_NAME = 'investory-app-v0-0-69-bond-accrued';
 const APP_SHELL = [
   './',
   './index.html',
