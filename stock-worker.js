@@ -308,9 +308,12 @@ async function handleAI(request, origin, env) {
   while (messages.length && messages[0].role !== 'user') messages.shift();
   if (!messages.length) return json({ error: 'messages required' }, 400, origin);
 
+  // thinking отключён намеренно: у Sonnet 5 он включён по умолчанию и «съедает» max_tokens,
+  // из-за чего на больших портфелях ответ приходил ПУСТЫМ (весь бюджет уходил в размышления).
   const reqBody = {
     model: 'claude-sonnet-5',
-    max_tokens: 1024,
+    max_tokens: 1400,
+    thinking: { type: 'disabled' },
     system,
     messages
   };
@@ -332,6 +335,15 @@ async function handleAI(request, origin, env) {
   }
   const textBlock = (data?.content || []).find(b => b.type === 'text');
   const content = textBlock?.text || '';
+  if (!content) {
+    // Пустой ответ — отдаём причину, чтобы не гадать (обычно stop_reason: max_tokens)
+    return json({
+      error: 'Порожня відповідь від моделі',
+      stop_reason: data?.stop_reason || null,
+      blocks: (data?.content || []).map(b => b.type),
+      usage: data?.usage || null
+    }, 200, origin, 0);
+  }
 
   // Считаем только УСПЕШНЫЕ вызовы — ошибки Anthropic не тарифицируются и не должны съедать лимит
   await bumpKey(env, gKey, globalUsed);
