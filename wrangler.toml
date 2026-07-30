@@ -4,3 +4,8 @@ compatibility_date = "2024-01-01"
 
 [observability]
 enabled = true
+
+# Счётчики лимитов ИИ: global:ДАТА и user:<id>:ДАТА
+[[kv_namespaces]]
+binding = "AI_LIMITS"
+id = "ac103a7abff8418082c6e90fa8baea5b"

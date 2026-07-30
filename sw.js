@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-71-bond-edit';
+﻿const CACHE_NAME = 'investory-app-v0-0-72-ai-limits';
 const APP_SHELL = [
   './',
   './index.html',
