@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-72-ai-limits';
+﻿const CACHE_NAME = 'investory-app-v0-0-73-device-id';
 const APP_SHELL = [
   './',
   './index.html',
