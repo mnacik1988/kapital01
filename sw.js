@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-75-deposit-income-sync';
+﻿const CACHE_NAME = 'investory-app-v0-0-76-deposit-schedule';
 const APP_SHELL = [
   './',
   './index.html',

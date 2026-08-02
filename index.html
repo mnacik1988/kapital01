@@ -167,6 +167,7 @@ body.is-dragging-card,body.is-dragging-card *{
 /* INPUTS */
 .field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
 .field-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;}
+.field-hint{font-family:'DM Mono',monospace;font-size:9px;line-height:1.4;color:var(--muted2);margin-top:6px;}
 .field-input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:16px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s;}
 .field-input:focus{border-color:var(--green);box-shadow:0 0 0 2px #4ecb8d20;}
 .field-input::placeholder{color:var(--muted);}
@@ -2854,7 +2855,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.75';
+const APP_VERSION = 'v0.0.76';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3368,7 +3369,10 @@ function startAutoI18nObserver(){
 let currentLang='uk';
 function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LANGS['uk'][key]||key;}
 const UI_TEXT={
-  depOpenDay:{uk:'Число відкриття',ru:'Число открытия',en:'Opening day',de:'Eröffnungstag',zh:'开户日'},
+  depOpenDay:{uk:'Число нарахування',ru:'Число начисления',en:'Interest day',de:'Zinstag',zh:'计息日'},
+  depAmountNow:{uk:'Сума на депозиті зараз (₴)',ru:'Сумма на депозите сейчас (₴)',en:'Balance right now (₴)',de:'Aktueller Stand (₴)',zh:'当前余额 (₴)'},
+  depAmountHint:{uk:'Залишок на сьогодні. Відсотки почнемо рахувати з цього дня',ru:'Остаток на сегодня. Проценты начнём считать с этого дня',en:'Today\'s balance. Interest is counted from this day on',de:'Heutiger Stand. Zinsen werden ab diesem Tag berechnet',zh:'今日余额。利息自该日起计算'},
+  depPayFreq:{uk:'Як часто приходять відсотки',ru:'Как часто приходят проценты',en:'How often interest arrives',de:'Wie oft Zinsen kommen',zh:'利息到账频率'},
   stockSaleCash:{uk:'Кошти від продажів акцій',ru:'Деньги от продажи акций',en:'Stock sale cash',de:'Geld aus Aktienverkäufen',zh:'股票卖出资金'},
   stockSaleCashShort:{uk:'Кошти від продажів',ru:'Деньги от продаж',en:'Sale cash',de:'Verkaufserlöse',zh:'卖出资金'},
   stockSaleCashHint:{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
@@ -3609,7 +3613,7 @@ function getDepositHtml(dep,idx){
       <div class="dep-calc-body" id="depCalcBody_${dep.id}">
         <div style="padding-top:14px;">
         <div class="field-group">
-          <div class="field-label">${getDepositFieldLabel(lang.depPrincipalLbl,dep)}</div>
+          <div class="field-label">${getDepositFieldLabel(uiText('depAmountNow'),dep)}</div>
           <div style="display:flex;gap:6px;">
             <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}" style="flex:1;"
               oninput="deposits[${idx}].principal=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
@@ -3623,10 +3627,11 @@ function getDepositHtml(dep,idx){
               <option value="CNY" ${dep.depCurrency==='CNY'?'selected':''}>¥</option>
             </select>
           </div>
+          <div class="field-hint">${uiText('depAmountHint')}</div>
         </div>
         <div class="row2">
           <div class="field-group">
-            <div class="field-label">${uiText('depOpenDay')||lang.depOpenDay||'Число відкриття'}</div>
+            <div class="field-label">${uiText('depOpenDay')||lang.depOpenDay||'Число нарахування'}</div>
             <input class="field-input" type="text" id="depOpenDay_${dep.id}" placeholder="1-31" value="${getDepositOpenDayValue(dep)}" inputmode="numeric"
               oninput="deposits[${idx}].openDay=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
           </div>
@@ -3679,7 +3684,7 @@ function getDepositHtml(dep,idx){
                 oninput="deposits[${idx}].months=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             </div>
             <div class="field-group">
-              <div class="field-label">${lang.capitaliz}</div>
+              <div class="field-label">${uiText('depPayFreq')}</div>
               <select class="field-input" id="depFreq_${dep.id}"
                 onchange="deposits[${idx}].freq=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
                 <option value="12" ${dep.freq=='12'?'selected':''}>${lang.monthly}</option>
@@ -3908,18 +3913,29 @@ function setDepositInterestTo(depId,idx,mode){
   startLiveTicker(depId);
   saveData();
 }
-function getDepositCapDates(start,end,startDay){
+// Шаг между начислениями в месяцах: 12 в году → раз в месяц, 4 → раз в квартал и т.д.
+function getDepositCapStepMonths(dep){
+  const freq=parseInt(String(dep?.freq??'12'),10);
+  if(freq===1)return 12;
+  if(freq===2)return 6;
+  if(freq===4)return 3;
+  return 1;
+}
+// График начислений отсчитывается от начала ДОГОВОРА, а не от даты внесения в
+// приложение: депозит с квартальной выплатой, открытый 1 января, платит 1 апреля,
+// 1 июля и 1 октября — ровно как в выписке банка, когда бы его сюда ни завели.
+function getDepositCapDates(start,end,startDay,dep){
   const dates=[];
-  let cd=new Date(start);
   const day=Math.min(31,Math.max(1,parseInt(startDay,10)||1));
-  while(true){
-    const y=cd.getFullYear();
-    const m=cd.getMonth()+1;
-    const last=new Date(y,m+1,0).getDate();
-    cd=new Date(y,m,Math.min(day,last));
-    if(cd>end)break;
-    dates.push(new Date(cd));
-  }
+  const step=getDepositCapStepMonths(dep);
+  const anchor=dep?getDepositContractStart(dep):depLocalDate(start);
+  const onDay=(y,m)=>{const last=new Date(y,m+1,0).getDate();return new Date(y,m,Math.min(day,last));};
+  const y=anchor.getFullYear();
+  let m=anchor.getMonth();
+  let cd=onDay(y,m);
+  let guard=0;
+  while(cd<=start&&guard++<3000){m+=step;cd=onDay(y,m);}
+  while(cd<=end&&guard++<3000){dates.push(new Date(cd));m+=step;cd=onDay(y,m);}
   return dates;
 }
 function simulateDeposit(dep,opts={}){
@@ -3945,7 +3961,7 @@ function simulateDeposit(dep,opts={}){
     if(!amount||!tp.date)return;
     events.push({date:depAddDays(tp.date,1),type:'topup',amount});
   });
-  getDepositCapDates(start,stop,startDay).forEach(date=>events.push({date,type:'cap'}));
+  getDepositCapDates(start,stop,startDay,dep).forEach(date=>events.push({date,type:'cap'}));
   getDepositModeHistory(dep).forEach(h=>{
     const d=depLocalDate(h.date);
     if(d>start&&d<=stop)events.push({date:d,type:'mode',mode:h.mode});
@@ -4187,13 +4203,9 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   // в приложении (start здесь теперь дата добавления).
   const startDay=getDepositOpenDay(dep);
   const interestToBody=dep?(dep.interestTo!=='separate'):true;
-  const capDateStrs=[];
-  let cd=new Date(start);
-  while(true){
-    cd=new Date(cd.getFullYear(),cd.getMonth()+1,startDay);
-    if(cd>now)break;
-    capDateStrs.push(toStr(cd));
-  }
+  // Тот же источник графика, что и у движка начисления, — иначе журнал рисовал
+  // капитализацию помесячно даже при квартальной выплате.
+  const capDateStrs=getDepositCapDates(start,now,startDay,dep).map(toStr);
 
   let rows='';
   for(let d=count-1;d>=0;d--){
