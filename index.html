@@ -2855,7 +2855,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.78';
+const APP_VERSION = 'v0.0.79';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3569,6 +3569,9 @@ let mainCounterPinned=localStorage.getItem('main_counter_pinned')||'';
 let deposits=[{id:'dep0',name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',openDay:'',startDate:'',endDate:''}];
 let currentDepSlide=0;
 let liveIntervals={};
+// Подпись последнего отрисованного дневного журнала по каждому депозиту —
+// чтобы не пересчитывать его на каждом тике счётчика. См. renderDailyLog.
+let dailyLogCache={};
 
 function getDepositHtml(dep,idx){
   const lang=LANGS[currentLang];
@@ -4203,74 +4206,48 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   const count=Math.min(Math.max(0,daysMonitored),30);
   if(count<=0){el.innerHTML='<div style="padding:10px;color:var(--muted);font-size:10px;font-family:monospace">'+(t('monitoringTomorrow')||'Моніторинг почнеться завтра')+'</div>';return;}
 
-  // Helper: date to YYYY-MM-DD string (avoids timezone issues)
   const toStr=d=>{const dd=new Date(d);return dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');};
 
-  // Build topup effective dates as strings
-  const topups=(dep?.topups||[]).map(tp=>{
-    const d=new Date(tp.date);
-    d.setDate(d.getDate()+1);
-    return {effStr:toStr(d), amount:parseInputNumber(tp.amount)};
-  }).sort((a,b)=>a.effStr.localeCompare(b.effStr));
+  // Журнал больше не считает проценты сам. Раньше здесь жила вторая, упрощённая
+  // копия движка: она не знала про необлагаемый минимум, про историю смены
+  // режима выплат и про то, что за день зачисления процент не платится, —
+  // и на этих настройках расходилась со счётчиком над ней. Теперь каждый день
+  // берётся как разница накопленных итогов движка между двумя полуночами.
+  const end=dep?.endDate?depLocalDate(dep.endDate):getDepositContractEnd(dep,start);
+  const capStrs=getDepositCapDates(start,now,getDepositOpenDay(dep),dep).map(toStr);
+  const midnight=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const days=[];
+  for(let i=count-1;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push(midnight(d));}
 
-  // Capitalization dates
-  // День капитализации — договорной день месяца, а не день, когда депозит завели
-  // в приложении (start здесь теперь дата добавления).
-  const startDay=getDepositOpenDay(dep);
-  const interestToBody=dep?(dep.interestTo!=='separate'):true;
-  // Тот же источник графика, что и у движка начисления, — иначе журнал рисовал
-  // капитализацию помесячно даже при квартальной выплате.
-  const capDateStrs=getDepositCapDates(start,now,startDay,dep).map(toStr);
+  // Пересчёт стоит дороже старой формулы, а тикер дёргает нас 10 раз в секунду.
+  // Внутри суток при неизменных настройках результат один и тот же — считаем раз.
+  const sig=[depId,toStr(now),P,rAnn,tax,dep?.taxFree,dep?.freq,dep?.interestTo,
+    dep?.endDate,dep?.months,dep?.openDay,toStr(start),depSym,currentLang,
+    JSON.stringify(dep?.topups||[]),JSON.stringify(dep?.interestModeHistory||[])].join('|');
+  // Проверяем и содержимое: renderDeposits() пересоздаёт элемент пустым, и по
+  // одной лишь совпавшей подписи журнал остался бы незаполненным.
+  if(dailyLogCache[depId]===sig&&el.childElementCount)return;
 
+  const totalsAt=dt=>{
+    const s=simulateDeposit(dep,{start,end,until:dt});
+    return {g:s.totalGross||0,t:s.totalTax||0,n:s.totalNet||0};
+  };
+  let prev=totalsAt(days[0]);
   let rows='';
-  for(let d=count-1;d>=0;d--){
-    const date=new Date(now);
-    date.setDate(date.getDate()-d);
-    const dayStr=toStr(date);
-
-    // Balance for this day: P + topups effective on or before this day
-    let dayBalance=P;
-    topups.forEach(tp=>{
-      if(tp.effStr<=dayStr) dayBalance+=tp.amount;
-    });
-
-    // Add completed capitalizations before this day
-    if(interestToBody && capDateStrs.length){
-      let simBal=P;
-      let simStartDate=new Date(start);
-      for(const capStr of capDateStrs){
-        if(capStr>dayStr)break;
-        const capDate=new Date(capStr+'T00:00:00');
-        // Balance during this period: simBal + topups effective in this period
-        let periodBal=simBal;
-        const simStartStr=toStr(simStartDate);
-        topups.forEach(tp=>{
-          if(tp.effStr>simStartStr&&tp.effStr<=capStr) periodBal+=tp.amount;
-        });
-        const days=Math.round((capDate-simStartDate)/(1000*60*60*24));
-        const gross=periodBal*rAnn*days/365;
-        const net=gross*(1-tax);
-        simBal=periodBal+net;
-        simStartDate=capDate;
-      }
-      dayBalance=simBal;
-      // Add topups after last cap but before this day
-      const lastCapStr=capDateStrs[capDateStrs.length-1]||toStr(start);
-      topups.forEach(tp=>{
-        if(tp.effStr>lastCapStr&&tp.effStr<=dayStr) dayBalance+=tp.amount;
-      });
-    }
-
-    const dailyGross=dayBalance*rAnn/365;
-    const dailyNet=dailyGross*(1-tax);
-    const isCap=capDateStrs.includes(dayStr);
-
+  for(const day of days){
+    const next=totalsAt(depAddDays(day,1));
+    const dayGross=Math.max(0,next.g-prev.g);
+    const dayTax=Math.max(0,next.t-prev.t);
+    const dayNet=Math.max(0,next.n-prev.n);
+    prev=next;
+    const isCap=capStrs.includes(toStr(day));
     rows+=`<div class="daily-row">
-      <span class="daily-date">${appShortDate(date,false)}${isCap?' 💰':''}</span>
-      <span class="daily-income" style="color:var(--green2)">+${dailyNet.toFixed(2)} ${depSym}/${t('days')}</span>
-      <span class="daily-total" style="color:var(--muted);font-size:9px">${dailyGross.toFixed(2)} − ${(dailyGross*tax).toFixed(2)} ${uiText('taxShort')}</span>
+      <span class="daily-date">${appShortDate(day,false)}${isCap?' 💰':''}</span>
+      <span class="daily-income" style="color:var(--green2)">+${dayNet.toFixed(2)} ${depSym}/${t('days')}</span>
+      <span class="daily-total" style="color:var(--muted);font-size:9px">${dayGross.toFixed(2)} − ${dayTax.toFixed(2)} ${uiText('taxShort')}</span>
     </div>`;
   }
+  dailyLogCache[depId]=sig;
   el.innerHTML=rows;
 }
 function startLiveTicker(depId){
