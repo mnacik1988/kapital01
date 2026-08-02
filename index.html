@@ -2855,7 +2855,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.81';
+const APP_VERSION = 'v0.0.82';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3373,6 +3373,7 @@ const UI_TEXT={
   depAmountNow:{uk:'Сума на депозиті зараз (₴)',ru:'Сумма на депозите сейчас (₴)',en:'Balance right now (₴)',de:'Aktueller Stand (₴)',zh:'当前余额 (₴)'},
   depAmountHint:{uk:'Залишок на сьогодні. Відсотки почнемо рахувати з цього дня',ru:'Остаток на сегодня. Проценты начнём считать с этого дня',en:'Today\'s balance. Interest is counted from this day on',de:'Heutiger Stand. Zinsen werden ab diesem Tag berechnet',zh:'今日余额。利息自该日起计算'},
   depPayFreq:{uk:'Як часто приходять відсотки',ru:'Как часто приходят проценты',en:'How often interest arrives',de:'Wie oft Zinsen kommen',zh:'利息到账频率'},
+  depAmountFrom:{uk:'Відлік з',ru:'Отсчёт с',en:'Counting from',de:'Zählung ab',zh:'起算日'},
   stockSaleCash:{uk:'Кошти від продажів акцій',ru:'Деньги от продажи акций',en:'Stock sale cash',de:'Geld aus Aktienverkäufen',zh:'股票卖出资金'},
   stockSaleCashShort:{uk:'Кошти від продажів',ru:'Деньги от продаж',en:'Sale cash',de:'Verkaufserlöse',zh:'卖出资金'},
   stockSaleCashHint:{uk:'Буде поповнюватися після продажу акцій',ru:'Будет пополняться после продажи акций',en:'Will be filled after selling stocks',de:'Wird nach Aktienverkäufen aufgefüllt',zh:'卖出股票后会自动增加'},
@@ -3619,7 +3620,7 @@ function getDepositHtml(dep,idx){
           <div class="field-label">${getDepositFieldLabel(uiText('depAmountNow'),dep)}</div>
           <div style="display:flex;gap:6px;">
             <input class="field-input" type="text" id="depPrincipal_${dep.id}" placeholder="100 000" inputmode="decimal" value="${dep.principal}" style="flex:1;"
-              oninput="deposits[${idx}].principal=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
+              oninput="setDepositAmount(${idx},'${dep.id}',this.value);calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             <select class="field-input" id="depCurrency_${dep.id}" style="width:72px;padding:10px 4px;"
               onchange="deposits[${idx}].depCurrency=this.value;renderDeposits();updateAll();startLiveTicker('${dep.id}');saveData()">
               <option value="UAH" ${dep.depCurrency==='UAH'||!dep.depCurrency?'selected':''}>₴</option>
@@ -3630,7 +3631,7 @@ function getDepositHtml(dep,idx){
               <option value="CNY" ${dep.depCurrency==='CNY'?'selected':''}>¥</option>
             </select>
           </div>
-          <div class="field-hint">${uiText('depAmountHint')}</div>
+          <div class="field-hint" id="depAmountHint_${dep.id}">${uiText('depAmountHint')}</div>
         </div>
         <div class="row2">
           <div class="field-group">
@@ -3863,6 +3864,16 @@ function getDepositMonitoringStart(dep){
 // Пользователь может открыть счёт раньше, чем внесёт его сюда, и дорисовывать
 // ему проценты за тот период нельзя — ради этого точная дата открытия и заменена
 // на одно число (день месяца).
+// Поле суммы означает «сколько лежит на вкладе СЕЙЧАС», то есть всё начисленное
+// до этой минуты уже внутри названного числа. Значит при изменении суммы отсчёт
+// процентов надо начинать заново с сегодня — иначе приложение накрутит проценты
+// за период, который пользователь уже учёл сам.
+function setDepositAmount(idx,depId,value){
+  const dep=deposits[idx]||deposits.find(d=>d.id===depId);
+  if(!dep)return;
+  if(String(value)!==String(dep.principal??''))dep.registeredDate=depDateKey(new Date());
+  dep.principal=value;
+}
 function getDepositAccrualStart(dep){
   if(dep?.registeredDate)return depLocalDate(dep.registeredDate);
   return getDepositMonitoringStart(dep);
@@ -4189,6 +4200,9 @@ function calcLive(depId){
   const dGone=Math.max(0,Math.floor((now-contractStart)/(1000*60*60*24)));
   let regDate=start;
   if(dep?.registeredDate)regDate=depLocalDate(dep.registeredDate);
+  // Дата, с которой идёт начисление, была невидимой — и когда она оказывалась
+  // неверной, увидеть это было неоткуда.
+  setText('depAmountHint_'+depId,uiText('depAmountHint')+' · '+uiText('depAmountFrom')+' '+appShortDate(regDate,true));
   const dMonitoring=Math.max(0,Math.floor((now-regDate)/(1000*60*60*24)));
   setText('liveSub_'+depId,t('daysPassed')+' '+dGone+' '+t('days')+' · '+t('daysLeft')+' '+dLeft+' '+t('days')+' · '+uiText('monitoring')+': '+dMonitoring+' '+uiText('daysShort'));
   setText('liveInterest_'+depId,'+'+fmtLive(sim.totalGross,depSym)+' ('+sim.completedCaps+' міс)');
