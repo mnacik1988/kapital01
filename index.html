@@ -2855,7 +2855,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.79';
+const APP_VERSION = 'v0.0.80';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4046,7 +4046,12 @@ function simulateDeposit(dep,opts={}){
   const shownTax=totalTax+pendingTax;
   const shownNet=totalNet+pendingNet;
   const dailyGross=bodyBalance*rAnn/365;
-  const dailyTax=Math.max(0,dailyGross)*taxRate;
+  // Пока необлагаемый минимум не исчерпан, налога нет и на дневной строке.
+  // Раньше она удерживала его всегда, а итог — нет: «за добу» показывало
+  // чистыми, а в тело падало грязное начисление.
+  const dailyAllowanceLeft=Math.max(0,taxFreeLeft-pendingGross);
+  const dailyTaxBase=Math.max(0,Math.max(0,dailyGross)-dailyAllowanceLeft);
+  const dailyTax=dailyTaxBase*taxRate;
   const dailyNet=dailyGross-dailyTax;
   return {principal:P,bodyBalance,separateNet,totalValue:bodyBalance+separateNet+pendingNet,totalGross:shownGross,totalTax:shownTax,totalNet:shownNet,capitalizedNet,completedCaps,currentMode,dailyGross,dailyNet,pendingGross,pendingTax,pendingNet};
 }
