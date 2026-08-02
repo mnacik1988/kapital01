@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-73-device-id';
+﻿const CACHE_NAME = 'investory-app-v0-0-74-deposit-progress';
 const APP_SHELL = [
   './',
   './index.html',
