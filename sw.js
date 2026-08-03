@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-83-open-date';
+﻿const CACHE_NAME = 'investory-app-v0-0-84-daily-log-first-day';
 const APP_SHELL = [
   './',
   './index.html',
