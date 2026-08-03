@@ -27,7 +27,11 @@ const DAY_SEC = 60 * 60 * 24;
 // Ограничения содержимого запроса к Claude (защита от дорогих «жирных» запросов)
 const MSG_MAX_CHARS = 4000;        // на одно сообщение
 const MSG_MAX_COUNT = 12;          // сообщений истории
-const CTX_MAX_CHARS = 3000;        // портфель / новости
+// Портфель теперь несёт условия депозитов, курсы, позиции по акциям, облигациям
+// и крипте — на 3000 символах у крупного портфеля обрезало самое полезное, и ИИ
+// отвечал «нет данных». 8000 символов ≈ 2500 токенов ≈ +$0.005 к запросу.
+const CTX_MAX_CHARS = 8000;        // портфель
+const NEWS_MAX_CHARS = 3000;       // новости
 
 // Инструкции ИИ живут ТОЛЬКО здесь — клиент их не задаёт и не может переопределить
 const AI_SYSTEM_RULES = `You are the built-in financial assistant inside a personal finance tracking app. You are talking directly with the app's owner about their own investment portfolio.
@@ -37,7 +41,8 @@ STRICT RULES — never break these:
 2. The portfolio data below is the user's real data. Use it.
 3. NEVER say you lack access to data or can't see the portfolio. The data is right there.
 4. Your role is ANALYSIS, not advice. You may: calculate shares by category, highlight concentrations, compare allocations, spot imbalances, explain what the numbers mean. You may NOT recommend specific buy/sell decisions or tell the user where to move money.
-5. If asked for investment advice specifically, say briefly that you can't recommend specific decisions, but offer to analyze the portfolio instead.
+4a. ARITHMETIC IS NOT ADVICE. Always do the maths the user asks for, using the data below: how many shares a given sum buys at the listed price, what a deposit grows to over N years at its stated rate and compounding, currency conversion using the listed FX rates, what a position would weigh after a hypothetical change. Show the calculation. Answering "how many shares can I buy for X" is arithmetic — do it; deciding whether they SHOULD buy is advice — don't.
+4b. If one specific number is missing, name that number and compute everything else you can. Never refuse the whole question because a single input is absent, and never claim data is missing without checking the DATA section below first.
 6. Be concise. Skip preambles and generic filler.
 7. Do not use markdown headers (## or ###).
 8. Only discuss this portfolio and personal finance. Politely decline unrelated requests (coding, writing, general questions) — you are not a general-purpose assistant.
@@ -296,7 +301,7 @@ async function handleAI(request, origin, env) {
   // Инструкции берём ТОЛЬКО свои. Всё, что прислал клиент, идёт как ДАННЫЕ.
   // body.system — совместимость со старыми версиями приложения: их промпт содержит данные портфеля.
   const portfolio = String(body.portfolio || body.system || '').slice(0, CTX_MAX_CHARS);
-  const news = String(body.news || '').slice(0, CTX_MAX_CHARS);
+  const news = String(body.news || '').slice(0, NEWS_MAX_CHARS);
   let system = AI_SYSTEM_RULES;
   if (portfolio) system += '\n\nPortfolio data:\n' + portfolio;
   if (news) system += '\n\nRecent news for portfolio stocks (last 7 days):\n' + news;

@@ -2855,7 +2855,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.84';
+const APP_VERSION = 'v0.0.85';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9558,14 +9558,83 @@ function buildPortfolioContext(){
     if(metals>0)lines.push(`• Метали: ${fmt(metals)} ${sym}`);
     if(other>0)lines.push(`• Інше: ${fmt(other)} ${sym}`);
     if(liab>0)lines.push(`• Зобов'язання: -${fmt(liab)} ${sym}`);
-    // Add stocks detail
-    const secDetails=[];
-    (securitiesSections||[]).forEach(sec=>{
-      (sec.items||[]).forEach(it=>{
-        if(it.ticker&&it.qty>0)secDetails.push(`  ${it.ticker}: ${it.qty} акцій`+(it.lastPrice?` @ $${it.lastPrice}`:'')+(it.divYield>0?` (дивіденди ${it.divYield}%)`:``));
+    // Курси — без них ІІ не може перерахувати гривні в позиції та навпаки
+    try{
+      const fx=[];
+      ['USD','EUR','GBP','PLN'].forEach(c=>{
+        const r=liveRates&&liveRates[c];
+        if(r>0)fx.push(`1 ${c} = ${r.toFixed(2)} ₴`);
       });
-    });
-    if(secDetails.length){lines.push(``);lines.push(`Акції:`);secDetails.forEach(d=>lines.push(d));}
+      if(fx.length){lines.push(``);lines.push(`Курси: ${fx.join(', ')}`);}
+    }catch{}
+
+    // Умови депозитів: ставка, податок, капіталізація, строки, накопичене
+    try{
+      const dRows=[];
+      (deposits||[]).forEach(dep=>{
+        const P=getDepositPrincipalNative(dep);
+        if(!(P>0))return;
+        const dSym=getDepositCurrencySymbol(dep);
+        const rate=parseInputNumber(dep.rate)||0;
+        const tax=parseInputNumber(dep.tax)||0;
+        const freqMap={1:'раз на рік',2:'раз на пів року',4:'щокварталу',12:'щомісяця'};
+        const freq=freqMap[String(parseInt(dep.freq,10)||12)]||'щомісяця';
+        const mode=dep.interestTo==='separate'?'на окремий рахунок':'капіталізація';
+        const sim=simulateDeposit(dep,{start:getDepositAccrualStart(dep),
+          end:getDepositContractEnd(dep,getDepositContractStart(dep)),until:new Date()});
+        const parts=[`${fmt(P)} ${dSym}`,`${rate}% річних`,`податок ${tax}%`,freq,mode];
+        if(dep.startDate&&dep.endDate)parts.push(`${dep.startDate} → ${dep.endDate}`);
+        if(dep.openDay)parts.push(`нарахування ${dep.openDay}-го числа`);
+        dRows.push(`  ${dep.name||'Депозит'}: ${parts.join(', ')}`);
+        dRows.push(`    нараховано з ${dep.registeredDate||'—'}: ${sim.totalNet.toFixed(2)} ${dSym} (${sim.dailyNet.toFixed(2)} ${dSym}/добу)`);
+      });
+      if(dRows.length){lines.push(``);lines.push(`Депозити (умови):`);dRows.forEach(r=>lines.push(r));}
+    }catch{}
+
+    // Акції та облігації — поштучно, з цінами й валютою
+    try{
+      const stockRows=[],bondRows=[];
+      (securitiesSections||[]).forEach(sec=>{
+        if(isBondSection(sec)){
+          (sec.items||[]).forEach(it=>{
+            const b=getBondItemStats(it);
+            if(!(b.qty>0))return;
+            const nm=it.name||it.ticker||'Облігація';
+            bondRows.push(`  ${nm}: ${b.qty} шт, номінал ${b.nominal} ${b.cur}, купон ${b.couponRate}%/рік`+
+              (it.maturityDate?`, погашення ${it.maturityDate}`:'')+
+              (b.daysToMaturity!=null?` (${b.daysToMaturity} дн)`:'')+
+              `, НКД ${b.accruedNative.toFixed(2)} ${b.cur}, вартість ${fmt(b.marketValue)} ₴`);
+          });
+        }else{
+          const st=getStockSectionStats(sec);
+          Object.values(st.groups||{}).forEach(g=>{
+            // it.price хранится УЖЕ в гривне (см. priceUah при обновлении котировок),
+            // а liveCurrency помнит только исходную валюту. Подписать цену этой
+            // валютой значило бы сказать ИІ, что акція коштує $655 замість $14.
+            const orig=(g.trades||[]).map(t=>t.liveOrigPrice).filter(v=>v>0).pop();
+            const price=`${g.curPrice.toFixed(2)} ₴`+
+              (orig&&g.liveCurrency&&g.liveCurrency!=='UAH'?` (${orig} ${g.liveCurrency})`:'');
+            stockRows.push(`  ${g.ticker||g.name}: ${g.totalQty} шт @ ${price}`+
+              `, вартість ${fmt(g.currentValue)} ₴, P/L ${g.pnl>=0?'+':''}${fmt(g.pnl)} ₴ (${g.pnlPct.toFixed(1)}%)`+
+              (g.divAnnual>0?`, дивіденди ${fmt(g.divAnnual)} ₴/рік`:''));
+          });
+        }
+      });
+      if(stockRows.length){lines.push(``);lines.push(`Акції:`);stockRows.forEach(r=>lines.push(r));}
+      if(bondRows.length){lines.push(``);lines.push(`Облігації:`);bondRows.forEach(r=>lines.push(r));}
+    }catch{}
+
+    // Крипто — поштучно
+    try{
+      const cRows=[];
+      (coins||[]).forEach(c=>{
+        if(!c||!(c.qty>0))return;
+        cRows.push(`  ${c.name}: ${c.qty} @ $${c.curPrice} (ціни крипти в USD)`+
+          (c.buyPrice>0?`, куплено @ $${c.buyPrice}`:''));
+      });
+      if(cRows.length){lines.push(``);lines.push(`Крипто:`);cRows.forEach(r=>lines.push(r));}
+    }catch{}
+
     return lines.join('\n');
   }catch{return 'Дані портфелю недоступні';}
 }
