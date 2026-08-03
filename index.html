@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://plain-bread-df6d.mnacik1988.workers.dev https://api.monobank.ua https://open.er-api.com https://api.frankfurter.app https://api.coingecko.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'; media-src 'self' blob:">
 <meta name="referrer" content="no-referrer">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#07192d">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -45,7 +45,10 @@ body.theme-light{
   --orange:#ea580c;--orange2:#c2410c;
   --red:#dc2626;
 }
-html,body{height:100%;width:100%;overflow-x:hidden;background:var(--app-bg-gradient);}
+/* pan-x pan-y разрешает обычную прокрутку, но убирает щипок и двойной тап —
+   приложение перестаёт зумиться. overscroll-behavior гасит резиновый отскок
+   за границы страницы и вытягивание «обновить» сверху. */
+html,body{height:100%;width:100%;overflow-x:hidden;background:var(--app-bg-gradient);touch-action:pan-x pan-y;overscroll-behavior:none;}
 body{font-family:'Syne',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;background:var(--app-bg-gradient);background-attachment:fixed;}
 /* iOS PWA: allow text selection in inputs */
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
@@ -2855,7 +2858,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.85';
+const APP_VERSION = 'v0.0.86';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9669,6 +9672,24 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('resize',_aiAdjustForKeyboard);
   window.visualViewport.addEventListener('scroll',_aiAdjustForKeyboard);
 }
+
+// Safari на iOS до сих пор шлёт собственные события щипка мимо touch-action,
+// поэтому глушим их отдельно. Двойной тап там же масштабирует страницу, если
+// между касаниями меньше 300 мс — и это тоже не через touch-action.
+['gesturestart','gesturechange','gestureend'].forEach(ev=>{
+  document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
+});
+// Гасим только настоящий двойной тап — два касания подряд почти в одну точку.
+// Глушить любой быстрый второй тап нельзя: пропадут нажатия по соседним кнопкам.
+let _lastTap={t:0,x:0,y:0};
+document.addEventListener('touchend',e=>{
+  const p=e.changedTouches&&e.changedTouches[0];
+  if(!p)return;
+  const now=Date.now();
+  const близко=Math.abs(p.clientX-_lastTap.x)<30&&Math.abs(p.clientY-_lastTap.y)<30;
+  if(now-_lastTap.t<300&&близко)e.preventDefault();
+  _lastTap={t:now,x:p.clientX,y:p.clientY};
+},{passive:false});
 
 const AI_LIMIT_I18N={
   uk:'запитів',ru:'запросов',en:'left',de:'übrig',zh:'次'

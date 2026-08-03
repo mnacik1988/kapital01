@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-85-ai-context';
+﻿const CACHE_NAME = 'investory-app-v0-0-86-no-zoom';
 const APP_SHELL = [
   './',
   './index.html',
