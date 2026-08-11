@@ -196,11 +196,21 @@ function bearerToken(request) {
 }
 
 // Обмен токена Google на нашу 90-дневную сессию.
-async function handleAuth(request, origin, env) {
+async function handleAuth(request, url, origin, env) {
   if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
   if (!env.GOOGLE_CLIENT_ID || !env.SESSION_SECRET) {
     return json({ error: 'Auth not configured' }, 503, origin);
   }
+
+  // Продление: сессию можно обновлять сколько угодно, не трогая Google. Иначе
+  // через 90 дней человека выкинуло бы на экран входа без всякой причины.
+  if (url.pathname === '/auth/refresh') {
+    const sub = await verifySessionToken(bearerToken(request) || '', env);
+    if (!sub) return json({ error: 'Invalid session' }, 401, origin);
+    const fresh = await signSessionToken(sub, env);
+    return json(fresh, 200, origin, 0);
+  }
+
   let body;
   try { body = await request.json(); } catch { return json({ error: 'Invalid body' }, 400, origin); }
   const sub = await verifyAuthToken(String(body.idToken || ''), env);
@@ -220,12 +230,12 @@ export default {
 
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
 
-    // Обмен токена Google на нашу сессию — POST, до GET-guard
-    if (url.pathname === '/auth') {
+    // Вход и продление сессии — POST, до GET-guard
+    if (url.pathname === '/auth' || url.pathname === '/auth/session' || url.pathname === '/auth/refresh') {
       if (await isRateLimited('auth', ip, AUTH_IP_PER_MIN, 60)) {
         return json({ error: 'Too many requests' }, 429, origin, 30);
       }
-      return handleAuth(request, origin, env);
+      return handleAuth(request, url, origin, env);
     }
 
     // AI proxy — POST only, обрабатывается до GET-guard, со своим строгим лимитом
