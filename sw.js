@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-91-calc-and-lang';
+﻿const CACHE_NAME = 'investory-app-v0-0-92-android-signin';
 const APP_SHELL = [
   './',
   './index.html',
