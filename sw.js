@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-87-google-auth';
+﻿const CACHE_NAME = 'investory-app-v0-0-88-google-auth-on';
 const APP_SHELL = [
   './',
   './index.html',
