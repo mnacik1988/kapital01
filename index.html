@@ -2888,7 +2888,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.0.89';
+const APP_VERSION = 'v0.0.90';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7274,11 +7274,11 @@ function bootstrapApp(){
 }
 
 const SETTINGS_I18N={
-  uk:{title:'Налаштування',langLbl:'Мова / Language',currLbl:'Відображення суми',themeLbl:'Тема',themeDark:'🌙 Темна',themeLight:'☀ Світла',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовий чек-лист',legalLbl:'Правові документи',privacyBtn:'🔐 Політика конфіденційності',termsBtn:'⚖️ Умови та відмова від відповідальності'},
-  ru:{title:'Настройки',langLbl:'Язык / Language',currLbl:'Отображение суммы',themeLbl:'Тема',themeDark:'🌙 Тёмная',themeLight:'☀ Светлая',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовый чек-лист',legalLbl:'Правовые документы',privacyBtn:'🔐 Политика конфиденциальности',termsBtn:'⚖️ Условия и отказ от ответственности'},
-  en:{title:'Settings',langLbl:'Language',currLbl:'Display currency',themeLbl:'Theme',themeDark:'🌙 Dark',themeLight:'☀ Light',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test checklist',legalLbl:'Legal documents',privacyBtn:'🔐 Privacy Policy',termsBtn:'⚖️ Terms & Disclaimer'},
-  de:{title:'Einstellungen',langLbl:'Sprache / Language',currLbl:'Währungsanzeige',themeLbl:'Design',themeDark:'🌙 Dunkel',themeLight:'☀ Hell',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test-Checkliste',legalLbl:'Rechtliches',privacyBtn:'🔐 Datenschutzrichtlinie',termsBtn:'⚖️ Nutzungsbedingungen & Haftungsausschluss'},
-  zh:{title:'设置',langLbl:'语言 / Language',currLbl:'显示货币',themeLbl:'主题',themeDark:'🌙 深色',themeLight:'☀ 浅色',qaLbl:'QA / Release',testChecklistBtn:'🧪 测试清单',legalLbl:'法律文件',privacyBtn:'🔐 隐私政策',termsBtn:'⚖️ 条款与免责声明'},
+  uk:{title:'Налаштування',langLbl:'Мова / Language',currLbl:'Відображення суми',themeLbl:'Тема',themeDark:'🌙 Темна',themeLight:'☀ Світла',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовий чек-лист',legalLbl:'Правові документи',privacyBtn:'🔐 Політика конфіденційності',termsBtn:'⚖️ Умови та відмова від відповідальності',authLbl:'👤 Обліковий запис',signOutBtn:'Вийти з облікового запису'},
+  ru:{title:'Настройки',langLbl:'Язык / Language',currLbl:'Отображение суммы',themeLbl:'Тема',themeDark:'🌙 Тёмная',themeLight:'☀ Светлая',qaLbl:'QA / Release',testChecklistBtn:'🧪 Тестовый чек-лист',legalLbl:'Правовые документы',privacyBtn:'🔐 Политика конфиденциальности',termsBtn:'⚖️ Условия и отказ от ответственности',authLbl:'👤 Аккаунт',signOutBtn:'Выйти из аккаунта'},
+  en:{title:'Settings',langLbl:'Language',currLbl:'Display currency',themeLbl:'Theme',themeDark:'🌙 Dark',themeLight:'☀ Light',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test checklist',legalLbl:'Legal documents',privacyBtn:'🔐 Privacy Policy',termsBtn:'⚖️ Terms & Disclaimer',authLbl:'👤 Account',signOutBtn:'Sign out'},
+  de:{title:'Einstellungen',langLbl:'Sprache / Language',currLbl:'Währungsanzeige',themeLbl:'Design',themeDark:'🌙 Dunkel',themeLight:'☀ Hell',qaLbl:'QA / Release',testChecklistBtn:'🧪 Test-Checkliste',legalLbl:'Rechtliches',privacyBtn:'🔐 Datenschutzrichtlinie',termsBtn:'⚖️ Nutzungsbedingungen & Haftungsausschluss',authLbl:'👤 Konto',signOutBtn:'Abmelden'},
+  zh:{title:'设置',langLbl:'语言 / Language',currLbl:'显示货币',themeLbl:'主题',themeDark:'🌙 深色',themeLight:'☀ 浅色',qaLbl:'QA / Release',testChecklistBtn:'🧪 测试清单',legalLbl:'法律文件',privacyBtn:'🔐 隐私政策',termsBtn:'⚖️ 条款与免责声明',authLbl:'👤 账户',signOutBtn:'退出登录'},
 };
 const TEST_BUILD_I18N={
   uk:{title:'Тестова збірка',enable:'Увімкнути доступ',disable:'Вимкнути доступ',active:'Тестовий доступ активний',inactive:'Тестовий доступ вимкнений',paywall:'🧪 Увімкнути тестовий доступ'},
@@ -7333,6 +7333,10 @@ function openSettings(){
     if(on){
       const line=document.getElementById('authAccountLine');
       if(line)line.textContent=getGoogleEmail()||'Google';
+      const lbl=document.getElementById('set_auth_label');
+      if(lbl)lbl.textContent=si.authLbl;
+      const out=document.getElementById('authSignOutBtn');
+      if(out)out.textContent=si.signOutBtn;
     }
   }
   const titleEl=document.getElementById('settingsTitleText');
@@ -9595,6 +9599,29 @@ function onGoogleCredential(resp){
 // «disallowed_useragent», поэтому обёртка открывает его снаружи и возвращает
 // готовый токен сюда. В браузере и в PWA этой функции никто не вызывает.
 window.onAndroidGoogleCredential=function(idToken){onGoogleCredential({credential:idToken});};
+const AUTH_GATE_I18N={
+  uk:{desc:'Увійдіть, щоб користуватися застосунком',
+      note:'Ми отримуємо лише імʼя, пошту та ідентифікатор облікового запису. Дані портфеля залишаються на пристрої.',
+      failed:'Не вдалося завантажити вхід Google. Перевірте зʼєднання.',
+      retry:'Спробувати ще раз',skip:'Продовжити без входу'},
+  ru:{desc:'Войдите, чтобы пользоваться приложением',
+      note:'Мы получаем только имя, почту и идентификатор аккаунта. Данные портфеля остаются на устройстве.',
+      failed:'Не удалось загрузить вход Google. Проверьте соединение.',
+      retry:'Попробовать ещё раз',skip:'Продолжить без входа'},
+  en:{desc:'Sign in to use the app',
+      note:'We only receive your name, email and account ID. Portfolio data stays on your device.',
+      failed:'Could not load Google sign-in. Check your connection.',
+      retry:'Try again',skip:'Continue without signing in'},
+  de:{desc:'Melden Sie sich an, um die App zu nutzen',
+      note:'Wir erhalten nur Name, E-Mail und Konto-ID. Ihre Portfoliodaten bleiben auf dem Gerät.',
+      failed:'Google-Anmeldung konnte nicht geladen werden. Prüfen Sie die Verbindung.',
+      retry:'Erneut versuchen',skip:'Ohne Anmeldung fortfahren'},
+  zh:{desc:'请登录以使用应用',
+      note:'我们仅获取您的姓名、邮箱和账户标识。投资组合数据仍保留在本设备上。',
+      failed:'无法加载 Google 登录。请检查网络连接。',
+      retry:'重试',skip:'不登录继续'}
+};
+function authGateText(){return AUTH_GATE_I18N[currentLang]||AUTH_GATE_I18N.uk;}
 const SIGNOUT_I18N={
   uk:'Вийти з облікового запису? Дані портфеля залишаться на пристрої.',
   ru:'Выйти из аккаунта? Данные портфеля останутся на устройстве.',
@@ -9620,6 +9647,12 @@ function showAuthGate(){
   if(!authEnabled())return;
   const g=document.getElementById('authGate');
   if(g)g.classList.add('open');
+  const T=authGateText();
+  const desc=document.getElementById('authGateDesc');
+  // Текст мог быть заменён на сообщение об ошибке — не затираем его обратно.
+  if(desc&&!desc.dataset.failed)desc.textContent=T.desc;
+  const note=document.getElementById('authGateNote');
+  if(note)note.textContent=T.note;
   renderGoogleButton();
 }
 function hideAuthGate(){
@@ -9632,8 +9665,11 @@ function renderGoogleButton(){
   if(!slot||!window.google||!google.accounts||!google.accounts.id)return;
   if(slot.dataset.ready)return;
   try{
+    // Без locale Google берёт язык браузера, и кнопка говорила по-русски в
+    // украинском интерфейсе.
+    const loc={uk:'uk',ru:'ru',en:'en',de:'de',zh:'zh_CN'}[currentLang]||'uk';
     google.accounts.id.renderButton(slot,{theme:'filled_black',size:'large',
-      shape:'pill',text:'signin_with',width:280});
+      shape:'pill',text:'signin_with',width:280,locale:loc});
     slot.dataset.ready='1';
   }catch{}
 }
@@ -9644,19 +9680,20 @@ function showAuthFallback(){
   const slot=document.getElementById('googleBtnSlot');
   if(!slot||slot.dataset.ready||slot.dataset.failed)return;
   slot.dataset.failed='1';
+  const T=authGateText();
   const note=document.getElementById('authGateDesc');
-  if(note)note.textContent='Не вдалося завантажити вхід Google. Перевірте зʼєднання.';
+  if(note){note.textContent=T.failed;note.dataset.failed='1';}
   const retry=document.createElement('button');
   retry.className='mini-btn edit';
   retry.style.cssText='padding:12px 22px;';
-  retry.textContent='Спробувати ще раз';
+  retry.textContent=T.retry;
   retry.onclick=()=>location.reload();
   slot.appendChild(retry);
   if(AUTH_SOFT_FALLBACK){
     const skip=document.createElement('button');
     skip.className='mini-btn';
     skip.style.cssText='padding:12px 22px;margin-left:8px;';
-    skip.textContent='Продовжити без входу';
+    skip.textContent=T.skip;
     skip.onclick=hideAuthGate;
     slot.appendChild(skip);
   }
