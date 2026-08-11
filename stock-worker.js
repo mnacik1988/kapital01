@@ -104,7 +104,11 @@ async function verifyGoogleIdToken(token, env) {
 
   const now = Math.floor(Date.now() / 1000);
   if (typeof payload.exp !== 'number' || payload.exp < now) return null;
-  if (payload.aud !== env.GOOGLE_CLIENT_ID) return null;
+  // Список, а не одно значение: добавление платформы (iOS, отдельный клиент)
+  // не должно требовать правки кода проверки. Мобильные SDK при этом просят
+  // токен для веб-клиента (serverClientId), так что обычно здесь один ID.
+  const allowed = String(env.GOOGLE_CLIENT_ID || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (!allowed.length || !allowed.includes(payload.aud)) return null;
   if (payload.iss !== 'accounts.google.com' && payload.iss !== 'https://accounts.google.com') return null;
   if (!payload.sub) return null;
 
