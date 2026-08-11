@@ -5,6 +5,11 @@ compatibility_date = "2024-01-01"
 [observability]
 enabled = true
 
+# Не секрет: client_id и так виден в коде любой страницы, которая просит вход.
+# Секретом остаётся только SESSION_SECRET — он ставится через wrangler secret.
+[vars]
+GOOGLE_CLIENT_ID = "802898443875-ipii5n1uh9u2i4n9iu87r5ks51pjk6tl.apps.googleusercontent.com"
+
 # Счётчики лимитов ИИ: global:ДАТА и user:<id>:ДАТА
 [[kv_namespaces]]
 binding = "AI_LIMITS"

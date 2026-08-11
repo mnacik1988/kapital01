@@ -9520,7 +9520,12 @@ window.refreshFromBottomNav=async function(event){
 // ── ВХІД ЧЕРЕЗ GOOGLE ─────────────────────────────────────
 // Пока строка пустая — вход выключен целиком и приложение работает как раньше.
 // Подставить ID веб-клиента из своего проекта Google Cloud, и вход включится.
-const GOOGLE_CLIENT_ID='';
+const GOOGLE_CLIENT_ID='802898443875-ipii5n1uh9u2i4n9iu87r5ks51pjk6tl.apps.googleusercontent.com';
+// Временная страховка. Если скрипт Google не загрузится (сеть, CSP, блокировщик),
+// экран входа останется без кнопки и человек упрётся в тупик — а служебный
+// работник отдаёт страницу из кэша, так что и перезагрузка не поможет.
+// Снять вместе с включением REQUIRE_AUTH на сервере, когда вход подтвердится.
+const AUTH_SOFT_FALLBACK=true;
 const AUTH_BASE='https://plain-bread-df6d.mnacik1988.workers.dev';
 const AK={jwt:'investory_g_jwt',jwtExp:'investory_g_jwt_exp',email:'investory_g_email',
   sub:'investory_g_sub',sess:'investory_sess',sessExp:'investory_sess_exp'};
@@ -9614,6 +9619,30 @@ function renderGoogleButton(){
     slot.dataset.ready='1';
   }catch{}
 }
+// Кнопки нет и не будет — скрипт Google не поднялся. Объясняем словами и
+// оставляем выход, иначе человек заперт: кэш служебного работника отдаёт ту же
+// страницу и после перезагрузки.
+function showAuthFallback(){
+  const slot=document.getElementById('googleBtnSlot');
+  if(!slot||slot.dataset.ready||slot.dataset.failed)return;
+  slot.dataset.failed='1';
+  const note=document.getElementById('authGateDesc');
+  if(note)note.textContent='Не вдалося завантажити вхід Google. Перевірте зʼєднання.';
+  const retry=document.createElement('button');
+  retry.className='mini-btn edit';
+  retry.style.cssText='padding:12px 22px;';
+  retry.textContent='Спробувати ще раз';
+  retry.onclick=()=>location.reload();
+  slot.appendChild(retry);
+  if(AUTH_SOFT_FALLBACK){
+    const skip=document.createElement('button');
+    skip.className='mini-btn';
+    skip.style.cssText='padding:12px 22px;margin-left:8px;';
+    skip.textContent='Продовжити без входу';
+    skip.onclick=hideAuthGate;
+    slot.appendChild(skip);
+  }
+}
 // Пока вход выключен, заголовка нет вовсе — сервер считает по device-id, как раньше.
 function authHeaders(){
   const t=getAuthToken();
@@ -9636,7 +9665,10 @@ function initGoogleAuth(){
   };
   if(!start()){
     let tries=0;
-    const t=setInterval(()=>{if(start()||++tries>40)clearInterval(t);},250);
+    const t=setInterval(()=>{
+      if(start()){clearInterval(t);return;}
+      if(++tries>40){clearInterval(t);showAuthGate();showAuthFallback();}
+    },250);
   }
   // Сессия живёт 90 дней, но продлеваем её при каждом запуске — иначе редкий
   // пользователь однажды упрётся в экран входа без всякой причины.
