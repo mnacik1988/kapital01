@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-96-backup-restore-fix';
+﻿const CACHE_NAME = 'investory-app-v0-0-97-android-signin-escape';
 const APP_SHELL = [
   './',
   './index.html',
