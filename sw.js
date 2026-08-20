@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-93-manrope-font';
+﻿const CACHE_NAME = 'investory-app-v0-0-94-fix-icon-bg';
 const APP_SHELL = [
   './',
   './index.html',
