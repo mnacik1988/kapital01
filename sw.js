@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-94-fix-icon-bg';
+﻿const CACHE_NAME = 'investory-app-v0-0-95-icon-and-gate-layer';
 const APP_SHELL = [
   './',
   './index.html',
