@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-0-97-android-signin-escape';
+﻿const CACHE_NAME = 'investory-app-v0-0-99-revert-24h';
 const APP_SHELL = [
   './',
   './index.html',
