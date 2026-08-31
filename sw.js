@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-00-daily-log-newest-first';
+﻿const CACHE_NAME = 'investory-app-v0-1-01-eff-rate-match-bank';
 const APP_SHELL = [
   './',
   './index.html',
