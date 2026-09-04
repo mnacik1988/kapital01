@@ -1,3 +1,8 @@
 .claude/
 .wrangler/
 Backup/
+
+# Исходники иконки в 2048 px — нужны для пересборки, но не для раздачи
+InveStory icon.png
+icons/InveStory icon.png
+icons/InveStory icon no text.png
