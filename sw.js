@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-02-icon-no-wordmark';
+﻿const CACHE_NAME = 'investory-app-v0-1-03-eff-rate-with-topups';
 const APP_SHELL = [
   './',
   './index.html',

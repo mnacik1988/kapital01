@@ -2896,7 +2896,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.02';
+const APP_VERSION = 'v0.1.03';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -2983,7 +2983,7 @@ const LANGS={
     compCalc:'Калькулятор складних відсотків',annualRate:'Річна ставка (%)',termMon:'Строк (місяців)',capitaliz:'Капіталізація',
     monthly:'Щомісяця',quarterly:'Щокварталу',every6m:'Кожні 6 міс',yearly:'Щорічно',
     taxPct:'Податок (%)',taxFree:'Без податку (₴)',
-    finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',effRateInfoTitle:'Як розраховується ефективна ставка?',effRateInfoFormula:'Чистий прибуток ÷ Сума ÷ Роки × 100',effRateInfoNote:'Показує реальний річний дохід після всіх податків. Може відрізнятись від ставки банку через різні методики розрахунку.',
+    finalAmt:'Підсумкова сума',accrued:'Нараховано %',taxBase:'Оподатк. база',taxPDFO:'Податок',netProfit:'Чистий прибуток',effRate:'Ефективна ставка',effRateInfoTitle:'Як розраховується ефективна ставка?',effRateInfoFormula:'Чистий прибуток ÷ Середній вкладений капітал ÷ Роки × 100',effRateInfoNote:'Показує реальний річний дохід після всіх податків. Може відрізнятись від ставки банку через різні методики розрахунку.',
     incomeDays:'Дохід по днях (останні 30 днів)',yield:'⚡ Дохідність',
     secName:'Назва',secQty:'Кількість',secPrice:'Ціна (₴)',secDiv:'Дивіденди (%)',secTotal:'Вартість',secActions:'Дія',
     addSecItem:'+ Додати позицію',removeSection:'✕ Видалити розділ',
@@ -3024,7 +3024,7 @@ const LANGS={
     compCalc:'Калькулятор сложных процентов',annualRate:'Годовая ставка (%)',termMon:'Срок (месяцев)',capitaliz:'Капитализация',
     monthly:'Ежемесячно',quarterly:'Ежеквартально',every6m:'Каждые 6 мес',yearly:'Ежегодно',
     taxPct:'Налог (%)',taxFree:'Без налога (₴)',
-    finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',effRateInfoTitle:'Как рассчитывается эффективная ставка?',effRateInfoFormula:'Чистая прибыль ÷ Сумма ÷ Лет × 100',effRateInfoNote:'Показывает реальный годовой доход после всех налогов. Может отличаться от ставки банка из-за разных методик расчёта.',
+    finalAmt:'Итоговая сумма',accrued:'Начислено %',taxBase:'Налогооблагаемая база',taxPDFO:'Налог',netProfit:'Чистая прибыль',effRate:'Эффективная ставка',effRateInfoTitle:'Как рассчитывается эффективная ставка?',effRateInfoFormula:'Чистая прибыль ÷ Средний вложенный капитал ÷ Лет × 100',effRateInfoNote:'Показывает реальный годовой доход после всех налогов. Может отличаться от ставки банка из-за разных методик расчёта.',
     incomeDays:'Доход по дням (последние 30 дней)',yield:'⚡ Доходность',
     secName:'Название',secQty:'Количество',secPrice:'Цена (₴)',secDiv:'Дивиденды (%)',secTotal:'Стоимость',secActions:'Действие',
     addSecItem:'+ Добавить позицию',removeSection:'✕ Удалить раздел',
@@ -3065,7 +3065,7 @@ const LANGS={
     compCalc:'Compound Interest Calculator',annualRate:'Annual Rate (%)',termMon:'Term (months)',capitaliz:'Compounding',
     monthly:'Monthly',quarterly:'Quarterly',every6m:'Every 6 months',yearly:'Annually',
     taxPct:'Income Tax (%)',taxFree:'Tax-free minimum',
-    finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',effRateInfoTitle:'How is the effective rate calculated?',effRateInfoFormula:'Net Profit ÷ Principal ÷ Years × 100',effRateInfoNote:'Shows the real annual return after all taxes. May differ from your bank\'s rate due to different calculation methods.',
+    finalAmt:'Final Amount',accrued:'Accrued Interest',taxBase:'Taxable Base',taxPDFO:'Tax',netProfit:'Net Profit',effRate:'Effective Rate',effRateInfoTitle:'How is the effective rate calculated?',effRateInfoFormula:'Net Profit ÷ Average Invested Capital ÷ Years × 100',effRateInfoNote:'Shows the real annual return after all taxes. May differ from your bank\'s rate due to different calculation methods.',
     incomeDays:'Daily Income (last 30 days)',yield:'⚡ Yield',
     secName:'Name',secQty:'Qty',secPrice:'Price (₴)',secDiv:'Dividends (%)',secTotal:'Value',secActions:'Action',
     addSecItem:'+ Add Position',removeSection:'✕ Delete Section',
@@ -3106,7 +3106,7 @@ const LANGS={
     rateLabel:'Jahreszins (%)',monthsLabel:'Laufzeit (Mon.)',freqLabel:'Kapitalisierung',taxPct:'Steuer (%)',taxFree:'Steuerfrei (€)',taxLabel:'Steuer (%)',taxFreeLabel:'Steuerfrei Min.',
     monthly:'Monatlich',quarterly:'Vierteljährlich',every6m:'Alle 6 Monate',yearly:'Jährlich',
     compCalc:'Zinseszinsrechner',annualRate:'Jahreszins (%)',termMon:'Laufzeit (Mon.)',capitaliz:'Kapitalisierung',
-    finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',effRateInfoTitle:'Wie wird der effektive Zinssatz berechnet?',effRateInfoFormula:'Nettogewinn ÷ Betrag ÷ Jahre × 100',effRateInfoNote:'Zeigt den realen Jahresertrag nach allen Steuern. Kann von der Bankrate aufgrund unterschiedlicher Berechnungsmethoden abweichen.',
+    finalAmt:'Endbetrag',accrued:'Aufgelaufen %',taxBase:'Steuerbasis',taxPDFO:'Steuer',netProfit:'Nettogewinn',effRate:'Effektivzins',effRateInfoTitle:'Wie wird der effektive Zinssatz berechnet?',effRateInfoFormula:'Nettogewinn ÷ Durchschnittlich eingezahltes Kapital ÷ Jahre × 100',effRateInfoNote:'Zeigt den realen Jahresertrag nach allen Steuern. Kann von der Bankrate aufgrund unterschiedlicher Berechnungsmethoden abweichen.',
     incomeDays:'Tageseinkommen (letzte 30 Tage)',
     calcTitle:'Zinseszinsrechner',totalSum:'Gesamtbetrag',taxBase:'Steuerbasis',
     perSecond:'Pro Sekunde',perDay:'Pro Tag',perSec:'Pro Sekunde',
@@ -3147,7 +3147,7 @@ const LANGS={
     rateLabel:'年利率 (%)',monthsLabel:'期限（月）',freqLabel:'复利频率',taxPct:'税率 (%)',taxFree:'免税额 (¥)',taxLabel:'税率 (%)',taxFreeLabel:'免税最低额',
     monthly:'每月',quarterly:'每季度',every6m:'每半年',yearly:'每年',
     compCalc:'复利计算器',annualRate:'年利率 (%)',termMon:'期限（月）',capitaliz:'复利频率',
-    finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',effRateInfoTitle:'实际利率如何计算？',effRateInfoFormula:'净利润 ÷ 本金 ÷ 年数 × 100',effRateInfoNote:'显示扣除所有税款后的实际年化收益。由于计算方法不同，可能与银行利率有所差异。',
+    finalAmt:'最终金额',accrued:'利息 %',taxBase:'应税基数',taxPDFO:'税款',netProfit:'净利润',effRate:'实际利率',effRateInfoTitle:'实际利率如何计算？',effRateInfoFormula:'净利润 ÷ 平均投入本金 ÷ 年数 × 100',effRateInfoNote:'显示扣除所有税款后的实际年化收益。由于计算方法不同，可能与银行利率有所差异。',
     incomeDays:'每日收入（最近30天）',
     calcTitle:'复利计算器',totalSum:'总金额',
     perSecond:'每秒',perDay:'每天',perSec:'每秒',
@@ -4040,7 +4040,7 @@ function simulateDeposit(dep,opts={}){
     const dailyGross=(P||0)*rAnn/365;
     const dailyTax=Math.max(0,dailyGross)*taxRate;
     const dailyNet=dailyGross-dailyTax;
-    return {principal:P||0,bodyBalance:P||0,separateNet:0,totalValue:P||0,totalGross:0,totalTax:0,totalNet:0,capitalizedNet:0,completedCaps:0,currentMode:normalizeDepositMode(dep?.interestTo),dailyGross,dailyNet};
+    return {principal:P||0,bodyBalance:P||0,separateNet:0,totalValue:P||0,totalGross:0,totalTax:0,totalNet:0,capitalizedNet:0,completedCaps:0,currentMode:normalizeDepositMode(dep?.interestTo),dailyGross,dailyNet,avgContributed:P||0,spanDays:0};
   }
   const events=[];
   (dep?.topups||[]).forEach(tp=>{
@@ -4068,11 +4068,19 @@ function simulateDeposit(dep,opts={}){
   let currentMode=getDepositInterestModeAt(dep,start);
   let weighted={body:0,separate:0};
   let totalGross=0,totalTax=0,totalNet=0,capitalizedNet=0,completedCaps=0;
+  // Средний вложенный капитал: сколько СВОИХ денег в среднем лежало на вкладе.
+  // Считается по тем же дням, что и проценты, но растёт только на пополнениях —
+  // капитализированные проценты сюда не идут, иначе доходность размывалась бы
+  // собственной прибылью и совпадение с банком (13,89%) сломалось бы.
+  let contributed=P;
+  let contribDays=0,spanDays=0;
 
   function addWeighted(toDate){
     const days=Math.round((toDate-periodStart)/oneDay);
     if(days>0){
       weighted[currentMode]+=bodyBalance*days;
+      contribDays+=contributed*days;
+      spanDays+=days;
       periodStart=new Date(toDate);
     }
   }
@@ -4106,7 +4114,7 @@ function simulateDeposit(dep,opts={}){
     if(ev.date<periodStart)continue;
     if(ev.date>stop)break;
     addWeighted(ev.date);
-    if(ev.type==='topup')bodyBalance+=ev.amount;
+    if(ev.type==='topup'){bodyBalance+=ev.amount;contributed+=ev.amount;}
     else if(ev.type==='mode')currentMode=normalizeDepositMode(ev.mode);
     else if(ev.type==='cap')settleCap();
   }
@@ -4133,7 +4141,7 @@ function simulateDeposit(dep,opts={}){
   const dailyTaxBase=Math.max(0,Math.max(0,dailyGross)-dailyAllowanceLeft);
   const dailyTax=dailyTaxBase*taxRate;
   const dailyNet=dailyGross-dailyTax;
-  return {principal:P,bodyBalance,separateNet,totalValue:bodyBalance+separateNet+pendingNet,totalGross:shownGross,totalTax:shownTax,totalNet:shownNet,capitalizedNet,completedCaps,currentMode,dailyGross,dailyNet,pendingGross,pendingTax,pendingNet};
+  return {principal:P,bodyBalance,separateNet,totalValue:bodyBalance+separateNet+pendingNet,totalGross:shownGross,totalTax:shownTax,totalNet:shownNet,capitalizedNet,completedCaps,currentMode,dailyGross,dailyNet,pendingGross,pendingTax,pendingNet,avgContributed:spanDays>0?contribDays/spanDays:P,spanDays};
 }
 
 function getDepositCurrency(d){
@@ -4199,7 +4207,12 @@ function calcDeposit(depId){
   const end=depAddMonthsSafe(start,months,getDepositOpenDay(dep));
   const sim=simulateDeposit(dep,{start,end,until:end});
   const taxBase=Math.max(0,sim.totalGross-parseInputNumber(dep.taxFree));
-  const eff=P&&months?((sim.totalNet/P)/(months/12)*100):0;
+  // Делим на СРЕДНИЙ вложенный капитал, а не на стартовую сумму: иначе прибыль,
+  // заработанная пополнениями, ложится на один только первый взнос и ставка
+  // взлетает. Без пополнений средний капитал равен стартовой сумме, поэтому
+  // сверенные с банком 13,89% не меняются.
+  const effBase=sim.avgContributed>0?sim.avgContributed:P;
+  const eff=effBase&&months?((sim.totalNet/effBase)/(months/12)*100):0;
   setText('r-total_'+depId,   fmtN(Math.round(sim.totalValue))+' '+depSym);
   setText('r-interest_'+depId,'+'+fmtN(Math.round(sim.totalGross))+' '+depSym);
   setText('r-taxbase_'+depId, fmtN(Math.round(taxBase))+' '+depSym);
