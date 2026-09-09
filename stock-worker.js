@@ -338,10 +338,14 @@ async function handleMulti(url, env, origin) {
 
   const settled = await Promise.allSettled(tickers.map(ticker => getStock(ticker, env)));
   const stocks = {};
+  // Причину отказа возвращаем поимённо: без неё клиент не мог отличить
+  // несуществующий тикер от лимита провайдера и писал одно и то же на всё.
+  const errors = {};
   settled.forEach((result, index) => {
     if (result.status === 'fulfilled') stocks[tickers[index]] = result.value;
+    else errors[tickers[index]] = String(result.reason?.message || result.reason || 'unknown');
   });
-  return json({ usdUah: await getUsdUah(), stocks, updated: new Date().toISOString() }, 200, origin, 300);
+  return json({ usdUah: await getUsdUah(), stocks, errors, updated: new Date().toISOString() }, 200, origin, 300);
 }
 
 async function getStock(ticker, env) {
@@ -350,15 +354,20 @@ async function getStock(ticker, env) {
     const base = 'https://finnhub.io/api/v1/';
     const token = encodeURIComponent(env.FINNHUB_KEY);
     const symbol = encodeURIComponent(ticker);
-    const [quoteRes, profileRes, metricsRes] = await Promise.all([
-      providerFetch(base + 'quote?symbol=' + symbol + '&token=' + token),
-      providerFetch(base + 'stock/profile2?symbol=' + symbol + '&token=' + token),
-      providerFetch(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token)
-    ]);
-    const [quote, profile, metrics] = await Promise.all([
-      quoteRes.json(), profileRes.json(), metricsRes.json()
-    ]);
+    // Цена — единственное, ради чего этот запрос вообще делается, поэтому
+    // котировка идёт отдельно и с повтором. Название, валюта и дивиденды —
+    // украшение: раньше падение ЛЮБОГО из трёх запросов роняло весь тикер, и
+    // Promise.allSettled в handleMulti молча выбрасывал его из ответа. Клиент
+    // получал пустой список и писал «дані отримано, але ціна відсутня», хотя
+    // цена была получена — терялась она из-за необязательных полей.
+    const quoteRes = await providerFetch(base + 'quote?symbol=' + symbol + '&token=' + token, 2);
+    const quote = await quoteRes.json();
     if (!Number(quote?.c)) throw new Error('Ticker not found');
+
+    const [profile, metrics] = await Promise.all([
+      optionalJson(base + 'stock/profile2?symbol=' + symbol + '&token=' + token),
+      optionalJson(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token)
+    ]);
 
     const price = Number(quote.c);
     const previous = Number(quote.pc) || price;
@@ -604,13 +613,29 @@ async function getUsdUah() {
   });
 }
 
-async function providerFetch(url) {
-  const response = await fetch(url, {
-    headers: { Accept: 'application/json', 'User-Agent': 'InveStory-Worker/2.0' },
-    cf: { cacheEverything: true, cacheTtl: 300 }
-  });
-  if (!response.ok) throw new Error('Provider HTTP ' + response.status);
-  return response;
+async function providerFetch(url, retries = 0) {
+  for (let attempt = 0; ; attempt++) {
+    const response = await fetch(url, {
+      headers: { Accept: 'application/json', 'User-Agent': 'InveStory-Worker/2.0' },
+      cf: { cacheEverything: true, cacheTtl: 300 }
+    });
+    if (response.ok) return response;
+    // 429 и 5xx — временные: у Finnhub на бесплатном тарифе лимит на пачку
+    // запросов, а на портфель уходит по нескольку штук на каждый тикер.
+    const retriable = response.status === 429 || response.status >= 500;
+    if (!retriable || attempt >= retries) throw new Error('Provider HTTP ' + response.status);
+    await new Promise(resolve => setTimeout(resolve, 400 * (attempt + 1)));
+  }
+}
+
+// Данные, без которых можно обойтись: ошибка гасится, поле остаётся пустым.
+async function optionalJson(url) {
+  try {
+    const response = await providerFetch(url);
+    return await response.json();
+  } catch {
+    return null;
+  }
 }
 
 async function memoize(key, loader) {

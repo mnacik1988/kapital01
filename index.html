@@ -614,7 +614,10 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 /* ── LIABILITIES ─────────────────────────────────────────── */
 .liab-section{padding:0 16px;margin-bottom:14px;}
 .liab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.liab-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;}
+/* Крупнее и контрастнее остальных заголовков разделов — по просьбе: на телефоне
+   «Обязательства» читались хуже всего, а раздел важный. */
+.liab-title{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;letter-spacing:0.14em;color:var(--muted2);text-transform:uppercase;}
+.liab-title .app-png-icon{width:1.85em;height:1.85em;vertical-align:-0.42em;margin-right:2px;}
 .liab-card{background:var(--bg2);border:1px solid #f8717130;border-radius:16px;margin-bottom:10px;overflow:hidden;}
 .liab-card-header{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 .liab-card-icon{font-size:20px;flex-shrink:0;}
@@ -2896,7 +2899,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.03';
+const APP_VERSION = 'v0.1.04';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4819,7 +4822,12 @@ async function fetchStockPrice(ticker){
   if(result.usdUah&&result.usdUah>1)usdUahRate=result.usdUah;
   const s=result.stocks&&(result.stocks[ticker]||Object.values(result.stocks)[0]);
   if(!s||!s.price){
-    stockLastError='Дані отримано але ціна відсутня';
+    // Воркер теперь присылает причину по каждому тикеру — показываем её, иначе
+    // «ціна відсутня» одинаково описывало и опечатку в тикере, и лимит провайдера.
+    const why=result.errors&&result.errors[ticker];
+    stockLastError=why==='Ticker not found'?('Тікер "'+ticker+'" не знайдено')
+      :why?('Джерело даних: '+why+'. Спробуй ще раз')
+      :'Дані отримано але ціна відсутня';
     return null;
   }
   const entry={...s,updated:Date.now()};

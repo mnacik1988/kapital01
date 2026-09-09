@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-03-eff-rate-with-topups';
+﻿const CACHE_NAME = 'investory-app-v0-1-04-liab-title-and-stock-fetch';
 const APP_SHELL = [
   './',
   './index.html',
