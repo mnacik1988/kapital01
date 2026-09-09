@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-04-liab-title-and-stock-fetch';
+﻿const CACHE_NAME = 'investory-app-v0-1-05-drop-price-move-caption';
 const APP_SHELL = [
   './',
   './index.html',
