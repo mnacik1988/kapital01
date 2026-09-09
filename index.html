@@ -2898,7 +2898,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.05';
+const APP_VERSION = 'v0.1.06';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3298,7 +3298,6 @@ Object.assign(EXTRA_I18N,{
   'Вартість портфелю':{uk:'Вартість портфелю',ru:'Стоимость портфеля',en:'Portfolio value',de:'Portfoliowert',zh:'投资组合价值'},
   'Вартість покупки':{uk:'Вартість покупки',ru:'Стоимость покупки',en:'Purchase cost',de:'Kaufwert',zh:'买入成本'},
   'Прибуток / Збиток':{uk:'Прибуток / Збиток',ru:'Прибыль / Убыток',en:'Profit / Loss',de:'Gewinn / Verlust',zh:'盈利 / 亏损'},
-  '💹 Середня ціна покупки':{uk:'💹 Середня ціна покупки',ru:'💹 Средняя цена покупки',en:'💹 Average purchase price',de:'💹 Durchschnittlicher Kaufpreis',zh:'💹 平均买入价'},
   'Депозит':{uk:'Депозит',ru:'Депозит',en:'Deposit',de:'Einlage',zh:'存款'},
   'Без податку':{uk:'Без податку',ru:'Без налога',en:'Tax-free',de:'Steuerfrei',zh:'免税'}
 });
@@ -10414,20 +10413,11 @@ function renderDiagnostics(){
   const depMonthIncome=dailyDepIncome*30.44;
   const combinedMonth=depMonthIncome+stockDivMonth;
 
-  // Average stock purchase
-  const tickerAvgs={};
-  visibleSecuritiesSections().forEach(sec=>{
-    sec.items.forEach(it=>{
-      if(!it.ticker)return;
-      if(!tickerAvgs[it.ticker])tickerAvgs[it.ticker]={totalQty:0,totalCost:0,curPrice:0,name:it.liveName||it.name||it.ticker};
-      const qty=parseFloat(it.qty)||0;
-      const bp=parseFloat(it.buyPrice)||0;
-      tickerAvgs[it.ticker].totalQty+=qty;
-      if(bp>0)tickerAvgs[it.ticker].totalCost+=qty*bp;
-      tickerAvgs[it.ticker].curPrice=parseFloat(it.price)||0;
-    });
-  });
-
+  // Блок «Середня ціна покупки» удалён: всё, что он показывал, уже есть на
+  // плитке тикера (Ø средняя, P&L и процент) и в детальной карточке (там ещё и
+  // текущая цена). Процент вообще совпадал до цифры — количество акций в дроби
+  // сокращается. Заодно ушла вторая, неверная формула средней: она вычитала
+  // проданное по цене сделки, и после выгодной продажи средняя падала.
 
   const currentPerf=getSectionPerformanceSnapshot(total);
   const sectionOrder=['stocks','crypto'];
@@ -10555,27 +10545,6 @@ function renderDiagnostics(){
       ${totalSecBuyCost>0?`
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('buyValue')}</span><span class="diag-row-val">${sym}${fmtN(toDisplayCurr(totalSecBuyCost))}</span></div>
       <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('profitLoss')}</span><span class="diag-row-val" style="color:${secPnl>=0?'var(--green2)':'var(--red)'}">${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(Math.abs(secPnl)))} (${secPnl>=0?'+':''}${secPnlPct.toFixed(1)}%)</span></div>`:''}
-    </div>`;
-  }
-
-  // Average purchase stats
-  const avgEntries=Object.entries(tickerAvgs).filter(([k,v])=>v.totalCost>0);
-  if(avgEntries.length){
-    html+=`<div class="diag-section">
-      <div class="diag-section-title">💹 Середня ціна покупки</div>
-      ${avgEntries.map(([ticker,data])=>{
-        const avgPrice=data.totalCost/data.totalQty;
-        const pnl=data.curPrice-avgPrice;
-        const pnlPct=avgPrice>0?(pnl/avgPrice*100):0;
-        const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
-        return `<div class="diag-row" style="flex-wrap:wrap;gap:4px;">
-          <span class="diag-row-key" style="min-width:60px;"><span style="color:var(--green2)">${ticker}</span> ${data.name}</span>
-          <span class="diag-row-val" style="font-size:10px;">
-            Ø ${sym}${fmtN(Math.round(toDisplayCurr(avgPrice)))} → ${sym}${fmtN(Math.round(toDisplayCurr(data.curPrice)))}
-            <span style="color:${pnlCol};font-size:9px">${pnl>=0?'+':''}${pnlPct.toFixed(1)}%</span>
-          </span>
-        </div>`;
-      }).join('')}
     </div>`;
   }
 
