@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-06-drop-avg-price-block';
+﻿const CACHE_NAME = 'investory-app-v0-1-07-stocks-day-from-exchange';
 const APP_SHELL = [
   './',
   './index.html',

@@ -317,6 +317,28 @@ async function readCount(env, key) {
 
 // Увеличивает суточный счётчик. KV согласуется не мгновенно — пара лишних запросов
 // может проскочить, для защиты расходов это приемлемо.
+// Реальный расход токенов за сутки. Без него стоимость запроса — оценка, а тариф
+// придётся назначать наугад: лимиты должны опираться на замер, а не на прикидку.
+// Ключ живёт 90 дней, чтобы можно было посмотреть на месяц назад.
+async function recordUsage(env, usage) {
+  if (!env.AI_LIMITS || !usage) return;
+  const key = 'usage:' + todayKey();
+  try {
+    const prev = JSON.parse(await env.AI_LIMITS.get(key) || '{}');
+    const next = {
+      calls: (prev.calls || 0) + 1,
+      in: (prev.in || 0) + (Number(usage.input_tokens) || 0),
+      out: (prev.out || 0) + (Number(usage.output_tokens) || 0),
+      cacheRead: (prev.cacheRead || 0) + (Number(usage.cache_read_input_tokens) || 0),
+      cacheWrite: (prev.cacheWrite || 0) + (Number(usage.cache_creation_input_tokens) || 0)
+    };
+    // Sonnet 5: $2 за миллион входных, $10 за миллион выходных
+    next.usd = Number(((next.in / 1e6) * 2 + (next.out / 1e6) * 10).toFixed(4));
+    next.usdPerCall = Number((next.usd / next.calls).toFixed(5));
+    await env.AI_LIMITS.put(key, JSON.stringify(next), { expirationTtl: DAY_SEC * 90 });
+  } catch { /* учёт не должен ронять ответ пользователю */ }
+}
+
 async function bumpKey(env, key, prevValue) {
   if (!env.AI_LIMITS) return;
   try {
@@ -558,6 +580,7 @@ async function handleAI(request, origin, env) {
   // Считаем только УСПЕШНЫЕ вызовы — ошибки Anthropic не тарифицируются и не должны съедать лимит
   await bumpKey(env, gKey, globalUsed);
   await bumpKey(env, uKey, userUsed);
+  await recordUsage(env, data?.usage);
 
   return json({
     content,
