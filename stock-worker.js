@@ -21,10 +21,12 @@ const AI_GLOBAL_DAILY_CAP = 100;
 const AI_USER_DAILY_LIMIT = 10;
 const AI_IP_PER_MIN = 10;          // всплески с одного IP
 const AUTH_IP_PER_MIN = 20;        // попытки входа с одного IP
-// Пока false — клиент ещё не умеет входить, и тестировщики не должны остаться
-// без приложения. Переключить в true, когда вход появится в index.html: тогда
-// запрос к ИИ без проверенного Google-токена перестанет обслуживаться совсем.
-const REQUIRE_AUTH = false;
+// true с 17.09.2026: запрос к ИИ без проверенного Google-токена не обслуживается.
+// Включено после того, как вход подтвердился на реальном Android — в KV появился
+// ключ user:g109451412161834737806:2026-09-17, то есть сервер увидел именно sub
+// из токена, а не id устройства. До этого id устройства менялся очисткой данных,
+// и дневной лимит обходился переустановкой.
+const REQUIRE_AUTH = true;
 const DATA_IP_PER_MIN = 60;        // котировки/курсы/новости с одного IP
 const USER_ID_RE = /^[A-Za-z0-9_-]{8,64}$/;
 const DAY_SEC = 60 * 60 * 24;
@@ -467,8 +469,10 @@ async function handleNews(url, env, origin) {
   return json(results, 200, origin, 1800);
 }
 
-// Один источник userId для лимитов: проверенный sub из токена. Пока REQUIRE_AUTH
-// выключен, старый клиент без токена продолжает считаться по своему device-id.
+// Один источник userId для лимитов: проверенный sub из токена. REQUIRE_AUTH
+// включён 17.09.2026 — запрос без токена получает 401, device-id больше не
+// принимается. Проверено живьём: вход с Android дошёл до сервера ключом
+// user:g109451412161834737806:2026-09-17.
 async function resolveUserId(request, env, fallback) {
   const sub = await verifyAuthToken(bearerToken(request), env);
   if (sub) return { userId: 'g' + sub, authed: true };

@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-07-stocks-day-from-exchange';
+﻿const CACHE_NAME = 'investory-app-v0-1-08-auth-required';
 const APP_SHELL = [
   './',
   './index.html',
