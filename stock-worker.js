@@ -232,7 +232,7 @@ async function handleAuth(request, url, origin, env) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get('Origin') || '';
     if (!isAllowedOrigin(origin)) return json({ error: 'Origin not allowed' }, 403, origin);
 
@@ -241,6 +241,10 @@ export default {
     const url = new URL(request.url);
 
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+
+    // Счётчики копятся в памяти, сюда попадает только периодический сброс —
+    // waitUntil, чтобы запись не задерживала ответ пользователю.
+    if (ctx && ctx.waitUntil) ctx.waitUntil(flushApiStats(env));
 
     // Вход и продление сессии — POST, до GET-guard
     if (url.pathname === '/auth' || url.pathname === '/auth/session' || url.pathname === '/auth/refresh') {
@@ -274,6 +278,7 @@ export default {
       if (url.pathname === '/crypto') return handleCrypto(url, origin);
       if (url.pathname === '/news') return handleNews(url, env, origin);
       if (url.pathname === '/limit') return handleLimit(request, url, env, origin);
+      if (url.pathname === '/stats') return handleStats(request, url, env, origin);
       return json({ error: 'Not found' }, 404, origin);
     } catch (error) {
       console.error('Worker request failed', error);
@@ -325,6 +330,68 @@ async function readCount(env, key) {
 
 // Увеличивает суточный счётчик. KV согласуется не мгновенно — пара лишних запросов
 // может проскочить, для защиты расходов это приемлемо.
+// ── Счётчики обращений к внешним сервисам ─────────────────────────────
+// Считаем, чтобы знать ёмкость приложения по фактам, а не по арифметике:
+// у Finnhub бесплатный тариф в 60 вызовов в минуту, и отказы 429 мы уже ловили
+// при одном пользователе. Отдельно разделяем «ушло к провайдеру» (miss) и
+// «отдал кеш Cloudflare» (hit) — на лимит провайдера влияет только первое.
+//
+// Копим в памяти и сбрасываем не чаще раза в 5 минут: на бесплатном тарифе KV
+// ограничено число записей в сутки, и запись на каждый вызов выбрала бы его
+// целиком, заодно сломав счётчики ИИ, то есть защиту от перерасхода.
+// Плата за это — при перезапуске изолята теряются несобранные единицы, поэтому
+// цифры верны «с точностью до нескольких вызовов», а не до одного.
+const API_STATS_FLUSH_MS = 5 * 60 * 1000;
+let apiStatsPending = {};
+let apiStatsFlushedAt = 0;
+
+function providerName(url) {
+  let host = '';
+  try { host = new URL(url).hostname; } catch { return 'unknown'; }
+  if (host.includes('finnhub')) return 'finnhub';
+  if (host.includes('coingecko')) return 'coingecko';
+  if (host.includes('er-api')) return 'rates';
+  if (host.includes('bank.gov.ua')) return 'nbu';
+  if (host.includes('yahoo')) return 'yahoo';
+  if (host.includes('googleapis')) return 'google-jwks';
+  if (host.includes('anthropic')) return 'anthropic';
+  return host;
+}
+
+function countApi(url, outcome) {
+  const name = providerName(url);
+  const row = apiStatsPending[name] || (apiStatsPending[name] = { miss: 0, hit: 0, rl: 0, err: 0 });
+  row[outcome] = (row[outcome] || 0) + 1;
+}
+
+// Ответ из кеша края Cloudflare провайдера не беспокоит — различаем по заголовку.
+function countApiResponse(url, response) {
+  if (!response) return countApi(url, 'err');
+  if (response.status === 429) return countApi(url, 'rl');
+  if (!response.ok) return countApi(url, 'err');
+  const cache = response.headers.get('cf-cache-status') || '';
+  countApi(url, cache === 'HIT' ? 'hit' : 'miss');
+}
+
+async function flushApiStats(env, force = false) {
+  if (!env.AI_LIMITS) return;
+  const now = Date.now();
+  if (!force && now - apiStatsFlushedAt < API_STATS_FLUSH_MS) return;
+  if (!Object.keys(apiStatsPending).length) return;
+  const pending = apiStatsPending;
+  apiStatsPending = {};
+  apiStatsFlushedAt = now;
+  const key = 'api:' + todayKey();
+  try {
+    const prev = JSON.parse(await env.AI_LIMITS.get(key) || '{}');
+    for (const [name, counts] of Object.entries(pending)) {
+      const dst = prev[name] || (prev[name] = { miss: 0, hit: 0, rl: 0, err: 0 });
+      for (const field of ['miss', 'hit', 'rl', 'err']) dst[field] += counts[field] || 0;
+    }
+    await env.AI_LIMITS.put(key, JSON.stringify(prev), { expirationTtl: DAY_SEC * 90 });
+  } catch { /* статистика не должна ронять запрос пользователя */ }
+}
+
 // Реальный расход токенов за сутки. Без него стоимость запроса — оценка, а тариф
 // придётся назначать наугад: лимиты должны опираться на замер, а не на прикидку.
 // Ключ живёт 90 дней, чтобы можно было посмотреть на месяц назад.
@@ -382,12 +449,13 @@ async function handleMulti(url, env, origin) {
 async function getDividendEvents(ticker) {
   return memoize('divs:' + ticker, async () => {
     try {
-      const resp = await fetch(
-        'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker) +
-        '?range=1y&interval=1mo&events=div',
+      const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' +
+        encodeURIComponent(ticker) + '?range=1y&interval=1mo&events=div';
+      const resp = await fetch(yahooUrl,
         { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
           cf: { cacheEverything: true, cacheTtl: 86400 } }
       );
+      countApiResponse(yahooUrl, resp);
       if (!resp.ok) return {};
       const data = await resp.json().catch(() => null);
       return data?.chart?.result?.[0]?.events?.dividends || {};
@@ -502,6 +570,39 @@ async function resolveUserId(request, env, fallback) {
   return { userId: USER_ID_RE.test(raw) ? raw : null, authed: false };
 }
 
+// Сводка расхода за последние дни. Только для владельца приложения: цифры сами
+// по себе не секретны, но показывать чужую кухню незачем.
+const ADMIN_SUB = '109451412161834737806';
+
+async function handleStats(request, url, env, origin) {
+  const sub = await verifyAuthToken(bearerToken(request), env);
+  if (!sub || sub !== ADMIN_SUB) return json({ error: 'Not allowed' }, 403, origin);
+  if (!env.AI_LIMITS) return json({ error: 'KV not bound' }, 503, origin);
+
+  await flushApiStats(env, true);
+  const days = Math.min(30, Math.max(1, parseInt(url.searchParams.get('days'), 10) || 7));
+  const out = [];
+  for (let i = 0; i < days; i++) {
+    const date = new Date(Date.now() - i * DAY_SEC * 1000).toISOString().slice(0, 10);
+    const [api, ai, global_] = await Promise.all([
+      env.AI_LIMITS.get('api:' + date),
+      env.AI_LIMITS.get('usage:' + date),
+      env.AI_LIMITS.get('global:' + date)
+    ]);
+    if (!api && !ai && !global_) continue;
+    out.push({
+      date,
+      api: api ? JSON.parse(api) : null,
+      ai: ai ? JSON.parse(ai) : null,
+      aiCalls: Number(global_) || 0
+    });
+  }
+  return json({ days: out, limits: {
+    aiGlobalDaily: AI_GLOBAL_DAILY_CAP,
+    aiUserDaily: AI_USER_DAILY_LIMIT
+  } }, 200, origin, 0);
+}
+
 async function handleLimit(request, url, env, origin) {
   const { userId } = await resolveUserId(request, env, url.searchParams.get('userId'));
   if (!userId) return json({ error: 'Sign in required' }, 401, origin);
@@ -574,7 +675,8 @@ async function handleAI(request, origin, env) {
     system,
     messages
   };
-  const claudeResp = await fetch('https://api.anthropic.com/v1/messages', {
+  const claudeUrl = 'https://api.anthropic.com/v1/messages';
+  const claudeResp = await fetch(claudeUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -582,7 +684,8 @@ async function handleAI(request, origin, env) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify(reqBody)
-  }).catch(e => { throw new Error('Anthropic unreachable: ' + e.message); });
+  }).catch(e => { countApi(claudeUrl, 'err'); throw new Error('Anthropic unreachable: ' + e.message); });
+  countApiResponse(claudeUrl, claudeResp);
 
   const rawText = await claudeResp.text().catch(() => '');
   let data = {};
@@ -669,6 +772,7 @@ async function providerFetch(url, retries = 0, cacheTtl = 300) {
       // поэтому именно он, а не память изолята, снимает основную нагрузку.
       cf: { cacheEverything: true, cacheTtl }
     });
+    countApiResponse(url, response);
     if (response.ok) return response;
     // 429 и 5xx — временные: у Finnhub на бесплатном тарифе лимит на пачку
     // запросов, а на портфель уходит по нескольку штук на каждый тикер.
