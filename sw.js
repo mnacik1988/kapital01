@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-10-no-duplicate-total';
+﻿const CACHE_NAME = 'investory-app-v0-1-11-day-change-badge';
 const APP_SHELL = [
   './',
   './index.html',
