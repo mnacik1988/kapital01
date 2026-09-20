@@ -9,6 +9,12 @@ const TICKER_RE = /^[A-Z0-9.\-]{1,15}$/;
 const COIN_RE = /^[A-Z0-9\-]{1,20}$/;
 const MEMORY_CACHE = new Map();
 const CACHE_TTL_MS = 5 * 60 * 1000;
+// Название компании, валюта, дивидендная доходность и даты дивидендов меняются
+// раз в квартал, а запрашивались наравне с ценой — каждые 5 минут. На каждый
+// тикер уходило ЧЕТЫРЕ обращения к провайдерам вместо одного нужного, и пачка
+// из 10 тикеров давала 40 вызовов разом при лимите Finnhub 60 в минуту.
+// Отсюда и отказы 429, пойманные живьём 17.09 при одном пользователе.
+const SLOW_CACHE_MS = 24 * 60 * 60 * 1000;
 
 // ── ЛИМИТЫ ────────────────────────────────────────────────
 // Потолок на ВСЕХ вместе за сутки — главный предохранитель расходов.
@@ -372,6 +378,23 @@ async function handleMulti(url, env, origin) {
   return json({ usdUah: await getUsdUah(), stocks, errors, updated: new Date().toISOString() }, 200, origin, 300);
 }
 
+// Дивидендные события с Yahoo. Объявляются раз в квартал — держим сутки.
+async function getDividendEvents(ticker) {
+  return memoize('divs:' + ticker, async () => {
+    try {
+      const resp = await fetch(
+        'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker) +
+        '?range=1y&interval=1mo&events=div',
+        { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
+          cf: { cacheEverything: true, cacheTtl: 86400 } }
+      );
+      if (!resp.ok) return {};
+      const data = await resp.json().catch(() => null);
+      return data?.chart?.result?.[0]?.events?.dividends || {};
+    } catch { return {}; }
+  }, SLOW_CACHE_MS);
+}
+
 async function getStock(ticker, env) {
   if (!env.FINNHUB_KEY) throw new Error('FINNHUB_KEY secret is missing');
   return memoize('stock:' + ticker, async () => {
@@ -388,40 +411,38 @@ async function getStock(ticker, env) {
     const quote = await quoteRes.json();
     if (!Number(quote?.c)) throw new Error('Ticker not found');
 
+    // Профиль и метрики — на сутки. Название компании и валюта не меняются
+    // годами, дивидендная доходность — раз в квартал. Держать их в одном ритме
+    // с ценой значило тратить два вызова из трёх впустую.
     const [profile, metrics] = await Promise.all([
-      optionalJson(base + 'stock/profile2?symbol=' + symbol + '&token=' + token),
-      optionalJson(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token)
+      memoize('profile:' + ticker,
+        () => optionalJson(base + 'stock/profile2?symbol=' + symbol + '&token=' + token, 86400),
+        SLOW_CACHE_MS),
+      memoize('metrics:' + ticker,
+        () => optionalJson(base + 'stock/metric?symbol=' + symbol + '&metric=all&token=' + token, 86400),
+        SLOW_CACHE_MS)
     ]);
 
     const price = Number(quote.c);
     const previous = Number(quote.pc) || price;
     const change = price - previous;
 
-    // Fetch dividend events from Yahoo Finance chart (range=1y includes announced future dates)
+    // Даты дивидендов — тоже на сутки. Кешируем СЫРЫЕ события, а не готовые даты:
+    // выбор «ближайшая будущая, иначе последняя прошедшая» зависит от сегодняшнего
+    // дня, и закешированный ответ через сутки показывал бы вчерашнюю логику.
+    const divEvents = await getDividendEvents(ticker);
     let exDate = '', payDate = '', divIsFuture = false;
-    try {
-      const yahooResp = await fetch(
-        'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker) +
-        '?range=1y&interval=1mo&events=div',
-        { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } }
-      );
-      if (yahooResp.ok) {
-        const yahooData = await yahooResp.json().catch(() => null);
-        const divEvents = yahooData?.chart?.result?.[0]?.events?.dividends || {};
-        const todayTs = Math.floor(Date.now() / 1000);
-        const tsToIso = ts => ts ? new Date(ts * 1000).toISOString().slice(0, 10) : '';
-        // Find nearest upcoming ex-date, fallback to most recent past ex-date
-        const tsList = Object.keys(divEvents).map(Number).sort((a, b) => a - b);
-        const future = tsList.filter(ts => ts >= todayTs);
-        const past = tsList.filter(ts => ts < todayTs);
-        const pick = future.length ? future[0] : (past.length ? past[past.length - 1] : 0);
-        if (pick) {
-          exDate = tsToIso(pick);
-          payDate = tsToIso(divEvents[String(pick)]?.date);
-          divIsFuture = pick >= todayTs;
-        }
-      }
-    } catch(_) {}
+    const todayTs = Math.floor(Date.now() / 1000);
+    const tsToIso = ts => ts ? new Date(ts * 1000).toISOString().slice(0, 10) : '';
+    const tsList = Object.keys(divEvents).map(Number).sort((a, b) => a - b);
+    const future = tsList.filter(ts => ts >= todayTs);
+    const past = tsList.filter(ts => ts < todayTs);
+    const pick = future.length ? future[0] : (past.length ? past[past.length - 1] : 0);
+    if (pick) {
+      exDate = tsToIso(pick);
+      payDate = tsToIso(divEvents[String(pick)]?.date);
+      divIsFuture = pick >= todayTs;
+    }
 
     return {
       ticker,
@@ -640,11 +661,13 @@ async function getUsdUah() {
   });
 }
 
-async function providerFetch(url, retries = 0) {
+async function providerFetch(url, retries = 0, cacheTtl = 300) {
   for (let attempt = 0; ; attempt++) {
     const response = await fetch(url, {
       headers: { Accept: 'application/json', 'User-Agent': 'InveStory-Worker/2.0' },
-      cf: { cacheEverything: true, cacheTtl: 300 }
+      // Кеш на краю Cloudflare общий для всех воркер-изолятов в этом дата-центре,
+      // поэтому именно он, а не память изолята, снимает основную нагрузку.
+      cf: { cacheEverything: true, cacheTtl }
     });
     if (response.ok) return response;
     // 429 и 5xx — временные: у Finnhub на бесплатном тарифе лимит на пачку
@@ -656,24 +679,26 @@ async function providerFetch(url, retries = 0) {
 }
 
 // Данные, без которых можно обойтись: ошибка гасится, поле остаётся пустым.
-async function optionalJson(url) {
+async function optionalJson(url, cacheTtl = 300) {
   try {
-    const response = await providerFetch(url);
+    const response = await providerFetch(url, 0, cacheTtl);
     return await response.json();
   } catch {
     return null;
   }
 }
 
-async function memoize(key, loader) {
+// Срок хранения теперь у каждой записи свой: раньше уборка сравнивала возраст
+// с общей константой и выбросила бы суточные записи через пять минут.
+async function memoize(key, loader, ttlMs = CACHE_TTL_MS) {
   const now = Date.now();
   const cached = MEMORY_CACHE.get(key);
-  if (cached && now - cached.savedAt < CACHE_TTL_MS) return cached.value;
+  if (cached && now - cached.savedAt < (cached.ttl || CACHE_TTL_MS)) return cached.value;
   const value = await loader();
-  MEMORY_CACHE.set(key, { savedAt: now, value });
+  MEMORY_CACHE.set(key, { savedAt: now, ttl: ttlMs, value });
   if (MEMORY_CACHE.size > 500) {
     for (const [cacheKey, entry] of MEMORY_CACHE) {
-      if (now - entry.savedAt >= CACHE_TTL_MS) MEMORY_CACHE.delete(cacheKey);
+      if (now - entry.savedAt >= (entry.ttl || CACHE_TTL_MS)) MEMORY_CACHE.delete(cacheKey);
     }
   }
   return value;
