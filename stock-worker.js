@@ -323,9 +323,40 @@ function todayKey() {
 }
 
 // Читает счётчик, НЕ увеличивая (для /limit — не тратит квоту записи KV)
+// Возвращает null, если счётчик прочитать НЕ УДАЛОСЬ. Раньше в этом случае
+// возвращался 0 — то есть при отвалившемся хранилище лимиты просто переставали
+// существовать, и платные вызовы шли без ограничения. Защита должна закрываться,
+// а не открываться.
 async function readCount(env, key) {
-  if (!env.AI_LIMITS) return 0;
-  return Number(await env.AI_LIMITS.get(key)) || 0;
+  if (!env.AI_LIMITS) return null;
+  try {
+    return Number(await env.AI_LIMITS.get(key)) || 0;
+  } catch {
+    return null;
+  }
+}
+
+// Резервируем квоту ДО платного вызова. Полностью гонку это не снимает — у KV
+// нет атомарного инкремента, и два одновременных запроса всё ещё могут прочитать
+// одно значение. Но окно сокращается с «всё время ответа Claude» (секунды) до
+// одной записи в KV. Полное решение — Durable Objects: это новый платный ресурс
+// Cloudflare, разворачивать без отдельного разрешения нельзя.
+// Если платный вызов не состоялся, резерв снимается откатом.
+async function reserveCount(env, key, prevValue) {
+  if (!env.AI_LIMITS) return false;
+  try {
+    await env.AI_LIMITS.put(key, String(prevValue + 1), { expirationTtl: DAY_SEC * 2 });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function releaseCount(env, key, prevValue) {
+  if (!env.AI_LIMITS) return;
+  try {
+    await env.AI_LIMITS.put(key, String(Math.max(0, prevValue)), { expirationTtl: DAY_SEC * 2 });
+  } catch { /* откат не удался — счётчик останется завышенным, это безопасная сторона */ }
 }
 
 // Увеличивает суточный счётчик. KV согласуется не мгновенно — пара лишних запросов
@@ -635,18 +666,41 @@ async function handleAI(request, origin, env) {
   if (!userId) return json({ error: 'Увійди через Google, щоб користуватися AI.' }, 401, origin);
   const uKey = 'user:' + userId + ':' + day;
 
-  // Сначала ЧИТАЕМ оба счётчика и решаем — отказ не тратит квоту записи KV
+  // Сначала ЧИТАЕМ оба счётчика и решаем — отказ не тратит квоту записи KV.
+  // null означает «прочитать не удалось»: тогда отказываем. Раньше в этом месте
+  // возвращался 0, и при отвалившемся хранилище лимиты переставали действовать.
   const globalUsed = await readCount(env, gKey);
+  if (globalUsed === null) {
+    return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
+  }
   if (globalUsed >= AI_GLOBAL_DAILY_CAP) {
     return json({ error: 'Денний ліміт запитів до AI вичерпано. Спробуй завтра.' }, 200, origin, 0);
   }
   const userUsed = await readCount(env, uKey);
+  if (userUsed === null) {
+    return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
+  }
   if (userUsed >= AI_USER_DAILY_LIMIT) {
     return json({
       error: 'Ти вичерпав денний ліміт запитів до AI. Спробуй завтра.',
       limit: { limit: AI_USER_DAILY_LIMIT, used: userUsed, left: 0 }
     }, 200, origin, 0);
   }
+
+  // Резервируем ОБА счётчика до обращения к Claude. Раньше запись шла после
+  // ответа, и всё время ожидания (секунды) параллельные запросы видели старое
+  // значение — при остатке в один запрос проходили оба. Теперь окно сузилось до
+  // одной записи в KV. Если резерв не удался, платный вызов не делаем вовсе.
+  if (!await reserveCount(env, gKey, globalUsed) || !await reserveCount(env, uKey, userUsed)) {
+    await releaseCount(env, gKey, globalUsed);
+    await releaseCount(env, uKey, userUsed);
+    return json({ error: 'Не вдалося зарезервувати ліміт. Спробуй ще раз.' }, 503, origin, 0);
+  }
+  // Любой выход после этой точки без успешного ответа обязан снять резерв.
+  const releaseReservation = async () => {
+    await releaseCount(env, gKey, globalUsed);
+    await releaseCount(env, uKey, userUsed);
+  };
 
   // Инструкции берём ТОЛЬКО свои. Всё, что прислал клиент, идёт как ДАННЫЕ.
   // body.system — совместимость со старыми версиями приложения: их промпт содержит данные портфеля.
@@ -684,19 +738,25 @@ async function handleAI(request, origin, env) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify(reqBody)
-  }).catch(e => { countApi(claudeUrl, 'err'); throw new Error('Anthropic unreachable: ' + e.message); });
+  }).catch(async e => {
+    countApi(claudeUrl, 'err');
+    await releaseReservation();
+    throw new Error('Anthropic unreachable: ' + e.message);
+  });
   countApiResponse(claudeUrl, claudeResp);
 
   const rawText = await claudeResp.text().catch(() => '');
   let data = {};
   try { data = JSON.parse(rawText); } catch {}
   if (!claudeResp.ok) {
+    await releaseReservation();
     return json({ error: data?.error?.message || ('Claude error ' + claudeResp.status) }, 200, origin, 0);
   }
   const textBlock = (data?.content || []).find(b => b.type === 'text');
   const content = textBlock?.text || '';
   if (!content) {
     // Пустой ответ — отдаём причину, чтобы не гадать (обычно stop_reason: max_tokens)
+    await releaseReservation();
     return json({
       error: 'Порожня відповідь від моделі',
       stop_reason: data?.stop_reason || null,
@@ -705,9 +765,8 @@ async function handleAI(request, origin, env) {
     }, 200, origin, 0);
   }
 
-  // Считаем только УСПЕШНЫЕ вызовы — ошибки Anthropic не тарифицируются и не должны съедать лимит
-  await bumpKey(env, gKey, globalUsed);
-  await bumpKey(env, uKey, userUsed);
+  // Резерв уже сделан выше — здесь только учёт токенов. Ошибки Anthropic лимит
+  // не съедают: на всех путях отказа резерв снимается (см. releaseReservation).
   await recordUsage(env, data?.usage);
 
   return json({
@@ -836,8 +895,13 @@ function responseHeaders(origin, maxAge) {
   return {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    // POST нужен для /ai и /auth, Authorization — для всего, что требует входа.
+    // Без них браузер отбивал запрос ещё на предполётной проверке: проверено
+    // живьём на mnacik1988.github.io — /rates проходил, /limit и /ai нет.
+    // Список разрешённых источников не тронут: сюда подставляется origin,
+    // который выше уже сверен с ALLOWED_ORIGINS, иначе запрос не доходит.
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
     'Cache-Control': maxAge ? 'public, max-age=' + maxAge : 'no-store',
     'Vary': 'Origin',

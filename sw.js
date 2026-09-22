@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-12-payout-not-in-value';
+﻿const CACHE_NAME = 'investory-app-v0-1-13-audit-fixes';
 const APP_SHELL = [
   './',
   './index.html',
@@ -41,23 +41,39 @@ const APP_SHELL = [
   './section-icons/ui-sold.png?v=1',
   './section-icons/Gold.png',
   './section-icons/Silver.png',
-  './section-icons/Platinum.png',
+  './section-icons/Platinum.png'
+];
+
+// Необязательное. Раньше шрифт лежал в общем списке, и один неудачный запрос к
+// Google ронял addAll целиком: ошибка гасилась, новый воркер всё равно
+// активировался и стирал прежний кэш — офлайн-версия исчезала из-за шрифта.
+const OPTIONAL_ASSETS = [
   'https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@400;500;600;700;800&display=swap'
 ];
 
+// Удаляем ТОЛЬКО свои кэши. Хранилище общее на весь домен, а на
+// mnacik1988.github.io живёт ещё NeedBuy — прежняя чистка сносила и его.
+const CACHE_PREFIX = 'investory-app-';
+
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .catch(() => null)
-  );
-  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // Обязательное — строго: если хоть один файл приложения не скачался,
+    // установка ПАДАЕТ. Новый воркер не активируется, прежняя рабочая версия
+    // остаётся на месте. Раньше ошибка гасилась и обновление шло с дырявым кэшем.
+    await cache.addAll(APP_SHELL);
+    // Необязательное — по возможности, поштучно, ошибки не мешают установке.
+    await Promise.all(OPTIONAL_ASSETS.map(url => cache.add(url).catch(() => null)));
+    // skipWaiting только после успешной установки.
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .map(key => caches.delete(key))
     ))
   );
   self.clients.claim();
