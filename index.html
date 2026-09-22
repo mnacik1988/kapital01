@@ -2898,7 +2898,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.12';
+const APP_VERSION = 'v0.1.13';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3583,6 +3583,15 @@ function renderChartI18n(){
   ['min','max','change','growth','day'].forEach((key,i)=>{if(labels[i])labels[i].textContent=chartUiText(key);});
   document.documentElement.lang=currentLang;
 }
+// Ноль — допустимое значение, а не «пусто». Выражение (значение || 16) считало
+// ставку 0% незаполненным полем и подставляло 16% — вклад без процентов начинал
+// приносить доход. Здесь запасное значение берётся ТОЛЬКО когда поле пустое или
+// введена бессмыслица.
+function numberOrFallback(v,fallback){
+  if(v===''||v===null||v===undefined)return fallback;
+  const n=parseInputNumber(v);
+  return Number.isFinite(n)?n:fallback;
+}
 function parseInputNumber(v){
   if(typeof v==='number')return Number.isFinite(v)?v:0;
   const raw=String(v??'').trim().replace(/\s+/g,'').replace(/[^0-9,.-]/g,'');
@@ -4032,7 +4041,7 @@ function simulateDeposit(dep,opts={}){
   const end=depLocalDate(opts.end||getDepositContractEnd(dep,start));
   const until=depLocalDate(opts.until||new Date());
   const stop=new Date(Math.min(end.getTime(),until.getTime()));
-  const rAnn=(parseInputNumber(opts.rate??dep?.rate)||16)/100;
+  const rAnn=numberOrFallback(opts.rate??dep?.rate,16)/100;
   const taxRate=parseInputNumber(opts.tax??dep?.tax)/100;
   let taxFreeLeft=parseInputNumber(opts.taxFree??dep?.taxFree);
   const startDay=getDepositOpenDay(dep);
@@ -4265,7 +4274,7 @@ function calcLive(depId){
   const dep=deposits.find(d=>d.id===depId);
   const depSym=getDepositCurrencySymbol(dep||{});
   const P=getDepositPrincipalNative(dep||{})||parseInputNumber($('depPrincipal_'+depId)?.value);
-  const rAnn=(parseInputNumber($('depRate_'+depId)?.value)||16)/100;
+  const rAnn=numberOrFallback($('depRate_'+depId)?.value,16)/100;
   const tax=parseInputNumber($('depTax_'+depId)?.value)/100;
   const eStr=$('depEndDate_'+depId)?.value;
   if(!P||!rAnn||!eStr){
@@ -4595,7 +4604,7 @@ function getCustomCardHtml(s,idx){
 function calcCustomSection(id){
   const P=parseInputNumber($('customPrincipal_'+id)?.value);
   if(!P){['cust-total','cust-interest','cust-tax','cust-net','cust-eff'].forEach(k=>setText(k+'_'+id,'—'));return;}
-  const r=parseInputNumber($('customRate_'+id)?.value||16)/100;
+  const r=numberOrFallback($('customRate_'+id)?.value,16)/100;
   const n=parseInputNumber($('customFreq_'+id)?.value||12);
   const tt=(parseInputNumber($('customMonths_'+id)?.value||12))/12;
   const tax=parseInputNumber($('customTax_'+id)?.value||0)/100;
@@ -5112,10 +5121,23 @@ function liveMetricLabel(key,text){
   const map={accrued:'accrued',tax:'tax',net:'net',sec:'clock',day:'period',month:'period',interest:'percent'};
   return uiIconHtml(map[key])+' '+cleanIconText(text);
 }
+// Значок раздела приходит в том числе из файла резервной копии, а результат
+// вставляется через innerHTML. Раньше поле уходило в разметку как есть: бэкап
+// с <img src=x onerror="..."> выполнял код в приложении — проверено сквозняком,
+// валидация такой файл пропускала. CSP не спасала: там стоит 'unsafe-inline'.
+// Теперь произвольная строка не может стать разметкой — только текстом, и
+// короткая: значок это эмодзи, а не абзац.
+function safeIconText(value,fallback){
+  const raw=String(value??'').trim();
+  if(!raw)return fallback;
+  if(raw.length>8)return fallback;
+  if(/[<>&"'`]/.test(raw))return fallback;
+  return escHtml(raw);
+}
 function sectionIconHtml(section,fallback){
   const key=sectionIconKey(section);
   if(key)return '<img class="section-card-icon-img" src="section-icons/section-'+key+'.png?v=1" alt="">';
-  return fallback||section?.icon||'✏️';
+  return safeIconText(fallback,safeIconText(section?.icon,'✏️'));
 }
 function diagIconHtml(key,fallback){
   const uiMap={tax:'tax',period:'period',history:'period',pnl:'pnl',percent:'percent'};
@@ -5454,6 +5476,9 @@ function getStockSectionStats(section){
       currentValue:0,
       pnl:0,
       pnlPct:0,
+      openQty:0,
+      openCost:0,
+      realizedPnl:0,
       divAnnualPct:0,
       divAnnualAbs:0,
       divAnnual:0
@@ -5465,9 +5490,25 @@ function getStockSectionStats(section){
     const isSell=qty<0||it.tradeType==='sell';
     g.trades.push({...it,origIdx:j,qty,buyPrice,price});
     g.totalQty+=qty;
+    // Метод учёта — СКОЛЬЗЯЩАЯ СРЕДНЯЯ, и сделки идут по порядку записи.
+    // Покупка добавляет свою стоимость, продажа ЗАБИРАЕТ долю по средней на
+    // тот момент. Раньше средняя считалась по всем покупкам за историю, а
+    // проданные бумаги свою часть не уносили: купил 10 по 100, продал 5, купил
+    // 5 по 200 — оставшиеся 10 стоили 1333.33 вместо 1500.
+    // Даты у сделок нет, поэтому порядок — это порядок добавления в приложении.
     if(!isSell&&qty>0){
       g.buyQty+=qty;
       g.buyCost+=qty*buyPrice;
+      g.openQty+=qty;
+      g.openCost+=qty*buyPrice;
+    }else if(isSell){
+      const soldQty=Math.min(Math.abs(qty),g.openQty);
+      if(soldQty>0){
+        const avgNow=g.openCost/g.openQty;
+        g.openCost-=soldQty*avgNow;
+        g.openQty-=soldQty;
+        g.realizedPnl+=soldQty*((stockNum(it.price)||buyPrice)-avgNow);
+      }
     }
     if(it.liveName)g.name=it.liveName;
     if(it.liveChange!=null)g.liveChange=it.liveChange;
@@ -5480,14 +5521,22 @@ function getStockSectionStats(section){
   });
   Object.values(groups).forEach(g=>{
     g.totalQty=Math.max(0,g.totalQty);
-    g.avgBuy=g.buyQty>0?g.buyCost/g.buyQty:0;
-    g.remainingCost=g.avgBuy*g.totalQty;
+    g.openQty=Math.max(0,g.openQty);
+    g.openCost=Math.max(0,g.openCost);
+    // Средняя — по ОСТАВШЕЙСЯ позиции, а не по всей истории покупок.
+    g.avgBuy=g.openQty>0?g.openCost/g.openQty:0;
+    g.remainingCost=g.openCost;
     g.currentValue=g.totalQty*g.curPrice;
     g.pnl=g.remainingCost>0?g.currentValue-g.remainingCost:0;
     g.pnlPct=g.remainingCost>0?((g.currentValue/g.remainingCost-1)*100):0;
     g.divAnnualPct=g.currentValue*(g.divYield/100);
+    // Доходность и дивиденд на акцию описывают ОДИН доход, складывать их нельзя.
+    // Основной способ — доходность, абсолютный дивиденд идёт только запасным,
+    // когда доходность не пришла. Сейчас Finnhub на бесплатном тарифе поле
+    // divAbs не отдаёт вовсе (проверено на десяти дивидендных бумагах — везде 0),
+    // поэтому двойной счёт пока спал, но проснулся бы на платном тарифе.
     g.divAnnualAbs=g.divAbs>0?g.totalQty*g.divAbs*getStockCurrencyRate(g.liveCurrency):0;
-    g.divAnnual=g.divAnnualPct+g.divAnnualAbs;
+    g.divAnnual=g.divAnnualPct>0?g.divAnnualPct:g.divAnnualAbs;
   });
   const visibleGroups=Object.fromEntries(Object.entries(groups).filter(([,g])=>g.totalQty>0));
   const vals=Object.values(visibleGroups);
@@ -5568,10 +5617,10 @@ function getSecCardHtml(s,idx){
       const divMonth=divAnn/12;
       return `<div class="ticker-card" onclick="openStockDetail('${s.id}','${key.replace(/'/g,"\\'")}')">
         <div class="ticker-card-head">
-          <span class="ticker-card-sym">${g.ticker||'—'}</span>
+          <span class="ticker-card-sym">${escHtml(g.ticker)||'—'}</span>
           <span class="ticker-card-qty">${fmtMax2(totalQty)} шт</span>
         </div>
-        <div class="ticker-card-name">${g.name}</div>
+        <div class="ticker-card-name">${escHtml(g.name)}</div>
         <div class="ticker-card-price" style="color:${pnlCol}">${sym}${fmtN(toDisplayCurr(curVal))}</div>
         <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
         ${avgBuy>0?`<div class="ticker-card-div">Ø ${sym}${fmtN(toDisplayCurr(avgBuy))}</div>`:''}
@@ -6038,15 +6087,26 @@ function getCryptoPortfolioStats(){
   coins.forEach(c=>{
     const key=String(c.name||'').trim().toUpperCase();
     if(!key)return;
-    if(!groups[key])groups[key]={name:key,totalQty:0,buyQty:0,buyCost:0,curPrice:0,change24h:0};
+    if(!groups[key])groups[key]={name:key,totalQty:0,buyQty:0,buyCost:0,openQty:0,openCost:0,realizedPnl:0,curPrice:0,change24h:0};
     const g=groups[key];
     const qty=cryptoNum(c.qty);
     const buyPrice=cryptoNum(c.buyPrice);
     const curPrice=cryptoNum(c.curPrice);
     g.totalQty+=qty;
+    // Скользящая средняя, как у акций: продажа уносит свою долю себестоимости.
     if(qty>0){
       g.buyQty+=qty;
       g.buyCost+=qty*buyPrice;
+      g.openQty+=qty;
+      g.openCost+=qty*buyPrice;
+    }else if(qty<0){
+      const soldQty=Math.min(Math.abs(qty),g.openQty);
+      if(soldQty>0){
+        const avgNow=g.openCost/g.openQty;
+        g.openCost-=soldQty*avgNow;
+        g.openQty-=soldQty;
+        g.realizedPnl+=soldQty*((curPrice||buyPrice)-avgNow);
+      }
     }
     if(curPrice>0)g.curPrice=curPrice;
     if(c.change24h!==undefined)g.change24h=cryptoNum(c.change24h);
@@ -6055,9 +6115,12 @@ function getCryptoPortfolioStats(){
   let remainingCostUsd=0;
   Object.values(groups).forEach(g=>{
     const netQty=Math.max(0,g.totalQty);
-    const avgBuy=g.buyQty>0?g.buyCost/g.buyQty:0;
+    g.openQty=Math.max(0,g.openQty);
+    g.openCost=Math.max(0,g.openCost);
+    const avgBuy=g.openQty>0?g.openCost/g.openQty:0;
+    g.avgBuy=avgBuy;
     g.currentUsd=netQty*g.curPrice;
-    g.remainingCostUsd=netQty*avgBuy;
+    g.remainingCostUsd=g.openCost;
     portfolioUsd+=g.currentUsd;
     remainingCostUsd+=g.remainingCostUsd;
   });
@@ -6153,7 +6216,7 @@ function _updateAllNow(){
       const depSym=getDepositCurrencySymbol(d);
       const converted=getDepositCurrency(d)===displayCurrency.toUpperCase()?'':' · '+fmtN(toDisplayCurr(uahTotal))+' '+sym;
       return `<div class="result-row">
-        <span class="result-key">${d.name||t('deposit')}</span>
+        <span class="result-key">${escHtml(d.name)||t('deposit')}</span>
         <span class="result-val blue">${fmtN(nativeTotal)} ${depSym}${converted}</span>
       </div>`;
     }).join('');
@@ -9902,6 +9965,14 @@ function initGoogleAuth(){
     setTimeout(refreshSessionToken,5000);
     return;
   }
+  // Сохранённый вход проверяем СРАЗУ, не дожидаясь скрипта Google. Раньше эта
+  // проверка жила внутри start(), который без загруженного SDK возвращал false —
+  // и человек без интернета через 10 секунд упирался в экран входа, хотя сессия
+  // действует, а портфель лежит у него же на устройстве. Серверные операции это
+  // не открывает: /ai и /limit по-прежнему требуют токен, который проверяет
+  // воркер, и офлайн они просто не выполнятся.
+  const alreadySignedIn=isSignedIn();
+  if(alreadySignedIn)hideAuthGate();
   const start=()=>{
     if(!window.google||!google.accounts||!google.accounts.id)return false;
     try{
@@ -9916,7 +9987,13 @@ function initGoogleAuth(){
     let tries=0;
     const t=setInterval(()=>{
       if(start()){clearInterval(t);return;}
-      if(++tries>40){clearInterval(t);showAuthGate();showAuthFallback();}
+      // Скрипт так и не поднялся. Экран входа показываем только тому, кто и
+      // правда не вошёл: у остальных приложение остаётся открытым, а вход
+      // подхватится, когда сеть вернётся.
+      if(++tries>40){
+        clearInterval(t);
+        if(!isSignedIn()){showAuthGate();showAuthFallback();}
+      }
     },250);
   }
   // Сессия живёт 90 дней, но продлеваем её при каждом запуске — иначе редкий
