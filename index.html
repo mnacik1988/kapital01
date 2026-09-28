@@ -2916,7 +2916,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.16';
+const APP_VERSION = 'v0.1.17';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6164,7 +6164,10 @@ function getCryptoPortfolioStats(){
 const EXCHANGE_KEYS_LS='investory_exchange_keys';
 const EXCHANGE_CACHE_LS='investory_exchange_cache';
 const EXCHANGE_STABLES=new Set(['USDT','USDC','DAI','FDUSD','TUSD','USDE','PYUSD','BUSD']);
-const exchangeUi={formOpen:false,busy:{},errors:{}};
+const exchangeUi={formOpen:false,busy:{},errors:{},dustOpen:{}};
+// Монеты дешевле доллара — награды с лаунчпулов и пыль. Отдельной карточкой
+// каждая только топит сетку, поэтому они собираются в одну раскрывающуюся.
+const EXCHANGE_DUST_USD=1;
 
 function exTxt(k){
   const d={
@@ -6193,6 +6196,9 @@ function exTxt(k){
     acc_TradingBot:{uk:'Боти',ru:'Боты',en:'Bots',de:'Bots',zh:'机器人'},
     acc_CopyTrading:{uk:'Копітрейдинг',ru:'Копитрейдинг',en:'Copy trading',de:'Copy-Trading',zh:'跟单'},
     acc_CryptoLoans:{uk:'Крипто-позики',ru:'Крипто-займы',en:'Crypto loans',de:'Krypto-Kredite',zh:'加密借贷'},
+    dustShort:{uk:'дрібних',ru:'мелких',en:'small',de:'kleine',zh:'小额'},
+    dustHide:{uk:'Згорнути',ru:'Свернуть',en:'Collapse',de:'Einklappen',zh:'收起'},
+    dustHint:{uk:'дешевше $1 кожна',ru:'дешевле $1 каждая',en:'under $1 each',de:'je unter $1',zh:'每个低于 $1'},
     noPrice:{uk:'ціна невідома',ru:'цена неизвестна',en:'price unknown',de:'Preis unbekannt',zh:'价格未知'},
     fillBoth:{uk:'Заповніть обидва поля',ru:'Заполните оба поля',en:'Fill in both fields',de:'Beide Felder ausfüllen',zh:'请填写两个字段'},
     errKey:{uk:'Невірний API Key або ключ вимкнено',ru:'Неверный API Key или ключ отключён',en:'Invalid API Key, or the key was disabled',de:'Ungültiger API Key oder Schlüssel deaktiviert',zh:'API Key 无效或已停用'},
@@ -6242,12 +6248,15 @@ const EXCHANGES={
       if(j.retCode!==0)throw ExchangeError(j.retCode,j.retMsg);
       return j;
     },
-    async priceUsd(coin){
-      if(EXCHANGE_STABLES.has(coin))return 1;
+    // Цена и изменение за сутки одним запросом тикера — для карточек монет.
+    async priceInfo(coin){
+      if(EXCHANGE_STABLES.has(coin))return {price:1,change:0};
       try{
         const t=await this.publicGet('/v5/market/tickers','category=spot&symbol='+encodeURIComponent(coin+'USDT'));
-        return Number(t?.result?.list?.[0]?.lastPrice)||0;
-      }catch{return 0;}
+        const row=t?.result?.list?.[0]||{};
+        const pct=Number(row.price24hPcnt);
+        return {price:Number(row.lastPrice)||0,change:Number.isFinite(pct)?pct*100:null};
+      }catch{return {price:0,change:null};}
     },
     // Сводка по ВСЕМ счетам одним запросом: торговый, финансовый, Earn (стейкинг),
     // Launchpool, боты, копитрейдинг. Итог в долларах биржа считает сама.
@@ -6265,8 +6274,8 @@ const EXCHANGES={
         if(Math.abs(usd)>=0.01)accounts.push({type:String(acc.accountType||''),usd});
       }
       const coinsList=await Promise.all(Object.entries(byCoin).map(async([coin,qty])=>{
-        const price=await this.priceUsd(coin);
-        return {coin,qty,usd:qty*price,noPrice:!(price>0)};
+        const {price,change}=await this.priceInfo(coin);
+        return {coin,qty,usd:qty*price,price,change24h:change,noPrice:!(price>0)};
       }));
       coinsList.sort((a,b)=>b.usd-a.usd);
       const total=Number(ov?.totalEquity);
@@ -6319,17 +6328,12 @@ const EXCHANGES={
         let price=0;
         if(EXCHANGE_STABLES.has(row.coin))price=1;
         else if(row.qty>row.unpriced&&row.usd>0)price=row.usd/(row.qty-row.unpriced);
-        else{
-          try{
-            const t=await this.publicGet('/v5/market/tickers','category=spot&symbol='+encodeURIComponent(row.coin+'USDT'));
-            price=Number(t?.result?.list?.[0]?.lastPrice)||0;
-          }catch{}
-        }
+        else price=(await this.priceInfo(row.coin)).price;
         if(price>0){row.usd+=row.unpriced*price;row.unpriced=0;}
       }
       const coinsList=Object.values(byCoin).sort((a,b)=>b.usd-a.usd);
       return {
-        coins:coinsList.map(r=>({coin:r.coin,qty:r.qty,usd:r.usd,noPrice:r.unpriced>0})),
+        coins:coinsList.map(r=>({coin:r.coin,qty:r.qty,usd:r.usd,price:r.qty>0?r.usd/r.qty:0,noPrice:r.unpriced>0})),
         totalUsd:coinsList.reduce((s,r)=>s+r.usd,0),
         partial:true
       };
@@ -6426,6 +6430,26 @@ function exFmtQty(q){
   const n=Number(q)||0;
   return n.toLocaleString(appLocale(),{maximumFractionDigits:n>=1000?2:n>=1?4:8});
 }
+function toggleExchangeDust(id){exchangeUi.dustOpen[id]=!exchangeUi.dustOpen[id];renderExchanges();}
+// Карточка монеты с биржи — в том же виде, что и введённые вручную: символ,
+// количество, цена со сдвигом за сутки, стоимость. Прибыли нет — биржа не
+// отдаёт цену покупки, поэтому вместо неё строка с долларовой стоимостью.
+function exCoinCard(r,rate,sym){
+  const price=Number(r.price)||(r.qty>0?(Number(r.usd)||0)/r.qty:0);
+  const ch=Number(r.change24h);
+  const hasCh=r.change24h!==null&&r.change24h!==undefined&&Number.isFinite(ch)&&Math.abs(ch)>=0.05;
+  const priceTxt=r.noPrice||!(price>0)?exTxt('noPrice'):'$'+(price>=1?fmtD(price,2):price.toLocaleString(appLocale(),{maximumSignificantDigits:3}));
+  const valueTxt=r.noPrice?'—':fmtN(toDisplayCurr((Number(r.usd)||0)*rate))+' '+sym;
+  const usd=Number(r.usd)||0;
+  const usdTxt=r.noPrice?'':(usd<0?'−$':'$')+(Math.abs(usd)<10?fmtD(Math.abs(usd),2):fmtN(Math.round(Math.abs(usd))));
+  return '<div class="ticker-card" style="border-top:2px solid var(--purple);cursor:default">'+
+    '<div class="ticker-card-head"><span class="ticker-card-sym" style="color:var(--purple2)">'+escHtml(r.coin)+'</span>'+
+    '<span class="ticker-card-qty">'+escHtml(exFmtQty(r.qty))+'</span></div>'+
+    '<div class="ticker-card-name">'+escHtml(priceTxt)+(hasCh?' <span style="font-size:9px;color:'+(ch>=0?'var(--green2)':'var(--red)')+'">'+(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(1)+'%</span>':'')+'</div>'+
+    '<div class="ticker-card-price" style="color:var(--purple2)">'+escHtml(valueTxt)+'</div>'+
+    '<div class="ticker-card-pnl" style="color:var(--muted2)">'+escHtml(usdTxt)+'</div>'+
+  '</div>';
+}
 function toggleExchangeForm(open){exchangeUi.formOpen=!!open;renderExchanges();}
 
 function renderExchanges(){
@@ -6455,8 +6479,22 @@ function renderExchanges(){
     }
     const list=c.coins||[];
     if(list.length){
-      html+='<div class="ex-coins">'+list.map(r=>'<div class="ex-coin"><span>'+escHtml(r.coin)+' · '+escHtml(exFmtQty(r.qty))+'</span><span>'+
-        (r.noPrice?exTxt('noPrice'):(r.usd<0?'−$':'$')+fmtN(Math.round(Math.abs(r.usd))))+'</span></div>').join('')+'</div>';
+      const big=list.filter(r=>!r.noPrice&&Math.abs(Number(r.usd)||0)>=EXCHANGE_DUST_USD);
+      const dust=list.filter(r=>r.noPrice||Math.abs(Number(r.usd)||0)<EXCHANGE_DUST_USD);
+      html+='<div class="ticker-cards">'+big.map(r=>exCoinCard(r,rate,sym)).join('');
+      if(dust.length){
+        if(exchangeUi.dustOpen[id]){
+          html+=dust.map(r=>exCoinCard(r,rate,sym)).join('');
+        }
+        const dustUsd=dust.reduce((sum,r)=>sum+(r.noPrice?0:(Number(r.usd)||0)),0);
+        html+='<div class="ticker-card" style="border-top:2px dashed var(--border2);cursor:pointer" onclick="toggleExchangeDust(\''+id+'\')">'+
+          '<div class="ticker-card-head"><span class="ticker-card-sym" style="color:var(--muted2)">'+
+            (exchangeUi.dustOpen[id]?exTxt('dustHide'):'+'+dust.length+' '+exTxt('dustShort'))+'</span></div>'+
+          '<div class="ticker-card-name">'+exTxt('dustHint')+'</div>'+
+          '<div class="ticker-card-price" style="color:var(--muted2)">$'+fmtD(dustUsd,2)+'</div>'+
+        '</div>';
+      }
+      html+='</div>';
     }else if(c.updatedAt&&!busy){
       html+='<div class="ex-sub">'+exTxt('empty')+'</div>';
     }
