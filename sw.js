@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-19-sw-bypass-http-cache';
+﻿const CACHE_NAME = 'investory-app-v0-1-20-exchange-coin-detail';
 const APP_SHELL = [
   './',
   './index.html',

@@ -2917,7 +2917,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.19';
+const APP_VERSION = 'v0.1.20';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6197,6 +6197,11 @@ function exTxt(k){
     acc_TradingBot:{uk:'Боти',ru:'Боты',en:'Bots',de:'Bots',zh:'机器人'},
     acc_CopyTrading:{uk:'Копітрейдинг',ru:'Копитрейдинг',en:'Copy trading',de:'Copy-Trading',zh:'跟单'},
     acc_CryptoLoans:{uk:'Крипто-позики',ru:'Крипто-займы',en:'Crypto loans',de:'Krypto-Kredite',zh:'加密借贷'},
+    close:{uk:'Закрити',ru:'Закрыть',en:'Close',de:'Schließen',zh:'关闭'},
+    valueUsd:{uk:'Вартість, $',ru:'Стоимость, $',en:'Value, $',de:'Wert, $',zh:'价值，$'},
+    share:{uk:'Частка на',ru:'Доля на',en:'Share on',de:'Anteil auf',zh:'占比'},
+    whereHeld:{uk:'Де лежить',ru:'Где лежит',en:'Where it is held',de:'Wo es liegt',zh:'存放位置'},
+    readonlyNote:{uk:'Дані з {ex}. Кількість змінюється на біржі — тут її не редагують: після наступного оновлення підтягнеться нова.',ru:'Данные с {ex}. Количество меняется на бирже — здесь его не редактируют: после следующего обновления подтянется новое.',en:'Data from {ex}. The amount changes on the exchange, not here — the next refresh picks it up.',de:'Daten von {ex}. Die Menge ändert sich an der Börse, nicht hier — die nächste Aktualisierung übernimmt sie.',zh:'数据来自 {ex}。数量在交易所变动，此处不可编辑——下次刷新时自动更新。'},
     dustShort:{uk:'дрібних',ru:'мелких',en:'small',de:'kleine',zh:'小额'},
     dustHide:{uk:'Згорнути',ru:'Свернуть',en:'Collapse',de:'Einklappen',zh:'收起'},
     dustHint:{uk:'дешевше $1 кожна',ru:'дешевле $1 каждая',en:'under $1 each',de:'je unter $1',zh:'每个低于 $1'},
@@ -6263,20 +6268,25 @@ const EXCHANGES={
     // Launchpool, боты, копитрейдинг. Итог в долларах биржа считает сама.
     // Не работает для региональных аккаунтов (Bybit EU, KZ, GE) — там запасной путь.
     async fromOverview(ov){
-      const byCoin={},accounts=[];
+      const byCoin={},accounts=[],whereByCoin={};
       for(const acc of (ov?.list||[])){
         const usd=Number(acc.totalEquity)||0;
+        const type=String(acc.accountType||'');
         const rows=[...(acc.coinDetail||[]),...(acc.categories||[]).flatMap(c=>c.coinDetail||[])];
         for(const c of rows){
           const k=String(c.coin||'').toUpperCase();
           const q=Number(c.equity)||0;
-          if(k&&q)byCoin[k]=(byCoin[k]||0)+q;
+          if(!k||!q)continue;
+          byCoin[k]=(byCoin[k]||0)+q;
+          // Для окна монеты: сколько её в стейкинге, сколько на торговом и т.д.
+          const w=whereByCoin[k]||(whereByCoin[k]={});
+          w[type]=(w[type]||0)+q;
         }
         if(Math.abs(usd)>=0.01)accounts.push({type:String(acc.accountType||''),usd});
       }
       const coinsList=await Promise.all(Object.entries(byCoin).map(async([coin,qty])=>{
         const {price,change}=await this.priceInfo(coin);
-        return {coin,qty,usd:qty*price,price,change24h:change,noPrice:!(price>0)};
+        return {coin,qty,usd:qty*price,price,change24h:change,noPrice:!(price>0),where:whereByCoin[coin]||{}};
       }));
       coinsList.sort((a,b)=>b.usd-a.usd);
       const total=Number(ov?.totalEquity);
@@ -6435,7 +6445,7 @@ function toggleExchangeDust(id){exchangeUi.dustOpen[id]=!exchangeUi.dustOpen[id]
 // Карточка монеты с биржи — в том же виде, что и введённые вручную: символ,
 // количество, цена со сдвигом за сутки, стоимость. Прибыли нет — биржа не
 // отдаёт цену покупки, поэтому вместо неё строка с долларовой стоимостью.
-function exCoinCard(r,rate,sym){
+function exCoinCard(r,rate,sym,exId){
   const price=Number(r.price)||(r.qty>0?(Number(r.usd)||0)/r.qty:0);
   const ch=Number(r.change24h);
   const hasCh=r.change24h!==null&&r.change24h!==undefined&&Number.isFinite(ch)&&Math.abs(ch)>=0.05;
@@ -6443,13 +6453,55 @@ function exCoinCard(r,rate,sym){
   const valueTxt=r.noPrice?'—':fmtN(toDisplayCurr((Number(r.usd)||0)*rate))+' '+sym;
   const usd=Number(r.usd)||0;
   const usdTxt=r.noPrice?'':(usd<0?'−$':'$')+(Math.abs(usd)<10?fmtD(Math.abs(usd),2):fmtN(Math.round(Math.abs(usd))));
-  return '<div class="ticker-card" style="border-top:2px solid var(--purple);cursor:default">'+
+  return '<div class="ticker-card" style="border-top:2px solid var(--purple)" onclick="openExchangeCoinDetail(\''+exId+'\',\''+String(r.coin).replace(/[^A-Za-z0-9._-]/g,'')+'\')">'+
     '<div class="ticker-card-head"><span class="ticker-card-sym" style="color:var(--purple2)">'+escHtml(r.coin)+'</span>'+
     '<span class="ticker-card-qty">'+escHtml(exFmtQty(r.qty))+'</span></div>'+
     '<div class="ticker-card-name">'+escHtml(priceTxt)+(hasCh?' <span style="font-size:9px;color:'+(ch>=0?'var(--green2)':'var(--red)')+'">'+(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(1)+'%</span>':'')+'</div>'+
     '<div class="ticker-card-price" style="color:var(--purple2)">'+escHtml(valueTxt)+'</div>'+
     '<div class="ticker-card-pnl" style="color:var(--muted2)">'+escHtml(usdTxt)+'</div>'+
   '</div>';
+}
+// Окно монеты с биржи — в том же оформлении, что у введённых вручную, но без
+// продажи и удаления: количество живёт на бирже и меняется там. Вместо этого —
+// на каких счетах монета лежит (стейкинг, торговый, лаунчпул).
+function openExchangeCoinDetail(exId,coin){
+  const cache=getExchangeCache()[exId];
+  const r=(cache?.coins||[]).find(c=>c.coin===coin);
+  if(!r)return;
+  const rate=getCryptoRate(),sym=getCurrSym();
+  const price=Number(r.price)||(r.qty>0?(Number(r.usd)||0)/r.qty:0);
+  const usd=Number(r.usd)||0;
+  const ch=Number(r.change24h);
+  const hasCh=r.change24h!==null&&r.change24h!==undefined&&Number.isFinite(ch);
+  const total=Number(cache.totalUsd)||0;
+  const share=total>0&&!r.noPrice?usd/total*100:0;
+  const exName=EXCHANGES[exId]?.name||exId;
+  const stat=(v,l,col)=>'<div class="stock-detail-stat"><div class="stock-detail-stat-val"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div><div class="stock-detail-stat-lbl">'+l+'</div></div>';
+  document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--purple2)">'+escHtml(coin)+'</span> · '+escHtml(exName);
+  let html='<div class="stock-detail-grid">'+
+    stat(r.noPrice||!(price>0)?exTxt('noPrice'):'$'+(price>=1?fmtD(price,2):price.toLocaleString(appLocale(),{maximumSignificantDigits:4})),cryptoDetailTxt('price'),'var(--purple2)')+
+    stat(escHtml(exFmtQty(r.qty)),cryptoDetailTxt('qty'))+
+    stat(r.noPrice?'—':fmtN(toDisplayCurr(usd*rate))+' '+sym,cryptoDetailTxt('value'),'var(--green2)')+
+    stat(r.noPrice?'—':'$'+(Math.abs(usd)<10?fmtD(usd,2):fmtN(Math.round(usd))),exTxt('valueUsd'))+
+    stat(hasCh?(ch>=0?'+':'')+ch.toFixed(2)+'%':'—',cryptoDetailTxt('change24'),hasCh?(ch>=0?'var(--green2)':'var(--red)'):'')+
+    stat(share?share.toFixed(1)+'%':'—',exTxt('share')+' '+escHtml(exName))+
+  '</div>';
+  const where=Object.entries(r.where||{}).filter(([,q])=>q);
+  if(where.length){
+    html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:14px 0 6px">'+exTxt('whereHeld')+'</div>';
+    html+=where.sort((a,b)=>b[1]-a[1]).map(([type,q])=>{
+      const label=exTxt('acc_'+type);
+      const part=r.qty?q/r.qty*100:0;
+      return '<div class="stock-detail-trade"><div>'+
+        '<div style="font-family:DM Mono,monospace;font-size:11px;font-weight:600">'+escHtml(label.startsWith('acc_')?type:label)+'</div>'+
+        '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+escHtml(exFmtQty(q))+' '+escHtml(coin)+(price>0?' · $'+fmtN(Math.round(q*price)):'')+'</div>'+
+        '</div><div style="font-family:DM Mono,monospace;font-size:11px;color:var(--muted2)">'+part.toFixed(0)+'%</div></div>';
+    }).join('');
+  }
+  html+='<div class="ex-hint" style="margin-top:14px">'+escHtml(exTxt('readonlyNote').replace('{ex}',exName))+'</div>'+
+    '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">'+exTxt('close')+'</button>';
+  document.getElementById('stockDetailContent').innerHTML=html;
+  document.getElementById('stockDetailOverlay').classList.add('open');
 }
 function toggleExchangeForm(open){exchangeUi.formOpen=!!open;renderExchanges();}
 
@@ -6482,10 +6534,10 @@ function renderExchanges(){
     if(list.length){
       const big=list.filter(r=>!r.noPrice&&Math.abs(Number(r.usd)||0)>=EXCHANGE_DUST_USD);
       const dust=list.filter(r=>r.noPrice||Math.abs(Number(r.usd)||0)<EXCHANGE_DUST_USD);
-      html+='<div class="ticker-cards">'+big.map(r=>exCoinCard(r,rate,sym)).join('');
+      html+='<div class="ticker-cards">'+big.map(r=>exCoinCard(r,rate,sym,id)).join('');
       if(dust.length){
         if(exchangeUi.dustOpen[id]){
-          html+=dust.map(r=>exCoinCard(r,rate,sym)).join('');
+          html+=dust.map(r=>exCoinCard(r,rate,sym,id)).join('');
         }
         const dustUsd=dust.reduce((sum,r)=>sum+(r.noPrice?0:(Number(r.usd)||0)),0);
         html+='<div class="ticker-card" style="border-top:2px dashed var(--border2);cursor:pointer" onclick="toggleExchangeDust(\''+id+'\')">'+
