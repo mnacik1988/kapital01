@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-18-exchange-no-frame';
+﻿const CACHE_NAME = 'investory-app-v0-1-19-sw-bypass-http-cache';
 const APP_SHELL = [
   './',
   './index.html',
@@ -61,7 +61,12 @@ self.addEventListener('install', event => {
     // Обязательное — строго: если хоть один файл приложения не скачался,
     // установка ПАДАЕТ. Новый воркер не активируется, прежняя рабочая версия
     // остаётся на месте. Раньше ошибка гасилась и обновление шло с дырявым кэшем.
-    await cache.addAll(APP_SHELL);
+    // cache:'reload' — мимо HTTP-кэша браузера. GitHub Pages отдаёт файлы с
+    // max-age=600, и без этого новый воркер получал от браузера 10-минутную
+    // копию СТАРОГО index.html и складывал её в новый кэш — страница застревала
+    // на прошлой версии до следующего выпуска. Поймано 28.09: v0.1.18 выложена,
+    // у Александра после десяти перезапусков — v0.1.17.
+    await cache.addAll(APP_SHELL.map(url => new Request(url, { cache: 'reload' })));
     // Необязательное — по возможности, поштучно, ошибки не мешают установке.
     await Promise.all(OPTIONAL_ASSETS.map(url => cache.add(url).catch(() => null)));
     // skipWaiting только после успешной установки.
