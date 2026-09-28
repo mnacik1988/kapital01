@@ -1309,7 +1309,8 @@ body.modern-mockup .card-value{
 }
 .usdt-balance-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;}
 /* Подключённые биржи в разделе крипты */
-.ex-block{margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;}
+/* Без своей рамки и заголовка: вложенное окно съедало ширину у карточки биржи. */
+.ex-block{margin-top:14px;}
 .ex-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;}
 .ex-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
 .ex-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
@@ -2916,7 +2917,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.17';
+const APP_VERSION = 'v0.1.18';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6458,7 +6459,7 @@ function renderExchanges(){
   const creds=getExchangeCreds(),cache=getExchangeCache();
   const rate=getCryptoRate(),sym=getCurrSym();
   const ids=Object.keys(creds).filter(id=>EXCHANGES[id]);
-  let html='<div class="ex-block"><div class="ex-title">🔗 '+exTxt('title')+'</div>';
+  let html='<div class="ex-block">';
   ids.forEach(id=>{
     const c=cache[id]||{};
     const busy=!!exchangeUi.busy[id];
@@ -6503,14 +6504,14 @@ function renderExchanges(){
   });
   const free=Object.keys(EXCHANGES).filter(id=>!creds[id]);
   if(exchangeUi.formOpen&&free.length){
-    html+='<div class="field-group"><div class="field-label">'+exTxt('exchange')+'</div>'+
+    html+='<div class="ex-card"><div class="field-group"><div class="field-label">'+exTxt('exchange')+'</div>'+
       '<select class="field-input" id="exSelect">'+free.map(id=>'<option value="'+id+'">'+escHtml(EXCHANGES[id].name)+'</option>').join('')+'</select></div>'+
       '<div class="field-group"><div class="field-label">API Key</div><input class="field-input" id="exKey" autocomplete="off" autocapitalize="off" spellcheck="false"></div>'+
       '<div class="field-group"><div class="field-label">API Secret</div><input class="field-input" id="exSecret" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div>'+
       '<div class="ex-hint">'+escHtml(exTxt('hint'))+'</div>'+
       '<div id="exFormMsg" class="ex-sub"></div>'+
       '<div class="ex-actions"><button class="ex-btn" id="exSaveBtn" onclick="connectExchange()">'+exTxt('save')+'</button>'+
-      '<button class="ex-btn" onclick="toggleExchangeForm(false)">'+exTxt('cancel')+'</button></div>';
+      '<button class="ex-btn" onclick="toggleExchangeForm(false)">'+exTxt('cancel')+'</button></div></div>';
   }else if(free.length){
     html+='<button class="add-btn" style="margin:0" onclick="toggleExchangeForm(true)">'+exTxt('connect')+'</button>';
   }
