@@ -2916,7 +2916,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.15';
+const APP_VERSION = 'v0.1.16';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6185,7 +6185,14 @@ function exTxt(k){
     checking:{uk:'Перевіряю ключ…',ru:'Проверяю ключ…',en:'Checking the key…',de:'Schlüssel wird geprüft…',zh:'正在验证密钥…'},
     loading:{uk:'Оновлюю…',ru:'Обновляю…',en:'Updating…',de:'Aktualisiere…',zh:'正在更新…'},
     empty:{uk:'На рахунку немає монет',ru:'На счёте нет монет',en:'No coins on the account',de:'Keine Coins auf dem Konto',zh:'账户中没有币'},
-    partial:{uk:'частина рахунків недоступна для цього ключа',ru:'часть счетов недоступна для этого ключа',en:'some accounts are not available for this key',de:'einige Konten sind für diesen Schlüssel nicht verfügbar',zh:'部分账户对该密钥不可用'},
+    partial:{uk:'видно лише торговий і фінансовий рахунки — Earn і Launchpool недоступні для цього ключа',ru:'видны только торговый и финансовый счета — Earn и Launchpool недоступны для этого ключа',en:'only trading and funding accounts are visible — Earn and Launchpool are not available for this key',de:'nur Handels- und Finanzkonto sichtbar — Earn und Launchpool für diesen Schlüssel nicht verfügbar',zh:'仅可见交易和资金账户——该密钥无法读取 Earn 和 Launchpool'},
+    acc_FundingAccount:{uk:'Фінансовий',ru:'Финансовый',en:'Funding',de:'Finanzkonto',zh:'资金'},
+    acc_UnifiedTradingAccount:{uk:'Торговий',ru:'Торговый',en:'Trading',de:'Handel',zh:'交易'},
+    acc_Earn:{uk:'Earn',ru:'Earn',en:'Earn',de:'Earn',zh:'理财'},
+    acc_Launchpool:{uk:'Launchpool',ru:'Launchpool',en:'Launchpool',de:'Launchpool',zh:'Launchpool'},
+    acc_TradingBot:{uk:'Боти',ru:'Боты',en:'Bots',de:'Bots',zh:'机器人'},
+    acc_CopyTrading:{uk:'Копітрейдинг',ru:'Копитрейдинг',en:'Copy trading',de:'Copy-Trading',zh:'跟单'},
+    acc_CryptoLoans:{uk:'Крипто-позики',ru:'Крипто-займы',en:'Crypto loans',de:'Krypto-Kredite',zh:'加密借贷'},
     noPrice:{uk:'ціна невідома',ru:'цена неизвестна',en:'price unknown',de:'Preis unbekannt',zh:'价格未知'},
     fillBoth:{uk:'Заповніть обидва поля',ru:'Заполните оба поля',en:'Fill in both fields',de:'Beide Felder ausfüllen',zh:'请填写两个字段'},
     errKey:{uk:'Невірний API Key або ключ вимкнено',ru:'Неверный API Key или ключ отключён',en:'Invalid API Key, or the key was disabled',de:'Ungültiger API Key oder Schlüssel deaktiviert',zh:'API Key 无效或已停用'},
@@ -6222,7 +6229,7 @@ const EXCHANGES={
       const ts=String(Math.round(Date.now()+offset));
       const recv='10000';
       const sign=await hmacSha256Hex(cred.secret,ts+cred.key+recv+query);
-      const r=await fetch('https://api.bybit.com'+path+'?'+query,{headers:{
+      const r=await fetch('https://api.bybit.com'+path+(query?'?'+query:''),{headers:{
         'X-BAPI-API-KEY':cred.key,'X-BAPI-TIMESTAMP':ts,'X-BAPI-RECV-WINDOW':recv,'X-BAPI-SIGN':sign}});
       let j;
       try{j=await r.json();}catch{throw ExchangeError('http'+r.status,'HTTP '+r.status);}
@@ -6235,11 +6242,55 @@ const EXCHANGES={
       if(j.retCode!==0)throw ExchangeError(j.retCode,j.retMsg);
       return j;
     },
+    async priceUsd(coin){
+      if(EXCHANGE_STABLES.has(coin))return 1;
+      try{
+        const t=await this.publicGet('/v5/market/tickers','category=spot&symbol='+encodeURIComponent(coin+'USDT'));
+        return Number(t?.result?.list?.[0]?.lastPrice)||0;
+      }catch{return 0;}
+    },
+    // Сводка по ВСЕМ счетам одним запросом: торговый, финансовый, Earn (стейкинг),
+    // Launchpool, боты, копитрейдинг. Итог в долларах биржа считает сама.
+    // Не работает для региональных аккаунтов (Bybit EU, KZ, GE) — там запасной путь.
+    async fromOverview(ov){
+      const byCoin={},accounts=[];
+      for(const acc of (ov?.list||[])){
+        const usd=Number(acc.totalEquity)||0;
+        const rows=[...(acc.coinDetail||[]),...(acc.categories||[]).flatMap(c=>c.coinDetail||[])];
+        for(const c of rows){
+          const k=String(c.coin||'').toUpperCase();
+          const q=Number(c.equity)||0;
+          if(k&&q)byCoin[k]=(byCoin[k]||0)+q;
+        }
+        if(Math.abs(usd)>=0.01)accounts.push({type:String(acc.accountType||''),usd});
+      }
+      const coinsList=await Promise.all(Object.entries(byCoin).map(async([coin,qty])=>{
+        const price=await this.priceUsd(coin);
+        return {coin,qty,usd:qty*price,noPrice:!(price>0)};
+      }));
+      coinsList.sort((a,b)=>b.usd-a.usd);
+      const total=Number(ov?.totalEquity);
+      return {
+        coins:coinsList,
+        accounts:accounts.sort((a,b)=>b.usd-a.usd),
+        totalUsd:Number.isFinite(total)?total:coinsList.reduce((s,r)=>s+r.usd,0),
+        partial:false
+      };
+    },
     async fetchBalances(cred){
       // Часы телефона могут отставать или спешить — а Bybit отвергает подпись, если
       // метка времени ушла вперёд больше чем на секунду. Берём время у биржи.
       let offset=0;
       try{const t=await this.publicGet('/v5/market/time');offset=Number(t.time)-Date.now();if(!Number.isFinite(offset))offset=0;}catch{}
+      try{
+        const ov=await this.signedGet(cred,'/v5/asset/asset-overview','',offset);
+        return await this.fromOverview(ov);
+      }catch(e){
+        // Неверный ключ или время — второй путь не поможет, сразу наверх.
+        if(['10003','10004','10002','33004','http401'].includes(String(e.exchangeCode)))throw e;
+      }
+      // Запасной путь: только торговый и финансовый счета. Стейкинг и лаунчпулы
+      // сюда не попадают — поэтому он запасной.
       // Два счёта: единый торговый (UNIFIED) и финансовый (FUND) — туда, например,
       // приходят монеты с P2P. Нужен хотя бы один; если ключу доступен только
       // один из них, показываем что есть и помечаем частичность.
@@ -6280,7 +6331,7 @@ const EXCHANGES={
       return {
         coins:coinsList.map(r=>({coin:r.coin,qty:r.qty,usd:r.usd,noPrice:r.unpriced>0})),
         totalUsd:coinsList.reduce((s,r)=>s+r.usd,0),
-        partial:uni.status==='rejected'||fund.status==='rejected'
+        partial:true
       };
     }
   }
@@ -6395,10 +6446,17 @@ function renderExchanges(){
       '<span class="ex-total">$'+fmtN(Math.round(Number(c.totalUsd)||0))+'<br><span style="font-size:10px;color:var(--muted2);font-weight:500">≈ '+fmtN(toDisplayCurr((Number(c.totalUsd)||0)*rate))+' '+sym+'</span></span></div>'+
       (sub?'<div class="ex-sub">'+escHtml(sub)+'</div>':'')+
       (err?'<div class="ex-sub err">'+escHtml(err)+'</div>':'');
+    const accs=(c.accounts||[]).filter(a=>Math.abs(a.usd)>=0.5);
+    if(accs.length>1){
+      html+='<div class="ex-sub" style="margin-top:6px">'+accs.map(a=>{
+        const label=exTxt('acc_'+a.type);
+        return escHtml(label.startsWith('acc_')?a.type:label)+' $'+fmtN(Math.round(a.usd));
+      }).join(' · ')+'</div>';
+    }
     const list=c.coins||[];
     if(list.length){
       html+='<div class="ex-coins">'+list.map(r=>'<div class="ex-coin"><span>'+escHtml(r.coin)+' · '+escHtml(exFmtQty(r.qty))+'</span><span>'+
-        (r.noPrice?exTxt('noPrice'):'$'+fmtN(Math.round(r.usd)))+'</span></div>').join('')+'</div>';
+        (r.noPrice?exTxt('noPrice'):(r.usd<0?'−$':'$')+fmtN(Math.round(Math.abs(r.usd))))+'</span></div>').join('')+'</div>';
     }else if(c.updatedAt&&!busy){
       html+='<div class="ex-sub">'+exTxt('empty')+'</div>';
     }
@@ -9432,7 +9490,7 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const cryptoBasis=(cryptoStats.remainingCostUsd+exchangeUsd)*cryptoRate;
   const cryptoDetailSrc=Object.fromEntries(Object.entries(cryptoStats.groups||{}).map(([k,g])=>[k,{qty:Math.max(0,Number(g.totalQty)||0),unitValue:Number(g.curPrice)||0,scale:cryptoRate}]));
   // Отдельный ключ «биржа:монета», чтобы не смешаться с введёнными вручную.
-  getExchangeHoldings().forEach(h=>{if(h.qty>0&&h.usd>0)cryptoDetailSrc[h.exchange+':'+h.coin]={qty:h.qty,unitValue:h.usd/h.qty,scale:cryptoRate};});
+  getExchangeHoldings().forEach(h=>{if(h.qty>0&&h.usd>0&&!h.noPrice)cryptoDetailSrc[h.exchange+':'+h.coin]={qty:h.qty,unitValue:h.usd/h.qty,scale:cryptoRate};});
   const cryptoDetails=makePriceDetails(cryptoDetailSrc);
   const stockStats=visibleSecuritiesSections().filter(s=>s.type==='stocks').reduce((acc,sec)=>{
     const st=getStockSectionStats(sec);

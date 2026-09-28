@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-15-bybit-readonly';
+﻿const CACHE_NAME = 'investory-app-v0-1-16-bybit-all-accounts';
 const APP_SHELL = [
   './',
   './index.html',
