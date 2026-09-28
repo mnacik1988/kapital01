@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-14-payout-whole-period';
+﻿const CACHE_NAME = 'investory-app-v0-1-15-bybit-readonly';
 const APP_SHELL = [
   './',
   './index.html',
