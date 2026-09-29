@@ -2932,7 +2932,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.26';
+const APP_VERSION = 'v0.1.27';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6773,7 +6773,42 @@ function renderExchanges(){
   }
   html+='</div>';
   el.innerHTML=html;
+  unlockCardBody(el.closest('.card-body'));
 }
+
+// Раскрытый раздел ограничен max-height:3000px — иначе не работает анимация
+// раскрытия. Развёрнутая мелочь двух бирж в него не влезла (29.09): низ
+// обрезался. Поэтому после раскрытия потолок снимается, а перед сворачиванием
+// ставится обратно ровно по текущей высоте — анимация остаётся в обе стороны.
+function unlockCardBody(body){
+  const card=body&&body.parentElement;
+  if(card&&card.classList.contains('card')&&card.classList.contains('expanded'))body.style.maxHeight='none';
+}
+function initCardHeightUnlock(){
+  document.querySelectorAll('.card.expanded > .card-body').forEach(unlockCardBody);
+  new MutationObserver(muts=>{
+    for(const m of muts){
+      const card=m.target;
+      if(!card.classList||!card.classList.contains('card'))continue;
+      const was=(' '+(m.oldValue||'')+' ').includes(' expanded ');
+      const now=card.classList.contains('expanded');
+      if(was===now)continue;
+      const body=[...card.children].find(c=>c.classList.contains('card-body'));
+      if(!body)continue;
+      if(now){
+        // По таймеру, а не по transitionend: событие не приходит, если анимация
+        // не шла (свёрнутая вкладка, отключённые анимации), и потолок остался бы.
+        setTimeout(()=>unlockCardBody(body),450);
+      }else if(body.style.maxHeight==='none'){
+        body.style.maxHeight=body.scrollHeight+'px';
+        void body.offsetHeight;
+        body.style.maxHeight='';
+      }
+    }
+  }).observe(document.body,{attributes:true,subtree:true,attributeFilter:['class'],attributeOldValue:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initCardHeightUnlock);
+else initCardHeightUnlock();
 
 function getCryptoVal(){
   const usdtUsd=val('cryptoUsdt');
