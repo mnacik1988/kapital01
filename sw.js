@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-31-exchange-logos';
+﻿const CACHE_NAME = 'investory-app-v0-1-32-coin-price-exchanges';
 const APP_SHELL = [
   './',
   './index.html',

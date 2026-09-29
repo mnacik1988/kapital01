@@ -277,17 +277,20 @@ export default {
       return json({ error: 'Too many requests' }, 429, origin, 30);
     }
 
+    // return await, а не return: иначе отказ внутри обработчика проскакивает
+    // мимо catch и Cloudflare отвечает 500 «error code: 1101» (поймано 29.09 на
+    // /crypto, когда CoinGecko начал отбивать запросы).
     try {
       if (url.pathname === '/') {
         return json({ status: 'ok', service: 'InveStory market data proxy', version: '2.0' }, 200, origin, 60);
       }
-      if (url.pathname === '/price') return handlePrice(url, env, origin);
-      if (url.pathname === '/multi') return handleMulti(url, env, origin);
-      if (url.pathname === '/rates') return handleRates(origin);
-      if (url.pathname === '/crypto') return handleCrypto(url, origin);
-      if (url.pathname === '/news') return handleNews(url, env, origin);
-      if (url.pathname === '/limit') return handleLimit(request, url, env, origin);
-      if (url.pathname === '/stats') return handleStats(request, url, env, origin);
+      if (url.pathname === '/price') return await handlePrice(url, env, origin);
+      if (url.pathname === '/multi') return await handleMulti(url, env, origin);
+      if (url.pathname === '/rates') return await handleRates(origin);
+      if (url.pathname === '/crypto') return await handleCrypto(url, origin);
+      if (url.pathname === '/news') return await handleNews(url, env, origin);
+      if (url.pathname === '/limit') return await handleLimit(request, url, env, origin);
+      if (url.pathname === '/stats') return await handleStats(request, url, env, origin);
       return json({ error: 'Not found' }, 404, origin);
     } catch (error) {
       console.error('Worker request failed', error);
