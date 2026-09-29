@@ -262,6 +262,15 @@ export default {
       return handleAI(request, origin, env);
     }
 
+    // Пересылка подписанных запросов к биржам, которые не пускают браузер напрямую
+    // (Binance). POST — ключ едет в теле, а не в заголовке, и не оседает в логах.
+    if (url.pathname === '/exrelay') {
+      if (await isRateLimited('exrelay', ip, EXRELAY_IP_PER_MIN, 60)) {
+        return json({ error: 'Too many requests' }, 429, origin, 0);
+      }
+      return handleExRelay(request, origin, env);
+    }
+
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
 
     if (await isRateLimited('data', ip, DATA_IP_PER_MIN, 60)) {
@@ -587,6 +596,59 @@ async function handleNews(url, env, origin) {
   }));
 
   return json(results, 200, origin, 1800);
+}
+
+// ── Пересылка к биржам ─────────────────────────────────────────────
+// Binance не отдаёт CORS-разрешение на свой заголовок X-MBX-APIKEY и на /sapi —
+// браузер и WebView отбивают запрос ещё до биржи (проверено 29.09.2026). Поэтому
+// запрос идёт через воркер. Секрет сюда НЕ приходит: подпись считается на
+// телефоне, воркер видит только публичный ключ и уже подписанную строку, которую
+// биржа примет лишь в окне recvWindow. Это не открытый прокси: только вход через
+// Google, только белый список адресов и методов, только чтение баланса.
+const EXRELAY_IP_PER_MIN = 30;
+const EXRELAY_ROUTES = {
+  binance: {
+    base: 'https://api.binance.com',
+    keyHeader: 'X-MBX-APIKEY',
+    paths: {
+      '/api/v3/account': 'GET',
+      '/sapi/v1/asset/wallet/balance': 'GET',
+      '/sapi/v1/asset/get-funding-asset': 'POST',
+      '/sapi/v1/simple-earn/flexible/position': 'GET',
+      '/sapi/v1/simple-earn/locked/position': 'GET',
+      '/sapi/v1/account/apiRestrictions': 'GET'
+    }
+  }
+};
+const EXRELAY_QUERY_RE = /^[A-Za-z0-9=&%._\-]{0,1500}$/;
+const EXRELAY_KEY_RE = /^[A-Za-z0-9]{16,128}$/;
+
+async function handleExRelay(request, origin, env) {
+  if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
+  const sub = await verifyAuthToken(bearerToken(request), env);
+  if (!sub) return json({ error: 'Sign-in required' }, 401, origin);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'Invalid body' }, 400, origin); }
+  const route = EXRELAY_ROUTES[String(body.ex || '')];
+  const path = String(body.path || '');
+  const method = route && Object.prototype.hasOwnProperty.call(route.paths, path) ? route.paths[path] : null;
+  const query = String(body.query || '');
+  const key = String(body.key || '');
+  if (!method || !EXRELAY_QUERY_RE.test(query) || !EXRELAY_KEY_RE.test(key)) {
+    return json({ error: 'Not allowed' }, 400, origin);
+  }
+  let resp;
+  try {
+    resp = await fetch(route.base + path + (query ? '?' + query : ''), {
+      method,
+      headers: { [route.keyHeader]: key }
+    });
+  } catch {
+    return json({ error: 'Exchange unreachable' }, 502, origin);
+  }
+  // Ответ биржи отдаём как есть вместе с кодом — разбирает его клиент.
+  const text = await resp.text();
+  return json({ status: resp.status, body: text.slice(0, 500000) }, 200, origin, 0);
 }
 
 // Один источник userId для лимитов: проверенный sub из токена. REQUIRE_AUTH

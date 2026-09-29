@@ -5,7 +5,7 @@
 <!-- Вход через Google требует своих исключений в CSP: скрипт GSI, его стили,
      запросы и iframe (кнопка и One Tap рисуются во фрейме). Без них вход
      молча не работает — браузер режет всё это без единого видимого сообщения. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://plain-bread-df6d.mnacik1988.workers.dev https://accounts.google.com/gsi/ https://api.monobank.ua https://open.er-api.com https://api.frankfurter.app https://api.coingecko.com https://api.bybit.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src https://accounts.google.com/gsi/; media-src 'self' blob:">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://plain-bread-df6d.mnacik1988.workers.dev https://accounts.google.com/gsi/ https://api.monobank.ua https://open.er-api.com https://api.frankfurter.app https://api.coingecko.com https://api.bybit.com https://api.binance.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src https://accounts.google.com/gsi/; media-src 'self' blob:">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
@@ -2932,7 +2932,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.22';
+const APP_VERSION = 'v0.1.23';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6175,12 +6175,15 @@ function getCryptoPortfolioStats(){
 // биржу НАПРЯМУЮ: Bybit разрешает CORS и для веба, и для Android-обёртки
 // (appassets.androidplatform.net), проверено 28.09.2026. Наш воркер не видит
 // ни ключа, ни подписанного запроса.
+// Binance так не умеет — не отдаёт CORS на свой заголовок ключа и на /sapi, —
+// поэтому его подписанные запросы идут через наш воркер (/exrelay). Секрет туда
+// НЕ уходит: подпись считается здесь, воркер видит только публичный ключ.
 // Каждая биржа — отдельный модуль в EXCHANGES с одной функцией fetchBalances;
 // новая добавляется без переделки остального.
 const EXCHANGE_KEYS_LS='investory_exchange_keys';
 const EXCHANGE_CACHE_LS='investory_exchange_cache';
 const EXCHANGE_STABLES=new Set(['USDT','USDC','DAI','FDUSD','TUSD','USDE','PYUSD','BUSD']);
-const exchangeUi={formOpen:false,busy:{},errors:{},dustOpen:{}};
+const exchangeUi={formOpen:false,formEx:'',busy:{},errors:{},dustOpen:{}};
 // Монеты дешевле доллара — награды с лаунчпулов и пыль. Отдельной карточкой
 // каждая только топит сетку, поэтому они собираются в одну раскрывающуюся.
 const EXCHANGE_DUST_USD=1;
@@ -6190,11 +6193,31 @@ function exTxt(k){
     title:{uk:'Біржі',ru:'Биржи',en:'Exchanges',de:'Börsen',zh:'交易所'},
     connect:{uk:'+ Підключити біржу',ru:'+ Подключить биржу',en:'+ Connect exchange',de:'+ Börse verbinden',zh:'+ 连接交易所'},
     exchange:{uk:'Біржа',ru:'Биржа',en:'Exchange',de:'Börse',zh:'交易所'},
-    hint:{uk:'Створіть на біржі ключ тільки для читання (Read-Only) — без права торгівлі й виведення. Ключ зберігається лише на цьому пристрої та не потрапляє в резервну копію. Ключ без прив’язки до IP Bybit вимикає через 3 місяці — тоді його треба перевипустити.',
-          ru:'Создайте на бирже ключ только для чтения (Read-Only) — без права торговли и вывода. Ключ хранится только на этом устройстве и не попадает в резервную копию. Ключ без привязки к IP Bybit отключает через 3 месяца — тогда его нужно перевыпустить.',
-          en:'Create a Read-Only key on the exchange — no trading or withdrawal rights. The key stays on this device only and is never included in backups. Bybit disables keys without an IP whitelist after 3 months — then issue a new one.',
-          de:'Erstellen Sie auf der Börse einen Nur-Lese-Schlüssel (Read-Only) — ohne Handels- und Auszahlungsrechte. Der Schlüssel bleibt nur auf diesem Gerät und gelangt nie in Backups. Bybit deaktiviert Schlüssel ohne IP-Bindung nach 3 Monaten.',
-          zh:'请在交易所创建只读（Read-Only）密钥，不含交易和提现权限。密钥仅保存在本设备上，不会进入备份。未绑定 IP 的 Bybit 密钥 3 个月后失效，届时需重新创建。'},
+    hint:{uk:'Створіть на біржі ключ тільки для читання (Read-Only) — без права торгівлі й виведення. Ключ зберігається лише на цьому пристрої та не потрапляє в резервну копію.',
+          ru:'Создайте на бирже ключ только для чтения (Read-Only) — без права торговли и вывода. Ключ хранится только на этом устройстве и не попадает в резервную копию.',
+          en:'Create a Read-Only key on the exchange — no trading or withdrawal rights. The key stays on this device only and is never included in backups.',
+          de:'Erstellen Sie auf der Börse einen Nur-Lese-Schlüssel (Read-Only) — ohne Handels- und Auszahlungsrechte. Der Schlüssel bleibt nur auf diesem Gerät und gelangt nie in Backups.',
+          zh:'请在交易所创建只读（Read-Only）密钥，不含交易和提现权限。密钥仅保存在本设备上，不会进入备份。'},
+    hint_bybit:{uk:'Bybit: ключ без прив’язки до IP біржа вимикає через 3 місяці — тоді його треба перевипустити.',
+          ru:'Bybit: ключ без привязки к IP биржа отключает через 3 месяца — тогда его нужно перевыпустить.',
+          en:'Bybit disables keys without an IP whitelist after 3 months — then issue a new one.',
+          de:'Bybit deaktiviert Schlüssel ohne IP-Bindung nach 3 Monaten — dann einen neuen erstellen.',
+          zh:'Bybit：未绑定 IP 的密钥 3 个月后失效，届时需重新创建。'},
+    hint_binance:{uk:'Binance: у ключі залиште лише «Enable Reading». Ключ із правом виведення не приймається. Запит до Binance йде через сервер InveStory — секрет туди не передається, лише публічний ключ.',
+          ru:'Binance: в ключе оставьте только «Enable Reading». Ключ с правом вывода не принимается. Запрос к Binance идёт через сервер InveStory — секрет туда не передаётся, только публичный ключ.',
+          en:'Binance: leave only “Enable Reading” on the key. Keys that allow withdrawals are rejected. Requests to Binance go through the InveStory server — only the public key is sent, never the secret.',
+          de:'Binance: Nur „Enable Reading“ aktiviert lassen. Schlüssel mit Auszahlungsrecht werden abgelehnt. Anfragen an Binance laufen über den InveStory-Server — nur der öffentliche Schlüssel, nie das Secret.',
+          zh:'Binance：密钥只保留“Enable Reading”。允许提现的密钥将被拒绝。发往 Binance 的请求经由 InveStory 服务器，只传公钥，从不传 Secret。'},
+    connected:{uk:'підключено',ru:'подключено',en:'connected',de:'verbunden',zh:'已连接'},
+    partial_binance:{uk:'частину активів (ф’ючерси, маржа, боти) враховано в сумі, але без розбивки по монетах',ru:'часть активов (фьючерсы, маржа, боты) учтена в сумме, но без разбивки по монетам',en:'some assets (futures, margin, bots) are in the total but not broken down by coin',de:'ein Teil (Futures, Margin, Bots) ist in der Summe, aber nicht nach Coins aufgeschlüsselt',zh:'部分资产（合约、杠杆、机器人）已计入总额，但未按币种拆分'},
+    partial_binance_miss:{uk:'не вдалося прочитати частину рахунків — сума може бути неповною',ru:'не удалось прочитать часть счетов — сумма может быть неполной',en:'some accounts could not be read — the total may be incomplete',de:'einige Konten konnten nicht gelesen werden — Summe evtl. unvollständig',zh:'部分账户读取失败——总额可能不完整'},
+    errWithdraw:{uk:'У ключа ввімкнено виведення коштів. Створіть ключ лише з «Enable Reading»',ru:'У ключа включён вывод средств. Создайте ключ только с «Enable Reading»',en:'This key allows withdrawals. Create a key with “Enable Reading” only',de:'Dieser Schlüssel erlaubt Auszahlungen. Nur mit „Enable Reading“ erstellen',zh:'该密钥允许提现。请创建仅含“Enable Reading”的密钥'},
+    errAuth:{uk:'Увійдіть через Google, щоб підключити Binance',ru:'Войдите через Google, чтобы подключить Binance',en:'Sign in with Google to connect Binance',de:'Mit Google anmelden, um Binance zu verbinden',zh:'请用 Google 登录以连接 Binance'},
+    errRegion:{uk:'Binance недоступний з цього регіону',ru:'Binance недоступен из этого региона',en:'Binance is not available from this region',de:'Binance ist aus dieser Region nicht verfügbar',zh:'该地区无法访问 Binance'},
+    acc_Spot:{uk:'Спот',ru:'Спот',en:'Spot',de:'Spot',zh:'现货'},
+    acc_Funding:{uk:'Фінансовий',ru:'Финансовый',en:'Funding',de:'Finanzkonto',zh:'资金'},
+    acc_EarnFlexible:{uk:'Earn гнучкий',ru:'Earn гибкий',en:'Earn flexible',de:'Earn flexibel',zh:'活期理财'},
+    acc_EarnLocked:{uk:'Earn фіксований',ru:'Earn фиксированный',en:'Earn locked',de:'Earn fest',zh:'定期理财'},
     save:{uk:'Підключити',ru:'Подключить',en:'Connect',de:'Verbinden',zh:'连接'},
     cancel:{uk:'Скасувати',ru:'Отмена',en:'Cancel',de:'Abbrechen',zh:'取消'},
     refresh:{uk:'⟳ Оновити',ru:'⟳ Обновить',en:'⟳ Refresh',de:'⟳ Aktualisieren',zh:'⟳ 刷新'},
@@ -6364,6 +6387,132 @@ const EXCHANGES={
         partial:true
       };
     }
+  },
+  binance:{
+    name:'Binance',
+    // Подпись: HMAC-SHA256( строка параметров ), hex, дописывается как &signature=.
+    // Сам запрос уходит через воркер — см. шапку модуля.
+    async signed(cred,path,params,offset){
+      const q=(params?params+'&':'')+'recvWindow=10000&timestamp='+Math.round(Date.now()+offset);
+      const sig=await hmacSha256Hex(cred.secret,q);
+      const r=await fetch(WORKER_URL+'/exrelay',{method:'POST',
+        headers:{'Content-Type':'application/json',...authHeaders()},
+        body:JSON.stringify({ex:'binance',path,query:q+'&signature='+sig,key:cred.key})});
+      if(r.status===401)throw ExchangeError('auth');
+      let j;
+      try{j=await r.json();}catch{throw ExchangeError('http'+r.status,'HTTP '+r.status);}
+      if(typeof j?.status!=='number')throw ExchangeError('relay',j?.error||('HTTP '+r.status));
+      if(j.status===451||j.status===403&&!/^\s*\{/.test(j.body||''))throw ExchangeError('region');
+      let b;
+      try{b=JSON.parse(j.body);}catch{throw ExchangeError('http'+j.status,'HTTP '+j.status);}
+      if(j.status!==200||(b&&typeof b.code==='number'&&b.code<0))throw ExchangeError('bn'+(b?.code??j.status),b?.msg||('HTTP '+j.status));
+      return b;
+    },
+    // Публичные цены браузеру отдаются напрямую — CORS для них открыт.
+    async publicGet(path,query){
+      const r=await fetch('https://api.binance.com'+path+(query?'?'+query:''));
+      const j=await r.json();
+      if(j&&typeof j.code==='number'&&j.code<0)throw ExchangeError('bn'+j.code,j.msg);
+      return j;
+    },
+    // Цены: один запрос по всем парам (дёшево по лимитам Binance), потом сутки
+    // только по нужным. Пакетный запрос суток падает целиком на одной
+    // несуществующей паре, поэтому пары сначала сверяются со списком цен.
+    async prices(coins){
+      const out={};
+      let all=[];
+      try{all=await this.publicGet('/api/v3/ticker/price');}catch{}
+      const px={};
+      for(const t of (Array.isArray(all)?all:[]))px[t.symbol]=Number(t.price)||0;
+      const direct=[];
+      for(const c of coins){
+        if(EXCHANGE_STABLES.has(c)){out[c]={price:1,change:0};continue;}
+        if(px[c+'USDT']>0){out[c]={price:px[c+'USDT'],change:null};direct.push(c+'USDT');continue;}
+        if(px['USDT'+c]>0){out[c]={price:1/px['USDT'+c],change:null};continue;}
+        if(px[c+'BTC']>0&&px.BTCUSDT>0){out[c]={price:px[c+'BTC']*px.BTCUSDT,change:null};continue;}
+        out[c]={price:0,change:null};
+      }
+      for(let i=0;i<direct.length;i+=100){
+        const part=direct.slice(i,i+100);
+        try{
+          const t=await this.publicGet('/api/v3/ticker/24hr','type=MINI&symbols='+encodeURIComponent(JSON.stringify(part)));
+          for(const row of (Array.isArray(t)?t:[])){
+            const coin=String(row.symbol).slice(0,-4);
+            const open=Number(row.openPrice),last=Number(row.lastPrice);
+            if(out[coin]&&open>0&&last>0){out[coin].price=last;out[coin].change=(last/open-1)*100;}
+          }
+        }catch{}
+      }
+      out._btc=px.BTCUSDT||0;
+      return out;
+    },
+    async fetchBalances(cred){
+      let offset=0;
+      try{const t=await this.publicGet('/api/v3/time');offset=Number(t.serverTime)-Date.now();if(!Number.isFinite(offset))offset=0;}catch{}
+      // Спот — обязательный: он же проверяет ключ. Остальное — по возможности.
+      const spot=await this.signed(cred,'/api/v3/account','omitZeroBalances=true',offset);
+      // Ключ с правом вывода не принимаем: приложению он не нужен, а утечка
+      // такого ключа — это уже не подсмотренный баланс, а пустой счёт.
+      try{
+        const rs=await this.signed(cred,'/sapi/v1/account/apiRestrictions','',offset);
+        if(rs&&rs.enableWithdrawals===true)throw ExchangeError('withdraw');
+      }catch(e){if(e.exchangeCode==='withdraw')throw e;}
+      const [fund,flex,locked,wallets]=await Promise.allSettled([
+        this.signed(cred,'/sapi/v1/asset/get-funding-asset','',offset),
+        this.signed(cred,'/sapi/v1/simple-earn/flexible/position','size=100',offset),
+        this.signed(cred,'/sapi/v1/simple-earn/locked/position','size=100',offset),
+        this.signed(cred,'/sapi/v1/asset/wallet/balance','',offset)
+      ]);
+      const byCoin={},where={};
+      const add=(coin,qty,type)=>{
+        const k=String(coin||'').toUpperCase();
+        if(!k||!(qty>0))return;
+        byCoin[k]=(byCoin[k]||0)+qty;
+        const w=where[k]||(where[k]={});
+        w[type]=(w[type]||0)+qty;
+      };
+      const flexRows=flex.status==='fulfilled'?(flex.value?.rows||[]):[];
+      const flexSet=new Set(flexRows.map(r=>String(r.asset||'').toUpperCase()));
+      for(const b of (spot?.balances||[])){
+        const a=String(b.asset||'').toUpperCase();
+        // Гибкий Earn Binance показывает и в споте токеном LD<монета> — если он
+        // уже есть в списке гибкого Earn, второй раз не считаем.
+        if(a.startsWith('LD')&&flexSet.has(a.slice(2)))continue;
+        add(a,(Number(b.free)||0)+(Number(b.locked)||0),'Spot');
+      }
+      if(fund.status==='fulfilled')for(const b of (Array.isArray(fund.value)?fund.value:[]))
+        add(b.asset,(Number(b.free)||0)+(Number(b.locked)||0)+(Number(b.freeze)||0)+(Number(b.withdrawing)||0),'Funding');
+      for(const r of flexRows)add(r.asset,Number(r.totalAmount)||0,'EarnFlexible');
+      if(locked.status==='fulfilled')for(const r of (locked.value?.rows||[]))add(r.asset,Number(r.amount)||0,'EarnLocked');
+
+      const px=await this.prices(Object.keys(byCoin));
+      const coinsList=Object.entries(byCoin).map(([coin,qty])=>{
+        const p=px[coin]||{price:0,change:null};
+        return {coin,qty,usd:qty*p.price,price:p.price,change24h:p.change,noPrice:!(p.price>0),where:where[coin]||{}};
+      }).sort((a,b)=>b.usd-a.usd);
+      const coinSum=coinsList.reduce((s,r)=>s+r.usd,0);
+
+      // Разбивка по кошелькам — от самой биржи, в BTC; переводим по цене BTC.
+      // Туда попадают и фьючерсы, маржа, боты, которых нет в списке монет, —
+      // поэтому общий итог берём из неё, если она пришла.
+      let accounts=[],walletSum=0;
+      if(wallets.status==='fulfilled'&&px._btc>0){
+        for(const w of (Array.isArray(wallets.value)?wallets.value:[])){
+          const usd=(Number(w.balance)||0)*px._btc;
+          if(Math.abs(usd)>=0.01)accounts.push({type:String(w.walletName||''),usd});
+          walletSum+=usd;
+        }
+      }
+      const missed=[fund,flex,locked].some(x=>x.status==='rejected');
+      const extra=walletSum>coinSum*1.02+1;
+      return {
+        coins:coinsList,
+        accounts:accounts.sort((a,b)=>b.usd-a.usd),
+        totalUsd:walletSum>0?Math.max(walletSum,coinSum):coinSum,
+        partial:missed||extra,
+        partialKey:missed?'partial_binance_miss':'partial_binance'
+      };
+    }
   }
 };
 
@@ -6375,6 +6524,12 @@ function exErrorText(e){
   if(c==='10002')return exTxt('errTime');
   if(c==='10005')return exTxt('errPerm');
   if(c==='10010')return exTxt('errIp');
+  if(c==='bn-2014'||c==='bn-2015'||c==='bn-2008')return exTxt('errKey');
+  if(c==='bn-1022')return exTxt('errSign');
+  if(c==='bn-1021')return exTxt('errTime');
+  if(c==='withdraw')return exTxt('errWithdraw');
+  if(c==='auth')return exTxt('errAuth');
+  if(c==='region')return exTxt('errRegion');
   if(!c||e instanceof TypeError)return exTxt('errNet');
   return exTxt('errOther')+' '+String(e?.message||c).slice(0,80);
 }
@@ -6529,6 +6684,11 @@ function exUsdtCard(r,rate,sym,exId){
     '</div><div class="usdt-balance-rate">1 USDT = '+escHtml(fmtMax2(rate))+' ₴</div></div></div>';
 }
 function toggleExchangeForm(open){exchangeUi.formOpen=!!open;renderExchanges();}
+function exHintHtml(id){
+  const extra=exTxt('hint_'+id);
+  return escHtml(exTxt('hint'))+(extra.startsWith('hint_')?'':'<br><br>'+escHtml(extra));
+}
+function renderExchangeHint(){const el=$('exHint');if(el)el.innerHTML=exHintHtml($('exSelect')?.value||'');}
 
 function renderExchanges(){
   const el=$('exchangeBlock');
@@ -6543,7 +6703,7 @@ function renderExchanges(){
     const err=exchangeUi.errors[id];
     const time=c.updatedAt?new Date(c.updatedAt).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'}):'';
     let sub=busy?exTxt('loading'):(time?exTxt('updated')+' '+time:'');
-    if(!busy&&c.partial)sub+=(sub?' · ':'')+exTxt('partial');
+    if(!busy&&c.partial)sub+=(sub?' · ':'')+exTxt(c.partialKey||'partial');
     html+='<div class="ex-card"><div class="ex-head"><span class="ex-name">'+escHtml(EXCHANGES[id].name)+'</span>'+
       '<span class="ex-total">$'+fmtN(Math.round(Number(c.totalUsd)||0))+'<br><span style="font-size:10px;color:var(--muted2);font-weight:500">≈ '+fmtN(toDisplayCurr((Number(c.totalUsd)||0)*rate))+' '+sym+'</span></span></div>'+
       (sub?'<div class="ex-sub">'+escHtml(sub)+'</div>':'')+
@@ -6585,13 +6745,16 @@ function renderExchanges(){
     html+='<div class="ex-actions"><button class="ex-btn" '+(busy?'disabled':'')+' onclick="refreshExchange(\''+id+'\')">'+exTxt('refresh')+'</button>'+
       '<button class="ex-btn danger" onclick="disconnectExchange(\''+id+'\')">'+exTxt('disconnect')+'</button></div></div>';
   });
+  // Список бирж строится из EXCHANGES: новая биржа появляется здесь сама,
+  // как только у неё есть модуль. Уже подключённые видны, но выбрать их нельзя.
   const free=Object.keys(EXCHANGES).filter(id=>!creds[id]);
   if(exchangeUi.formOpen&&free.length){
+    const sel=free.includes(exchangeUi.formEx)?exchangeUi.formEx:free[0];
     html+='<div class="ex-card"><div class="field-group"><div class="field-label">'+exTxt('exchange')+'</div>'+
-      '<select class="field-input" id="exSelect">'+free.map(id=>'<option value="'+id+'">'+escHtml(EXCHANGES[id].name)+'</option>').join('')+'</select></div>'+
+      '<select class="field-input" id="exSelect" onchange="exchangeUi.formEx=this.value;renderExchangeHint()">'+Object.keys(EXCHANGES).map(id=>'<option value="'+id+'"'+(creds[id]?' disabled':'')+(id===sel?' selected':'')+'>'+escHtml(EXCHANGES[id].name)+(creds[id]?' — '+exTxt('connected'):'')+'</option>').join('')+'</select></div>'+
       '<div class="field-group"><div class="field-label">API Key</div><input class="field-input" id="exKey" autocomplete="off" autocapitalize="off" spellcheck="false"></div>'+
       '<div class="field-group"><div class="field-label">API Secret</div><input class="field-input" id="exSecret" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div>'+
-      '<div class="ex-hint">'+escHtml(exTxt('hint'))+'</div>'+
+      '<div class="ex-hint" id="exHint">'+exHintHtml(sel)+'</div>'+
       '<div id="exFormMsg" class="ex-sub"></div>'+
       '<div class="ex-actions"><button class="ex-btn" id="exSaveBtn" onclick="connectExchange()">'+exTxt('save')+'</button>'+
       '<button class="ex-btn" onclick="toggleExchangeForm(false)">'+exTxt('cancel')+'</button></div></div>';
