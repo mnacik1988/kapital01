@@ -1767,6 +1767,21 @@ body.modern-mockup.theme-light .main-counter-card{
   border-color:#e2dbcf!important;
   box-shadow:0 10px 24px rgba(74,57,34,.10)!important;
 }
+/* Плашка USDT внутри карточки биржи: фон карточки биржи совпадает с её
+   собственным, поэтому она выглядит как карточки монет рядом — светлая, с тенью. */
+body.modern-mockup .usdt-balance-card.ex-usdt{
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(26,29,42,.88),rgba(15,17,26,.92));
+  border-color:#ffffff14;
+  border-top-color:var(--purple);
+  box-shadow:0 10px 26px #00000022, inset 0 1px 0 #ffffff0a;
+}
+body.modern-mockup.theme-light .usdt-balance-card.ex-usdt{
+  background:#fffdf9!important;
+  border-color:#e2dbcf!important;
+  border-top:2px solid var(--purple)!important;
+  box-shadow:0 10px 24px rgba(74,57,34,.10)!important;
+}
 body.modern-mockup.theme-light .card.expanded{border-color:#d8cfc1!important;}
 body.modern-mockup.theme-light .live-wrap{
   background:#f3f8fc!important;
@@ -2917,7 +2932,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.21';
+const APP_VERSION = 'v0.1.22';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6507,7 +6522,7 @@ function exUsdtCard(r,rate,sym,exId){
   const qty=Number(r?.qty)||0;
   const usd=r?(Number(r.usd)||qty):0;
   const click=r?' style="cursor:pointer;margin:10px 0" onclick="openExchangeCoinDetail(\''+exId+'\',\'USDT\')"':' style="margin:10px 0"';
-  return '<div class="usdt-balance-card"'+click+'><div class="usdt-balance-top"><div class="usdt-balance-info">'+
+  return '<div class="usdt-balance-card ex-usdt"'+click+'><div class="usdt-balance-top"><div class="usdt-balance-info">'+
     '<div class="usdt-balance-title"><img class="ui-inline-icon" src="section-icons/ui-usdt.png?v=1" alt=""> <span>'+escHtml(usdtBalanceText('title'))+'</span></div>'+
     '<div class="usdt-balance-main">'+escHtml(fmtMax2(qty))+' USDT</div>'+
     '<div class="usdt-balance-equiv">'+escHtml(fmtN(toDisplayCurr(usd*rate))+' '+sym)+'</div>'+

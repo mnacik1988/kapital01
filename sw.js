@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-21-exchange-usdt-card';
+﻿const CACHE_NAME = 'investory-app-v0-1-22-exchange-usdt-contrast';
 const APP_SHELL = [
   './',
   './index.html',
