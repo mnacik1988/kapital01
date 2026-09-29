@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-28-exchange-collapse';
+﻿const CACHE_NAME = 'investory-app-v0-1-29-exchange-bold';
 const APP_SHELL = [
   './',
   './index.html',
