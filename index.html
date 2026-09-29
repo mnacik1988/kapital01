@@ -1312,18 +1312,30 @@ body.modern-mockup .card-value{
 /* Без своей рамки и заголовка: вложенное окно съедало ширину у карточки биржи. */
 .ex-block{margin-top:14px;}
 .ex-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;}
-.ex-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
+.ex-card{background:var(--bg3);border:1px solid var(--border);border-radius:18px;padding:15px 15px 14px;margin-bottom:12px;}
 .ex-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
 .ex-top{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
-.ex-chev{font-size:14px;color:var(--purple2);margin-left:7px;}
-.ex-more{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--purple2);margin-top:10px;}
-.ex-name{font:800 20px 'Manrope',sans-serif;letter-spacing:-.01em;color:var(--text);}
-.ex-total{font:800 21px 'Manrope',sans-serif;letter-spacing:-.01em;color:var(--purple2);text-align:right;white-space:nowrap;}
-.ex-total-sub{display:block;font:700 12px 'DM Mono',monospace;color:var(--muted);margin-top:2px;letter-spacing:0;}
-.ex-sub{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted2);margin-top:4px;}
-.ex-accs{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
-.ex-acc{display:inline-flex;align-items:baseline;gap:5px;padding:4px 9px;border-radius:9px;background:var(--bg2);border:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
-.ex-acc b{font-weight:800;color:var(--text);font-size:12px;}
+.ex-chev{width:13px;height:13px;color:var(--muted2);transition:transform .25s ease;flex:0 0 13px;}
+.ex-card.collapsed .ex-name .ex-chev{transform:rotate(-90deg);}
+.ex-more{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding-top:11px;
+  border-top:1px dashed var(--border2);font:600 11px 'DM Mono',monospace;letter-spacing:.02em;color:var(--purple2);}
+.ex-more .ex-chev{color:var(--purple2);}
+.ex-id{display:flex;align-items:center;gap:11px;min-width:0;}
+.ex-logo{flex:0 0 38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font:800 12px 'Manrope',sans-serif;letter-spacing:.04em;color:var(--purple2);
+  background:linear-gradient(140deg,#a78bfa38,#a78bfa0d);border:1px solid #a78bfa45;}
+.ex-id-text{min-width:0;}
+.ex-name{display:flex;align-items:center;gap:5px;font:700 17px 'Manrope',sans-serif;letter-spacing:-.015em;color:var(--text);line-height:1.15;}
+.ex-upd{font:500 10.5px 'DM Mono',monospace;color:var(--muted2);margin-top:3px;}
+.ex-total{font:800 22px 'Manrope',sans-serif;letter-spacing:-.025em;color:var(--purple2);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.1;}
+.ex-total-sub{display:block;font:500 11px 'DM Mono',monospace;color:var(--muted2);margin-top:3px;letter-spacing:0;}
+.ex-sub{font-family:'DM Mono',monospace;font-size:10px;line-height:1.5;color:var(--muted2);margin-top:8px;}
+.ex-bar{display:flex;gap:3px;height:6px;margin-top:14px;border-radius:99px;overflow:hidden;}
+.ex-bar span{min-width:4px;border-radius:99px;}
+.ex-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:9px;}
+.ex-lg{display:inline-flex;align-items:center;gap:6px;font:500 10.5px 'DM Mono',monospace;color:var(--muted2);}
+.ex-lg i{width:7px;height:7px;border-radius:50%;flex:0 0 7px;}
+.ex-lg b{font:700 11.5px 'Manrope',sans-serif;color:var(--text);font-variant-numeric:tabular-nums;}
 .ex-sub.err{color:var(--red);}
 .ex-coins{margin-top:8px;display:flex;flex-direction:column;gap:4px;}
 .ex-coin{display:flex;justify-content:space-between;gap:8px;font-family:'DM Mono',monospace;font-size:11px;}
@@ -2939,7 +2951,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.29';
+const APP_VERSION = 'v0.1.30';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6248,7 +6260,7 @@ function exTxt(k){
     share:{uk:'Частка на',ru:'Доля на',en:'Share on',de:'Anteil auf',zh:'占比'},
     whereHeld:{uk:'Де лежить',ru:'Где лежит',en:'Where it is held',de:'Wo es liegt',zh:'存放位置'},
     readonlyNote:{uk:'Дані з {ex}. Кількість змінюється на біржі — тут її не редагують: після наступного оновлення підтягнеться нова.',ru:'Данные с {ex}. Количество меняется на бирже — здесь его не редактируют: после следующего обновления подтянется новое.',en:'Data from {ex}. The amount changes on the exchange, not here — the next refresh picks it up.',de:'Daten von {ex}. Die Menge ändert sich an der Börse, nicht hier — die nächste Aktualisierung übernimmt sie.',zh:'数据来自 {ex}。数量在交易所变动，此处不可编辑——下次刷新时自动更新。'},
-    showCoins:{uk:'▸ Показати монети ({n})',ru:'▸ Показать монеты ({n})',en:'▸ Show coins ({n})',de:'▸ Coins anzeigen ({n})',zh:'▸ 显示币种（{n}）'},
+    showCoins:{uk:'Показати монети · {n}',ru:'Показать монеты · {n}',en:'Show coins · {n}',de:'Coins anzeigen · {n}',zh:'显示币种 · {n}'},
     dustShort:{uk:'дрібних',ru:'мелких',en:'small',de:'kleine',zh:'小额'},
     dustHide:{uk:'Згорнути',ru:'Свернуть',en:'Collapse',de:'Einklappen',zh:'收起'},
     dustHint:{uk:'дешевше $1 кожна',ru:'дешевле $1 каждая',en:'under $1 each',de:'je unter $1',zh:'每个低于 $1'},
@@ -6283,6 +6295,7 @@ function ExchangeError(code,message){const e=new Error(message||String(code));e.
 const EXCHANGES={
   bybit:{
     name:'Bybit',
+    mono:'BY',
     // Подпись V5: HMAC-SHA256( timestamp + apiKey + recvWindow + queryString ), hex.
     async signedGet(cred,path,query,offset){
       const ts=String(Math.round(Date.now()+offset));
@@ -6399,6 +6412,7 @@ const EXCHANGES={
   },
   binance:{
     name:'Binance',
+    mono:'BN',
     // Подпись: HMAC-SHA256( строка параметров ), hex, дописывается как &signature=.
     // Сам запрос уходит через воркер — см. шапку модуля.
     async signed(cred,path,params,offset){
@@ -6730,24 +6744,31 @@ function renderExchanges(){
     const busy=!!exchangeUi.busy[id];
     const err=exchangeUi.errors[id];
     const time=c.updatedAt?new Date(c.updatedAt).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'}):'';
-    let sub=busy?exTxt('loading'):(time?exTxt('updated')+' '+time:'');
-    if(!busy&&c.partial)sub+=(sub?' · ':'')+exTxt(c.partialKey||'partial');
+    const upd=busy?exTxt('loading'):(time?exTxt('updated')+' '+time:'');
     const collapsed=isExchangeCollapsed(id);
-    html+='<div class="ex-card"><div class="ex-top" onclick="toggleExchangeCollapse(\''+id+'\')">'+
-      '<div class="ex-head"><span class="ex-name">'+escHtml(EXCHANGES[id].name)+'<span class="ex-chev">'+(collapsed?'▸':'▾')+'</span></span>'+
-      '<span class="ex-total">$'+fmtN(Math.round(Number(c.totalUsd)||0))+'<span class="ex-total-sub">≈ '+fmtN(toDisplayCurr((Number(c.totalUsd)||0)*rate))+' '+sym+'</span></span></div>'+
-      (sub?'<div class="ex-sub">'+escHtml(sub)+'</div>':'')+
+    const totalUsd=Number(c.totalUsd)||0;
+    const chev='<svg class="ex-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    html+='<div class="ex-card'+(collapsed?' collapsed':'')+'"><div class="ex-top" onclick="toggleExchangeCollapse(\''+id+'\')">'+
+      '<div class="ex-head">'+
+        '<div class="ex-id"><div class="ex-logo">'+escHtml(EXCHANGES[id].mono||EXCHANGES[id].name.slice(0,2))+'</div>'+
+          '<div class="ex-id-text"><div class="ex-name">'+escHtml(EXCHANGES[id].name)+chev+'</div>'+
+          (upd?'<div class="ex-upd">'+escHtml(upd)+'</div>':'')+'</div></div>'+
+        '<div class="ex-total">$'+fmtN(Math.round(totalUsd))+'<span class="ex-total-sub">≈ '+fmtN(toDisplayCurr(totalUsd*rate))+' '+sym+'</span></div>'+
+      '</div>'+
+      (!busy&&c.partial?'<div class="ex-sub">'+escHtml(exTxt(c.partialKey||'partial'))+'</div>':'')+
       (err?'<div class="ex-sub err">'+escHtml(err)+'</div>':'');
-    const accs=(c.accounts||[]).filter(a=>Math.abs(a.usd)>=0.5);
-    if(accs.length>1){
-      html+='<div class="ex-accs">'+accs.map(a=>{
-        const label=exTxt('acc_'+a.type);
-        return '<span class="ex-acc">'+escHtml(label.startsWith('acc_')?a.type:label)+' <b>$'+fmtN(Math.round(a.usd))+'</b></span>';
-      }).join('')+'</div>';
+    // Разбивка по счетам — полоской долей и подписью под ней, как у диаграммы.
+    const accs=(c.accounts||[]).filter(a=>a.usd>=0.5);
+    const accSum=accs.reduce((sum,a)=>sum+a.usd,0);
+    if(accs.length>1&&accSum>0){
+      const tints=['var(--purple)','var(--teal)','var(--orange)','var(--blue)','var(--green)','var(--muted2)'];
+      const accLabel=a=>{const l=exTxt('acc_'+a.type);return l.startsWith('acc_')?a.type:l;};
+      html+='<div class="ex-bar">'+accs.map((a,i)=>'<span style="flex:'+(a.usd/accSum).toFixed(4)+';background:'+tints[Math.min(i,tints.length-1)]+'"></span>').join('')+'</div>'+
+        '<div class="ex-legend">'+accs.map((a,i)=>'<span class="ex-lg"><i style="background:'+tints[Math.min(i,tints.length-1)]+'"></i>'+escHtml(accLabel(a))+'<b>$'+fmtN(Math.round(a.usd))+'</b></span>').join('')+'</div>';
     }
     // Свёрнутая биржа — только итог и разбивка по счетам, без ленты монет.
     if(collapsed){
-      html+='<div class="ex-more">'+escHtml(exTxt('showCoins').replace('{n}',String((c.coins||[]).length)))+'</div></div></div>';
+      html+='<div class="ex-more">'+escHtml(exTxt('showCoins').replace('{n}',String((c.coins||[]).length)))+chev+'</div></div></div>';
       return;
     }
     html+='</div>';
