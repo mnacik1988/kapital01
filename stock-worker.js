@@ -621,7 +621,9 @@ const EXRELAY_ROUTES = {
   }
 };
 const EXRELAY_QUERY_RE = /^[A-Za-z0-9=&%._\-]{0,1500}$/;
-const EXRELAY_KEY_RE = /^[A-Za-z0-9]{16,128}$/;
+// Любые видимые ASCII-символы: 29.09 живой ключ Binance длиной 64 не прошёл
+// через «только буквы и цифры».
+const EXRELAY_KEY_RE = /^[\x21-\x7E]{16,256}$/;
 
 async function handleExRelay(request, origin, env) {
   if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
@@ -638,7 +640,12 @@ async function handleExRelay(request, origin, env) {
   // гадать, что именно не так. Сам ключ не возвращаем — только его длину.
   if (!method) return json({ error: 'Not allowed: path' }, 400, origin);
   if (!EXRELAY_QUERY_RE.test(query)) return json({ error: 'Not allowed: query (' + query.length + ')' }, 400, origin);
-  if (!EXRELAY_KEY_RE.test(key)) return json({ error: 'Not allowed: key (' + key.length + ')' }, 400, origin);
+  if (!EXRELAY_KEY_RE.test(key)) {
+    // Коды НЕпечатных/чужих символов — без позиций: по ним видно, что попало
+    // в ключ (кириллица, пробел, символ форматирования), но ключ не восстановить.
+    const odd = [...new Set([...key].filter(ch => !/[\x21-\x7E]/.test(ch)).map(ch => 'U+' + ch.codePointAt(0).toString(16).toUpperCase()))];
+    return json({ error: 'Not allowed: key (' + key.length + (odd.length ? ', ' + odd.slice(0, 5).join(' ') : '') + ')' }, 400, origin);
+  }
   let resp;
   try {
     resp = await fetch(route.base + path + (query ? '?' + query : ''), {
