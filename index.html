@@ -2932,7 +2932,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.25';
+const APP_VERSION = 'v0.1.26';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6211,6 +6211,7 @@ function exTxt(k){
     connected:{uk:'підключено',ru:'подключено',en:'connected',de:'verbunden',zh:'已连接'},
     partial_binance:{uk:'частину активів (ф’ючерси, маржа, боти) враховано в сумі, але без розбивки по монетах',ru:'часть активов (фьючерсы, маржа, боты) учтена в сумме, но без разбивки по монетам',en:'some assets (futures, margin, bots) are in the total but not broken down by coin',de:'ein Teil (Futures, Margin, Bots) ist in der Summe, aber nicht nach Coins aufgeschlüsselt',zh:'部分资产（合约、杠杆、机器人）已计入总额，但未按币种拆分'},
     partial_binance_miss:{uk:'не вдалося прочитати частину рахунків — сума може бути неповною',ru:'не удалось прочитать часть счетов — сумма может быть неполной',en:'some accounts could not be read — the total may be incomplete',de:'einige Konten konnten nicht gelesen werden — Summe evtl. unvollständig',zh:'部分账户读取失败——总额可能不完整'},
+    errChars:{uk:'У ключах Binance бувають лише латинські літери й цифри, а тут є зайві знаки — скопіюйте ключ заново.',ru:'В ключах Binance бывают только латинские буквы и цифры, а здесь есть лишние знаки — скопируйте ключ заново.',en:'Binance keys contain only Latin letters and digits, but extra characters were found — copy the key again.',de:'Binance-Schlüssel enthalten nur lateinische Buchstaben und Ziffern, hier sind zusätzliche Zeichen — Schlüssel neu kopieren.',zh:'Binance 密钥只含拉丁字母和数字，这里有多余字符——请重新复制密钥。'},
     errWithdraw:{uk:'У ключа ввімкнено виведення коштів. Створіть ключ лише з «Enable Reading»',ru:'У ключа включён вывод средств. Создайте ключ только с «Enable Reading»',en:'This key allows withdrawals. Create a key with “Enable Reading” only',de:'Dieser Schlüssel erlaubt Auszahlungen. Nur mit „Enable Reading“ erstellen',zh:'该密钥允许提现。请创建仅含“Enable Reading”的密钥'},
     errAuth:{uk:'Увійдіть через Google, щоб підключити Binance',ru:'Войдите через Google, чтобы подключить Binance',en:'Sign in with Google to connect Binance',de:'Mit Google anmelden, um Binance zu verbinden',zh:'请用 Google 登录以连接 Binance'},
     errRegion:{uk:'Binance недоступний з цього регіону',ru:'Binance недоступен из этого региона',en:'Binance is not available from this region',de:'Binance ist aus dieser Region nicht verfügbar',zh:'该地区无法访问 Binance'},
@@ -6524,7 +6525,7 @@ function exErrorText(e){
   if(c==='10002')return exTxt('errTime');
   if(c==='10005')return exTxt('errPerm');
   if(c==='10010')return exTxt('errIp');
-  if(c==='bn-2014'||c==='bn-2015'||c==='bn-2008')return exTxt('errKey');
+  if(c==='bn-2014'||c==='bn-2015'||c==='bn-2008')return exTxt('errKey')+' (Binance '+c.slice(2)+': '+String(e?.message||'').slice(0,80)+')';
   if(c==='bn-1022')return exTxt('errSign');
   if(c==='bn-1021')return exTxt('errTime');
   if(c==='withdraw')return exTxt('errWithdraw');
@@ -6577,7 +6578,13 @@ async function connectExchange(){
   const key=clean($('exKey')?.value);
   const secret=clean($('exSecret')?.value);
   const msg=$('exFormMsg');
+  exchangeUi.keyOdd='';
   if(!key||!secret){if(msg){msg.textContent=exTxt('fillBoth');msg.className='ex-sub err';}return;}
+  if(id==='binance'){
+    const odd=(f,v)=>{const x=[...new Set(v.replace(/[A-Za-z0-9]/g,''))];return x.length?f+': '+x.map(ch=>'«'+ch+'»').join(' '):'';};
+    const bad=[odd('API Key',key),odd('API Secret',secret)].filter(Boolean);
+    if(bad.length)exchangeUi.keyOdd=exTxt('errChars')+' '+bad.join(' · ');
+  }
   const btn=$('exSaveBtn');
   if(btn)btn.disabled=true;
   if(msg){msg.textContent=exTxt('checking');msg.className='ex-sub';}
@@ -6596,7 +6603,7 @@ async function connectExchange(){
     renderExchanges();
     updateAll();
   }catch(e){
-    if(msg){msg.textContent=exErrorText(e);msg.className='ex-sub err';}
+    if(msg){msg.textContent=exErrorText(e)+(exchangeUi.keyOdd?' '+exchangeUi.keyOdd:'');msg.className='ex-sub err';}
     if(btn)btn.disabled=false;
   }
 }

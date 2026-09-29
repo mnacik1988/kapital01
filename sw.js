@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-25-fix-syntax';
+﻿const CACHE_NAME = 'investory-app-v0-1-26-binance-key-diag';
 const APP_SHELL = [
   './',
   './index.html',
