@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-27-card-height';
+﻿const CACHE_NAME = 'investory-app-v0-1-28-exchange-collapse';
 const APP_SHELL = [
   './',
   './index.html',

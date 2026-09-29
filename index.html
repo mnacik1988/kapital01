@@ -1314,6 +1314,9 @@ body.modern-mockup .card-value{
 .ex-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;}
 .ex-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
 .ex-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.ex-top{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
+.ex-chev{font-size:12px;color:var(--muted2);margin-left:6px;}
+.ex-more{font-family:'DM Mono',monospace;font-size:10px;color:var(--purple2);margin-top:8px;}
 .ex-name{font-weight:800;font-size:15px;}
 .ex-total{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--purple2);text-align:right;}
 .ex-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:3px;}
@@ -2932,7 +2935,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.27';
+const APP_VERSION = 'v0.1.28';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6241,6 +6244,7 @@ function exTxt(k){
     share:{uk:'Частка на',ru:'Доля на',en:'Share on',de:'Anteil auf',zh:'占比'},
     whereHeld:{uk:'Де лежить',ru:'Где лежит',en:'Where it is held',de:'Wo es liegt',zh:'存放位置'},
     readonlyNote:{uk:'Дані з {ex}. Кількість змінюється на біржі — тут її не редагують: після наступного оновлення підтягнеться нова.',ru:'Данные с {ex}. Количество меняется на бирже — здесь его не редактируют: после следующего обновления подтянется новое.',en:'Data from {ex}. The amount changes on the exchange, not here — the next refresh picks it up.',de:'Daten von {ex}. Die Menge ändert sich an der Börse, nicht hier — die nächste Aktualisierung übernimmt sie.',zh:'数据来自 {ex}。数量在交易所变动，此处不可编辑——下次刷新时自动更新。'},
+    showCoins:{uk:'▸ Показати монети ({n})',ru:'▸ Показать монеты ({n})',en:'▸ Show coins ({n})',de:'▸ Coins anzeigen ({n})',zh:'▸ 显示币种（{n}）'},
     dustShort:{uk:'дрібних',ru:'мелких',en:'small',de:'kleine',zh:'小额'},
     dustHide:{uk:'Згорнути',ru:'Свернуть',en:'Collapse',de:'Einklappen',zh:'收起'},
     dustHint:{uk:'дешевше $1 кожна',ru:'дешевле $1 каждая',en:'under $1 each',de:'je unter $1',zh:'每个低于 $1'},
@@ -6621,6 +6625,16 @@ function exFmtQty(q){
   const n=Number(q)||0;
   return n.toLocaleString(appLocale(),{maximumFractionDigits:n>=1000?2:n>=1?4:8});
 }
+// Какие биржи свёрнуты — удобство одного устройства, в бэкап не идёт.
+const EXCHANGE_UI_LS='investory_exchange_ui';
+function isExchangeCollapsed(id){return !!exReadJson(EXCHANGE_UI_LS).collapsed?.[id];}
+function toggleExchangeCollapse(id){
+  const ui=exReadJson(EXCHANGE_UI_LS);
+  ui.collapsed=ui.collapsed||{};
+  if(ui.collapsed[id])delete ui.collapsed[id]; else ui.collapsed[id]=true;
+  exWriteJson(EXCHANGE_UI_LS,ui);
+  renderExchanges();
+}
 function toggleExchangeDust(id){exchangeUi.dustOpen[id]=!exchangeUi.dustOpen[id];renderExchanges();}
 // Карточка монеты с биржи — в том же виде, что и введённые вручную: символ,
 // количество, цена со сдвигом за сутки, стоимость. Прибыли нет — биржа не
@@ -6714,7 +6728,9 @@ function renderExchanges(){
     const time=c.updatedAt?new Date(c.updatedAt).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'}):'';
     let sub=busy?exTxt('loading'):(time?exTxt('updated')+' '+time:'');
     if(!busy&&c.partial)sub+=(sub?' · ':'')+exTxt(c.partialKey||'partial');
-    html+='<div class="ex-card"><div class="ex-head"><span class="ex-name">'+escHtml(EXCHANGES[id].name)+'</span>'+
+    const collapsed=isExchangeCollapsed(id);
+    html+='<div class="ex-card"><div class="ex-top" onclick="toggleExchangeCollapse(\''+id+'\')">'+
+      '<div class="ex-head"><span class="ex-name">'+escHtml(EXCHANGES[id].name)+'<span class="ex-chev">'+(collapsed?'▸':'▾')+'</span></span>'+
       '<span class="ex-total">$'+fmtN(Math.round(Number(c.totalUsd)||0))+'<br><span style="font-size:10px;color:var(--muted2);font-weight:500">≈ '+fmtN(toDisplayCurr((Number(c.totalUsd)||0)*rate))+' '+sym+'</span></span></div>'+
       (sub?'<div class="ex-sub">'+escHtml(sub)+'</div>':'')+
       (err?'<div class="ex-sub err">'+escHtml(err)+'</div>':'');
@@ -6725,6 +6741,12 @@ function renderExchanges(){
         return escHtml(label.startsWith('acc_')?a.type:label)+' $'+fmtN(Math.round(a.usd));
       }).join(' · ')+'</div>';
     }
+    // Свёрнутая биржа — только итог и разбивка по счетам, без ленты монет.
+    if(collapsed){
+      html+='<div class="ex-more">'+escHtml(exTxt('showCoins').replace('{n}',String((c.coins||[]).length)))+'</div></div></div>';
+      return;
+    }
+    html+='</div>';
     // USDT биржи — отдельной плашкой сверху, как ручной «Баланс USDT», чтобы
     // было видно, сколько на бирже в стейблах. Всегда первая, даже при нуле;
     // без кнопок: количество живёт на бирже. Тап — то же окно монеты.
