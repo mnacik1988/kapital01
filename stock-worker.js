@@ -634,9 +634,11 @@ async function handleExRelay(request, origin, env) {
   const method = route && Object.prototype.hasOwnProperty.call(route.paths, path) ? route.paths[path] : null;
   const query = String(body.query || '');
   const key = String(body.key || '');
-  if (!method || !EXRELAY_QUERY_RE.test(query) || !EXRELAY_KEY_RE.test(key)) {
-    return json({ error: 'Not allowed' }, 400, origin);
-  }
+  // Причина отказа — в ответе: «Not allowed» без подробностей 29.09 оставил
+  // гадать, что именно не так. Сам ключ не возвращаем — только его длину.
+  if (!method) return json({ error: 'Not allowed: path' }, 400, origin);
+  if (!EXRELAY_QUERY_RE.test(query)) return json({ error: 'Not allowed: query (' + query.length + ')' }, 400, origin);
+  if (!EXRELAY_KEY_RE.test(key)) return json({ error: 'Not allowed: key (' + key.length + ')' }, 400, origin);
   let resp;
   try {
     resp = await fetch(route.base + path + (query ? '?' + query : ''), {
