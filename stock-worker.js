@@ -608,7 +608,10 @@ async function handleNews(url, env, origin) {
 const EXRELAY_IP_PER_MIN = 30;
 const EXRELAY_ROUTES = {
   binance: {
-    base: 'https://api.binance.com',
+    // api.binance.com (CloudFront) отдаёт 403 любому запросу с IP Cloudflare —
+    // проверено 29.09.2026 из VIE. Официальный запасной адрес api-gcp пропускает
+    // и публичные, и подписанные запросы; основной — на случай, если закроют и его.
+    bases: ['https://api-gcp.binance.com', 'https://api.binance.com'],
     keyHeader: 'X-MBX-APIKEY',
     paths: {
       '/api/v3/account': 'GET',
@@ -646,18 +649,23 @@ async function handleExRelay(request, origin, env) {
     const odd = [...new Set([...key].filter(ch => !/[\x21-\x7E]/.test(ch)).map(ch => 'U+' + ch.codePointAt(0).toString(16).toUpperCase()))];
     return json({ error: 'Not allowed: key (' + key.length + (odd.length ? ', ' + odd.slice(0, 5).join(' ') : '') + ')' }, 400, origin);
   }
-  let resp;
-  try {
-    resp = await fetch(route.base + path + (query ? '?' + query : ''), {
-      method,
-      headers: { [route.keyHeader]: key }
-    });
-  } catch {
-    return json({ error: 'Exchange unreachable' }, 502, origin);
-  }
   // Ответ биржи отдаём как есть вместе с кодом — разбирает его клиент.
-  const text = await resp.text();
-  return json({ status: resp.status, body: text.slice(0, 500000) }, 200, origin, 0);
+  // Следующий адрес пробуем, только если этот не ответил или ответил не JSON
+  // (страница блокировки), — ответы самой биржи не перезапрашиваем.
+  let last = null;
+  for (const base of route.bases) {
+    try {
+      const resp = await fetch(base + path + (query ? '?' + query : ''), {
+        method,
+        headers: { [route.keyHeader]: key }
+      });
+      const text = await resp.text();
+      last = { status: resp.status, body: text.slice(0, 500000) };
+      if (/^\s*[\[{]/.test(text)) break;
+    } catch {}
+  }
+  if (!last) return json({ error: 'Exchange unreachable' }, 502, origin);
+  return json(last, 200, origin, 0);
 }
 
 // Один источник userId для лимитов: проверенный sub из токена. REQUIRE_AUTH
