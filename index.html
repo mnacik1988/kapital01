@@ -2954,7 +2954,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.33';
+const APP_VERSION = 'v0.1.34';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -5679,7 +5679,7 @@ function getSecCardHtml(s,idx){
       const pnlCol=pnl===null?'var(--muted)':pnl>=0?'var(--green2)':'var(--red)';
       const divAnn=g.divAnnual;
       const divMonth=divAnn/12;
-      return `<div class="ticker-card" onclick="openStockDetail('${s.id}','${key.replace(/'/g,"\\'")}')">
+      return `<div class="ticker-card" onclick="openStockDetail('${s.id}','${escAttr(String(key).replace(/[^A-Za-z0-9.\-^=_:]/g,''))}')">
         <div class="ticker-card-head">
           <span class="ticker-card-sym">${escHtml(g.ticker)||'—'}</span>
           <span class="ticker-card-qty">${fmtMax2(totalQty)} шт</span>
@@ -6234,6 +6234,12 @@ function exTxt(k){
     partial_binance:{uk:'частину активів (ф’ючерси, маржа, боти) враховано в сумі, але без розбивки по монетах',ru:'часть активов (фьючерсы, маржа, боты) учтена в сумме, но без разбивки по монетам',en:'some assets (futures, margin, bots) are in the total but not broken down by coin',de:'ein Teil (Futures, Margin, Bots) ist in der Summe, aber nicht nach Coins aufgeschlüsselt',zh:'部分资产（合约、杠杆、机器人）已计入总额，但未按币种拆分'},
     partial_binance_miss:{uk:'не вдалося прочитати частину рахунків — сума може бути неповною',ru:'не удалось прочитать часть счетов — сумма может быть неполной',en:'some accounts could not be read — the total may be incomplete',de:'einige Konten konnten nicht gelesen werden — Summe evtl. unvollständig',zh:'部分账户读取失败——总额可能不完整'},
     errChars:{uk:'У ключах Binance бувають лише латинські літери й цифри, а тут є зайві знаки — скопіюйте ключ заново.',ru:'В ключах Binance бывают только латинские буквы и цифры, а здесь есть лишние знаки — скопируйте ключ заново.',en:'Binance keys contain only Latin letters and digits, but extra characters were found — copy the key again.',de:'Binance-Schlüssel enthalten nur lateinische Buchstaben und Ziffern, hier sind zusätzliche Zeichen — Schlüssel neu kopieren.',zh:'Binance 密钥只含拉丁字母和数字，这里有多余字符——请重新复制密钥。'},
+    errNotReadOnly:{uk:'Ключ дозволяє не лише читання (торгівля, переказ або виведення). Створіть ключ тільки з читанням — застосунку більше не потрібно.',
+      ru:'Ключ разрешает не только чтение (торговлю, переводы или вывод). Создайте ключ только с чтением — приложению больше не нужно.',
+      en:'This key allows more than reading (trading, transfers or withdrawals). Create a read-only key — the app needs nothing more.',
+      de:'Dieser Schlüssel erlaubt mehr als Lesen (Handel, Transfers oder Auszahlungen). Erstellen Sie einen Nur-Lese-Schlüssel.',
+      zh:'该密钥不仅可读（可交易、划转或提现）。请创建只读密钥——应用不需要更多权限。'},
+    errPermCheck:{uk:'Не вдалося перевірити права ключа на біржі. Спробуйте ще раз.',ru:'Не удалось проверить права ключа на бирже. Попробуйте ещё раз.',en:'Could not verify the key permissions with the exchange. Please try again.',de:'Die Schlüsselrechte konnten nicht geprüft werden. Bitte erneut versuchen.',zh:'无法向交易所核实密钥权限，请重试。'},
     errWithdraw:{uk:'У ключа ввімкнено виведення коштів. Створіть ключ лише з «Enable Reading»',ru:'У ключа включён вывод средств. Создайте ключ только с «Enable Reading»',en:'This key allows withdrawals. Create a key with “Enable Reading” only',de:'Dieser Schlüssel erlaubt Auszahlungen. Nur mit „Enable Reading“ erstellen',zh:'该密钥允许提现。请创建仅含“Enable Reading”的密钥'},
     errAuth:{uk:'Увійдіть через Google, щоб підключити Binance',ru:'Войдите через Google, чтобы подключить Binance',en:'Sign in with Google to connect Binance',de:'Mit Google anmelden, um Binance zu verbinden',zh:'请用 Google 登录以连接 Binance'},
     errRegion:{uk:'Binance недоступний з цього регіону',ru:'Binance недоступен из этого региона',en:'Binance is not available from this region',de:'Binance ist aus dieser Region nicht verfügbar',zh:'该地区无法访问 Binance'},
@@ -6361,11 +6367,22 @@ const EXCHANGES={
         partial:false
       };
     },
-    async fetchBalances(cred){
+    async fetchBalances(cred,opts){
       // Часы телефона могут отставать или спешить — а Bybit отвергает подпись, если
       // метка времени ушла вперёд больше чем на секунду. Берём время у биржи.
       let offset=0;
       try{const t=await this.publicGet('/v5/market/time');offset=Number(t.time)-Date.now();if(!Number.isFinite(offset))offset=0;}catch{}
+      // При подключении: Bybit сам говорит, только ли чтение у ключа
+      // (readOnly 1 — да, 0 — чтение и запись). Ключ на запись не принимаем.
+      // Если ответа нет, не блокируем: это проверка сверх того, что Bybit
+      // и так не даёт вывести средства без отдельного разрешения.
+      if(opts&&opts.strict){
+        let info=null;
+        try{info=await this.signedGet(cred,'/v5/user/query-api','',offset);}catch(e){
+          if(['10003','10004','10002','33004','http401'].includes(String(e.exchangeCode)))throw e;
+        }
+        if(info&&Number(info.readOnly)===0)throw ExchangeError('notReadOnly');
+      }
       try{
         const ov=await this.signedGet(cred,'/v5/asset/asset-overview','',offset);
         return await this.fromOverview(ov);
@@ -6474,17 +6491,27 @@ const EXCHANGES={
       out._btc=px.BTCUSDT||0;
       return out;
     },
-    async fetchBalances(cred){
+    async fetchBalances(cred,opts){
       let offset=0;
       try{const t=await this.publicGet('/api/v3/time');offset=Number(t.serverTime)-Date.now();if(!Number.isFinite(offset))offset=0;}catch{}
       // Спот — обязательный: он же проверяет ключ. Остальное — по возможности.
       const spot=await this.signed(cred,'/api/v3/account','omitZeroBalances=true',offset);
-      // Ключ с правом вывода не принимаем: приложению он не нужен, а утечка
-      // такого ключа — это уже не подсмотренный баланс, а пустой счёт.
-      try{
-        const rs=await this.signed(cred,'/sapi/v1/account/apiRestrictions','',offset);
-        if(rs&&rs.enableWithdrawals===true)throw ExchangeError('withdraw');
-      }catch(e){if(e.exchangeCode==='withdraw')throw e;}
+      // Приложению нужно только чтение. Ключ, который умеет выводить,
+      // переводить или торговать, не принимаем: его утечка — это уже не
+      // подсмотренный баланс, а пустой счёт. При подключении (strict) права
+      // ОБЯЗАНЫ подтвердиться: раньше сбой проверки проглатывался, и ключ
+      // сохранялся непроверенным (аудит 01.10.2026, K04).
+      let rs=null;
+      try{rs=await this.signed(cred,'/sapi/v1/account/apiRestrictions','',offset);}
+      catch(e){if(opts&&opts.strict)throw ExchangeError('permCheck');}
+      if(isPlainDataObject(rs)){
+        const risky=['enableWithdrawals','enableInternalTransfer','permitsUniversalTransfer','enableSpotAndMarginTrading',
+          'enableMargin','enableFutures','enableVanillaOptions','enablePortfolioMarginTrading','enableFixApiTrade'];
+        if(risky.some(k=>rs[k]===true))throw ExchangeError('notReadOnly');
+        if(rs.enableReading===false)throw ExchangeError('bn-2015');
+      }else if(opts&&opts.strict){
+        throw ExchangeError('permCheck');
+      }
       const [fund,flex,locked,wallets]=await Promise.allSettled([
         this.signed(cred,'/sapi/v1/asset/get-funding-asset','',offset),
         this.signed(cred,'/sapi/v1/simple-earn/flexible/position','size=100',offset),
@@ -6555,7 +6582,8 @@ function exErrorText(e){
   if(c==='bn-2014'||c==='bn-2015'||c==='bn-2008')return exTxt('errKey')+' (Binance '+c.slice(2)+': '+String(e?.message||'').slice(0,80)+')';
   if(c==='bn-1022')return exTxt('errSign');
   if(c==='bn-1021')return exTxt('errTime');
-  if(c==='withdraw')return exTxt('errWithdraw');
+  if(c==='withdraw'||c==='notReadOnly')return exTxt('errNotReadOnly');
+  if(c==='permCheck')return exTxt('errPermCheck');
   if(c==='auth')return exTxt('errAuth');
   if(c==='region')return exTxt('errRegion');
   if(!c||e instanceof TypeError)return exTxt('errNet');
@@ -6581,8 +6609,12 @@ async function refreshExchange(id){
   if(!cred||!ex||exchangeUi.busy[id])return;
   if(isOffline()){exchangeUi.errors[id]=exTxt('errNet');renderExchanges();return;}
   exchangeUi.busy[id]=true;renderExchanges();
+  const gen=authGeneration;
   try{
     const res=await ex.fetchBalances(cred);
+    // За время запроса могли выйти из аккаунта или отключить биржу —
+    // тогда поздний ответ не должен вернуть её балансы на устройство.
+    if(gen!==authGeneration||getExchangeCreds()[id]?.key!==cred.key)return;
     const cache=getExchangeCache();
     cache[id]={...res,updatedAt:Date.now()};
     exWriteJson(EXCHANGE_CACHE_LS,cache);
@@ -6617,8 +6649,12 @@ async function connectExchange(){
   if(msg){msg.textContent=exTxt('checking');msg.className='ex-sub';}
   try{
     // Ключ сохраняется только ПОСЛЕ того, как биржа его приняла: неверный
-    // ключ не должен оседать на устройстве.
-    const res=await EXCHANGES[id].fetchBalances({key,secret});
+    // ключ не должен оседать на устройстве. strict — права ключа обязаны
+    // подтвердиться, «не удалось проверить» = отказ (аудит K04).
+    const gen=authGeneration;
+    const res=await EXCHANGES[id].fetchBalances({key,secret},{strict:true});
+    // Пока биржа отвечала, человек мог выйти из аккаунта (аудит K05).
+    if(gen!==authGeneration||!isSignedIn()){if(btn)btn.disabled=false;if(msg)msg.textContent='';return;}
     const creds=getExchangeCreds();
     creds[id]={key,secret,connectedAt:Date.now()};
     exWriteJson(EXCHANGE_KEYS_LS,creds);
@@ -7062,12 +7098,14 @@ function cryptoAddCloseOutside(e){
   if(e.target===document.getElementById('cryptoAddOverlay'))closeCoinAddPopup();
 }
 function addCoin(){
-  const name=($('newCoinName')?.value||'').trim().toUpperCase();
+  const name=safeCoinSymbol($('newCoinName')?.value);
   const qty=parseInputNumber($('newCoinQty')?.value);
   const buyPrice=parseInputNumber($('newCoinBuyPrice')?.value);
   const curPrice=parseInputNumber($('newCoinCurPrice')?.value);
   if(!name)return;
-  coins.push({name,qty,buyPrice:roundMoney(buyPrice),curPrice:roundMoney(curPrice)});
+  // Цену монеты НЕ округляем до копеек: у мемкоинов она 0,00002 $, и
+  // roundMoney превращал её в ноль — стоимость и себестоимость пропадали.
+  coins.push({name,qty,buyPrice:coinPricePrecise(buyPrice),curPrice:coinPricePrecise(curPrice)});
   if($('newCoinName'))$('newCoinName').value='';
   if($('newCoinQty'))$('newCoinQty').value='';
   if($('newCoinBuyPrice'))$('newCoinBuyPrice').value='';
@@ -7076,6 +7114,13 @@ function addCoin(){
   renderCoins(); updateAll(); saveData();
 }
 function removeCoin(i){coins.splice(i,1);renderCoins();updateAll();saveData();}
+function coinPricePrecise(v){const n=Number(v);return Number.isFinite(n)&&n>0?Number(n.toPrecision(12)):0;}
+// Цена монеты для показа: от доллара — два знака, дешевле — значащие цифры.
+function fmtCoinPrice(p){
+  const n=Number(p)||0;
+  if(!n)return '0';
+  return Math.abs(n)>=1?fmtD(n,2):n.toLocaleString(appLocale(),{maximumSignificantDigits:4});
+}
 function renderCoins(){
   const rate=getCryptoRate();
   const sym=getCurrSym();
@@ -7101,12 +7146,17 @@ function renderCoins(){
   
   let html='<div class="ticker-cards">';
   let totalVal=0,totalCost=0;
+  const coinStats=getCryptoPortfolioStats().groups;
   
   Object.entries(groups).forEach(([key,g])=>{
     if(g.totalQty<=0)return; // skip sold-out coins
-    const avgBuy=g.buyQty>0&&g.buyCost>0?g.buyCost/g.buyQty:0;
+    // Та же модель, что в общей статистике (скользящая средняя): продажа
+    // уносит свою долю себестоимости. Раньше здесь была средняя по всей
+    // истории покупок, включая проданное (аудит 01.10.2026, K07).
+    const sg=coinStats[key]||{};
+    const avgBuy=Number(sg.avgBuy)||0;
     const value=g.totalQty*g.curPrice;
-    const cost=g.totalQty*avgBuy;
+    const cost=Number(sg.remainingCostUsd)||0;
     const pnl=cost>0?value-cost:0;
     const pnlPct=cost>0?((value/cost-1)*100):0;
     const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
@@ -7115,15 +7165,15 @@ function renderCoins(){
     const ch=g.change24h;
     totalVal+=value;totalCost+=cost;
     
-    html+=`<div class="ticker-card" style="border-top:2px solid var(--purple)" onclick="openCryptoDetail('${key}')">
+    html+=`<div class="ticker-card" style="border-top:2px solid var(--purple)" onclick="openCryptoDetail('${safeCoinSymbol(key)}')">
       <div class="ticker-card-head">
-        <span class="ticker-card-sym" style="color:var(--purple2)">${key}</span>
+        <span class="ticker-card-sym" style="color:var(--purple2)">${escHtml(key)}</span>
         <span class="ticker-card-qty">${g.totalQty}</span>
       </div>
-      <div class="ticker-card-name">$${g.curPrice>0?fmtD(g.curPrice,2):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
+      <div class="ticker-card-name">$${g.curPrice>0?fmtCoinPrice(g.curPrice):'—'}${ch?` <span style="font-size:9px;color:${ch>=0?'var(--green2)':'var(--red)'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</span>`:''}</div>
       <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(toDisplayCurr(valUah))} ${sym}</div>
       <div class="ticker-card-pnl" style="color:${pnlCol}">${cost>0?(pnl>=0?'+':'')+fmtN(toDisplayCurr(pnlUah))+' '+sym+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
-      ${avgBuy>0?`<div class="ticker-card-div">Ø $${fmtD(avgBuy,2)}</div>`:''}
+      ${avgBuy>0?`<div class="ticker-card-div">Ø $${fmtCoinPrice(avgBuy)}</div>`:''}
     </div>`;
   });
   
@@ -7176,30 +7226,24 @@ function openCryptoDetail(coinKey){
   const group=coins.map((c,i)=>({...c,idx:i})).filter(c=>c.name.toUpperCase()===coinKey);
   if(!group.length)return;
   const totalQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
-  const buyQty=group.reduce((s,t)=>{
-    const qty=parseFloat(t.qty)||0;
-    return qty>0?s+qty:s;
-  },0);
-  const buyCost=group.reduce((s,t)=>{
-    const qty=parseFloat(t.qty)||0;
-    return qty>0?s+qty*(t.buyPrice||0):s;
-  },0);
-  const curPrice=group.find(c=>c.curPrice)?.curPrice||0;
-  const avgBuy=buyQty>0&&buyCost>0?buyCost/buyQty:0;
+  // Себестоимость — из общей статистики: продажа уносит свою долю, как у акций.
+  const sg=getCryptoPortfolioStats().groups[coinKey]||{};
+  const curPrice=Number(group.find(c=>c.curPrice)?.curPrice)||0;
+  const avgBuy=Number(sg.avgBuy)||0;
   const curVal=totalQty*curPrice;
-  const totalCost=Math.max(0,totalQty)*avgBuy;
+  const totalCost=Number(sg.remainingCostUsd)||0;
   const pnl=totalCost>0?curVal-totalCost:0;
   const pnlPct=totalCost>0?((curVal/totalCost-1)*100):0;
   const pnlCol=pnl>=0?'var(--green2)':'var(--red)';
   const ch=group[0].change24h||0;
   const sym=getCurrSym();
 
-  document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--purple2)">'+coinKey+'</span> '+cryptoDetailTxt('title');
+  document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--purple2)">'+escHtml(coinKey)+'</span> '+cryptoDetailTxt('title');
   let html='<div class="stock-detail-grid">'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--purple2)">$'+fmtD(curPrice,2)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('price')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--purple2)">$'+fmtCoinPrice(curPrice)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('price')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+totalQty+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('qty')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+fmtN(Math.round(curVal*rate))+' ₴</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('value')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">$'+fmtD(avgBuy,2)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('avg')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">$'+fmtCoinPrice(avgBuy)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('avg')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'')+'$'+fmtN(Math.round(pnl))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+(ch>=0?'var(--green2)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('change24')+'</div></div>'+
     '</div>';
@@ -7212,19 +7256,19 @@ function openCryptoDetail(coinKey){
     const isSell=qty<0;
     html+='<div class="stock-detail-trade"><div>'+
       '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?cryptoDetailTxt('sell'):cryptoDetailTxt('buy'))+' '+Math.abs(qty)+'</div>'+
-      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">по $'+(t.buyPrice||0)+'</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">по $'+fmtCoinPrice(t.buyPrice)+'</div>'+
       '</div><button class="rm-btn" onclick="removeCoin('+t.idx+');closeStockDetail()">×</button></div>';
   });
   html+='</div>';
 
   // Sell section
   html+='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
-    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">'+cryptoDetailTxt('sellTitle')+' '+coinKey+' → USDT</div>'+
+    '<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">'+cryptoDetailTxt('sellTitle')+' '+escHtml(coinKey)+' → USDT</div>'+
     '<div class="row2"><div class="field-group"><div class="field-label">'+cryptoDetailTxt('qtyLabel')+'</div>'+
     '<input class="field-input" type="text" id="cryptoSellQty" placeholder="'+totalQty+'" inputmode="decimal" value="'+totalQty+'"></div>'+
     '<div class="field-group"><div class="field-label">'+cryptoDetailTxt('priceUsd')+'</div>'+
     '<input class="field-input" type="text" id="cryptoSellPrice" placeholder="'+curPrice+'" inputmode="decimal" value="'+curPrice+'"></div></div>'+
-    '<button onclick="sellCrypto(\''+coinKey+'\')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">'+cryptoDetailTxt('confirm')+'</button>'+
+    '<button onclick="sellCrypto(\''+safeCoinSymbol(coinKey)+'\')" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--red);background:#f8717115;font-family:DM Mono,monospace;font-size:12px;color:var(--red);cursor:pointer;font-weight:600">'+cryptoDetailTxt('confirm')+'</button>'+
     '<button onclick="closeStockDetail()" style="width:100%;margin-top:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;font-family:DM Mono,monospace;font-size:11px;color:var(--muted);cursor:pointer;">'+cryptoDetailTxt('cancel')+'</button></div>';
 
   document.getElementById('stockDetailContent').innerHTML=html;
@@ -7238,7 +7282,7 @@ function sellCrypto(coinKey){
   const owned=coins.filter(c=>String(c.name||'').toUpperCase()===coinKey).reduce((sum,c)=>sum+parseInputNumber(c.qty),0);
   if(qty>owned){alert(cryptoDetailTxt('cannotSellMore')+': '+fmtMax2(owned));return;}
   customConfirm(cryptoSellAskText(qty,coinKey,price), function(){
-    coins.push({name:coinKey,qty:-Math.abs(qty),buyPrice:price,curPrice:price,change24h:0});
+    coins.push({name:safeCoinSymbol(coinKey),qty:-Math.abs(qty),buyPrice:coinPricePrecise(price),curPrice:coinPricePrecise(price),change24h:0});
     const totals={};
     coins.forEach(c=>{const k=String(c.name||'').toUpperCase();totals[k]=(totals[k]||0)+parseInputNumber(c.qty);});
     Object.entries(totals).forEach(([k,total])=>{if(total<=0)coins=coins.filter(c=>String(c.name||'').toUpperCase()!==k);});
@@ -7313,7 +7357,7 @@ function openStockDetail(secId, tickerKey){
   const saleCurrency=getStockCashCurrency(sec);
   const saleCurrencyOptions=STOCK_CASH_CURRENCIES.map(cur=>'<option value="'+cur+'" '+(saleCurrency===cur?'selected':'')+'>'+getStockCurrencySymbol(cur)+' '+cur+'</option>').join('');
 
-  document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+ticker+'</span> '+name;
+  document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+escHtml(ticker)+'</span> '+escHtml(name);
   let html='<div class="stock-detail-grid">'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('value')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtMax2(totalQty)+' шт</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('qty')+'</div></div>'+
@@ -7974,6 +8018,95 @@ function restoreVisibleCardsForStoredAssets(d){
   if(backupHasDepositAssets(d))d.hiddenCards.deposit=false;
   return d;
 }
+// ══ ПРОВЕРКА И ЧИСТКА ДАННЫХ ═════════════════════════════════════════════
+// Аудит 01.10.2026 (K01, K08). Из подменённого бэкапа в id, тикер, название или
+// дату могла прийти разметка или кусок кода: он попадал в innerHTML и в
+// обработчики нажатий и выполнялся с доступом ко всему хранилищу, включая ключи
+// бирж. А запись null вместо монеты ломала отрисовку после перезапуска.
+// Поэтому КАЖДАЯ загрузка (и импорт — он заканчивается перезагрузкой) проходит
+// здесь: служебные поля приводятся к строгому формату, в свободном тексте знаки
+// разметки заменяются похожими типографскими (‹ › ″ ʼ) — текст читается как
+// прежде, но ни тег, ни атрибут из него уже не собрать. Записи, которые не
+// объекты, отбрасываются.
+// Без const на верхнем уровне: loadData вызывается раньше, чем исполняется
+// часть кода ниже по файлу, и константа оттуда дала бы ошибку TDZ.
+function isPlainDataObject(v){
+  if(!v||typeof v!=='object'||Array.isArray(v))return false;
+  const proto=Object.getPrototypeOf(v);
+  return proto===Object.prototype||proto===null;
+}
+function isSafeDataId(v){return typeof v==='string'&&/^[A-Za-z0-9_\-:.]{1,120}$/.test(v);}
+function neutralizeText(v){return String(v).replace(/</g,'‹').replace(/>/g,'›').replace(/"/g,'″').replace(/`/g,'ʼ');}
+function safeCoinSymbol(v){return String(v||'').trim().toUpperCase().replace(/[^A-Z0-9.\-_]/g,'').slice(0,24);}
+var dataSanitizeSeq=0;
+function sanitizeDataValue(key,v,depth){
+  if(depth>30)return undefined;
+  if(typeof v==='number')return Number.isFinite(v)?v:0;
+  if(v===null||v===undefined||typeof v==='boolean')return v;
+  if(typeof v==='string'){
+    if(key==='id'||/Id$/.test(key))return isSafeDataId(v)?v:'r_'+Date.now().toString(36)+'_'+(++dataSanitizeSeq);
+    if(/date$/i.test(key))return v.replace(/[^0-9TZ:.\-+\/ ]/g,'').slice(0,40);
+    if(key==='ticker'||key==='symbol')return v.replace(/[^A-Za-z0-9.\-^=_:]/g,'').slice(0,24);
+    if(/currency$/i.test(key))return v.replace(/[^A-Za-z]/g,'').slice(0,6);
+    if(key==='type'||key==='sectionType'||key==='color'||/(Mode|Stage|Status|Period)$/.test(key))return v.replace(/[^\p{L}\p{N}_\-. ]/gu,'').slice(0,60);
+    return neutralizeText(v);
+  }
+  if(Array.isArray(v)){
+    const arr=v.map(x=>sanitizeDataValue(key,x,depth+1)).filter(x=>x!==undefined);
+    // Список записей (пополнения, сделки, слитки) — только объекты:
+    // null среди них ронял отрисовку.
+    return arr.some(x=>isPlainDataObject(x))?arr.filter(x=>isPlainDataObject(x)):arr;
+  }
+  if(isPlainDataObject(v))return sanitizeDataObject(v,depth+1);
+  return undefined;
+}
+function sanitizeDataObject(o,depth){
+  const out={};
+  Object.keys(o).forEach(k=>{
+    if(k==='__proto__'||k==='prototype'||k==='constructor')return;
+    const val=sanitizeDataValue(k,o[k],depth||0);
+    if(val!==undefined)out[k]=val;
+  });
+  return out;
+}
+function sanitizeStoredData(d){
+  if(!isPlainDataObject(d))return d;
+  const out=sanitizeDataObject(d,0);
+  ['deposits','coins','forexItems','customSections','securitiesSections','liabilities','metalsSections'].forEach(k=>{
+    if(out[k]!==undefined)out[k]=(Array.isArray(out[k])?out[k]:[]).filter(isPlainDataObject);
+  });
+  // Название ручной монеты — это её тикер: идёт в обработчик нажатия и в заголовки.
+  if(Array.isArray(out.coins))out.coins=out.coins.map(c=>({...c,name:safeCoinSymbol(c.name)})).filter(c=>c.name);
+  if(Array.isArray(d.cardOrder))out.cardOrder=d.cardOrder.filter(isSafeDataId);
+  if(d.hiddenCards!==undefined){
+    const hc={};
+    if(isPlainDataObject(d.hiddenCards))Object.keys(d.hiddenCards).forEach(k=>{if(isSafeDataId(k))hc[k]=!!d.hiddenCards[k];});
+    out.hiddenCards=hc;
+  }
+  if(out.currentLang!==undefined&&!['uk','ru','en','de','zh'].includes(out.currentLang))delete out.currentLang;
+  if(out.appTheme!==undefined&&!['dark','light'].includes(out.appTheme))delete out.appTheme;
+  return out;
+}
+// Импорт: основные данные — той же чисткой; остальные JSON-ключи (история,
+// журнал миграций) — нейтрализацией текста; простые значения — строгим форматом.
+function prepareBackupStorage(payload){
+  const st=payload.storage;
+  Object.keys(st).forEach(key=>{
+    const raw=st[key];
+    if(typeof raw!=='string')return;
+    if(BACKUP_JSON_KEYS.has(key)){
+      if(!raw)return;
+      let parsed;
+      try{parsed=JSON.parse(raw);}catch(e){delete st[key];return;}
+      const clean=(key==='kapital_v6'||key==='kapital_v6_prev')?sanitizeStoredData(parsed):sanitizeDataValue('',parsed,0);
+      st[key]=JSON.stringify(clean===undefined?null:clean);
+    }else if(!/^[\w.\-:+ ]{0,64}$/.test(raw)){
+      delete st[key];
+    }
+  });
+  if(Array.isArray(payload.capitalHistory))payload.capitalHistory=sanitizeDataValue('',payload.capitalHistory,0);
+  return payload;
+}
 function migrateStoragePayload(d){
   if(!d||typeof d!=='object')return null;
   const fromVersion=Number(d.storageSchemaVersion)||1;
@@ -7992,8 +8125,9 @@ function migrateStoragePayload(d){
   }else{
     recordMigration(fromVersion,STORAGE_SCHEMA_VERSION,applied);
   }
-  restoreVisibleCardsForStoredAssets(d);
-  return d;
+  const clean=sanitizeStoredData(d);
+  restoreVisibleCardsForStoredAssets(clean);
+  return clean;
 }
 function _saveDataNow(){
   if(window._kapitalImportInProgress)return;
@@ -10506,6 +10640,11 @@ function getSessionToken(){
   return t&&exp>Date.now()/1000+60?t:'';
 }
 function setSessionToken(t,exp){ls.set(AK.sess,t);ls.set(AK.sessExp,String(exp||0));}
+// Поколение входа: растёт при каждом выходе. Всё, что ждёт ответа сети
+// (сессия, подключение биржи, балансы), сверяет его ПОСЛЕ await и ничего не
+// пишет, если человек за это время вышел. Аудит 01.10.2026, K05: ключ биржи,
+// подключавшейся в момент выхода, записывался обратно уже после выхода.
+var authGeneration=0;
 // Сессия предпочтительнее: живёт 90 дней, тогда как токен Google — около часа.
 function getAuthToken(){
   const s=getSessionToken();
@@ -10528,20 +10667,24 @@ function setGoogleToken(jwt){
   }catch{}
 }
 async function exchangeForSessionToken(idToken){
+  const gen=authGeneration;
   try{
     const r=await fetch(AUTH_BASE+'/auth/session',{method:'POST',
       headers:{'content-type':'application/json'},body:JSON.stringify({idToken})});
     const d=await r.json();
+    if(gen!==authGeneration)return;
     if(d&&d.token)setSessionToken(d.token,d.exp);
   }catch{}
 }
 async function refreshSessionToken(){
   const t=getSessionToken();
   if(!t)return;
+  const gen=authGeneration;
   try{
     const r=await fetch(AUTH_BASE+'/auth/refresh',{method:'POST',
       headers:{'Authorization':'Bearer '+t}});
     const d=await r.json();
+    if(gen!==authGeneration||getSessionToken()!==t)return;
     if(d&&d.token)setSessionToken(d.token,d.exp);
   }catch{}
 }
@@ -10601,9 +10744,11 @@ function confirmSignOut(){
   });
 }
 function signOutGoogle(){
+  authGeneration++;
   [AK.jwt,AK.jwtExp,AK.email,AK.sub,AK.sess,AK.sessExp].forEach(ls.del);
   // Ключи бирж — чужие финансовые доступы; после выхода на устройстве им не место.
   ls.del('investory_exchange_keys');ls.del('investory_exchange_cache');
+  try{exchangeUi.busy={};exchangeUi.errors={};exchangeUi.formOpen=false;renderExchanges();}catch{}
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();}catch{}
   aiLimitInfo=null;
   showAuthGate();
@@ -12333,6 +12478,20 @@ function validateMainBackupData(data){
     if(Array.isArray(data[key])&&data[key].length>MAX_BACKUP_COLLECTION_ITEMS)throw new Error(key+' has too many items');
   });
   if(data.hiddenCards!==undefined&&!isPlainBackupObject(data.hiddenCards))throw new Error('hiddenCards must be an object');
+  // Каждая запись — объект, вложенные списки — тоже: null среди монет
+  // принимался и ронял отрисовку уже после замены рабочих данных.
+  ['deposits','coins','forexItems','customSections','securitiesSections','liabilities','metalsSections'].forEach(key=>{
+    (data[key]||[]).forEach((item,i)=>{
+      if(!isPlainBackupObject(item))throw new Error(key+'['+i+'] is not a record');
+      ['items','topups','trades','partialPays','stocks'].forEach(sub=>{
+        if(item[sub]!==undefined&&!Array.isArray(item[sub]))throw new Error(key+'['+i+'].'+sub+' must be an array');
+        (item[sub]||[]).forEach((x,j)=>{if(!isPlainBackupObject(x))throw new Error(key+'['+i+'].'+sub+'['+j+'] is not a record');});
+      });
+    });
+  });
+  (data.coins||[]).forEach((c,i)=>{if(typeof c.name!=='string'||!safeCoinSymbol(c.name))throw new Error('coins['+i+'] has no symbol');});
+  const ver=Number(data.storageSchemaVersion);
+  if(Number.isFinite(ver)&&ver>STORAGE_SCHEMA_VERSION)throw new Error('backup is from a newer app version');
   if(data.currentLang!==undefined&&!['uk','ru','en','de','zh'].includes(data.currentLang))throw new Error('unsupported language');
   if(data.appTheme!==undefined&&!['dark','light'].includes(data.appTheme))throw new Error('unsupported theme');
 }
@@ -12393,6 +12552,7 @@ function restoreBackupPayload(payload){
   try{
     payload=sanitizeBackupAccessState(payload);
     validateBackupPayload(payload);
+    payload=prepareBackupStorage(payload);
     createRollbackSnapshot();
     window._kapitalImportInProgress=true;
     if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}

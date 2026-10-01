@@ -1,8 +1,7 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-33-batch-prices';
+﻿const CACHE_NAME = 'investory-app-v0-1-34-audit-fixes';
 const APP_SHELL = [
   './',
   './index.html',
-  './Depozit_v0_0_24.html',
   './manifest.json',
   './icons/icon-384.png',
   './privacy-policy.html',
@@ -97,7 +96,7 @@ self.addEventListener('fetch', event => {
         const copy = res.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
         return res;
-      }).catch(() => caches.match('./index.html').then(cached => cached || caches.match('./Depozit_v0_0_24.html'))))
+      }).catch(() => caches.match('./index.html')))
     );
     return;
   }

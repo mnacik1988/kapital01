@@ -162,6 +162,10 @@ async function signSessionToken(sub, env) {
   return { token: signingInput + '.' + b64url(new Uint8Array(sig)), exp };
 }
 
+class AuthUnavailableError extends Error {
+  constructor() { super('Auth check temporarily unavailable'); this.authUnavailable = true; }
+}
+
 async function verifySessionToken(token, env) {
   const parts = token.split('.');
   if (parts.length !== 3) return null;
@@ -182,11 +186,21 @@ async function verifySessionToken(token, env) {
   // токен жил бы все 90 дней и сделать с ним было бы нечего.
   // cacheTtl держит чтение на границе 5 минут, чтобы не жечь квоту KV на каждом
   // запросе; плата — отзыв вступает в силу в течение этих пяти минут.
-  try {
-    const revokedBefore = await env.AI_LIMITS.get('revoke:' + payload.sub, { cacheTtl: 300 });
-    if (revokedBefore && typeof payload.iat === 'number'
-        && payload.iat < parseInt(revokedBefore, 10)) return null;
-  } catch { /* KV недоступен — токен всё равно подписан нами, вход не роняем */ }
+  // Если проверить отзыв не удалось (KV недоступен), раньше токен пропускали —
+  // и отозванная сессия снова работала. Теперь одна повторная попытка, затем
+  // временный отказ 503: человек видит «попробуйте позже», а не выход из
+  // аккаунта, и отозванный токен не проходит (аудит 01.10.2026, K09).
+  let revokedBefore;
+  for (let attempt = 0; ; attempt++) {
+    try {
+      revokedBefore = await env.AI_LIMITS.get('revoke:' + payload.sub, { cacheTtl: 300 });
+      break;
+    } catch {
+      if (attempt >= 1) throw new AuthUnavailableError();
+    }
+  }
+  if (revokedBefore && typeof payload.iat === 'number'
+      && payload.iat < parseInt(revokedBefore, 10)) return null;
 
   return payload.sub;
 }
@@ -233,6 +247,21 @@ async function handleAuth(request, url, origin, env) {
 
 export default {
   async fetch(request, env, ctx) {
+    try {
+      return await handleRequest(request, env, ctx);
+    } catch (error) {
+      const origin = request.headers.get('Origin') || '';
+      if (error && error.authUnavailable) {
+        return json({ error: 'Сервіс входу тимчасово недоступний. Спробуй за хвилину.' }, 503, isAllowedOrigin(origin) ? origin : '', 0);
+      }
+      console.error('Unhandled worker error', error);
+      return json({ error: 'Temporary server error' }, 500, isAllowedOrigin(origin) ? origin : '', 0);
+    }
+  }
+};
+
+async function handleRequest(request, env, ctx) {
+  {
     const origin = request.headers.get('Origin') || '';
     if (!isAllowedOrigin(origin)) return json({ error: 'Origin not allowed' }, 403, origin);
 
@@ -293,11 +322,12 @@ export default {
       if (url.pathname === '/stats') return await handleStats(request, url, env, origin);
       return json({ error: 'Not found' }, 404, origin);
     } catch (error) {
+      if (error && error.authUnavailable) throw error;
       console.error('Worker request failed', error);
       return json({ error: 'Market data is temporarily unavailable' }, 502, origin);
     }
   }
-};
+}
 
 function isAllowedOrigin(origin) {
   if (ALLOWED_ORIGINS.has(origin)) return true;
@@ -742,6 +772,19 @@ async function handleAI(request, origin, env) {
     return json({ error: 'messages required' }, 400, origin);
   }
 
+  // Сообщения нормализуем ДО резервирования квоты: раньше пустое сообщение
+  // проходило первичную проверку, списывало оба счётчика и лишь потом
+  // отбрасывалось с ответом 400 (аудит 01.10.2026, K03).
+  let messages = body.messages.slice(-MSG_MAX_COUNT)
+    .map(m => ({
+      role: m && m.role === 'assistant' ? 'assistant' : 'user',
+      content: String((m && m.content) || '').slice(0, MSG_MAX_CHARS)
+    }))
+    .filter(m => m.content.trim())
+    .filter((m, i, arr) => i === 0 || m.role !== arr[i - 1].role);
+  while (messages.length && messages[0].role !== 'user') messages.shift();
+  if (!messages.length) return json({ error: 'messages required' }, 400, origin);
+
   const day = todayKey();
   const gKey = 'global:' + day;
   const { userId } = await resolveUserId(request, env, body.userId);
@@ -791,16 +834,6 @@ async function handleAI(request, origin, env) {
   let system = AI_SYSTEM_RULES;
   if (portfolio) system += '\n\nPortfolio data:\n' + portfolio;
   if (news) system += '\n\nRecent news for portfolio stocks (last 7 days):\n' + news;
-
-  let messages = body.messages.slice(-MSG_MAX_COUNT)
-    .map(m => ({
-      role: m && m.role === 'assistant' ? 'assistant' : 'user',
-      content: String((m && m.content) || '').slice(0, MSG_MAX_CHARS)
-    }))
-    .filter(m => m.content)
-    .filter((m, i, arr) => i === 0 || m.role !== arr[i - 1].role);
-  while (messages.length && messages[0].role !== 'user') messages.shift();
-  if (!messages.length) return json({ error: 'messages required' }, 400, origin);
 
   // thinking отключён намеренно: у Sonnet 5 он включён по умолчанию и «съедает» max_tokens,
   // из-за чего на больших портфелях ответ приходил ПУСТЫМ (весь бюджет уходил в размышления).
