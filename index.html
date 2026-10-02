@@ -568,6 +568,38 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .privacy-section h3{font-family:'Manrope',sans-serif;font-size:13px;color:var(--text);margin-bottom:8px;}
 .privacy-section p,.privacy-section li{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted2);line-height:1.6;}
 .privacy-section ul{padding-left:18px;}
+/* Админ-панель */
+.admin-box{max-height:90vh;}
+.admin-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.admin-tab{flex:1;padding:9px 6px;border-radius:11px;border:1px solid var(--border2);background:var(--bg3);font:700 12px 'Manrope',sans-serif;color:var(--muted2);cursor:pointer;}
+.admin-tab.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+.admin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.admin-stat{background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:11px 6px;text-align:center;}
+.admin-stat b{display:block;font:800 19px 'Manrope',sans-serif;color:var(--text);font-variant-numeric:tabular-nums;}
+.admin-stat span{font:500 9.5px 'DM Mono',monospace;color:var(--muted2);}
+.admin-hint{font:500 10.5px 'DM Mono',monospace;color:var(--muted2);line-height:1.55;margin-top:4px;}
+.admin-hint b{color:var(--text);}
+.admin-warn{color:var(--orange2);}
+.admin-search{display:flex;gap:6px;margin-bottom:10px;}
+.admin-search .field-input{flex:1;}
+.admin-user{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:10px 12px;margin-bottom:6px;color:var(--text);cursor:pointer;}
+.admin-user-name{font:700 13px 'Manrope',sans-serif;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.admin-chip{font:700 10px 'DM Mono',monospace;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--bg2);color:var(--muted2);border:1px solid var(--border);}
+.admin-chip.free{color:var(--green2);border-color:#4ecb8d55;}
+.admin-chip.trial{color:var(--blue2);border-color:#5b9cf655;}
+.admin-chip.locked{color:var(--orange2);border-color:#fb923c55;}
+.admin-chip.pro{color:var(--purple2);border-color:#a78bfa66;}
+.admin-chip.banned{color:var(--red);border-color:#f8717166;}
+.admin-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px;margin:10px 0 14px;}
+.admin-field{margin-bottom:12px;}
+.admin-label{font:600 10px 'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px;}
+.admin-check{display:flex;align-items:center;gap:8px;font:600 13px 'Manrope',sans-serif;color:var(--text);}
+.admin-check input{width:18px;height:18px;}
+.admin-btn{padding:10px 14px;border-radius:12px;border:1px solid var(--purple);background:var(--purple);color:#fff;font:700 12px 'Manrope',sans-serif;cursor:pointer;}
+.admin-btn.ghost{background:transparent;color:var(--purple2);border-color:var(--border2);margin-bottom:6px;}
+.admin-btn.danger{background:transparent;color:var(--red);border-color:#f8717155;}
+.admin-msg{font:600 11px 'DM Mono',monospace;color:var(--green2);margin:6px 0;min-height:14px;}
+.admin-msg.err{color:var(--red);}
 .privacy-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange2);line-height:1.6;margin-top:10px;}
 .test-check-progress{font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);background:#4ecb8d12;border:1px solid #4ecb8d35;border-radius:12px;padding:10px 12px;margin-bottom:12px;text-align:center;}
 .test-check-section{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:10px;}
@@ -2750,6 +2782,12 @@ body.modern-mockup.theme-light .total-currency{
           <span>🧪 Тестовий чек-лист</span><span>›</span>
         </button>
       </div>
+      <div class="settings-section" id="adminSection" style="display:none;border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+        <div class="settings-label">Адміністратор</div>
+        <button class="settings-link-btn" id="adminPanelBtn" onclick="openAdminPanel()">
+          <span>🛠 Админ-панель</span><span>›</span>
+        </button>
+      </div>
       <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
         <div class="settings-label" id="set_legal_label">Правові документи</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
@@ -2954,7 +2992,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.36';
+const APP_VERSION = 'v0.1.37';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -2968,13 +3006,32 @@ const TRIAL_FROZEN = true;
 const SUBSCRIPTION_KEY = 'investory_subscription_active';
 const TEST_BUILD = false;
 const TEST_ACCESS_KEY = 'investory_test_access_active';
-const ACCESS_STATES = Object.freeze({TRIAL:'trial', SUBSCRIBED:'subscribed', LOCKED:'locked'});
+const ACCESS_STATES = Object.freeze({TRIAL:'trial', SUBSCRIBED:'subscribed', LOCKED:'locked', FREE:'free'});
+// Доступ решает сервер (/me): триал вкл/выкл и его срок — для всех и для
+// отдельного человека, подписка, выданная вручную, бан. Всё это меняется из
+// админ-панели. Телефон помнит последний ответ, чтобы работать без сети:
+// конец триала — момент времени, он отсчитывается и офлайн. Ответ привязан к
+// аккаунту и живёт 30 дней. Пока ответа не было — прежняя логика на устройстве.
+// Ключ записан строкой: эта часть исполняется раньше, чем объявлен AK.
+const SERVER_ACCESS_KEY='investory_access';
+function readServerAccess(){
+  try{
+    const a=JSON.parse(localStorage.getItem(SERVER_ACCESS_KEY)||'null');
+    if(!a||typeof a!=='object')return null;
+    const sub=localStorage.getItem('investory_g_sub')||'';
+    if(!sub||a.sub!==sub)return null;
+    if(!(Date.now()-Number(a.at)<30*86400000))return null;
+    return a;
+  }catch(e){return null;}
+}
 
 function hasActiveSubscription(){
   return localStorage.getItem(SUBSCRIPTION_KEY)==='true'
     || (TEST_BUILD&&localStorage.getItem(TEST_ACCESS_KEY)==='true');
 }
 function getTrialDaysLeft(){
+  const srv=readServerAccess();
+  if(srv&&srv.state==='trial')return Math.max(0,Math.ceil((Number(srv.endsAt)-Date.now())/86400000));
   const trialStart=Number(localStorage.getItem('trial_start'));
   if(!Number.isFinite(trialStart)||trialStart<=0)return -1;
   if(TRIAL_FROZEN)return TRIAL_DAYS;
@@ -2982,8 +3039,23 @@ function getTrialDaysLeft(){
   return Math.max(0,TRIAL_DAYS-Math.floor(elapsed/86400000));
 }
 function getAccessState(){
+  const srv=readServerAccess();
+  if(srv&&srv.state==='banned')return ACCESS_STATES.LOCKED;
   if(hasActiveSubscription())return ACCESS_STATES.SUBSCRIBED;
+  if(srv){
+    if(srv.state==='subscribed')return ACCESS_STATES.SUBSCRIBED;
+    if(srv.state==='free')return ACCESS_STATES.FREE;
+    if(srv.state==='trial')return Number(srv.endsAt)>Date.now()?ACCESS_STATES.TRIAL:ACCESS_STATES.LOCKED;
+    return ACCESS_STATES.LOCKED;
+  }
   return getTrialDaysLeft()>0?ACCESS_STATES.TRIAL:ACCESS_STATES.LOCKED;
+}
+// Текст для закрытого доступа: бан или закончившийся триал (со своим сроком).
+function serverAccessReason(){
+  const srv=readServerAccess();
+  if(srv&&srv.state==='banned')return accessTxt('banned');
+  if(srv&&Number(srv.days)>=0&&srv.days!==null)return accessTxt('expiredN').replace('{n}',srv.days);
+  return accessTxt('expired');
 }
 let accessState=getAccessState();
 function refreshAccessState(){
@@ -8256,6 +8328,7 @@ function bootstrapApp(){
     // Пока GOOGLE_CLIENT_ID пуст, вызов ничего не делает и приложение
     // работает ровно как раньше — экран входа не появляется.
     initGoogleAuth();
+    setTimeout(()=>{syncServerAccess();},1500);
 
     document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
     const activeLangBtn=$('lang-'+currentLang);
@@ -8454,6 +8527,10 @@ const PRIVACY_I18N={
     "To use the app you sign in with your Google account. From Google we receive your account identifier and email address. They are used to keep you signed in and to apply fair-use limits to the AI assistant. We never receive your Google password."
    ],
    [
+    "Your account on our server",
+    "When you sign in, we create an account record on our server: your Google account identifier, email address, dates of your first and latest visit, the number of AI requests, your access status (trial, subscription) and settings made by the administrator (for example, a personal limit or a block). It is needed to provide access, apply limits and prevent abuse. The record is kept while you use the app and is deleted at your request."
+   ],
+   [
     "Your portfolio data",
     "Everything you enter — deposits, coins, stocks, loans, notes and other values — is stored only on your device. We do not upload your portfolio to our servers, except the summary described in \"AI assistant\" when you use it."
    ],
@@ -8487,7 +8564,7 @@ const PRIVACY_I18N={
    ],
    [
     "Retention and deletion",
-    "Data on your device stays until you delete it — in the app settings, by clearing the app data or by uninstalling the app. Signing out removes sign-in data and exchange keys from the device. Data on our server is deleted automatically within the periods stated above. You can ask us to delete any data related to you by email."
+    "Data on your device stays until you delete it — in the app settings, by clearing the app data or by uninstalling the app. Signing out removes sign-in data and exchange keys from the device. Daily counters on our server are deleted automatically within the periods stated above; your account record is kept while you use the app. You can ask us to delete any data related to you by email."
    ],
    [
     "Your rights",
@@ -8525,6 +8602,10 @@ const PRIVACY_I18N={
     "Щоб користуватися застосунком, ви входите через обліковий запис Google. Від Google ми отримуємо ідентифікатор облікового запису та адресу пошти. Вони потрібні, щоб тримати вхід і застосовувати ліміти AI-асистента. Ваш пароль Google ми ніколи не отримуємо."
    ],
    [
+    "Ваш обліковий запис на сервері",
+    "Коли ви входите, ми створюємо на своєму сервері картку облікового запису: ідентифікатор облікового запису Google, адресу пошти, дати першого й останнього входу, кількість запитів до AI, ваш статус доступу (пробний період, підписка) і налаштування, зроблені адміністратором (наприклад, особистий ліміт або блокування). Вона потрібна, щоб надавати доступ, застосовувати ліміти й запобігати зловживанням. Картка зберігається, доки ви користуєтеся застосунком, і видаляється на ваш запит."
+   ],
+   [
     "Дані вашого портфеля",
     "Усе, що ви вводите, — депозити, монети, акції, кредити, нотатки та інші значення — зберігається лише на вашому пристрої. Ми не завантажуємо портфель на свої сервери, окрім зведення, описаного в розділі «AI-асистент», коли ви ним користуєтеся."
    ],
@@ -8558,7 +8639,7 @@ const PRIVACY_I18N={
    ],
    [
     "Строки зберігання та видалення",
-    "Дані на пристрої зберігаються, доки ви їх не видалите — у налаштуваннях застосунку, очищенням даних застосунку або його видаленням. Вихід з облікового запису видаляє з пристрою дані входу та ключі бірж. Дані на нашому сервері видаляються автоматично у строки, вказані вище. Ви можете попросити видалити будь-які повʼязані з вами дані поштою."
+    "Дані на пристрої зберігаються, доки ви їх не видалите — у налаштуваннях застосунку, очищенням даних застосунку або його видаленням. Вихід з облікового запису видаляє з пристрою дані входу та ключі бірж. Денні лічильники на нашому сервері видаляються автоматично у строки, вказані вище; картка облікового запису зберігається, доки ви користуєтеся застосунком. Ви можете попросити видалити будь-які повʼязані з вами дані поштою."
    ],
    [
     "Ваші права",
@@ -8596,6 +8677,10 @@ const PRIVACY_I18N={
     "Чтобы пользоваться приложением, вы входите через аккаунт Google. От Google мы получаем идентификатор аккаунта и адрес почты. Они нужны, чтобы держать вход и применять лимиты AI-ассистента. Ваш пароль Google мы никогда не получаем."
    ],
    [
+    "Ваш аккаунт на сервере",
+    "Когда вы входите, мы создаём на своём сервере карточку аккаунта: идентификатор аккаунта Google, адрес почты, даты первого и последнего входа, количество запросов к AI, ваш статус доступа (пробный период, подписка) и настройки, сделанные администратором (например, личный лимит или блокировка). Она нужна, чтобы предоставлять доступ, применять лимиты и предотвращать злоупотребления. Карточка хранится, пока вы пользуетесь приложением, и удаляется по вашему запросу."
+   ],
+   [
     "Данные вашего портфеля",
     "Всё, что вы вводите, — депозиты, монеты, акции, кредиты, заметки и другие значения — хранится только на вашем устройстве. Мы не загружаем портфель на свои серверы, кроме сводки, описанной в разделе «AI-ассистент», когда вы им пользуетесь."
    ],
@@ -8629,7 +8714,7 @@ const PRIVACY_I18N={
    ],
    [
     "Сроки хранения и удаление",
-    "Данные на устройстве хранятся, пока вы их не удалите — в настройках приложения, очисткой данных приложения или его удалением. Выход из аккаунта удаляет с устройства данные входа и ключи бирж. Данные на нашем сервере удаляются автоматически в сроки, указанные выше. Вы можете попросить удалить любые связанные с вами данные по почте."
+    "Данные на устройстве хранятся, пока вы их не удалите — в настройках приложения, очисткой данных приложения или его удалением. Выход из аккаунта удаляет с устройства данные входа и ключи бирж. Дневные счётчики на нашем сервере удаляются автоматически в сроки, указанные выше; карточка аккаунта хранится, пока вы пользуетесь приложением. Вы можете попросить удалить любые связанные с вами данные по почте."
    ],
    [
     "Ваши права",
@@ -8667,6 +8752,10 @@ const PRIVACY_I18N={
     "Zur Nutzung der App melden Sie sich mit Ihrem Google-Konto an. Von Google erhalten wir Ihre Konto-ID und E-Mail-Adresse. Sie dienen dazu, Sie angemeldet zu halten und Nutzungsgrenzen für den KI-Assistenten anzuwenden. Ihr Google-Passwort erhalten wir nie."
    ],
    [
+    "Ihr Konto auf unserem Server",
+    "Bei der Anmeldung legen wir auf unserem Server einen Kontodatensatz an: Ihre Google-Konto-ID, E-Mail-Adresse, Datum des ersten und letzten Besuchs, Anzahl der KI-Anfragen, Ihren Zugangsstatus (Testphase, Abonnement) und Einstellungen des Administrators (z. B. ein persönliches Limit oder eine Sperre). Er dient dazu, Zugang zu gewähren, Grenzen anzuwenden und Missbrauch zu verhindern. Der Datensatz bleibt bestehen, solange Sie die App nutzen, und wird auf Ihren Wunsch gelöscht."
+   ],
+   [
     "Ihre Portfoliodaten",
     "Alles, was Sie eingeben — Einlagen, Coins, Aktien, Kredite, Notizen und andere Werte — wird nur auf Ihrem Gerät gespeichert. Wir laden Ihr Portfolio nicht auf unsere Server hoch, außer der unter „KI-Assistent“ beschriebenen Zusammenfassung, wenn Sie ihn nutzen."
    ],
@@ -8700,7 +8789,7 @@ const PRIVACY_I18N={
    ],
    [
     "Speicherdauer und Löschung",
-    "Daten auf Ihrem Gerät bleiben, bis Sie sie löschen — in den App-Einstellungen, durch Löschen der App-Daten oder Deinstallation. Abmelden entfernt Anmeldedaten und Börsenschlüssel vom Gerät. Daten auf unserem Server werden automatisch innerhalb der oben genannten Fristen gelöscht. Sie können per E-Mail die Löschung aller Sie betreffenden Daten verlangen."
+    "Daten auf Ihrem Gerät bleiben, bis Sie sie löschen — in den App-Einstellungen, durch Löschen der App-Daten oder Deinstallation. Abmelden entfernt Anmeldedaten und Börsenschlüssel vom Gerät. Tageszähler auf unserem Server werden automatisch innerhalb der oben genannten Fristen gelöscht; Ihr Kontodatensatz bleibt bestehen, solange Sie die App nutzen. Sie können per E-Mail die Löschung aller Sie betreffenden Daten verlangen."
    ],
    [
     "Ihre Rechte",
@@ -8738,6 +8827,10 @@ const PRIVACY_I18N={
     "使用本应用需要通过 Google 账户登录。我们从 Google 获得您的账户标识和电子邮箱地址，用于保持登录状态并对 AI 助手实施合理使用限制。我们从不获取您的 Google 密码。"
    ],
    [
+    "您在我们服务器上的账户",
+    "登录时，我们会在服务器上创建账户记录：您的 Google 账户标识、电子邮箱地址、首次和最近访问日期、AI 请求次数、访问状态（试用、订阅）以及管理员所做的设置（例如个人限额或封禁）。它用于提供访问权限、实施限制并防止滥用。在您使用应用期间保留，应您的要求删除。"
+   ],
+   [
     "您的投资组合数据",
     "您输入的所有内容——存款、币种、股票、贷款、备注及其他数值——仅保存在您的设备上。除您使用“AI 助手”时发送的摘要外，我们不会将您的投资组合上传到我们的服务器。"
    ],
@@ -8771,7 +8864,7 @@ const PRIVACY_I18N={
    ],
    [
     "保存期限与删除",
-    "设备上的数据会一直保留，直到您在应用设置中删除、清除应用数据或卸载应用。退出登录会从设备上删除登录数据和交易所密钥。我们服务器上的数据会在上述期限内自动删除。您可以通过电子邮件要求删除与您相关的任何数据。"
+    "设备上的数据会一直保留，直到您在应用设置中删除、清除应用数据或卸载应用。退出登录会从设备上删除登录数据和交易所密钥。我们服务器上的每日计数会在上述期限内自动删除；账户记录在您使用应用期间保留。您可以通过电子邮件要求删除与您相关的任何数据。"
    ],
    [
     "您的权利",
@@ -11219,7 +11312,7 @@ function onGoogleCredential(resp){
   setGoogleToken(resp.credential);
   // Сразу меняем часовой токен Google на свою 90-дневную сессию — дальше вход
   // держится на ней и не зависит от One Tap, который в обёртке негде показать.
-  exchangeForSessionToken(resp.credential).then(()=>{fetchAILimit();});
+  exchangeForSessionToken(resp.credential).then(()=>{fetchAILimit();syncServerAccess();});
   hideAuthGate();
 }
 // Мост для Android-обёртки: Google блокирует свой вход внутри WebView как
@@ -11274,6 +11367,8 @@ function signOutGoogle(){
   [AK.jwt,AK.jwtExp,AK.email,AK.sub,AK.sess,AK.sessExp].forEach(ls.del);
   // Ключи бирж — чужие финансовые доступы; после выхода на устройстве им не место.
   ls.del('investory_exchange_keys');ls.del('investory_exchange_cache');
+  ls.del('investory_access');
+  try{const a=document.getElementById('adminSection');if(a)a.style.display='none';closeAdminPanel();}catch{}
   try{exchangeUi.busy={};exchangeUi.errors={};exchangeUi.formOpen=false;renderExchanges();}catch{}
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();}catch{}
   aiLimitInfo=null;
@@ -11649,6 +11744,256 @@ function _updateAILimitUI(){
   el.style.borderColor=low?'#f8717155':'#D4A84340';
   el.style.background=low?'#f871711a':'#D4A84315';
 }
+// Карточка на сервере: доступ, лимит ИИ, админ ли. При запуске, после входа,
+// раз в 6 часов и при возвращении в приложение (не чаще раза в час).
+var serverAccessSyncAt=0;
+async function syncServerAccess(){
+  if(!isSignedIn())return;
+  const gen=authGeneration;
+  serverAccessSyncAt=Date.now();
+  try{
+    const r=await fetch(AUTH_BASE+'/me',{method:'POST',
+      headers:{'Content-Type':'application/json',...authHeaders()},
+      body:JSON.stringify({email:getGoogleEmail()})});
+    if(!r.ok)return;
+    const d=await r.json();
+    if(gen!==authGeneration||!d||!d.access)return;
+    localStorage.setItem(SERVER_ACCESS_KEY,JSON.stringify({sub:getGoogleSub(),state:d.access.state,
+      endsAt:d.access.endsAt||null,until:d.access.until||null,days:d.access.days??null,isAdmin:!!d.isAdmin,at:Date.now()}));
+    if(d.ai&&typeof d.ai.left==='number'){aiLimitInfo={limit:d.ai.limit,used:d.ai.used,left:d.ai.left};try{_updateAILimitUI();}catch(e){}}
+    applyServerAccess();
+  }catch(e){}
+}
+function applyServerAccess(){
+  const state=refreshAccessState();
+  updateAccessUI();
+  const adminSec=document.getElementById('adminSection');
+  if(adminSec)adminSec.style.display=readServerAccess()?.isAdmin?'':'none';
+  document.getElementById('trialOverlay')?.style.setProperty('display','none');
+  if(state===ACCESS_STATES.LOCKED)openPaywall(serverAccessReason());
+  else{updatePaywallAccessText();document.getElementById('paywallOverlay')?.classList.remove('open');}
+}
+setInterval(()=>{syncServerAccess();},6*3600*1000);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&Date.now()-serverAccessSyncAt>3600*1000)syncServerAccess();
+});
+
+
+// ══ АДМИН-ПАНЕЛЬ ═════════════════════════════════════════════════════
+// Видна только владельцу: сервер проверяет аккаунт на каждом запросе, кнопка
+// в настройках — лишь удобство. Текст по-русски: панелью пользуется один человек.
+const adminState={tab:'summary',users:[],q:'',offset:0,more:false,cfg:null,openSub:null};
+async function adminFetch(path,body){
+  const r=await fetch(AUTH_BASE+path,{method:body?'POST':'GET',
+    headers:{'Content-Type':'application/json',...authHeaders()},body:body?JSON.stringify(body):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+function openAdminPanel(){
+  try{closeSettings();}catch(e){}
+  let ov=document.getElementById('adminOverlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='adminOverlay';ov.className='privacy-overlay';
+    ov.addEventListener('click',e=>{if(e.target===ov)closeAdminPanel();});
+    ov.innerHTML='<div class="privacy-box admin-box"><div class="privacy-head"><div class="privacy-title">🛠 Админ-панель</div>'+
+      '<button class="privacy-close" onclick="closeAdminPanel()">✕</button></div>'+
+      '<div class="admin-tabs"><button class="admin-tab" data-tab="summary" onclick="adminShow(\'summary\')">Сводка</button>'+
+      '<button class="admin-tab" data-tab="users" onclick="adminShow(\'users\')">Пользователи</button>'+
+      '<button class="admin-tab" data-tab="settings" onclick="adminShow(\'settings\')">Настройки</button></div>'+
+      '<div id="adminBody"></div></div>';
+    document.body.appendChild(ov);
+  }
+  ov.classList.add('open');
+  adminShow(adminState.tab);
+}
+function closeAdminPanel(){document.getElementById('adminOverlay')?.classList.remove('open');}
+function adminBody(html){const b=document.getElementById('adminBody');if(b)b.innerHTML=html;}
+function adminMsg(text,isErr){
+  const el=document.getElementById('adminMsg');
+  if(el){el.textContent=text;el.className='admin-msg'+(isErr?' err':'');}
+}
+const ADMIN_FOREVER=Date.UTC(2100,0,1);
+function adminDate(ms){return ms?new Date(ms).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';}
+function adminSeen(ms){
+  if(!ms)return '—';
+  const d=new Date(ms),now=new Date();
+  const time=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  const days=Math.floor((new Date(now.toDateString())-new Date(d.toDateString()))/86400000);
+  if(days<=0)return 'сегодня в '+time;
+  if(days===1)return 'вчера в '+time;
+  return days+' дн. назад';
+}
+function adminStatus(a){
+  if(!a)return {t:'—',c:''};
+  if(a.owner)return {t:'Владелец',c:'free'};
+  if(a.state==='free')return {t:'Бесплатно',c:'free'};
+  if(a.state==='trial')return {t:'Триал · '+Math.max(0,Math.ceil((a.endsAt-Date.now())/86400000))+' дн.',c:'trial'};
+  if(a.state==='locked')return {t:'Триал закончился',c:'locked'};
+  if(a.state==='subscribed')return {t:a.until>=ADMIN_FOREVER?'Подписка навсегда':'Подписка до '+adminDate(a.until),c:'pro'};
+  if(a.state==='banned')return {t:'Бан',c:'banned'};
+  return {t:a.state,c:''};
+}
+function adminShow(tab){
+  adminState.tab=tab;
+  document.querySelectorAll('#adminOverlay .admin-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  if(tab==='summary')adminLoadSummary();
+  else if(tab==='users'){adminState.openSub=null;adminLoadUsers(true);}
+  else adminLoadSettings();
+}
+async function adminLoadSummary(){
+  adminBody('<div class="admin-hint">Загрузка…</div>');
+  try{
+    const d=await adminFetch('/admin/summary');
+    const s=d.summary,c=d.config;
+    adminState.cfg=c;
+    const stat=(v,l)=>'<div class="admin-stat"><b>'+v+'</b><span>'+l+'</span></div>';
+    adminBody('<div class="admin-grid">'+
+      stat(s.total,'всего')+stat(s.activeToday,'сегодня')+stat(s.active7d,'за 7 дней')+
+      stat(s.free,'бесплатно')+stat(s.trial,'на триале')+stat(s.locked,'триал закончился')+
+      stat(s.subscribed,'подписка')+stat(s.banned,'бан')+stat(d.aiGlobalUsed+' / '+c.aiGlobalCap,'ИИ сегодня')+
+      '</div><div class="admin-hint" style="margin-top:12px">Триал для всех: <b>'+(c.trialEnabled?'включён, '+c.trialDays+' дн.':'выключен (без ограничения по времени)')+
+      '</b><br>ИИ: <b>'+c.aiDaily+'</b> в день на человека, общий потолок <b>'+c.aiGlobalCap+'</b>.</div>');
+  }catch(e){adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
+}
+async function adminLoadUsers(reset){
+  if(reset){adminState.offset=0;adminState.users=[];}
+  if(reset)adminBody('<div class="admin-search"><input class="field-input" id="adminQ" placeholder="Поиск по почте" value="'+escAttr(adminState.q)+'" onkeydown="if(event.key===\'Enter\')adminSearch()">'+
+    '<button class="admin-btn" onclick="adminSearch()">Найти</button></div><div id="adminList"><div class="admin-hint">Загрузка…</div></div>');
+  try{
+    const d=await adminFetch('/admin/users?q='+encodeURIComponent(adminState.q)+'&offset='+adminState.offset);
+    adminState.users=adminState.users.concat(d.users);
+    adminState.more=d.more;adminState.offset+=d.users.length;
+    adminRenderList();
+  }catch(e){const l=document.getElementById('adminList');if(l)l.innerHTML='<div class="admin-msg err">'+escHtml(e.message)+'</div>';}
+}
+function adminSearch(){adminState.q=String(document.getElementById('adminQ')?.value||'').trim();adminLoadUsers(true);}
+function adminRenderList(){
+  const l=document.getElementById('adminList');
+  if(!l)return;
+  if(!adminState.users.length){l.innerHTML='<div class="admin-hint">Никого не найдено.</div>';return;}
+  l.innerHTML=adminState.users.map(u=>{
+    const st=adminStatus(u.access);
+    return '<button class="admin-user" onclick="adminOpenUser(\''+escAttr(u.sub)+'\')"><div style="min-width:0">'+
+      '<div class="admin-user-name">'+escHtml(u.email||('ID …'+u.sub.slice(-6)))+'</div>'+
+      '<div class="admin-hint">был '+adminSeen(u.lastSeen)+' · ИИ сегодня '+u.aiToday+'</div></div>'+
+      '<span class="admin-chip '+st.c+'">'+escHtml(st.t)+'</span></button>';
+  }).join('')+(adminState.more?'<button class="admin-btn ghost" style="width:100%" onclick="adminLoadUsers(false)">Показать ещё</button>':'');
+}
+function adminOpenUser(sub){
+  const u=adminState.users.find(x=>x.sub===sub);
+  if(!u)return;
+  adminState.openSub=sub;
+  const st=adminStatus(u.access);
+  const cfg=adminState.cfg;
+  const proMode=!u.proUntil?'none':u.proUntil>=ADMIN_FOREVER?'forever':'until';
+  const proDate=u.proUntil&&u.proUntil<ADMIN_FOREVER?new Date(u.proUntil).toISOString().slice(0,10):'';
+  adminBody('<button class="admin-btn ghost" onclick="adminShow(\'users\')">‹ Назад к списку</button>'+
+    '<div class="admin-card"><div class="admin-user-name" style="font-size:15px">'+escHtml(u.email||'почта неизвестна')+'</div>'+
+    '<div class="admin-hint">ID: '+escHtml(u.sub)+'<br>первый вход: '+adminDate(u.firstSeen)+' · был '+adminSeen(u.lastSeen)+
+    '<br>ИИ: сегодня '+u.aiToday+', всего '+u.aiTotal+'</div>'+
+    '<div style="margin-top:8px"><span class="admin-chip '+st.c+'">'+escHtml(st.t)+'</span></div></div>'+
+    '<div class="admin-field"><div class="admin-label">Триал</div>'+
+      '<select class="field-input" id="auTrialMode" onchange="document.getElementById(\'auTrialDaysRow\').style.display=this.value===\'days\'?\'\':\'none\'">'+
+        '<option value="default"'+(u.trialMode==='default'?' selected':'')+'>Как у всех ('+(cfg&&cfg.trialEnabled?cfg.trialDays+' дн.':'выключен')+')</option>'+
+        '<option value="off"'+(u.trialMode==='off'?' selected':'')+'>Выключен — без ограничения по времени</option>'+
+        '<option value="days"'+(u.trialMode==='days'?' selected':'')+'>Свой срок</option></select>'+
+      '<div id="auTrialDaysRow" style="margin-top:6px;'+(u.trialMode==='days'?'':'display:none')+'"><input class="field-input" id="auTrialDays" type="number" min="0" max="3650" inputmode="numeric" placeholder="дней" value="'+(u.trialDays??'')+'"></div>'+
+      '<button class="admin-btn ghost" style="margin-top:6px" onclick="adminRestartTrial()">Начать триал заново (с сегодня)</button>'+
+      '<div class="admin-hint">Триал считается с первого входа'+(u.trialStart?' (перезапущен '+adminDate(u.trialStart)+')':'')+'.</div></div>'+
+    '<div class="admin-field"><div class="admin-label">ИИ-запросов в день</div>'+
+      '<input class="field-input" id="auAiLimit" type="number" min="0" max="1000" inputmode="numeric" placeholder="как у всех ('+(cfg?cfg.aiDaily:3)+')" value="'+(u.aiLimit??'')+'"></div>'+
+    '<div class="admin-field"><div class="admin-label">Подписка вручную</div>'+
+      '<select class="field-input" id="auProMode" onchange="document.getElementById(\'auProDate\').style.display=this.value===\'until\'?\'\':\'none\'">'+
+        '<option value="none"'+(proMode==='none'?' selected':'')+'>Нет</option>'+
+        '<option value="until"'+(proMode==='until'?' selected':'')+'>До даты</option>'+
+        '<option value="forever"'+(proMode==='forever'?' selected':'')+'>Навсегда</option></select>'+
+      '<input class="field-input" id="auProDate" type="date" style="margin-top:6px;'+(proMode==='until'?'':'display:none')+'" value="'+proDate+'"></div>'+
+    '<div class="admin-field"><label class="admin-check"><input type="checkbox" id="auBanned"'+(u.banned?' checked':'')+'> Бан — закрыть доступ</label></div>'+
+    '<div class="admin-field"><div class="admin-label">Заметка</div><textarea class="field-input" id="auNote" rows="2" maxlength="500">'+escHtml(u.note||'')+'</textarea></div>'+
+    '<div id="adminMsg" class="admin-msg"></div>'+
+    '<button class="admin-btn" style="width:100%" onclick="adminSaveUser()">Сохранить</button>'+
+    (u.access&&u.access.owner?'':'<button class="admin-btn danger" style="width:100%;margin-top:8px" onclick="adminDeleteUser()">Удалить пользователя</button>'));
+}
+function adminReplaceUser(user){
+  const i=adminState.users.findIndex(x=>x.sub===user.sub);
+  if(i>=0)adminState.users[i]=user;
+  adminOpenUser(user.sub);
+}
+async function adminSaveUser(){
+  const sub=adminState.openSub;
+  const mode=document.getElementById('auTrialMode').value;
+  const daysRaw=document.getElementById('auTrialDays').value.trim();
+  const aiRaw=document.getElementById('auAiLimit').value.trim();
+  const proMode=document.getElementById('auProMode').value;
+  const proDate=document.getElementById('auProDate').value;
+  const set={trialMode:mode,banned:document.getElementById('auBanned').checked,note:document.getElementById('auNote').value};
+  if(mode==='days'){
+    const n=parseInt(daysRaw,10);
+    if(!Number.isInteger(n)||n<0){adminMsg('Укажи количество дней триала',true);return;}
+    set.trialDays=n;
+  }
+  set.aiLimit=aiRaw===''?null:parseInt(aiRaw,10);
+  if(set.aiLimit!==null&&!(set.aiLimit>=0)){adminMsg('Лимит ИИ — целое число',true);return;}
+  if(proMode==='none')set.proUntil=null;
+  else if(proMode==='forever')set.proUntil=ADMIN_FOREVER;
+  else{
+    if(!proDate){adminMsg('Выбери дату окончания подписки',true);return;}
+    set.proUntil=new Date(proDate+'T23:59:59').getTime();
+  }
+  try{
+    adminMsg('Сохраняю…');
+    const d=await adminFetch('/admin/user',{sub,set});
+    adminReplaceUser(d.user);
+    adminMsg('Сохранено. У человека изменится при следующем открытии приложения.');
+  }catch(e){adminMsg(e.message,true);}
+}
+async function adminRestartTrial(){
+  try{
+    const d=await adminFetch('/admin/user',{sub:adminState.openSub,set:{restartTrial:true}});
+    adminReplaceUser(d.user);
+    adminMsg('Триал начат заново с сегодняшнего дня.');
+  }catch(e){adminMsg(e.message,true);}
+}
+function adminDeleteUser(){
+  const sub=adminState.openSub;
+  customConfirm('Удалить карточку пользователя? Его настройки (триал, лимиты, бан) пропадут, при следующем входе карточка создастся заново.',async()=>{
+    try{
+      await adminFetch('/admin/user/delete',{sub});
+      adminState.users=adminState.users.filter(x=>x.sub!==sub);
+      adminShow('users');
+    }catch(e){adminMsg(e.message,true);}
+  });
+}
+async function adminLoadSettings(){
+  adminBody('<div class="admin-hint">Загрузка…</div>');
+  try{
+    const c=(await adminFetch('/admin/config')).config;
+    adminState.cfg=c;
+    adminBody('<div class="admin-field"><label class="admin-check"><input type="checkbox" id="acTrial"'+(c.trialEnabled?' checked':'')+'> Триал для всех включён</label>'+
+      '<div class="admin-hint">Выключен — пользоваться можно без ограничения по времени. Включён — столько дней с первого входа, потом экран подписки.</div></div>'+
+      '<div class="admin-field"><div class="admin-label">Дней триала</div><input class="field-input" id="acDays" type="number" min="0" max="3650" inputmode="numeric" value="'+c.trialDays+'"></div>'+
+      '<div class="admin-hint admin-warn">⚠ Оплаты пока нет: когда триал закончится, человек увидит экран подписки и не сможет пользоваться приложением.</div>'+
+      '<div class="admin-field" style="margin-top:12px"><div class="admin-label">ИИ-запросов в день на человека</div><input class="field-input" id="acAi" type="number" min="0" max="1000" inputmode="numeric" value="'+c.aiDaily+'"></div>'+
+      '<div class="admin-field"><div class="admin-label">Общий потолок ИИ в сутки (на всех)</div><input class="field-input" id="acCap" type="number" min="0" max="100000" inputmode="numeric" value="'+c.aiGlobalCap+'">'+
+      '<div class="admin-hint">Один запрос стоит около $0,007. 100 запросов ≈ $0,70 в сутки.</div></div>'+
+      '<div id="adminMsg" class="admin-msg"></div>'+
+      '<button class="admin-btn" style="width:100%" onclick="adminSaveSettings()">Сохранить</button>'+
+      '<div class="admin-hint" style="margin-top:8px">Изменения доходят до сервера за полминуты, у людей — при следующем открытии приложения. Личные настройки пользователя важнее общих.</div>');
+  }catch(e){adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
+}
+async function adminSaveSettings(){
+  const n=id=>parseInt(document.getElementById(id).value,10);
+  const body={trialEnabled:document.getElementById('acTrial').checked,trialDays:n('acDays'),aiDaily:n('acAi'),aiGlobalCap:n('acCap')};
+  if(![body.trialDays,body.aiDaily,body.aiGlobalCap].every(v=>Number.isInteger(v)&&v>=0)){adminMsg('Все числа — целые, не меньше нуля',true);return;}
+  try{
+    adminMsg('Сохраняю…');
+    adminState.cfg=(await adminFetch('/admin/config',body)).config;
+    adminMsg('Сохранено.');
+  }catch(e){adminMsg(e.message,true);}
+}
+
 async function fetchAILimit(){
   try{
     const resp=await fetch(LIMIT_WORKER+'?userId='+encodeURIComponent(getDeviceId()),
@@ -12131,6 +12476,9 @@ function accessTxt(key){
     trial:{uk:'Тріал',ru:'Триал',en:'Trial',de:'Testphase',zh:'试用'},
     days:{uk:'дн.',ru:'дн.',en:'days',de:'Tage',zh:'天'},
     required:{uk:'Потрібна підписка',ru:'Требуется подписка',en:'Subscription required',de:'Abonnement erforderlich',zh:'需要订阅'},
+    banned:{uk:'Доступ до застосунку обмежено. Якщо це помилка — напишіть на mnacik1988@gmail.com.',ru:'Доступ к приложению ограничен. Если это ошибка — напишите на mnacik1988@gmail.com.',en:'Access to the app is restricted. If this is a mistake, write to mnacik1988@gmail.com.',de:'Der Zugang zur App ist eingeschränkt. Falls das ein Fehler ist, schreiben Sie an mnacik1988@gmail.com.',zh:'应用访问已受限。如有误，请联系 mnacik1988@gmail.com。'},
+    expiredN:{uk:'Пробний період ({n} дн.) завершився. Для продовження потрібна підписка.',ru:'Пробный период ({n} дн.) завершён. Для продолжения требуется подписка.',en:'Your {n}-day trial has ended. A subscription is required to continue.',de:'Die Testphase ({n} Tage) ist beendet. Zum Fortfahren ist ein Abo erforderlich.',zh:'{n} 天试用期已结束，需要订阅才能继续。'},
+    free:{uk:'Безкоштовно',ru:'Бесплатно',en:'Free',de:'Kostenlos',zh:'免费'},
     expired:{uk:'30-денний пробний період завершився. Для продовження потрібна підписка.',ru:'30-дневный пробный период завершён. Для продолжения требуется подписка.',en:'Your 30-day trial has ended. A subscription is required to continue.',de:'Die 30-tägige Testphase ist beendet. Zum Fortfahren ist ein Abo erforderlich.',zh:'30 天试用期已结束，需要订阅才能继续。'},
     subscribe:{uk:'Оформити підписку',ru:'Оформить подписку',en:'Subscribe',de:'Abonnieren',zh:'订阅'},
     restore:{uk:'Відновити підписку',ru:'Восстановить подписку',en:'Restore subscription',de:'Abo wiederherstellen',zh:'恢复订阅'},
@@ -12158,10 +12506,18 @@ function updateAccessUI(){
   }
 }
 function updatePaywallAccessText(reason){
-  const locked=refreshAccessState()===ACCESS_STATES.LOCKED&&Boolean(localStorage.getItem('trial_start'));
-  if(!locked)return;
-  setText('pw_title',accessTxt('required'));
-  setText('pw_sub',reason||accessTxt('expired'));
+  const srv=readServerAccess();
+  const locked=refreshAccessState()===ACCESS_STATES.LOCKED&&(Boolean(localStorage.getItem('trial_start'))||!!srv);
+  // Тексты экрана подписки подменяются только на время закрытого доступа:
+  // после разбана или продления триала возвращаем прежние.
+  const ids=['pw_title','pw_sub','pw_btn','pw_restore'];
+  if(!locked){
+    ids.forEach(id=>{const el=document.getElementById(id);if(el&&el.dataset.orig!==undefined){el.textContent=el.dataset.orig;delete el.dataset.orig;}});
+    return;
+  }
+  ids.forEach(id=>{const el=document.getElementById(id);if(el&&el.dataset.orig===undefined)el.dataset.orig=el.textContent;});
+  setText('pw_title',srv&&srv.state==='banned'?'⛔':accessTxt('required'));
+  setText('pw_sub',reason||serverAccessReason());
   setText('pw_btn',accessTxt('subscribe'));
   setText('pw_restore',accessTxt('restore'));
 }
@@ -12169,6 +12525,8 @@ function checkTrial(){
   const state=refreshAccessState();
   updateAccessUI();
   if(state!==ACCESS_STATES.LOCKED)return;
+  // Решение сервера уже есть — предложение «начать триал» не нужно.
+  if(readServerAccess()){setTimeout(()=>openPaywall(serverAccessReason()),500);return;}
   if(!localStorage.getItem('trial_start')){
     setTimeout(showTrialOffer,500);
     return;

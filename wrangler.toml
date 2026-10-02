@@ -14,3 +14,10 @@ GOOGLE_CLIENT_ID = "802898443875-ipii5n1uh9u2i4n9iu87r5ks51pjk6tl.apps.googleuse
 [[kv_namespaces]]
 binding = "AI_LIMITS"
 id = "ac103a7abff8418082c6e90fa8baea5b"
+
+# Карточки пользователей и настройки доступа (триал, лимиты, бан) — для админ-панели.
+# D1: 100 000 записей в сутки бесплатно против 1 000 у KV.
+[[d1_databases]]
+binding = "DB"
+database_name = "investory"
+database_id = "13bad18d-76dd-4210-988a-fc25bc3fd770"

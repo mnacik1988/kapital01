@@ -27,9 +27,6 @@ const AI_GLOBAL_DAILY_CAP = 100;
 // чтобы проверять ИИ без упора в лимит.
 const AI_USER_DAILY_LIMIT = 3;
 const AI_OWNER_DAILY_LIMIT = 10;
-function aiDailyLimitFor(userId) {
-  return userId === 'g' + ADMIN_SUB ? AI_OWNER_DAILY_LIMIT : AI_USER_DAILY_LIMIT;
-}
 const AI_IP_PER_MIN = 10;          // всплески с одного IP
 const AUTH_IP_PER_MIN = 20;        // попытки входа с одного IP
 // true с 17.09.2026: запрос к ИИ без проверенного Google-токена не обслуживается.
@@ -246,6 +243,7 @@ async function handleAuth(request, url, origin, env) {
   try { body = await request.json(); } catch { return json({ error: 'Invalid body' }, 400, origin); }
   const sub = await verifyAuthToken(String(body.idToken || ''), env);
   if (!sub) return json({ error: 'Invalid token' }, 401, origin);
+  await rememberVerifiedEmail(env, sub, body.idToken);
   const { token, exp } = await signSessionToken(sub, env);
   return json({ token, exp }, 200, origin, 0);
 }
@@ -300,6 +298,16 @@ async function handleRequest(request, env, ctx) {
         return json({ error: 'Too many requests' }, 429, origin, 0);
       }
       return handleExRelay(request, origin, env);
+    }
+
+    // Карточка пользователя и админ-панель — свои лимиты частоты, GET и POST.
+    if (url.pathname === '/me') {
+      if (await isRateLimited('me', ip, 30, 60)) return json({ error: 'Too many requests' }, 429, origin, 0);
+      return handleMe(request, origin, env);
+    }
+    if (url.pathname.startsWith('/admin/')) {
+      if (await isRateLimited('admin', ip, 120, 60)) return json({ error: 'Too many requests' }, 429, origin, 0);
+      return handleAdmin(request, url, origin, env);
     }
 
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
@@ -611,6 +619,10 @@ async function handleExRelay(request, origin, env) {
   if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
   const sub = await verifyAuthToken(bearerToken(request), env);
   if (!sub) return json({ error: 'Sign-in required' }, 401, origin);
+  try {
+    const st = computeAccess(await getUserRecord(env, sub), await getAccessConfig(env), Date.now(), sub).state;
+    if (st === 'banned' || st === 'locked') return json({ error: 'Access restricted' }, 403, origin);
+  } catch { /* база недоступна — не ломаем просмотр баланса */ }
   let body;
   try { body = await request.json(); } catch { return json({ error: 'Invalid body' }, 400, origin); }
   const route = EXRELAY_ROUTES[String(body.ex || '')];
@@ -645,6 +657,260 @@ async function handleExRelay(request, origin, env) {
   }
   if (!last) return json({ error: 'Exchange unreachable' }, 502, origin);
   return json(last, 200, origin, 0);
+}
+
+// ══ КАРТОЧКИ ПОЛЬЗОВАТЕЛЕЙ И ДОСТУП (D1) ═══════════════════════════════
+// Решение о доступе принимает сервер: триал (вкл/выкл, срок — для всех и для
+// отдельного человека), подписка, выданная вручную, личный лимит ИИ, бан.
+// Раньше триал жил только в памяти телефона — управлять им было нельзя, а
+// очистка данных начинала его заново. Начало триала теперь — первый вход на
+// сервер, и оно одно на все устройства человека.
+// Хранится только то, что нужно для этого: ID аккаунта Google, почта, даты
+// первого и последнего входа, счётчики ИИ, настройки администратора.
+// D1, а не KV: 100 000 записей в сутки бесплатно против 1 000.
+const ACCESS_DEFAULTS = {
+  trialEnabled: false,          // false = пользоваться можно без ограничения по времени
+  trialDays: 30,
+  aiDaily: AI_USER_DAILY_LIMIT,
+  aiGlobalCap: AI_GLOBAL_DAILY_CAP
+};
+let schemaReady = false;
+let accessCfgCache = null;
+let accessCfgAt = 0;
+
+async function ensureSchema(env) {
+  if (schemaReady || !env.DB) return;
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS users (
+      sub TEXT PRIMARY KEY, email TEXT,
+      first_seen INTEGER NOT NULL, last_seen INTEGER NOT NULL,
+      trial_mode TEXT NOT NULL DEFAULT 'default', trial_days INTEGER, trial_start INTEGER,
+      ai_limit INTEGER, pro_until INTEGER, banned INTEGER NOT NULL DEFAULT 0, note TEXT,
+      ai_total INTEGER NOT NULL DEFAULT 0, ai_day TEXT, ai_day_count INTEGER NOT NULL DEFAULT 0)`),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS users_last_seen ON users(last_seen)'),
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS config (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
+  ]);
+  schemaReady = true;
+}
+
+function cleanAccessConfig(c) {
+  const out = {};
+  if (!c || typeof c !== 'object') return out;
+  const int = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
+  if (typeof c.trialEnabled === 'boolean') out.trialEnabled = c.trialEnabled;
+  if (int(c.trialDays, 0, 3650)) out.trialDays = c.trialDays;
+  if (int(c.aiDaily, 0, 1000)) out.aiDaily = c.aiDaily;
+  if (int(c.aiGlobalCap, 0, 100000)) out.aiGlobalCap = c.aiGlobalCap;
+  return out;
+}
+
+// Кеш на 30 секунд на копию воркера: изменение в админке доходит до всех за полминуты.
+async function getAccessConfig(env) {
+  if (accessCfgCache && Date.now() - accessCfgAt < 30000) return accessCfgCache;
+  let cfg = { ...ACCESS_DEFAULTS };
+  if (env.DB) {
+    try {
+      await ensureSchema(env);
+      const row = await env.DB.prepare('SELECT value FROM config WHERE key = ?').bind('access').first();
+      if (row) cfg = { ...cfg, ...cleanAccessConfig(JSON.parse(row.value)) };
+    } catch { /* без базы — значения по умолчанию */ }
+  }
+  accessCfgCache = cfg;
+  accessCfgAt = Date.now();
+  return cfg;
+}
+
+function cleanEmail(v) {
+  const e = String(v || '').trim().toLowerCase();
+  return /^[^\s@<>"'`]{1,64}@[^\s@<>"'`]{1,190}$/.test(e) ? e : null;
+}
+
+// Создаёт карточку при первом обращении. touch — отметить «был сейчас».
+async function getUserRecord(env, sub, { touch = false, email = null } = {}) {
+  if (!env.DB || !sub) return null;
+  await ensureSchema(env);
+  const now = Date.now();
+  if (touch) {
+    await env.DB.prepare(`INSERT INTO users (sub, email, first_seen, last_seen) VALUES (?1, ?2, ?3, ?3)
+      ON CONFLICT(sub) DO UPDATE SET last_seen = ?3, email = COALESCE(users.email, ?2)`)
+      .bind(sub, cleanEmail(email), now).run();
+  } else {
+    await env.DB.prepare('INSERT OR IGNORE INTO users (sub, email, first_seen, last_seen) VALUES (?1, ?2, ?3, ?3)')
+      .bind(sub, cleanEmail(email), now).run();
+  }
+  return env.DB.prepare('SELECT * FROM users WHERE sub = ?').bind(sub).first();
+}
+
+function computeAccess(rec, cfg, now, sub) {
+  // Владелец не может закрыть приложение сам себе — иначе не попасть и в админку.
+  if (sub === ADMIN_SUB) return { state: 'free', owner: true };
+  if (!rec) return { state: cfg.trialEnabled ? 'trial' : 'free' };
+  if (rec.banned) return { state: 'banned' };
+  if (rec.pro_until && rec.pro_until > now) return { state: 'subscribed', until: rec.pro_until };
+  let enabled = cfg.trialEnabled;
+  let days = cfg.trialDays;
+  if (rec.trial_mode === 'off') enabled = false;
+  else if (rec.trial_mode === 'days') {
+    enabled = true;
+    if (Number.isInteger(rec.trial_days)) days = rec.trial_days;
+  }
+  if (!enabled) return { state: 'free' };
+  const endsAt = (rec.trial_start || rec.first_seen) + days * DAY_SEC * 1000;
+  return { state: endsAt > now ? 'trial' : 'locked', endsAt, days };
+}
+
+function aiLimitFor(sub, rec, cfg) {
+  if (rec && Number.isInteger(rec.ai_limit)) return rec.ai_limit;
+  if (sub === ADMIN_SUB) return AI_OWNER_DAILY_LIMIT;
+  return cfg.aiDaily;
+}
+
+// Почта из ПРОВЕРЕННОГО токена Google — при входе. Подпись проверена выше.
+async function rememberVerifiedEmail(env, sub, idToken) {
+  if (!env.DB) return;
+  try {
+    const payload = JSON.parse(new TextDecoder().decode(b64urlToBytes(String(idToken).split('.')[1])));
+    const email = payload.email_verified === false ? null : cleanEmail(payload.email);
+    if (!email) return;
+    await ensureSchema(env);
+    const now = Date.now();
+    await env.DB.prepare(`INSERT INTO users (sub, email, first_seen, last_seen) VALUES (?1, ?2, ?3, ?3)
+      ON CONFLICT(sub) DO UPDATE SET email = ?2, last_seen = ?3`).bind(sub, email, now).run();
+  } catch { /* карточка не должна мешать входу */ }
+}
+
+// Что приложение узнаёт о себе при запуске: доступ, лимит ИИ, админ ли.
+async function handleMe(request, origin, env) {
+  const sub = await verifyAuthToken(bearerToken(request), env);
+  if (!sub) return json({ error: 'Sign in required' }, 401, origin);
+  let body = {};
+  if (request.method === 'POST') { try { body = await request.json(); } catch {} }
+  const cfg = await getAccessConfig(env);
+  let rec = null;
+  try { rec = await getUserRecord(env, sub, { touch: true, email: body.email }); } catch {}
+  const now = Date.now();
+  const used = await readCount(env, 'user:g' + sub + ':' + todayKey());
+  const limit = aiLimitFor(sub, rec, cfg);
+  return json({
+    access: computeAccess(rec, cfg, now, sub),
+    ai: { limit, used: used || 0, left: Math.max(0, limit - (used || 0)) },
+    isAdmin: sub === ADMIN_SUB,
+    serverTime: now
+  }, 200, origin, 0);
+}
+
+// ── Админ-панель ──────────────────────────────────────────────────────
+async function requireAdmin(request, env, origin) {
+  const sub = await verifyAuthToken(bearerToken(request), env);
+  if (!sub) return json({ error: 'Sign in required' }, 401, origin);
+  if (sub !== ADMIN_SUB) return json({ error: 'Not allowed' }, 403, origin);
+  if (!env.DB) return json({ error: 'Database not bound' }, 503, origin);
+  await ensureSchema(env);
+  return null;
+}
+
+function adminRow(r, cfg, now, today) {
+  return {
+    sub: r.sub, email: r.email, firstSeen: r.first_seen, lastSeen: r.last_seen,
+    trialMode: r.trial_mode, trialDays: r.trial_days, trialStart: r.trial_start,
+    aiLimit: r.ai_limit, proUntil: r.pro_until, banned: !!r.banned, note: r.note || '',
+    aiTotal: r.ai_total, aiToday: r.ai_day === today ? r.ai_day_count : 0,
+    access: computeAccess(r, cfg, now, r.sub)
+  };
+}
+
+async function handleAdmin(request, url, origin, env) {
+  const denied = await requireAdmin(request, env, origin);
+  if (denied) return denied;
+  const cfg = await getAccessConfig(env);
+  const now = Date.now();
+  const today = todayKey();
+  const path = url.pathname;
+  let body = {};
+  if (request.method === 'POST') {
+    try { body = await request.json(); } catch { return json({ error: 'Invalid body' }, 400, origin); }
+  }
+
+  if (path === '/admin/summary' && request.method === 'GET') {
+    const { results } = await env.DB.prepare(
+      'SELECT sub, first_seen, last_seen, trial_mode, trial_days, trial_start, pro_until, banned, ai_day, ai_day_count FROM users LIMIT 50000').all();
+    const dayStart = Date.parse(today + 'T00:00:00Z');
+    const sum = { total: results.length, activeToday: 0, active7d: 0, free: 0, trial: 0, locked: 0, subscribed: 0, banned: 0, aiToday: 0 };
+    for (const r of results) {
+      if (r.last_seen >= dayStart) sum.activeToday++;
+      if (r.last_seen >= now - 7 * DAY_SEC * 1000) sum.active7d++;
+      const st = computeAccess(r, cfg, now, r.sub).state;
+      if (sum[st] !== undefined) sum[st]++;
+      if (r.ai_day === today) sum.aiToday += r.ai_day_count || 0;
+    }
+    const globalUsed = await readCount(env, 'global:' + today);
+    return json({ summary: sum, aiGlobalUsed: globalUsed || 0, config: cfg }, 200, origin, 0);
+  }
+
+  if (path === '/admin/users' && request.method === 'GET') {
+    const q = String(url.searchParams.get('q') || '').trim().toLowerCase().slice(0, 100);
+    const offset = Math.max(0, parseInt(url.searchParams.get('offset'), 10) || 0);
+    const like = '%' + q.replace(/[%_]/g, '') + '%';
+    const { results } = await env.DB.prepare(
+      `SELECT * FROM users WHERE (?1 = '' OR email LIKE ?2 OR sub LIKE ?2) ORDER BY last_seen DESC LIMIT 50 OFFSET ?3`)
+      .bind(q, like, offset).all();
+    return json({ users: results.map(r => adminRow(r, cfg, now, today)), offset, more: results.length === 50 }, 200, origin, 0);
+  }
+
+  if (path === '/admin/config') {
+    if (request.method === 'POST') {
+      const next = { ...cfg, ...cleanAccessConfig(body) };
+      await env.DB.prepare('INSERT INTO config (key, value) VALUES (?1, ?2) ON CONFLICT(key) DO UPDATE SET value = ?2')
+        .bind('access', JSON.stringify(cleanAccessConfig(next))).run();
+      accessCfgCache = null;
+      return json({ config: await getAccessConfig(env) }, 200, origin, 0);
+    }
+    return json({ config: cfg }, 200, origin, 0);
+  }
+
+  if (path === '/admin/user' && request.method === 'POST') {
+    const sub = String(body.sub || '');
+    if (!/^\d{5,40}$/.test(sub)) return json({ error: 'Invalid user' }, 400, origin);
+    const set = body.set || {};
+    const fields = [];
+    const vals = [];
+    const put = (col, v) => { fields.push(col + ' = ?'); vals.push(v); };
+    if (set.trialMode !== undefined) {
+      if (!['default', 'off', 'days'].includes(set.trialMode)) return json({ error: 'Invalid trial mode' }, 400, origin);
+      put('trial_mode', set.trialMode);
+    }
+    if (set.trialDays !== undefined) {
+      if (set.trialDays !== null && !(Number.isInteger(set.trialDays) && set.trialDays >= 0 && set.trialDays <= 3650)) return json({ error: 'Invalid trial days' }, 400, origin);
+      put('trial_days', set.trialDays);
+    }
+    if (set.restartTrial === true) put('trial_start', now);
+    if (set.aiLimit !== undefined) {
+      if (set.aiLimit !== null && !(Number.isInteger(set.aiLimit) && set.aiLimit >= 0 && set.aiLimit <= 1000)) return json({ error: 'Invalid AI limit' }, 400, origin);
+      put('ai_limit', set.aiLimit);
+    }
+    if (set.proUntil !== undefined) {
+      if (set.proUntil !== null && !(Number.isInteger(set.proUntil) && set.proUntil > 0)) return json({ error: 'Invalid date' }, 400, origin);
+      put('pro_until', set.proUntil);
+    }
+    if (set.banned !== undefined) put('banned', set.banned ? 1 : 0);
+    if (set.note !== undefined) put('note', String(set.note || '').slice(0, 500));
+    if (!fields.length) return json({ error: 'Nothing to change' }, 400, origin);
+    vals.push(sub);
+    const res = await env.DB.prepare('UPDATE users SET ' + fields.join(', ') + ' WHERE sub = ?').bind(...vals).run();
+    if (!res.meta || !res.meta.changes) return json({ error: 'User not found' }, 404, origin);
+    const row = await env.DB.prepare('SELECT * FROM users WHERE sub = ?').bind(sub).first();
+    return json({ user: adminRow(row, cfg, now, today) }, 200, origin, 0);
+  }
+
+  if (path === '/admin/user/delete' && request.method === 'POST') {
+    const sub = String(body.sub || '');
+    if (!/^\d{5,40}$/.test(sub)) return json({ error: 'Invalid user' }, 400, origin);
+    if (sub === ADMIN_SUB) return json({ error: 'Cannot delete the owner' }, 400, origin);
+    await env.DB.prepare('DELETE FROM users WHERE sub = ?').bind(sub).run();
+    return json({ ok: true }, 200, origin, 0);
+  }
+
+  return json({ error: 'Not found' }, 404, origin);
 }
 
 // Один источник userId для лимитов: проверенный sub из токена. REQUIRE_AUTH
@@ -692,14 +958,19 @@ async function handleStats(request, url, env, origin) {
 async function handleLimit(request, url, env, origin) {
   const { userId } = await resolveUserId(request, env, url.searchParams.get('userId'));
   if (!userId) return json({ error: 'Sign in required' }, 401, origin);
+  const sub = userId.slice(1);
+  const cfg = await getAccessConfig(env);
+  let rec = null;
+  try { rec = await getUserRecord(env, sub); } catch {}
+  const limit = aiLimitFor(sub, rec, cfg);
   const day = todayKey();
   const used = await readCount(env, 'user:' + userId + ':' + day);
   const globalUsed = await readCount(env, 'global:' + day);
   return json({
-    limit: aiDailyLimitFor(userId),
+    limit,
     used,
-    left: Math.max(0, aiDailyLimitFor(userId) - used),
-    globalLeft: Math.max(0, AI_GLOBAL_DAILY_CAP - globalUsed)
+    left: Math.max(0, limit - used),
+    globalLeft: Math.max(0, cfg.aiGlobalCap - globalUsed)
   }, 200, origin, 0);
 }
 
@@ -733,6 +1004,13 @@ async function handleAI(request, origin, env) {
   const { userId } = await resolveUserId(request, env, body.userId);
   if (!userId) return json({ error: 'Увійди через Google, щоб користуватися AI.' }, 401, origin);
   const uKey = 'user:' + userId + ':' + day;
+  const sub = userId.slice(1);
+  const cfg = await getAccessConfig(env);
+  let rec = null;
+  try { rec = await getUserRecord(env, sub, { touch: true }); } catch {}
+  const access = computeAccess(rec, cfg, Date.now(), sub);
+  if (access.state === 'banned') return json({ error: 'Доступ обмежено.' }, 403, origin, 0);
+  if (access.state === 'locked') return json({ error: 'Пробний період завершено.' }, 402, origin, 0);
 
   // Сначала ЧИТАЕМ оба счётчика и решаем — отказ не тратит квоту записи KV.
   // null означает «прочитать не удалось»: тогда отказываем. Раньше в этом месте
@@ -741,14 +1019,14 @@ async function handleAI(request, origin, env) {
   if (globalUsed === null) {
     return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
   }
-  if (globalUsed >= AI_GLOBAL_DAILY_CAP) {
+  if (globalUsed >= cfg.aiGlobalCap) {
     return json({ error: 'Денний ліміт запитів до AI вичерпано. Спробуй завтра.' }, 200, origin, 0);
   }
   const userUsed = await readCount(env, uKey);
   if (userUsed === null) {
     return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
   }
-  const userLimit = aiDailyLimitFor(userId);
+  const userLimit = aiLimitFor(sub, rec, cfg);
   if (userUsed >= userLimit) {
     return json({
       error: 'Ти вичерпав денний ліміт запитів до AI. Спробуй завтра.',
@@ -825,6 +1103,13 @@ async function handleAI(request, origin, env) {
   // Резерв уже сделан выше — здесь только учёт токенов. Ошибки Anthropic лимит
   // не съедают: на всех путях отказа резерв снимается (см. releaseReservation).
   await recordUsage(env, data?.usage);
+  if (env.DB) {
+    try {
+      await env.DB.prepare(`UPDATE users SET ai_total = ai_total + 1,
+        ai_day_count = CASE WHEN ai_day = ?2 THEN ai_day_count + 1 ELSE 1 END, ai_day = ?2 WHERE sub = ?1`)
+        .bind(sub, day).run();
+    } catch { /* учёт для админки не должен ронять ответ */ }
+  }
 
   return json({
     content,

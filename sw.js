@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-36-privacy-policy';
+﻿const CACHE_NAME = 'investory-app-v0-1-37-admin-panel';
 const APP_SHELL = [
   './',
   './index.html',
