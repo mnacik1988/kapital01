@@ -271,9 +271,6 @@ async function handleRequest(request, env, ctx) {
 
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
 
-    // Счётчики копятся в памяти, сюда попадает только периодический сброс —
-    // waitUntil, чтобы запись не задерживала ответ пользователю.
-    if (ctx && ctx.waitUntil) ctx.waitUntil(flushApiStats(env));
 
     // Вход и продление сессии — POST, до GET-guard
     if (url.pathname === '/auth' || url.pathname === '/auth/session' || url.pathname === '/auth/refresh') {
@@ -403,67 +400,12 @@ async function releaseCount(env, key, prevValue) {
 
 // Увеличивает суточный счётчик. KV согласуется не мгновенно — пара лишних запросов
 // может проскочить, для защиты расходов это приемлемо.
-// ── Счётчики обращений к внешним сервисам ─────────────────────────────
-// Считаем, чтобы знать ёмкость приложения по фактам, а не по арифметике:
-// у Finnhub бесплатный тариф в 60 вызовов в минуту, и отказы 429 мы уже ловили
-// при одном пользователе. Отдельно разделяем «ушло к провайдеру» (miss) и
-// «отдал кеш Cloudflare» (hit) — на лимит провайдера влияет только первое.
-//
-// Копим в памяти и сбрасываем не чаще раза в 5 минут: на бесплатном тарифе KV
-// ограничено число записей в сутки, и запись на каждый вызов выбрала бы его
-// целиком, заодно сломав счётчики ИИ, то есть защиту от перерасхода.
-// Плата за это — при перезапуске изолята теряются несобранные единицы, поэтому
-// цифры верны «с точностью до нескольких вызовов», а не до одного.
-const API_STATS_FLUSH_MS = 5 * 60 * 1000;
-let apiStatsPending = {};
-let apiStatsFlushedAt = 0;
-
-function providerName(url) {
-  let host = '';
-  try { host = new URL(url).hostname; } catch { return 'unknown'; }
-  if (host.includes('finnhub')) return 'finnhub';
-  if (host.includes('coingecko')) return 'coingecko';
-  if (host.includes('er-api')) return 'rates';
-  if (host.includes('bank.gov.ua')) return 'nbu';
-  if (host.includes('yahoo')) return 'yahoo';
-  if (host.includes('googleapis')) return 'google-jwks';
-  if (host.includes('anthropic')) return 'anthropic';
-  return host;
-}
-
-function countApi(url, outcome) {
-  const name = providerName(url);
-  const row = apiStatsPending[name] || (apiStatsPending[name] = { miss: 0, hit: 0, rl: 0, err: 0 });
-  row[outcome] = (row[outcome] || 0) + 1;
-}
-
-// Ответ из кеша края Cloudflare провайдера не беспокоит — различаем по заголовку.
-function countApiResponse(url, response) {
-  if (!response) return countApi(url, 'err');
-  if (response.status === 429) return countApi(url, 'rl');
-  if (!response.ok) return countApi(url, 'err');
-  const cache = response.headers.get('cf-cache-status') || '';
-  countApi(url, cache === 'HIT' ? 'hit' : 'miss');
-}
-
-async function flushApiStats(env, force = false) {
-  if (!env.AI_LIMITS) return;
-  const now = Date.now();
-  if (!force && now - apiStatsFlushedAt < API_STATS_FLUSH_MS) return;
-  if (!Object.keys(apiStatsPending).length) return;
-  const pending = apiStatsPending;
-  apiStatsPending = {};
-  apiStatsFlushedAt = now;
-  const key = 'api:' + todayKey();
-  try {
-    const prev = JSON.parse(await env.AI_LIMITS.get(key) || '{}');
-    for (const [name, counts] of Object.entries(pending)) {
-      const dst = prev[name] || (prev[name] = { miss: 0, hit: 0, rl: 0, err: 0 });
-      for (const field of ['miss', 'hit', 'rl', 'err']) dst[field] += counts[field] || 0;
-    }
-    await env.AI_LIMITS.put(key, JSON.stringify(prev), { expirationTtl: DAY_SEC * 90 });
-  } catch { /* статистика не должна ронять запрос пользователя */ }
-}
+// Счётчики обращений к провайдерам (api:ДАТА) убраны 02.10.2026 перед закрытым
+// тестом: они писали в KV раз в 5 минут из КАЖДОЙ копии воркера, и при росте
+// числа людей бесплатный лимит записей кончился бы на сотнях пользователей —
+// а с ним отказали бы и счётчики ИИ. Неделя замеров (20–28.09) своё дала:
+// выводы в журнале проекта. Расход ИИ (usage:ДАТА) остаётся — одна запись на
+// платный запрос, при потолке 100 в сутки это безопасно.
 
 // Реальный расход токенов за сутки. Без него стоимость запроса — оценка, а тариф
 // придётся назначать наугад: лимиты должны опираться на замер, а не на прикидку.
@@ -528,7 +470,6 @@ async function getDividendEvents(ticker) {
         { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
           cf: { cacheEverything: true, cacheTtl: 86400 } }
       );
-      countApiResponse(yahooUrl, resp);
       if (!resp.ok) return {};
       const data = await resp.json().catch(() => null);
       return data?.chart?.result?.[0]?.events?.dividends || {};
@@ -722,20 +663,17 @@ async function handleStats(request, url, env, origin) {
   if (!sub || sub !== ADMIN_SUB) return json({ error: 'Not allowed' }, 403, origin);
   if (!env.AI_LIMITS) return json({ error: 'KV not bound' }, 503, origin);
 
-  await flushApiStats(env, true);
   const days = Math.min(30, Math.max(1, parseInt(url.searchParams.get('days'), 10) || 7));
   const out = [];
   for (let i = 0; i < days; i++) {
     const date = new Date(Date.now() - i * DAY_SEC * 1000).toISOString().slice(0, 10);
-    const [api, ai, global_] = await Promise.all([
-      env.AI_LIMITS.get('api:' + date),
+    const [ai, global_] = await Promise.all([
       env.AI_LIMITS.get('usage:' + date),
       env.AI_LIMITS.get('global:' + date)
     ]);
-    if (!api && !ai && !global_) continue;
+    if (!ai && !global_) continue;
     out.push({
       date,
-      api: api ? JSON.parse(api) : null,
       ai: ai ? JSON.parse(ai) : null,
       aiCalls: Number(global_) || 0
     });
@@ -854,11 +792,9 @@ async function handleAI(request, origin, env) {
     },
     body: JSON.stringify(reqBody)
   }).catch(async e => {
-    countApi(claudeUrl, 'err');
     await releaseReservation();
     throw new Error('Anthropic unreachable: ' + e.message);
   });
-  countApiResponse(claudeUrl, claudeResp);
 
   const rawText = await claudeResp.text().catch(() => '');
   let data = {};
@@ -946,7 +882,6 @@ async function providerFetch(url, retries = 0, cacheTtl = 300) {
       // поэтому именно он, а не память изолята, снимает основную нагрузку.
       cf: { cacheEverything: true, cacheTtl }
     });
-    countApiResponse(url, response);
     if (response.ok) return response;
     // 429 и 5xx — временные: у Finnhub на бесплатном тарифе лимит на пачку
     // запросов, а на портфель уходит по нескольку штук на каждый тикер.
