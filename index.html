@@ -2954,7 +2954,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.35';
+const APP_VERSION = 'v0.1.36';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -8440,96 +8440,361 @@ function setDisplayCurrency(cur){
 }
 
 const PRIVACY_I18N={
-  uk:{
-    title:'Політика конфіденційності',
-    updated:'Оновлено: 3 липня 2026',
-    note:'Перед публікацією в магазинах додайте публічну URL-адресу цієї політики та контакт розробника.',
-    sections:[
-      ['Хто ми','InveStory — застосунок для обліку особистих фінансових активів: депозитів, валют, криптовалют, акцій, кредитів, дорогоцінних металів та інших розділів.'],
-      ['Які дані ви вводите','Ви можете вводити суми, назви активів, дати, ставки, нотатки, історію поповнень, дані кредитів та іншу фінансову інформацію. Ці дані потрібні тільки для роботи функцій застосунку.'],
-      ['Де зберігаються дані','Основні дані зберігаються локально на вашому пристрої у сховищі застосунку. Ми не створюємо обліковий запис і не передаємо вашу локальну фінансову базу на наш сервер.'],
-      ['Онлайн-функції','Якщо ви використовуєте онлайн-курси валют, ціни криптовалют або акцій, застосунок може звертатися до зовнішніх сервісів за курсами та цінами. Такі запити можуть містити тикер, валютну пару, технічні дані запиту та IP-адресу, які обробляються відповідним зовнішнім сервісом.'],
-      ['AI-асистент','У застосунку є необов\'язковий AI-чат. Коли ви надсилаєте повідомлення, ваш текст і зведення портфелю (категорії активів, суми, тикери акцій) передаються сторонньому AI-провайдеру (наразі Anthropic) для формування відповіді. Це відбувається лише коли ви активно користуєтесь AI-чатом. Ми не зберігаємо ваші розмови на своїх серверах.'],
-      ['Експорт та імпорт','Експорт створює файл резервної копії на вашому пристрої. Якщо ви самостійно передаєте цей файл у хмару, месенджер або інший сервіс, обробка цього файлу залежить від правил такого сервісу.'],
-      ['Покупки та підписки','Після підключення платних функцій платежі та підписки оброблятимуться Apple App Store або Google Play. Ми не отримуємо дані вашої банківської картки.'],
-      ['Аналітика та реклама','У поточній версії застосунок не використовує рекламні трекери та не збирає аналітику поведінки користувача. Якщо це зміниться, політика буде оновлена до публікації такої версії.'],
-      ['Безпека','Ви відповідаєте за безпеку пристрою та файлів резервних копій. Рекомендуємо використовувати блокування екрана та зберігати резервні копії тільки у довірених місцях.'],
-      ['Ваші права','Ви можете видалити дані через налаштування застосунку або видаливши застосунок з пристрою. Ви також можете експортувати резервну копію перед видаленням.'],
-      ['Важливо','InveStory не є фінансовим радником. Розрахунки, курси та прогнози мають інформаційний характер і можуть відрізнятися від фактичних банківських або біржових значень.']
-    ]
-  },
-  ru:{
-    title:'Политика конфиденциальности',
-    updated:'Обновлено: 3 июля 2026',
-    note:'Перед публикацией в магазинах добавьте публичный URL этой политики и контакт разработчика.',
-    sections:[
-      ['Кто мы','InveStory — приложение для учёта личных финансовых активов: депозитов, валют, криптовалют, акций, кредитов, драгоценных металлов и других разделов.'],
-      ['Какие данные вы вводите','Вы можете вводить суммы, названия активов, даты, ставки, заметки, историю пополнений, данные кредитов и другую финансовую информацию. Эти данные нужны только для работы функций приложения.'],
-      ['Где хранятся данные','Основные данные хранятся локально на вашем устройстве в хранилище приложения. Мы не создаём аккаунт и не передаём вашу локальную финансовую базу на наш сервер.'],
-      ['Онлайн-функции','Если вы используете онлайн-курсы валют, цены криптовалют или акций, приложение может обращаться к внешним сервисам за курсами и ценами. Такие запросы могут содержать тикер, валютную пару, технические данные запроса и IP-адрес, которые обрабатываются соответствующим внешним сервисом.'],
-      ['AI-ассистент','В приложении есть необязательный AI-чат. Когда вы отправляете сообщение, ваш текст и сводка портфеля (категории активов, суммы, тикеры акций) передаются стороннему AI-провайдеру (в настоящее время Anthropic) для формирования ответа. Это происходит только когда вы активно пользуетесь AI-чатом. Мы не храним ваши переписки на своих серверах.'],
-      ['Экспорт и импорт','Экспорт создаёт файл резервной копии на вашем устройстве. Если вы самостоятельно передаёте этот файл в облако, мессенджер или другой сервис, обработка файла зависит от правил такого сервиса.'],
-      ['Покупки и подписки','После подключения платных функций платежи и подписки будут обрабатываться Apple App Store или Google Play. Мы не получаем данные вашей банковской карты.'],
-      ['Аналитика и реклама','В текущей версии приложение не использует рекламные трекеры и не собирает аналитику поведения пользователя. Если это изменится, политика будет обновлена до публикации такой версии.'],
-      ['Безопасность','Вы отвечаете за безопасность устройства и файлов резервных копий. Рекомендуем использовать блокировку экрана и хранить резервные копии только в доверенных местах.'],
-      ['Ваши права','Вы можете удалить данные через настройки приложения или удалив приложение с устройства. Вы также можете экспортировать резервную копию перед удалением.'],
-      ['Важно','InveStory не является финансовым советником. Расчёты, курсы и прогнозы носят информационный характер и могут отличаться от фактических банковских или биржевых значений.']
-    ]
-  },
-  en:{
-    title:'Privacy Policy',
-    updated:'Updated: July 3, 2026',
-    note:'Before store release, publish this policy at a public URL and add the developer contact.',
-    sections:[
-      ['Who we are','InveStory is an app for tracking personal financial assets, including deposits, currencies, crypto, stocks, loans, precious metals and custom sections.'],
-      ['Data you enter','You may enter amounts, asset names, dates, rates, notes, top-up history, loan details and other financial information. This data is used only to provide the app features.'],
-      ['Where data is stored','Core data is stored locally on your device in the app storage. We do not create an account and do not upload your local financial database to our server.'],
-      ['Online features','If you use online exchange rates, crypto prices or stock prices, the app may contact external services to request rates and prices. These requests may include a ticker, currency pair, technical request data and IP address processed by the relevant external service.'],
-      ['AI assistant','The app includes an optional AI chat assistant. When you send a message, your message and a summary of your portfolio (asset categories, totals, stock tickers) are transmitted to a third-party AI provider (currently Anthropic) to generate a response. This happens only when you actively use the AI chat. We do not store your conversations on our servers.'],
-      ['Export and import','Export creates a backup file on your device. If you choose to upload or send that file to cloud storage, a messenger or another service, that service handles the file under its own rules.'],
-      ['Purchases and subscriptions','After paid features are connected, payments and subscriptions will be processed by Apple App Store or Google Play. We do not receive your payment card details.'],
-      ['Analytics and advertising','The current version does not use advertising trackers and does not collect user behaviour analytics. If this changes, this policy will be updated before that version is released.'],
-      ['Security','You are responsible for protecting your device and backup files. We recommend using screen lock and storing backups only in trusted locations.'],
-      ['Your choices','You can delete data in the app settings or by removing the app from your device. You can also export a backup before deletion.'],
-      ['Important','InveStory is not a financial advisor. Calculations, rates and forecasts are informational and may differ from actual bank or market values.']
-    ]
-  },
-  de:{
-    title:'Datenschutzrichtlinie',
-    updated:'Aktualisiert: 3. Juli 2026',
-    note:'Vor der Veröffentlichung im Store veröffentlichen Sie diese Richtlinie unter einer öffentlichen URL und ergänzen den Entwicklerkontakt.',
-    sections:[
-      ['Wer wir sind','InveStory ist eine App zur Verwaltung persönlicher Finanzwerte wie Einlagen, Währungen, Kryptowährungen, Aktien, Kredite, Edelmetalle und eigene Bereiche.'],
-      ['Welche Daten Sie eingeben','Sie können Beträge, Namen von Vermögenswerten, Daten, Zinssätze, Notizen, Aufstockungen, Kreditdaten und andere Finanzinformationen eingeben. Diese Daten werden nur für die Funktionen der App verwendet.'],
-      ['Wo Daten gespeichert werden','Die Hauptdaten werden lokal auf Ihrem Gerät im App-Speicher gespeichert. Wir erstellen kein Konto und übertragen Ihre lokale Finanzdatenbank nicht auf unseren Server.'],
-      ['Online-Funktionen','Wenn Sie Online-Wechselkurse, Kryptopreise oder Aktienpreise nutzen, kann die App externe Dienste für Kurse und Preise anfragen. Solche Anfragen können Ticker, Währungspaare, technische Anfragedaten und IP-Adresse enthalten, die vom jeweiligen externen Dienst verarbeitet werden.'],
-      ['KI-Assistent','Die App enthält einen optionalen KI-Chat. Wenn Sie eine Nachricht senden, werden Ihr Text und eine Zusammenfassung Ihres Portfolios (Anlagekategorien, Beträge, Aktien-Ticker) an einen externen KI-Anbieter (derzeit Anthropic) übertragen, um eine Antwort zu erstellen. Dies geschieht nur, wenn Sie den KI-Chat aktiv nutzen. Wir speichern Ihre Unterhaltungen nicht auf unseren Servern.'],
-      ['Export und Import','Der Export erstellt eine Sicherungsdatei auf Ihrem Gerät. Wenn Sie diese Datei selbst in eine Cloud, einen Messenger oder einen anderen Dienst übertragen, gelten die Regeln dieses Dienstes.'],
-      ['Käufe und Abonnements','Nach Aktivierung kostenpflichtiger Funktionen werden Zahlungen und Abonnements über Apple App Store oder Google Play verarbeitet. Wir erhalten keine ZahlungsKartendaten.'],
-      ['Analyse und Werbung','Die aktuelle Version verwendet keine Werbe-Tracker und erhebt keine Verhaltensanalysen. Falls sich dies ändert, wird diese Richtlinie vor Veröffentlichung aktualisiert.'],
-      ['Sicherheit','Sie sind für den Schutz Ihres Geräts und Ihrer Sicherungsdateien verantwortlich. Wir empfehlen Bildschirmsperre und Speicherung von Backups nur an vertrauenswürdigen Orten.'],
-      ['Ihre Möglichkeiten','Sie können Daten in den App-Einstellungen oder durch Entfernen der App löschen. Vor dem Löschen können Sie eine Sicherung exportieren.'],
-      ['Wichtig','InveStory ist kein Finanzberater. Berechnungen, Kurse und Prognosen dienen nur zur Information und können von tatsächlichen Bank- oder Marktdaten abweichen.']
-    ]
-  },
-  zh:{
-    title:'隐私政策',
-    updated:'更新日期：2026年7月3日',
-    note:'发布到应用商店前，请将本政策放在公开 URL，并添加开发者联系方式。',
-    sections:[
-      ['我们是谁','InveStory 是一款用于记录个人金融资产的应用，包括存款、货币、加密货币、股票、贷款、贵金属和自定义部分。'],
-      ['您输入的数据','您可以输入金额、资产名称、日期、利率、备注、追加记录、贷款信息和其他财务信息。这些数据仅用于提供应用功能。'],
-      ['数据存储位置','核心数据保存在您设备上的应用本地存储中。我们不创建账户，也不会将您的本地财务数据库上传到我们的服务器。'],
-      ['在线功能','如果您使用在线汇率、加密货币价格或股票价格，应用可能会请求外部服务获取价格。这些请求可能包含代码、货币对、技术请求数据和 IP 地址，并由相应外部服务处理。'],
-      ['AI 助手','应用包含可选的 AI 聊天助手。当您发送消息时，您的消息和投资组合摘要（资产类别、金额、股票代码）会传输给第三方 AI 提供商（目前为 Anthropic）以生成回复。这仅在您主动使用 AI 聊天时发生。我们不会在服务器上存储您的对话。'],
-      ['导出和导入','导出会在您的设备上创建备份文件。如果您自行将该文件上传或发送到云服务、聊天工具或其他服务，该服务将按照自己的规则处理该文件。'],
-      ['购买和订阅','接入付费功能后，付款和订阅将由 Apple App Store 或 Google Play 处理。我们不会收到您的银行卡信息。'],
-      ['分析和广告','当前版本不使用广告跟踪器，也不收集用户行为分析。如果未来发生变化，本政策会在发布前更新。'],
-      ['安全','您需要自行保护设备和备份文件。建议使用屏幕锁，并仅将备份存放在可信位置。'],
-      ['您的选择','您可以在应用设置中删除数据，或从设备上删除应用。删除前也可以导出备份。'],
-      ['重要说明','InveStory 不是财务顾问。计算、汇率和预测仅供参考，可能与实际银行或市场数据不同。']
-    ]
-  }
+ "en": {
+  "title": "Privacy Policy",
+  "updated": "Updated: October 2, 2026",
+  "note": "Contact: mnacik1988@gmail.com · Online version: https://mnacik1988.github.io/kapital01/privacy-policy.html",
+  "sections": [
+   [
+    "Who we are",
+    "InveStory is a personal finance tracker created by an independent developer (\"we\"). Contact: mnacik1988@gmail.com."
+   ],
+   [
+    "Sign-in with Google",
+    "To use the app you sign in with your Google account. From Google we receive your account identifier and email address. They are used to keep you signed in and to apply fair-use limits to the AI assistant. We never receive your Google password."
+   ],
+   [
+    "Your portfolio data",
+    "Everything you enter — deposits, coins, stocks, loans, notes and other values — is stored only on your device. We do not upload your portfolio to our servers, except the summary described in \"AI assistant\" when you use it."
+   ],
+   [
+    "Exchange connections",
+    "You can connect a crypto exchange (currently Bybit and Binance) with a read-only API key. The key and secret are stored only on your device and are never included in backups. The app refuses keys that allow trading, transfers or withdrawals. Bybit requests go directly from your device to Bybit. Binance does not accept such requests from a browser, so they pass through our server: it receives the public API key and an already signed request, forwards it to Binance and returns the answer. The secret key never leaves your device, and the server does not store or log keys or balances. Balances are stored only on your device. Signing out or disconnecting the exchange deletes the keys from the device."
+   ],
+   [
+    "Prices and exchange rates",
+    "To show current prices and rates, the app requests public market data from Binance, Bybit, CoinGecko, Finnhub, Yahoo Finance, the National Bank of Ukraine and other exchange-rate sources — directly or through our server. These requests contain only tickers, coin symbols or currency codes; the services also see your IP address."
+   ],
+   [
+    "AI assistant",
+    "The AI chat is optional. When you send a message, your message and a summary of your portfolio (totals by category, deposit terms and names, positions in stocks, bonds and crypto including coins from connected exchanges, exchange rates) are sent through our server to Anthropic, the provider of the Claude model, to generate a reply. We do not store the content of your conversations. To enforce limits we keep a daily request counter linked to your Google account identifier (deleted automatically after 2 days) and total token usage without any identifier (kept up to 90 days). If you do not use the AI chat, no portfolio data is sent."
+   ],
+   [
+    "Servers and hosting",
+    "The app is hosted on GitHub Pages, and our server runs on Cloudflare Workers. These providers may keep technical data such as IP address, device type and request time in their logs for a short period for security and operation. Fonts are loaded from Google Fonts."
+   ],
+   [
+    "What we do not do",
+    "We do not sell your data, do not show advertising and do not use analytics or tracking tools."
+   ],
+   [
+    "Export and import",
+    "Export creates a backup file on your device. If you upload or send it to a cloud service or messenger, that service handles the file under its own rules."
+   ],
+   [
+    "Purchases",
+    "The app is currently free. If paid features are added, payments will be processed by Google Play or the App Store, and we will not receive your card details. This policy will be updated before that."
+   ],
+   [
+    "Retention and deletion",
+    "Data on your device stays until you delete it — in the app settings, by clearing the app data or by uninstalling the app. Signing out removes sign-in data and exchange keys from the device. Data on our server is deleted automatically within the periods stated above. You can ask us to delete any data related to you by email."
+   ],
+   [
+    "Your rights",
+    "Depending on your country (for example under the GDPR), you have the right to access, correct and delete your data and to object to its processing. Write to mnacik1988@gmail.com — we reply within 30 days."
+   ],
+   [
+    "International transfers",
+    "Cloudflare, Anthropic, Google and other providers may process data outside your country, including in the USA, under their own safeguards."
+   ],
+   [
+    "Children",
+    "The app is intended for adults (18+) and is not directed to children."
+   ],
+   [
+    "Important",
+    "InveStory is not a financial advisor. Calculations, rates and forecasts are informational and may differ from actual bank or market values."
+   ],
+   [
+    "Changes",
+    "We may update this policy. The date at the top shows the current version; significant changes will be announced in the app."
+   ]
+  ]
+ },
+ "uk": {
+  "title": "Політика конфіденційності",
+  "updated": "Оновлено: 2 жовтня 2026",
+  "note": "Контакт: mnacik1988@gmail.com · Онлайн-версія: https://mnacik1988.github.io/kapital01/privacy-policy.html",
+  "sections": [
+   [
+    "Хто ми",
+    "InveStory — застосунок для обліку особистих фінансів, створений незалежним розробником («ми»). Контакт: mnacik1988@gmail.com."
+   ],
+   [
+    "Вхід через Google",
+    "Щоб користуватися застосунком, ви входите через обліковий запис Google. Від Google ми отримуємо ідентифікатор облікового запису та адресу пошти. Вони потрібні, щоб тримати вхід і застосовувати ліміти AI-асистента. Ваш пароль Google ми ніколи не отримуємо."
+   ],
+   [
+    "Дані вашого портфеля",
+    "Усе, що ви вводите, — депозити, монети, акції, кредити, нотатки та інші значення — зберігається лише на вашому пристрої. Ми не завантажуємо портфель на свої сервери, окрім зведення, описаного в розділі «AI-асистент», коли ви ним користуєтеся."
+   ],
+   [
+    "Підключення бірж",
+    "Ви можете підключити криптобіржу (зараз Bybit і Binance) ключем API лише для читання. Ключ і секрет зберігаються тільки на вашому пристрої й ніколи не потрапляють у резервні копії. Застосунок не приймає ключі з правом торгівлі, переказів або виведення. Запити до Bybit ідуть напряму з вашого пристрою. Binance не приймає таких запитів із браузера, тому вони проходять через наш сервер: він отримує публічний ключ API та вже підписаний запит, пересилає його до Binance і повертає відповідь. Секретний ключ не залишає ваш пристрій, а сервер не зберігає й не записує ні ключі, ні баланси. Баланси зберігаються лише на пристрої. Вихід з облікового запису або відключення біржі видаляє ключі з пристрою."
+   ],
+   [
+    "Ціни та курси",
+    "Щоб показувати поточні ціни й курси, застосунок запитує публічні ринкові дані в Binance, Bybit, CoinGecko, Finnhub, Yahoo Finance, Національного банку України та інших джерел курсів — напряму або через наш сервер. Такі запити містять лише тикери, символи монет або коди валют; сервіси також бачать вашу IP-адресу."
+   ],
+   [
+    "AI-асистент",
+    "AI-чат необовʼязковий. Коли ви надсилаєте повідомлення, ваш текст і зведення портфеля (суми за категоріями, умови та назви депозитів, позиції в акціях, облігаціях і криптовалюті, зокрема монети з підключених бірж, курси валют) передаються через наш сервер компанії Anthropic — постачальнику моделі Claude — для формування відповіді. Зміст розмов ми не зберігаємо. Для лімітів ми зберігаємо денний лічильник запитів, привʼязаний до ідентифікатора облікового запису Google (видаляється автоматично через 2 дні), і загальну витрату токенів без будь-якого ідентифікатора (до 90 днів). Якщо ви не користуєтеся AI-чатом, дані портфеля нікуди не надсилаються."
+   ],
+   [
+    "Сервери та хостинг",
+    "Застосунок розміщено на GitHub Pages, наш сервер працює на Cloudflare Workers. Ці постачальники можуть недовго зберігати в журналах технічні дані — IP-адресу, тип пристрою, час запиту — для безпеки та роботи сервісу. Шрифти завантажуються з Google Fonts."
+   ],
+   [
+    "Чого ми не робимо",
+    "Ми не продаємо ваші дані, не показуємо рекламу та не використовуємо аналітику чи інструменти відстеження."
+   ],
+   [
+    "Експорт та імпорт",
+    "Експорт створює файл резервної копії на вашому пристрої. Якщо ви завантажуєте його в хмару чи надсилаєте в месенджер, цей сервіс обробляє файл за власними правилами."
+   ],
+   [
+    "Покупки",
+    "Зараз застосунок безкоштовний. Якщо зʼявляться платні функції, платежі оброблятимуть Google Play або App Store, і дані вашої картки ми не отримаємо. Перед цим політику буде оновлено."
+   ],
+   [
+    "Строки зберігання та видалення",
+    "Дані на пристрої зберігаються, доки ви їх не видалите — у налаштуваннях застосунку, очищенням даних застосунку або його видаленням. Вихід з облікового запису видаляє з пристрою дані входу та ключі бірж. Дані на нашому сервері видаляються автоматично у строки, вказані вище. Ви можете попросити видалити будь-які повʼязані з вами дані поштою."
+   ],
+   [
+    "Ваші права",
+    "Залежно від країни (наприклад, за GDPR) ви маєте право на доступ до своїх даних, їх виправлення й видалення та право заперечити проти обробки. Пишіть на mnacik1988@gmail.com — ми відповідаємо протягом 30 днів."
+   ],
+   [
+    "Міжнародна передача",
+    "Cloudflare, Anthropic, Google та інші постачальники можуть обробляти дані за межами вашої країни, зокрема у США, за власними гарантіями захисту."
+   ],
+   [
+    "Діти",
+    "Застосунок призначений для дорослих (18+) і не орієнтований на дітей."
+   ],
+   [
+    "Важливо",
+    "InveStory не є фінансовим радником. Розрахунки, курси та прогнози мають інформаційний характер і можуть відрізнятися від фактичних банківських або ринкових значень."
+   ],
+   [
+    "Зміни",
+    "Ми можемо оновлювати цю політику. Дата вгорі показує чинну редакцію; про суттєві зміни повідомимо в застосунку."
+   ]
+  ]
+ },
+ "ru": {
+  "title": "Политика конфиденциальности",
+  "updated": "Обновлено: 2 октября 2026",
+  "note": "Контакт: mnacik1988@gmail.com · Онлайн-версия: https://mnacik1988.github.io/kapital01/privacy-policy.html",
+  "sections": [
+   [
+    "Кто мы",
+    "InveStory — приложение для учёта личных финансов, созданное независимым разработчиком («мы»). Контакт: mnacik1988@gmail.com."
+   ],
+   [
+    "Вход через Google",
+    "Чтобы пользоваться приложением, вы входите через аккаунт Google. От Google мы получаем идентификатор аккаунта и адрес почты. Они нужны, чтобы держать вход и применять лимиты AI-ассистента. Ваш пароль Google мы никогда не получаем."
+   ],
+   [
+    "Данные вашего портфеля",
+    "Всё, что вы вводите, — депозиты, монеты, акции, кредиты, заметки и другие значения — хранится только на вашем устройстве. Мы не загружаем портфель на свои серверы, кроме сводки, описанной в разделе «AI-ассистент», когда вы им пользуетесь."
+   ],
+   [
+    "Подключение бирж",
+    "Вы можете подключить криптобиржу (сейчас Bybit и Binance) ключом API только для чтения. Ключ и секрет хранятся только на вашем устройстве и никогда не попадают в резервные копии. Приложение не принимает ключи с правом торговли, переводов или вывода. Запросы к Bybit идут напрямую с вашего устройства. Binance не принимает таких запросов из браузера, поэтому они проходят через наш сервер: он получает публичный ключ API и уже подписанный запрос, пересылает его в Binance и возвращает ответ. Секретный ключ не покидает ваше устройство, а сервер не хранит и не записывает ни ключи, ни балансы. Балансы хранятся только на устройстве. Выход из аккаунта или отключение биржи удаляет ключи с устройства."
+   ],
+   [
+    "Цены и курсы",
+    "Чтобы показывать текущие цены и курсы, приложение запрашивает публичные рыночные данные у Binance, Bybit, CoinGecko, Finnhub, Yahoo Finance, Национального банка Украины и других источников курсов — напрямую или через наш сервер. Такие запросы содержат только тикеры, символы монет или коды валют; сервисы также видят ваш IP-адрес."
+   ],
+   [
+    "AI-ассистент",
+    "AI-чат необязателен. Когда вы отправляете сообщение, ваш текст и сводка портфеля (суммы по категориям, условия и названия депозитов, позиции в акциях, облигациях и криптовалюте, включая монеты с подключённых бирж, курсы валют) передаются через наш сервер компании Anthropic — поставщику модели Claude — для формирования ответа. Содержание переписки мы не храним. Для лимитов мы храним дневной счётчик запросов, привязанный к идентификатору аккаунта Google (удаляется автоматически через 2 дня), и общий расход токенов без какого-либо идентификатора (до 90 дней). Если вы не пользуетесь AI-чатом, данные портфеля никуда не отправляются."
+   ],
+   [
+    "Серверы и хостинг",
+    "Приложение размещено на GitHub Pages, наш сервер работает на Cloudflare Workers. Эти поставщики могут недолго хранить в журналах технические данные — IP-адрес, тип устройства, время запроса — для безопасности и работы сервиса. Шрифты загружаются с Google Fonts."
+   ],
+   [
+    "Чего мы не делаем",
+    "Мы не продаём ваши данные, не показываем рекламу и не используем аналитику или инструменты отслеживания."
+   ],
+   [
+    "Экспорт и импорт",
+    "Экспорт создаёт файл резервной копии на вашем устройстве. Если вы загружаете его в облако или отправляете в мессенджер, этот сервис обрабатывает файл по своим правилам."
+   ],
+   [
+    "Покупки",
+    "Сейчас приложение бесплатное. Если появятся платные функции, платежи будут обрабатывать Google Play или App Store, и данные вашей карты мы не получим. Перед этим политика будет обновлена."
+   ],
+   [
+    "Сроки хранения и удаление",
+    "Данные на устройстве хранятся, пока вы их не удалите — в настройках приложения, очисткой данных приложения или его удалением. Выход из аккаунта удаляет с устройства данные входа и ключи бирж. Данные на нашем сервере удаляются автоматически в сроки, указанные выше. Вы можете попросить удалить любые связанные с вами данные по почте."
+   ],
+   [
+    "Ваши права",
+    "В зависимости от страны (например, по GDPR) у вас есть право на доступ к своим данным, их исправление и удаление, а также право возразить против обработки. Пишите на mnacik1988@gmail.com — мы отвечаем в течение 30 дней."
+   ],
+   [
+    "Международная передача",
+    "Cloudflare, Anthropic, Google и другие поставщики могут обрабатывать данные за пределами вашей страны, в том числе в США, по своим гарантиям защиты."
+   ],
+   [
+    "Дети",
+    "Приложение предназначено для взрослых (18+) и не ориентировано на детей."
+   ],
+   [
+    "Важно",
+    "InveStory не является финансовым советником. Расчёты, курсы и прогнозы носят информационный характер и могут отличаться от фактических банковских или рыночных значений."
+   ],
+   [
+    "Изменения",
+    "Мы можем обновлять эту политику. Дата вверху показывает действующую редакцию; о существенных изменениях сообщим в приложении."
+   ]
+  ]
+ },
+ "de": {
+  "title": "Datenschutzrichtlinie",
+  "updated": "Aktualisiert: 2. Oktober 2026",
+  "note": "Kontakt: mnacik1988@gmail.com · Online-Version: https://mnacik1988.github.io/kapital01/privacy-policy.html",
+  "sections": [
+   [
+    "Wer wir sind",
+    "InveStory ist eine App zur Verwaltung persönlicher Finanzen, entwickelt von einem unabhängigen Entwickler („wir“). Kontakt: mnacik1988@gmail.com."
+   ],
+   [
+    "Anmeldung mit Google",
+    "Zur Nutzung der App melden Sie sich mit Ihrem Google-Konto an. Von Google erhalten wir Ihre Konto-ID und E-Mail-Adresse. Sie dienen dazu, Sie angemeldet zu halten und Nutzungsgrenzen für den KI-Assistenten anzuwenden. Ihr Google-Passwort erhalten wir nie."
+   ],
+   [
+    "Ihre Portfoliodaten",
+    "Alles, was Sie eingeben — Einlagen, Coins, Aktien, Kredite, Notizen und andere Werte — wird nur auf Ihrem Gerät gespeichert. Wir laden Ihr Portfolio nicht auf unsere Server hoch, außer der unter „KI-Assistent“ beschriebenen Zusammenfassung, wenn Sie ihn nutzen."
+   ],
+   [
+    "Börsenverbindungen",
+    "Sie können eine Kryptobörse (derzeit Bybit und Binance) mit einem Nur-Lese-API-Schlüssel verbinden. Schlüssel und Secret werden nur auf Ihrem Gerät gespeichert und nie in Backups aufgenommen. Die App lehnt Schlüssel mit Handels-, Transfer- oder Auszahlungsrechten ab. Anfragen an Bybit gehen direkt von Ihrem Gerät an Bybit. Binance akzeptiert solche Anfragen nicht aus dem Browser, daher laufen sie über unseren Server: Er erhält den öffentlichen API-Schlüssel und eine bereits signierte Anfrage, leitet sie an Binance weiter und gibt die Antwort zurück. Das Secret verlässt Ihr Gerät nie, und der Server speichert oder protokolliert weder Schlüssel noch Guthaben. Guthaben werden nur auf Ihrem Gerät gespeichert. Abmelden oder Trennen der Börse löscht die Schlüssel vom Gerät."
+   ],
+   [
+    "Preise und Wechselkurse",
+    "Für aktuelle Preise und Kurse ruft die App öffentliche Marktdaten von Binance, Bybit, CoinGecko, Finnhub, Yahoo Finance, der Nationalbank der Ukraine und weiteren Kursquellen ab — direkt oder über unseren Server. Diese Anfragen enthalten nur Ticker, Coin-Symbole oder Währungscodes; die Dienste sehen auch Ihre IP-Adresse."
+   ],
+   [
+    "KI-Assistent",
+    "Der KI-Chat ist optional. Wenn Sie eine Nachricht senden, werden Ihr Text und eine Zusammenfassung Ihres Portfolios (Summen nach Kategorien, Bedingungen und Namen von Einlagen, Positionen in Aktien, Anleihen und Krypto einschließlich Coins verbundener Börsen, Wechselkurse) über unseren Server an Anthropic, den Anbieter des Modells Claude, gesendet, um eine Antwort zu erzeugen. Den Inhalt Ihrer Unterhaltungen speichern wir nicht. Für Nutzungsgrenzen speichern wir einen täglichen Anfragezähler, verknüpft mit Ihrer Google-Konto-ID (automatisch nach 2 Tagen gelöscht), sowie den gesamten Token-Verbrauch ohne jede Kennung (bis zu 90 Tage). Wenn Sie den KI-Chat nicht nutzen, werden keine Portfoliodaten gesendet."
+   ],
+   [
+    "Server und Hosting",
+    "Die App wird auf GitHub Pages gehostet, unser Server läuft auf Cloudflare Workers. Diese Anbieter können technische Daten wie IP-Adresse, Gerätetyp und Anfragezeit für kurze Zeit zur Sicherheit und zum Betrieb protokollieren. Schriften werden von Google Fonts geladen."
+   ],
+   [
+    "Was wir nicht tun",
+    "Wir verkaufen Ihre Daten nicht, zeigen keine Werbung und verwenden keine Analyse- oder Tracking-Tools."
+   ],
+   [
+    "Export und Import",
+    "Der Export erstellt eine Sicherungsdatei auf Ihrem Gerät. Wenn Sie sie in eine Cloud hochladen oder per Messenger senden, verarbeitet dieser Dienst die Datei nach eigenen Regeln."
+   ],
+   [
+    "Käufe",
+    "Die App ist derzeit kostenlos. Falls kostenpflichtige Funktionen hinzukommen, werden Zahlungen über Google Play oder den App Store abgewickelt, und wir erhalten keine Kartendaten. Diese Richtlinie wird vorher aktualisiert."
+   ],
+   [
+    "Speicherdauer und Löschung",
+    "Daten auf Ihrem Gerät bleiben, bis Sie sie löschen — in den App-Einstellungen, durch Löschen der App-Daten oder Deinstallation. Abmelden entfernt Anmeldedaten und Börsenschlüssel vom Gerät. Daten auf unserem Server werden automatisch innerhalb der oben genannten Fristen gelöscht. Sie können per E-Mail die Löschung aller Sie betreffenden Daten verlangen."
+   ],
+   [
+    "Ihre Rechte",
+    "Je nach Land (z. B. nach der DSGVO) haben Sie das Recht auf Auskunft, Berichtigung und Löschung Ihrer Daten sowie auf Widerspruch gegen die Verarbeitung. Schreiben Sie an mnacik1988@gmail.com — wir antworten innerhalb von 30 Tagen."
+   ],
+   [
+    "Internationale Übermittlung",
+    "Cloudflare, Anthropic, Google und andere Anbieter können Daten außerhalb Ihres Landes verarbeiten, auch in den USA, unter ihren eigenen Schutzmaßnahmen."
+   ],
+   [
+    "Kinder",
+    "Die App richtet sich an Erwachsene (18+) und nicht an Kinder."
+   ],
+   [
+    "Wichtig",
+    "InveStory ist kein Finanzberater. Berechnungen, Kurse und Prognosen dienen nur zur Information und können von tatsächlichen Bank- oder Marktwerten abweichen."
+   ],
+   [
+    "Änderungen",
+    "Wir können diese Richtlinie aktualisieren. Das Datum oben zeigt die aktuelle Fassung; wesentliche Änderungen kündigen wir in der App an."
+   ]
+  ]
+ },
+ "zh": {
+  "title": "隐私政策",
+  "updated": "更新日期：2026年10月2日",
+  "note": "联系方式：mnacik1988@gmail.com · 在线版本：https://mnacik1988.github.io/kapital01/privacy-policy.html",
+  "sections": [
+   [
+    "我们是谁",
+    "InveStory 是一款个人财务记录应用，由独立开发者（“我们”）开发。联系方式：mnacik1988@gmail.com。"
+   ],
+   [
+    "使用 Google 登录",
+    "使用本应用需要通过 Google 账户登录。我们从 Google 获得您的账户标识和电子邮箱地址，用于保持登录状态并对 AI 助手实施合理使用限制。我们从不获取您的 Google 密码。"
+   ],
+   [
+    "您的投资组合数据",
+    "您输入的所有内容——存款、币种、股票、贷款、备注及其他数值——仅保存在您的设备上。除您使用“AI 助手”时发送的摘要外，我们不会将您的投资组合上传到我们的服务器。"
+   ],
+   [
+    "交易所连接",
+    "您可以使用只读 API 密钥连接加密货币交易所（目前为 Bybit 和 Binance）。密钥和 Secret 仅保存在您的设备上，绝不会进入备份。应用会拒绝具有交易、划转或提现权限的密钥。发往 Bybit 的请求直接从您的设备发出。Binance 不接受来自浏览器的此类请求，因此请求经由我们的服务器：服务器收到公开的 API 密钥和已签名的请求，将其转发给 Binance 并返回结果。Secret 从不离开您的设备，服务器不保存也不记录密钥或余额。余额仅保存在您的设备上。退出登录或断开交易所会从设备上删除密钥。"
+   ],
+   [
+    "价格与汇率",
+    "为显示当前价格和汇率，应用会直接或通过我们的服务器向 Binance、Bybit、CoinGecko、Finnhub、Yahoo Finance、乌克兰国家银行及其他汇率来源请求公开市场数据。这些请求仅包含股票代码、币种符号或货币代码；这些服务也会看到您的 IP 地址。"
+   ],
+   [
+    "AI 助手",
+    "AI 聊天为可选功能。当您发送消息时，您的消息和投资组合摘要（各类别合计、存款条件和名称、股票、债券和加密货币持仓（包括已连接交易所的币种）、汇率）会通过我们的服务器发送给 Claude 模型的提供商 Anthropic 以生成回复。我们不保存对话内容。为执行使用限制，我们保存与您的 Google 账户标识关联的每日请求计数（2 天后自动删除），以及不含任何标识的总 token 用量（最多保存 90 天）。如果您不使用 AI 聊天，则不会发送任何投资组合数据。"
+   ],
+   [
+    "服务器与托管",
+    "应用托管在 GitHub Pages 上，我们的服务器运行在 Cloudflare Workers 上。这些提供商可能会为安全和运行目的在日志中短期保存 IP 地址、设备类型和请求时间等技术数据。字体从 Google Fonts 加载。"
+   ],
+   [
+    "我们不做的事",
+    "我们不出售您的数据，不展示广告，也不使用分析或跟踪工具。"
+   ],
+   [
+    "导出和导入",
+    "导出会在您的设备上创建备份文件。如果您将其上传到云服务或通过聊天工具发送，该服务将按其自身规则处理该文件。"
+   ],
+   [
+    "购买",
+    "应用目前免费。如果将来增加付费功能，付款将由 Google Play 或 App Store 处理，我们不会获得您的银行卡信息。届时本政策会提前更新。"
+   ],
+   [
+    "保存期限与删除",
+    "设备上的数据会一直保留，直到您在应用设置中删除、清除应用数据或卸载应用。退出登录会从设备上删除登录数据和交易所密钥。我们服务器上的数据会在上述期限内自动删除。您可以通过电子邮件要求删除与您相关的任何数据。"
+   ],
+   [
+    "您的权利",
+    "根据您所在国家/地区（例如 GDPR），您有权访问、更正和删除您的数据，并有权反对处理。请发送邮件至 mnacik1988@gmail.com，我们将在 30 天内答复。"
+   ],
+   [
+    "国际传输",
+    "Cloudflare、Anthropic、Google 等提供商可能会在您所在国家/地区以外（包括美国）依据其自身保护措施处理数据。"
+   ],
+   [
+    "儿童",
+    "本应用面向成年人（18 岁及以上），不面向儿童。"
+   ],
+   [
+    "重要说明",
+    "InveStory 不是财务顾问。计算、汇率和预测仅供参考，可能与实际银行或市场数据不同。"
+   ],
+   [
+    "变更",
+    "我们可能会更新本政策。顶部日期显示当前版本；重大变更将在应用中告知。"
+   ]
+  ]
+ }
 };
 function escapeHtml(s){
   return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -8553,56 +8818,221 @@ function privacyCloseOutside(e){
 }
 
 const LEGAL_I18N={
-  uk:{title:'Умови використання та відмова від відповідальності',updated:'Оновлено: 27 травня 2026',note:'Перед публікацією додайте контакт розробника, юридичну назву власника застосунку та публічну URL-адресу цього документа.',sections:[
-    ['Інформаційний характер','InveStory призначений для особистого обліку активів, боргів, доходів і орієнтовних розрахунків. Застосунок не є банком, брокером, податковим консультантом або фінансовим радником.'],
-    ['Не фінансова порада','Будь-які розрахунки, графіки, доходність, курси валют, ціни акцій або криптовалют та прогнози є довідковими. Вони не є рекомендацією купувати, продавати, інвестувати, брати кредит або розміщувати депозит.'],
-    ['Відповідальність користувача','Ви самостійно приймаєте фінансові рішення та несете відповідальність за перевірку даних у банку, брокера, біржі або офіційного джерела перед будь-якою дією з грошима.'],
-    ['Точність даних','Ми прагнемо робити розрахунки корисними, але не гарантуємо абсолютну точність. Банківські умови, податки, комісії, курси та біржові ціни можуть відрізнятися від значень у застосунку.'],
-    ['Онлайн-джерела','Онлайн-ціни та курси залежать від доступності зовнішніх сервісів. Дані можуть затримуватися, бути недоступними або тимчасово неправильними. В офлайн-режимі застосунок використовує ручні або останні збережені значення.'],
-    ['Збереження даних','Дані зберігаються локально на пристрої. Користувач відповідає за резервні копії, безпеку пристрою та перевірку імпортованих файлів.'],
-    ['Обмеження відповідальності','У межах, дозволених законом, розробник не несе відповідальності за фінансові втрати, втрачену вигоду, помилки розрахунків, неправильні рішення користувача або недоступність зовнішніх сервісів.'],
-    ['Зміни умов','Ці умови можуть оновлюватися. Продовження використання застосунку після оновлення означає прийняття актуальної редакції.']
-  ]},
-  ru:{title:'Условия использования и отказ от ответственности',updated:'Обновлено: 27 мая 2026',note:'Перед публикацией добавьте контакт разработчика, юридическое имя владельца приложения и публичный URL этого документа.',sections:[
-    ['Информационный характер','InveStory предназначен для личного учёта активов, долгов, доходов и ориентировочных расчётов. Приложение не является банком, брокером, налоговым консультантом или финансовым советником.'],
-    ['Не финансовая рекомендация','Любые расчёты, графики, доходность, курсы валют, цены акций или криптовалют и прогнозы являются справочной информацией. Они не являются рекомендацией покупать, продавать, инвестировать, брать кредит или размещать депозит.'],
-    ['Ответственность пользователя','Вы самостоятельно принимаете финансовые решения и отвечаете за проверку данных в банке, у брокера, на бирже или в официальном источнике перед любым действием с деньгами.'],
-    ['Точность данных','Мы стремимся делать расчёты полезными, но не гарантируем абсолютную точность. Банковские условия, налоги, комиссии, курсы и биржевые цены могут отличаться от значений в приложении.'],
-    ['Онлайн-источники','Онлайн-цены и курсы зависят от доступности внешних сервисов. Данные могут задерживаться, быть недоступными или временно неверными. В оффлайн-режиме приложение использует ручные или последние сохранённые значения.'],
-    ['Хранение данных','Данные хранятся локально на устройстве. Пользователь отвечает за резервные копии, безопасность устройства и проверку импортированных файлов.'],
-    ['Ограничение ответственности','В пределах, разрешённых законом, разработчик не несёт ответственности за финансовые потери, упущенную выгоду, ошибки расчётов, неправильные решения пользователя или недоступность внешних сервисов.'],
-    ['Изменения условий','Эти условия могут обновляться. Продолжение использования приложения после обновления означает принятие актуальной редакции.']
-  ]},
-  en:{title:'Terms of Use and Disclaimer',updated:'Updated: May 27, 2026',note:'Before store release, add the developer contact, legal owner name and a public URL for this document.',sections:[
-    ['Informational purpose','InveStory is intended for personal tracking of assets, debts, income and approximate calculations. The app is not a bank, broker, tax advisor or financial advisor.'],
-    ['Not financial advice','Any calculations, charts, yields, exchange rates, stock or crypto prices and forecasts are informational only. They are not a recommendation to buy, sell, invest, borrow money or open a deposit.'],
-    ['User responsibility','You make financial decisions independently and are responsible for verifying data with a bank, broker, exchange or official source before taking any action with money.'],
-    ['Accuracy of data','We aim to make calculations useful, but we do not guarantee absolute accuracy. Bank terms, taxes, fees, rates and market prices may differ from values shown in the app.'],
-    ['Online sources','Online prices and rates depend on external services. Data may be delayed, unavailable or temporarily incorrect. In offline mode, the app uses manual or last saved values.'],
-    ['Data storage','Data is stored locally on the device. The user is responsible for backups, device security and checking imported files.'],
-    ['Limitation of liability','To the extent permitted by law, the developer is not liable for financial losses, lost profits, calculation errors, user decisions or unavailability of external services.'],
-    ['Changes to terms','These terms may be updated. Continued use of the app after an update means acceptance of the current version.']
-  ]},
-  de:{title:'Nutzungsbedingungen und Haftungsausschluss',updated:'Aktualisiert: 27. Mai 2026',note:'Vor der Veröffentlichung ergänzen Sie Entwicklerkontakt, rechtlichen Inhaber und eine öffentliche URL dieses Dokuments.',sections:[
-    ['Informationszweck','InveStory dient der persönlichen Erfassung von Vermögenswerten, Schulden, Einkommen und ungefähren Berechnungen. Die App ist keine Bank, kein Broker, kein Steuerberater und kein Finanzberater.'],
-    ['Keine Finanzberatung','Berechnungen, Diagramme, Renditen, Wechselkurse, Aktien- oder Kryptopreise und Prognosen dienen nur zur Information. Sie sind keine Empfehlung zum Kaufen, Verkaufen, Investieren, Kreditaufnehmen oder Anlegen.'],
-    ['Verantwortung des Nutzers','Sie treffen Finanzentscheidungen selbständig und sind dafür verantwortlich, Daten vor Handlungen mit Geld bei Bank, Broker, Börse oder offizieller Quelle zu prüfen.'],
-    ['Genauigkeit der Daten','Wir bemühen uns um nützliche Berechnungen, garantieren jedoch keine absolute Genauigkeit. Bankbedingungen, Steuern, Gebühren, Kurse und Marktpreise können von den App-Werten abweichen.'],
-    ['Online-Quellen','Online-Preise und Kurse hängen von externen Diensten ab. Daten können verzögert, nicht verfügbar oder vorübergehend falsch sein. Offline nutzt die App manuelle oder zuletzt gespeicherte Werte.'],
-    ['Datenspeicherung','Daten werden lokal auf dem Gerät gespeichert. Der Nutzer ist für Backups, Gerätesicherheit und Prüfung importierter Dateien verantwortlich.'],
-    ['Haftungsbeschränkung','Soweit gesetzlich zulässig, haftet der Entwickler nicht für finanzielle Verluste, entgangenen Gewinn, Berechnungsfehler, Nutzerentscheidungen oder Nichtverfügbarkeit externer Dienste.'],
-    ['Änderungen','Diese Bedingungen können aktualisiert werden. Die weitere Nutzung nach einer Aktualisierung gilt als Annahme der aktuellen Fassung.']
-  ]},
-  zh:{title:'使用条款与免责声明',updated:'更新日期：2026年5月27日',note:'发布前请添加开发者联系方式、应用所有者法律名称以及本文件的公开 URL。',sections:[
-    ['信息用途','InveStory 用于个人记录资产、债务、收入和近似计算。本应用不是银行、券商、税务顾问或财务顾问。'],
-    ['非财务建议','任何计算、图表、收益率、汇率、股票或加密货币价格及预测仅供参考，不构成买卖、投资、借贷或存款建议。'],
-    ['用户责任','您自行做出财务决定，并有责任在进行任何资金操作前向银行、券商、交易所或官方来源核实数据。'],
-    ['数据准确性','我们努力提供有用的计算，但不保证绝对准确。银行条款、税费、手续费、汇率和市场价格可能与应用显示值不同。'],
-    ['在线来源','在线价格和汇率依赖外部服务，数据可能延迟、不可用或暂时不正确。离线模式下应用使用手动或最后保存的值。'],
-    ['数据存储','数据保存在设备本地。用户负责备份、设备安全以及检查导入文件。'],
-    ['责任限制','在法律允许范围内，开发者不对财务损失、利润损失、计算错误、用户决策或外部服务不可用承担责任。'],
-    ['条款变更','这些条款可能会更新。更新后继续使用应用即表示接受当前版本。']
-  ]}
+ "uk": {
+  "title": "Умови використання та відмова від відповідальності",
+  "updated": "Оновлено: 2 жовтня 2026",
+  "note": "Контакт: mnacik1988@gmail.com · Онлайн-версія: https://mnacik1988.github.io/kapital01/terms-disclaimer.html",
+  "sections": [
+   [
+    "Інформаційний характер",
+    "InveStory призначений для особистого обліку активів, боргів, доходів і орієнтовних розрахунків. Застосунок не є банком, брокером, податковим консультантом або фінансовим радником."
+   ],
+   [
+    "Не фінансова порада",
+    "Будь-які розрахунки, графіки, доходність, курси валют, ціни акцій або криптовалют та прогнози є довідковими. Вони не є рекомендацією купувати, продавати, інвестувати, брати кредит або розміщувати депозит."
+   ],
+   [
+    "Відповідальність користувача",
+    "Ви самостійно приймаєте фінансові рішення та несете відповідальність за перевірку даних у банку, брокера, біржі або офіційного джерела перед будь-якою дією з грошима."
+   ],
+   [
+    "Точність даних",
+    "Ми прагнемо робити розрахунки корисними, але не гарантуємо абсолютну точність. Банківські умови, податки, комісії, курси та біржові ціни можуть відрізнятися від значень у застосунку."
+   ],
+   [
+    "Онлайн-джерела",
+    "Онлайн-ціни та курси залежать від доступності зовнішніх сервісів. Дані можуть затримуватися, бути недоступними або тимчасово неправильними. В офлайн-режимі застосунок використовує ручні або останні збережені значення."
+   ],
+   [
+    "Збереження даних",
+    "Дані зберігаються локально на пристрої. Користувач відповідає за резервні копії, безпеку пристрою та перевірку імпортованих файлів."
+   ],
+   [
+    "Підключення бірж",
+    "Підключення бірж працює лише на читання: застосунок показує баланси, але не купує, не продає, не переказує й не виводить активи. Ви самостійно створюєте ключ лише для читання та відповідаєте за безпеку свого облікового запису на біржі."
+   ],
+   [
+    "Обмеження відповідальності",
+    "У межах, дозволених законом, розробник не несе відповідальності за фінансові втрати, втрачену вигоду, помилки розрахунків, неправильні рішення користувача або недоступність зовнішніх сервісів."
+   ],
+   [
+    "Зміни умов",
+    "Ці умови можуть оновлюватися. Продовження використання застосунку після оновлення означає прийняття актуальної редакції."
+   ]
+  ]
+ },
+ "ru": {
+  "title": "Условия использования и отказ от ответственности",
+  "updated": "Обновлено: 2 октября 2026",
+  "note": "Контакт: mnacik1988@gmail.com · Онлайн-версия: https://mnacik1988.github.io/kapital01/terms-disclaimer.html",
+  "sections": [
+   [
+    "Информационный характер",
+    "InveStory предназначен для личного учёта активов, долгов, доходов и ориентировочных расчётов. Приложение не является банком, брокером, налоговым консультантом или финансовым советником."
+   ],
+   [
+    "Не финансовая рекомендация",
+    "Любые расчёты, графики, доходность, курсы валют, цены акций или криптовалют и прогнозы являются справочной информацией. Они не являются рекомендацией покупать, продавать, инвестировать, брать кредит или размещать депозит."
+   ],
+   [
+    "Ответственность пользователя",
+    "Вы самостоятельно принимаете финансовые решения и отвечаете за проверку данных в банке, у брокера, на бирже или в официальном источнике перед любым действием с деньгами."
+   ],
+   [
+    "Точность данных",
+    "Мы стремимся делать расчёты полезными, но не гарантируем абсолютную точность. Банковские условия, налоги, комиссии, курсы и биржевые цены могут отличаться от значений в приложении."
+   ],
+   [
+    "Онлайн-источники",
+    "Онлайн-цены и курсы зависят от доступности внешних сервисов. Данные могут задерживаться, быть недоступными или временно неверными. В оффлайн-режиме приложение использует ручные или последние сохранённые значения."
+   ],
+   [
+    "Хранение данных",
+    "Данные хранятся локально на устройстве. Пользователь отвечает за резервные копии, безопасность устройства и проверку импортированных файлов."
+   ],
+   [
+    "Подключение бирж",
+    "Подключение бирж работает только на чтение: приложение показывает балансы, но не покупает, не продаёт, не переводит и не выводит активы. Вы сами создаёте ключ только для чтения и отвечаете за безопасность своего аккаунта на бирже."
+   ],
+   [
+    "Ограничение ответственности",
+    "В пределах, разрешённых законом, разработчик не несёт ответственности за финансовые потери, упущенную выгоду, ошибки расчётов, неправильные решения пользователя или недоступность внешних сервисов."
+   ],
+   [
+    "Изменения условий",
+    "Эти условия могут обновляться. Продолжение использования приложения после обновления означает принятие актуальной редакции."
+   ]
+  ]
+ },
+ "en": {
+  "title": "Terms of Use and Disclaimer",
+  "updated": "Updated: October 2, 2026",
+  "note": "Contact: mnacik1988@gmail.com · Online version: https://mnacik1988.github.io/kapital01/terms-disclaimer.html",
+  "sections": [
+   [
+    "Informational purpose",
+    "InveStory is intended for personal tracking of assets, debts, income and approximate calculations. The app is not a bank, broker, tax advisor or financial advisor."
+   ],
+   [
+    "Not financial advice",
+    "Any calculations, charts, yields, exchange rates, stock or crypto prices and forecasts are informational only. They are not a recommendation to buy, sell, invest, borrow money or open a deposit."
+   ],
+   [
+    "User responsibility",
+    "You make financial decisions independently and are responsible for verifying data with a bank, broker, exchange or official source before taking any action with money."
+   ],
+   [
+    "Accuracy of data",
+    "We aim to make calculations useful, but we do not guarantee absolute accuracy. Bank terms, taxes, fees, rates and market prices may differ from values shown in the app."
+   ],
+   [
+    "Online sources",
+    "Online prices and rates depend on external services. Data may be delayed, unavailable or temporarily incorrect. In offline mode, the app uses manual or last saved values."
+   ],
+   [
+    "Data storage",
+    "Data is stored locally on the device. The user is responsible for backups, device security and checking imported files."
+   ],
+   [
+    "Exchange connections",
+    "Exchange connections are read-only: the app shows balances but does not buy, sell, transfer or withdraw assets. You create a read-only key yourself and are responsible for the security of your exchange account."
+   ],
+   [
+    "Limitation of liability",
+    "To the extent permitted by law, the developer is not liable for financial losses, lost profits, calculation errors, user decisions or unavailability of external services."
+   ],
+   [
+    "Changes to terms",
+    "These terms may be updated. Continued use of the app after an update means acceptance of the current version."
+   ]
+  ]
+ },
+ "de": {
+  "title": "Nutzungsbedingungen und Haftungsausschluss",
+  "updated": "Aktualisiert: 2. Oktober 2026",
+  "note": "Kontakt: mnacik1988@gmail.com · Online-Version: https://mnacik1988.github.io/kapital01/terms-disclaimer.html",
+  "sections": [
+   [
+    "Informationszweck",
+    "InveStory dient der persönlichen Erfassung von Vermögenswerten, Schulden, Einkommen und ungefähren Berechnungen. Die App ist keine Bank, kein Broker, kein Steuerberater und kein Finanzberater."
+   ],
+   [
+    "Keine Finanzberatung",
+    "Berechnungen, Diagramme, Renditen, Wechselkurse, Aktien- oder Kryptopreise und Prognosen dienen nur zur Information. Sie sind keine Empfehlung zum Kaufen, Verkaufen, Investieren, Kreditaufnehmen oder Anlegen."
+   ],
+   [
+    "Verantwortung des Nutzers",
+    "Sie treffen Finanzentscheidungen selbständig und sind dafür verantwortlich, Daten vor Handlungen mit Geld bei Bank, Broker, Börse oder offizieller Quelle zu prüfen."
+   ],
+   [
+    "Genauigkeit der Daten",
+    "Wir bemühen uns um nützliche Berechnungen, garantieren jedoch keine absolute Genauigkeit. Bankbedingungen, Steuern, Gebühren, Kurse und Marktpreise können von den App-Werten abweichen."
+   ],
+   [
+    "Online-Quellen",
+    "Online-Preise und Kurse hängen von externen Diensten ab. Daten können verzögert, nicht verfügbar oder vorübergehend falsch sein. Offline nutzt die App manuelle oder zuletzt gespeicherte Werte."
+   ],
+   [
+    "Datenspeicherung",
+    "Daten werden lokal auf dem Gerät gespeichert. Der Nutzer ist für Backups, Gerätesicherheit und Prüfung importierter Dateien verantwortlich."
+   ],
+   [
+    "Börsenverbindungen",
+    "Börsenverbindungen sind nur lesend: Die App zeigt Guthaben an, kauft, verkauft, überträgt oder zahlt aber keine Vermögenswerte aus. Sie erstellen selbst einen Nur-Lese-Schlüssel und sind für die Sicherheit Ihres Börsenkontos verantwortlich."
+   ],
+   [
+    "Haftungsbeschränkung",
+    "Soweit gesetzlich zulässig, haftet der Entwickler nicht für finanzielle Verluste, entgangenen Gewinn, Berechnungsfehler, Nutzerentscheidungen oder Nichtverfügbarkeit externer Dienste."
+   ],
+   [
+    "Änderungen",
+    "Diese Bedingungen können aktualisiert werden. Die weitere Nutzung nach einer Aktualisierung gilt als Annahme der aktuellen Fassung."
+   ]
+  ]
+ },
+ "zh": {
+  "title": "使用条款与免责声明",
+  "updated": "更新日期：2026年10月2日",
+  "note": "联系方式：mnacik1988@gmail.com · 在线版本：https://mnacik1988.github.io/kapital01/terms-disclaimer.html",
+  "sections": [
+   [
+    "信息用途",
+    "InveStory 用于个人记录资产、债务、收入和近似计算。本应用不是银行、券商、税务顾问或财务顾问。"
+   ],
+   [
+    "非财务建议",
+    "任何计算、图表、收益率、汇率、股票或加密货币价格及预测仅供参考，不构成买卖、投资、借贷或存款建议。"
+   ],
+   [
+    "用户责任",
+    "您自行做出财务决定，并有责任在进行任何资金操作前向银行、券商、交易所或官方来源核实数据。"
+   ],
+   [
+    "数据准确性",
+    "我们努力提供有用的计算，但不保证绝对准确。银行条款、税费、手续费、汇率和市场价格可能与应用显示值不同。"
+   ],
+   [
+    "在线来源",
+    "在线价格和汇率依赖外部服务，数据可能延迟、不可用或暂时不正确。离线模式下应用使用手动或最后保存的值。"
+   ],
+   [
+    "数据存储",
+    "数据保存在设备本地。用户负责备份、设备安全以及检查导入文件。"
+   ],
+   [
+    "交易所连接",
+    "交易所连接为只读：应用显示余额，但不会买入、卖出、划转或提取资产。您需自行创建只读密钥，并对交易所账户的安全负责。"
+   ],
+   [
+    "责任限制",
+    "在法律允许范围内，开发者不对财务损失、利润损失、计算错误、用户决策或外部服务不可用承担责任。"
+   ],
+   [
+    "条款变更",
+    "这些条款可能会更新。更新后继续使用应用即表示接受当前版本。"
+   ]
+  ]
+ }
 };
 function openLegalPolicy(){
   const data=LEGAL_I18N[currentLang]||LEGAL_I18N.en;
