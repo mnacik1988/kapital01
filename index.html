@@ -581,6 +581,37 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .bank-dot.black{background:#111;}.bank-dot.white{background:#f4f4f4;}.bank-dot.platinum{background:#b9bcc4;}.bank-dot.iron{background:#5d6470;}
 .bank-dot.fop{background:var(--blue);}.bank-dot.yellow{background:#f5c518;}.bank-dot.eAid{background:var(--teal);}.bank-dot.madeInUkraine{background:linear-gradient(180deg,#2f6bff 50%,#ffd400 50%);}
 .bank-jar{font-size:13px;}
+.bank-cards{display:flex;gap:10px;overflow-x:auto;background:inherit;scroll-snap-type:x mandatory;margin:2px -15px 0;padding:6px 15px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.bank-cards::-webkit-scrollbar{display:none;}
+.bank-plastic{flex:0 0 176px;height:110px;border-radius:16px;padding:12px 13px;color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;scroll-snap-align:start;box-shadow:0 8px 18px #00000033;}
+.bank-plastic::after{content:"";position:absolute;right:-34px;top:-44px;width:124px;height:124px;border-radius:50%;background:#ffffff14;pointer-events:none;}
+.bp-top{display:flex;justify-content:space-between;align-items:center;gap:6px;font:700 11.5px 'Manrope',sans-serif;opacity:.92;position:relative;z-index:1;}
+.bp-top span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bp-pan{font:600 11px 'DM Mono',monospace;white-space:nowrap;}
+.bp-chip{width:22px;height:16px;border-radius:4px;background:linear-gradient(135deg,#e9c46a,#b8862f);flex:0 0 22px;}
+.bp-amt{font:800 19px 'Manrope',sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums;position:relative;z-index:1;white-space:nowrap;}
+.bp-sub{font:500 10px 'DM Mono',monospace;opacity:.78;margin-top:2px;position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bank-plastic.debt .bp-amt{color:#ffb4b4;}
+.bp-black{background:linear-gradient(135deg,#2a2b31,#0e0f12);}
+.bp-white{background:linear-gradient(135deg,#fbfbfb,#d9dbe0);color:#1b1d24;}
+.bp-white.debt .bp-amt{color:var(--red);}
+.bp-platinum{background:linear-gradient(135deg,#d4d6dc,#9a9ea8);color:#1b1d24;}
+.bp-iron{background:linear-gradient(135deg,#6b7280,#3b4048);}
+.bp-fop{background:linear-gradient(135deg,#3a7bd5,#1f4fa3);}
+.bp-usd{background:linear-gradient(135deg,#1f6f55,#0f3d30);}
+.bp-eur{background:linear-gradient(135deg,#3d4fa6,#232e6b);}
+.bp-yellow{background:linear-gradient(135deg,#ffd84d,#f0a500);color:#1b1d24;}
+.bp-eaid{background:linear-gradient(135deg,#1aa39a,#0d6660);}
+.bp-miu{background:linear-gradient(180deg,#2f6bff 0 50%,#f2c200 50% 100%);}
+.bank-swipe{font:500 10px 'DM Mono',monospace;color:var(--muted2);text-align:center;margin:-2px 0 2px;}
+.bank-jars{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.bank-jar-tile{display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:15px;padding:10px;background:var(--bg2);min-width:0;}
+.bj-ring{width:42px;height:42px;flex:0 0 42px;}
+.bj-pct{font:600 10px 'DM Mono',ui-monospace,monospace;fill:var(--text);}
+.bj-meta{min-width:0;}
+.bj-title{font:700 12px 'Manrope',sans-serif;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bj-amt{font:800 14px 'Manrope',sans-serif;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.bj-sub{font:500 9.5px 'DM Mono',monospace;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bank-row-amt{font:800 14px 'Manrope',sans-serif;color:var(--text);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .bank-row-amt.neg{color:var(--red);}
 .bank-row-uah{display:block;font:500 10px 'DM Mono',monospace;color:var(--muted2);}
@@ -3015,7 +3046,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.39';
+const APP_VERSION = 'v0.1.40';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7028,6 +7059,8 @@ function bankTxt(k){
     loading:{uk:'Оновлюю…',ru:'Обновляю…',en:'Updating…',de:'Aktualisiere…',zh:'正在更新…'},
     updated:{uk:'оновлено',ru:'обновлено',en:'updated',de:'aktualisiert',zh:'更新于'},
     cards:{uk:'Картки',ru:'Карты',en:'Cards',de:'Karten',zh:'银行卡'},
+    swipe:{uk:'← гортайте · {n} карт →',ru:'← листайте · {n} карт →',en:'← swipe · {n} cards →',de:'← wischen · {n} Karten →',zh:'← 滑动 · {n} 张卡 →'},
+    limitShort:{uk:'ліміт {l} не враховано',ru:'лимит {l} не учтён',en:'limit {l} not counted',de:'Limit {l} nicht gezählt',zh:'未计入额度 {l}'},
     jars:{uk:'Банки (накопичення)',ru:'Банки (накопления)',en:'Jars (savings)',de:'Spardosen',zh:'储蓄罐'},
     limitNote:{uk:'кредитний ліміт {l} не враховано',ru:'кредитный лимит {l} не учтён',en:'credit limit {l} not counted',de:'Kreditlimit {l} nicht gezählt',zh:'未计入信用额度 {l}'},
     debt:{uk:'борг по кредитці',ru:'долг по кредитке',en:'credit card debt',de:'Kreditkartenschuld',zh:'信用卡欠款'},
@@ -7192,6 +7225,37 @@ function bankRowHtml(x){
     (x.cur!=='UAH'?'<span class="bank-row-uah">'+(uah===null?bankTxt('noRate'):'≈ '+fmtN(toDisplayCurr(uah))+' '+getCurrSym())+'</span>':'')+'</div></div>'+
     (sub?'<div class="ex-upd">'+escHtml(sub)+'</div>':'')+prog+'</div>';
 }
+// Карта — как настоящая: цвет по типу (чёрная, біла, ФОП…) и валюте
+// (долларовая — зелёная, евро — синяя). Листается пальцем вбок.
+function bankPlasticClass(x){
+  if(x.cur==='USD')return 'usd';
+  if(x.cur==='EUR')return 'eur';
+  return {black:'black',white:'white',platinum:'platinum',iron:'iron',fop:'fop',yellow:'yellow',eAid:'eaid',madeInUkraine:'miu'}[x.type]||'black';
+}
+function bankPlasticHtml(x){
+  const neg=Number(x.balance)<0;
+  const tl=bankTxt('t_'+x.type);
+  const name=(tl.startsWith('t_')?(x.type||'—'):tl)+(x.cur!=='UAH'?' · '+x.cur:'');
+  const uah=x.cur!=='UAH'?bankAmountUah(Number(x.balance)||0,x.cur):null;
+  let sub='';
+  if(neg)sub=bankTxt('debt');
+  else if(x.creditLimit>0)sub=bankTxt('limitShort').replace('{l}',fmtN(x.creditLimit));
+  else if(x.cur!=='UAH')sub=uah===null?bankTxt('noRate'):'≈ '+fmtN(toDisplayCurr(uah))+' '+getCurrSym();
+  return '<div class="bank-plastic bp-'+bankPlasticClass(x)+(neg?' debt':'')+'">'+
+    '<div class="bp-top"><span>'+escHtml(name)+'</span>'+(x.last4?'<span class="bp-pan">··'+escHtml(x.last4)+'</span>':'<span class="bp-chip"></span>')+'</div>'+
+    '<div><div class="bp-amt">'+escHtml(bankMoney(Number(x.balance)||0,x.cur))+'</div>'+(sub?'<div class="bp-sub">'+escHtml(sub)+'</div>':'')+'</div></div>';
+}
+function bankJarHtml(x){
+  const pct=x.goal>0?Math.min(100,Math.max(0,x.balance/x.goal*100)):null;
+  const C=2*Math.PI*17;
+  const ring='<svg class="bj-ring" viewBox="0 0 42 42" aria-hidden="true"><circle cx="21" cy="21" r="17" fill="none" stroke="var(--border)" stroke-width="5"/>'+
+    (pct!==null?'<circle cx="21" cy="21" r="17" fill="none" stroke="var(--blue)" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+(C*pct/100).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 21 21)"/>'+
+      '<text x="21" y="24.5" text-anchor="middle" class="bj-pct">'+Math.round(pct)+'%</text>':'<text x="21" y="26" text-anchor="middle" font-size="14">💰</text>')+'</svg>';
+  const uah=x.cur!=='UAH'?bankAmountUah(Number(x.balance)||0,x.cur):null;
+  const sub=x.goal>0?bankTxt('of')+' '+bankMoney(x.goal,x.cur):(x.cur!=='UAH'?(uah===null?bankTxt('noRate'):'≈ '+fmtN(toDisplayCurr(uah))+' '+getCurrSym()):'');
+  return '<div class="bank-jar-tile">'+ring+'<div class="bj-meta"><div class="bj-title">'+escHtml(x.title||'—')+'</div>'+
+    '<div class="bj-amt">'+escHtml(bankMoney(Number(x.balance)||0,x.cur))+'</div>'+(sub?'<div class="bj-sub">'+escHtml(sub)+'</div>':'')+'</div></div>';
+}
 function renderBanks(){
   const el=document.getElementById('bankBlock');
   if(!el)return;
@@ -7220,8 +7284,9 @@ function renderBanks(){
       return;
     }
     html+='</div>';
-    if(cards.length)html+='<div class="bank-group">'+escHtml(bankTxt('cards'))+'</div>'+cards.map(bankRowHtml).join('');
-    if(jars.length)html+='<div class="bank-group">'+escHtml(bankTxt('jars'))+'</div>'+jars.map(bankRowHtml).join('');
+    if(cards.length)html+='<div class="bank-cards">'+cards.map(bankPlasticHtml).join('')+'</div>'+
+      (cards.length>2?'<div class="bank-swipe">'+escHtml(bankTxt('swipe').replace('{n}',cards.length))+'</div>':'');
+    if(jars.length)html+='<div class="bank-group">'+escHtml(bankTxt('jars'))+'</div><div class="bank-jars">'+jars.map(bankJarHtml).join('')+'</div>';
     html+='<div class="ex-hint">'+escHtml(bankTxt('dupHint'))+'</div>';
     html+='<div class="ex-actions"><button class="ex-btn" '+(busy?'disabled':'')+' onclick="refreshBank(\''+id+'\',true)">'+bankTxt('refresh')+'</button>'+
       '<button class="ex-btn danger" onclick="disconnectBank(\''+id+'\')">'+bankTxt('disconnect')+'</button></div></div>';
