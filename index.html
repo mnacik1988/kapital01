@@ -5,7 +5,7 @@
 <!-- Вход через Google требует своих исключений в CSP: скрипт GSI, его стили,
      запросы и iframe (кнопка и One Tap рисуются во фрейме). Без них вход
      молча не работает — браузер режет всё это без единого видимого сообщения. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://plain-bread-df6d.mnacik1988.workers.dev https://accounts.google.com/gsi/ https://api.monobank.ua https://open.er-api.com https://api.frankfurter.app https://api.coingecko.com https://api.bybit.com https://api.binance.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src https://accounts.google.com/gsi/; media-src 'self' blob:">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://plain-bread-df6d.mnacik1988.workers.dev https://accounts.google.com/gsi/ https://api.monobank.ua https://open.er-api.com https://api.frankfurter.app https://api.coingecko.com https://api.bybit.com https://api.monobank.ua https://api.binance.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src https://accounts.google.com/gsi/; media-src 'self' blob:">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
@@ -569,6 +569,23 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .privacy-section p,.privacy-section li{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted2);line-height:1.6;}
 .privacy-section ul{padding-left:18px;}
 /* Админ-панель */
+/* Банки в «Поточному рахунку» */
+.bank-card{margin-bottom:12px;}
+.bank-group{font:600 10px 'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin:14px 0 6px;}
+.bank-row{padding:9px 0;border-top:1px solid var(--border);}
+.bank-row:first-of-type{border-top:none;}
+.bank-row-main{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.bank-row-left{display:flex;align-items:center;gap:8px;min-width:0;font:600 13px 'Manrope',sans-serif;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bank-pan{font:500 11px 'DM Mono',monospace;color:var(--muted2);}
+.bank-dot{width:12px;height:12px;border-radius:4px;flex:0 0 12px;background:var(--muted2);border:1px solid var(--border2);}
+.bank-dot.black{background:#111;}.bank-dot.white{background:#f4f4f4;}.bank-dot.platinum{background:#b9bcc4;}.bank-dot.iron{background:#5d6470;}
+.bank-dot.fop{background:var(--blue);}.bank-dot.yellow{background:#f5c518;}.bank-dot.eAid{background:var(--teal);}.bank-dot.madeInUkraine{background:linear-gradient(180deg,#2f6bff 50%,#ffd400 50%);}
+.bank-jar{font-size:13px;}
+.bank-row-amt{font:800 14px 'Manrope',sans-serif;color:var(--text);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.bank-row-amt.neg{color:var(--red);}
+.bank-row-uah{display:block;font:500 10px 'DM Mono',monospace;color:var(--muted2);}
+.bank-prog{height:5px;border-radius:99px;background:var(--border);margin-top:6px;overflow:hidden;}
+.bank-prog span{display:block;height:100%;border-radius:99px;background:var(--blue);}
 .admin-box{max-height:90vh;}
 .admin-tabs{display:flex;gap:6px;margin-bottom:14px;}
 .admin-tab{flex:1;padding:9px 6px;border-radius:11px;border:1px solid var(--border2);background:var(--bg3);font:700 12px 'Manrope',sans-serif;color:var(--muted2);cursor:pointer;}
@@ -2298,6 +2315,7 @@ body.modern-mockup.theme-light .total-currency{
     </div>
     <div class="card-body"><div class="card-inner">
       <div class="divider"></div>
+      <div id="bankBlock"></div>
       <div class="field-group">
         <div class="field-label" data-i18n="balanceUah">Баланс (₴)</div>
         <input class="field-input" type="text" id="otherAmount" placeholder="0" inputmode="decimal" oninput="updateAll()">
@@ -2997,7 +3015,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.38';
+const APP_VERSION = 'v0.1.39';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -6977,6 +6995,256 @@ function initCardHeightUnlock(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initCardHeightUnlock);
 else initCardHeightUnlock();
 
+
+// ══ ПОДКЛЮЧЕНИЕ БАНКОВ — ТОЛЬКО ЧТЕНИЕ ═══════════════════════════════════
+// Карты и «банки» (накопления) попадают в «Поточний рахунок»: по каждой карте
+// своя строка, сверху итог банка. Первый — monobank: личный токен API только
+// для чтения (перевести или снять деньги им нельзя), monobank отдаёт CORS, так
+// что запрос идёт С ТЕЛЕФОНА напрямую — токен не проходит через наш сервер и
+// хранится только на устройстве, вне резервной копии. Депозитов в открытом API
+// monobank нет — депозит остаётся ручным. Новый банк = новая запись в BANKS.
+// Кредитка: monobank отдаёт баланс вместе с кредитным лимитом — в капитал
+// идут только свои деньги (баланс − лимит); долг по кредитке уменьшает итог.
+const BANK_KEYS_LS='investory_bank_keys';
+const BANK_CACHE_LS='investory_bank_cache';
+const bankUi={formOpen:false,formBank:'',busy:{},errors:{}};
+const ISO_CURRENCY={980:'UAH',840:'USD',978:'EUR',985:'PLN',826:'GBP',156:'CNY',756:'CHF',203:'CZK',643:'RUB'};
+function bankTxt(k){
+  const d={
+    connect:{uk:'+ Підключити банк',ru:'+ Подключить банк',en:'+ Connect bank',de:'+ Bank verbinden',zh:'+ 连接银行'},
+    bank:{uk:'Банк',ru:'Банк',en:'Bank',de:'Bank',zh:'银行'},
+    token:{uk:'Токен API',ru:'Токен API',en:'API token',de:'API-Token',zh:'API 令牌'},
+    hint_monobank:{uk:'1. Відкрийте api.monobank.ua і натисніть «Отримати токен». 2. Відскануйте QR-код у застосунку monobank і підтвердіть. 3. Скопіюйте токен і вставте сюди. Токен лише для перегляду: переказати, оплатити чи зняти гроші ним неможливо. Він зберігається тільки на цьому пристрої й не потрапляє в резервну копію; відкликати його можна там само, на api.monobank.ua. Депозити monobank через API недоступні — їх вносьте вручну.',
+      ru:'1. Откройте api.monobank.ua и нажмите «Получить токен». 2. Отсканируйте QR-код в приложении monobank и подтвердите. 3. Скопируйте токен и вставьте сюда. Токен только для просмотра: перевести, оплатить или снять деньги им невозможно. Он хранится только на этом устройстве и не попадает в резервную копию; отозвать его можно там же, на api.monobank.ua. Депозиты monobank через API недоступны — вносите их вручную.',
+      en:'1. Open api.monobank.ua and tap “Get token”. 2. Scan the QR code in the monobank app and confirm. 3. Copy the token and paste it here. The token is view-only: it cannot transfer, pay or withdraw money. It stays only on this device and is never included in backups; you can revoke it at api.monobank.ua. monobank deposits are not available via the API — add them manually.',
+      de:'1. Öffnen Sie api.monobank.ua und tippen Sie auf „Token erhalten“. 2. Scannen Sie den QR-Code in der monobank-App und bestätigen Sie. 3. Token kopieren und hier einfügen. Der Token ist nur zum Ansehen: Überweisen, Bezahlen oder Abheben ist damit unmöglich. Er bleibt nur auf diesem Gerät und kommt nie ins Backup; widerrufen können Sie ihn auf api.monobank.ua. monobank-Einlagen sind über die API nicht verfügbar — bitte manuell erfassen.',
+      zh:'1. 打开 api.monobank.ua，点击“获取令牌”。2. 在 monobank 应用中扫描二维码并确认。3. 复制令牌并粘贴到此处。令牌仅用于查看：无法转账、付款或取款。它只保存在本设备上，不会进入备份；可在 api.monobank.ua 撤销。monobank 存款无法通过 API 获取，请手动添加。'},
+    save:{uk:'Підключити',ru:'Подключить',en:'Connect',de:'Verbinden',zh:'连接'},
+    cancel:{uk:'Скасувати',ru:'Отмена',en:'Cancel',de:'Abbrechen',zh:'取消'},
+    refresh:{uk:'⟳ Оновити',ru:'⟳ Обновить',en:'⟳ Refresh',de:'⟳ Aktualisieren',zh:'⟳ 刷新'},
+    disconnect:{uk:'Відключити',ru:'Отключить',en:'Disconnect',de:'Trennen',zh:'断开'},
+    confirmDisconnect:{uk:'Відключити банк? Токен буде видалено з пристрою.',ru:'Отключить банк? Токен будет удалён с устройства.',en:'Disconnect the bank? The token will be removed from this device.',de:'Bank trennen? Der Token wird vom Gerät gelöscht.',zh:'断开银行？令牌将从本设备删除。'},
+    checking:{uk:'Перевіряю токен…',ru:'Проверяю токен…',en:'Checking the token…',de:'Token wird geprüft…',zh:'正在验证令牌…'},
+    loading:{uk:'Оновлюю…',ru:'Обновляю…',en:'Updating…',de:'Aktualisiere…',zh:'正在更新…'},
+    updated:{uk:'оновлено',ru:'обновлено',en:'updated',de:'aktualisiert',zh:'更新于'},
+    cards:{uk:'Картки',ru:'Карты',en:'Cards',de:'Karten',zh:'银行卡'},
+    jars:{uk:'Банки (накопичення)',ru:'Банки (накопления)',en:'Jars (savings)',de:'Spardosen',zh:'储蓄罐'},
+    limitNote:{uk:'кредитний ліміт {l} не враховано',ru:'кредитный лимит {l} не учтён',en:'credit limit {l} not counted',de:'Kreditlimit {l} nicht gezählt',zh:'未计入信用额度 {l}'},
+    debt:{uk:'борг по кредитці',ru:'долг по кредитке',en:'credit card debt',de:'Kreditkartenschuld',zh:'信用卡欠款'},
+    of:{uk:'з',ru:'из',en:'of',de:'von',zh:'/'},
+    summary:{uk:'{c} карт · {j} банок',ru:'{c} карт · {j} банок',en:'{c} cards · {j} jars',de:'{c} Karten · {j} Spardosen',zh:'{c} 张卡 · {j} 个储蓄罐'},
+    dupHint:{uk:'Якщо цей банк уже враховано вручну в полі «Баланс» нижче — приберіть ту суму, щоб гроші не рахувалися двічі.',ru:'Если этот банк уже учтён вручную в поле «Баланс» ниже — уберите ту сумму, чтобы деньги не считались дважды.',en:'If this bank is already counted manually in the “Balance” field below, remove that amount so it is not counted twice.',de:'Falls diese Bank schon manuell im Feld „Saldo“ unten erfasst ist, entfernen Sie den Betrag, damit nichts doppelt zählt.',zh:'如果下方“余额”中已手动计入该银行，请删除该金额，以免重复计算。'},
+    fillToken:{uk:'Вставте токен',ru:'Вставьте токен',en:'Paste the token',de:'Token einfügen',zh:'请粘贴令牌'},
+    errToken:{uk:'Невірний токен або його відкликано',ru:'Неверный токен или он отозван',en:'Invalid or revoked token',de:'Ungültiger oder widerrufener Token',zh:'令牌无效或已撤销'},
+    errRate:{uk:'Банк дозволяє оновлення раз на хвилину — спробуйте трохи пізніше',ru:'Банк разрешает обновление раз в минуту — попробуйте чуть позже',en:'The bank allows one update per minute — try again shortly',de:'Die Bank erlaubt eine Aktualisierung pro Minute — bitte gleich erneut versuchen',zh:'银行每分钟只允许更新一次，请稍后再试'},
+    errNet:{uk:'Немає зв’язку з банком',ru:'Нет связи с банком',en:'Cannot reach the bank',de:'Bank nicht erreichbar',zh:'无法连接银行'},
+    errOther:{uk:'Помилка банку:',ru:'Ошибка банка:',en:'Bank error:',de:'Bankfehler:',zh:'银行错误：'},
+    noRate:{uk:'курс невідомий',ru:'курс неизвестен',en:'rate unknown',de:'Kurs unbekannt',zh:'汇率未知'},
+    showAll:{uk:'Показати картки · {n}',ru:'Показать карты · {n}',en:'Show cards · {n}',de:'Karten anzeigen · {n}',zh:'显示卡片 · {n}'},
+    t_black:{uk:'Чорна',ru:'Чёрная',en:'Black',de:'Schwarz',zh:'黑卡'},
+    t_white:{uk:'Біла',ru:'Белая',en:'White',de:'Weiß',zh:'白卡'},
+    t_platinum:{uk:'Platinum',ru:'Platinum',en:'Platinum',de:'Platinum',zh:'白金卡'},
+    t_iron:{uk:'Iron',ru:'Iron',en:'Iron',de:'Iron',zh:'Iron'},
+    t_fop:{uk:'ФОП',ru:'ФЛП',en:'Business (FOP)',de:'Gewerbe (FOP)',zh:'个体户'},
+    t_yellow:{uk:'Дитяча',ru:'Детская',en:'Kids',de:'Kinder',zh:'儿童卡'},
+    t_eAid:{uk:'єПідтримка',ru:'єПідтримка',en:'eAid',de:'eAid',zh:'eAid'},
+    t_madeInUkraine:{uk:'Зроблено в Україні',ru:'Сделано в Украине',en:'Made in Ukraine',de:'Made in Ukraine',zh:'乌克兰制造'}
+  };
+  const row=d[k]||{};
+  return row[currentLang]||row.uk||k;
+}
+function getBankCreds(){return exReadJson(BANK_KEYS_LS);}
+function getBankCache(){return exReadJson(BANK_CACHE_LS);}
+// Сумма в гривнах по курсам приложения; null — курса нет (такую сумму не считаем).
+function bankAmountUah(amount,cur){
+  if(cur==='UAH')return amount;
+  const r=Number(liveRates&&liveRates[cur]);
+  return r>0?amount*r:null;
+}
+const BANKS={
+  monobank:{
+    name:'monobank',
+    logo:'exchange-logos/monobank.png?v=1',
+    mono:'MB',
+    // monobank отдаёт client-info не чаще раза в 60 секунд на токен.
+    minIntervalMs:61000,
+    async fetchAccounts(cred){
+      let r;
+      try{r=await fetch('https://api.monobank.ua/personal/client-info',{headers:{'X-Token':cred.token}});}
+      catch(e){throw ExchangeError('net');}
+      if(r.status===403||r.status===401)throw ExchangeError('bankToken');
+      if(r.status===429)throw ExchangeError('bankRate');
+      if(!r.ok)throw ExchangeError('http'+r.status,'HTTP '+r.status);
+      const d=await r.json();
+      const cards=(Array.isArray(d.accounts)?d.accounts:[]).map(a=>{
+        const cur=ISO_CURRENCY[a.currencyCode]||'?';
+        const limit=(Number(a.creditLimit)||0)/100;
+        const pan=Array.isArray(a.maskedPan)&&a.maskedPan[0]?String(a.maskedPan[0]):'';
+        return {kind:'card',type:String(a.type||'').replace(/[^A-Za-z]/g,'').slice(0,20),cur,
+          balance:(Number(a.balance)||0)/100-limit,creditLimit:limit,last4:pan.replace(/\D/g,'').slice(-4)};
+      });
+      const jars=(Array.isArray(d.jars)?d.jars:[]).map(j=>({kind:'jar',title:String(j.title||'').slice(0,60),
+        cur:ISO_CURRENCY[j.currencyCode]||'?',balance:(Number(j.balance)||0)/100,goal:j.goal?Number(j.goal)/100:null}));
+      return {cards,jars};
+    }
+  }
+};
+function bankErrorText(e){
+  const c=String(e?.exchangeCode||'');
+  if(c==='bankToken')return bankTxt('errToken');
+  if(c==='bankRate')return bankTxt('errRate');
+  if(c==='net'||e instanceof TypeError)return bankTxt('errNet');
+  return bankTxt('errOther')+' '+String(e?.message||c).slice(0,80);
+}
+function getBankTotalUah(){
+  const creds=getBankCreds(),cache=getBankCache();
+  let sum=0;
+  Object.keys(creds).forEach(id=>{
+    const c=cache[id];
+    if(!c)return;
+    [...(c.cards||[]),...(c.jars||[])].forEach(x=>{const v=bankAmountUah(Number(x.balance)||0,x.cur);if(v!==null)sum+=v;});
+  });
+  return sum;
+}
+async function refreshBank(id,force){
+  const cred=getBankCreds()[id];
+  const bank=BANKS[id];
+  if(!cred||!bank||bankUi.busy[id])return;
+  if(isOffline()){bankUi.errors[id]=bankTxt('errNet');renderBanks();return;}
+  const last=Number(getBankCache()[id]?.updatedAt)||0;
+  if(Date.now()-last<bank.minIntervalMs){if(force){bankUi.errors[id]=bankTxt('errRate');renderBanks();}return;}
+  bankUi.busy[id]=true;delete bankUi.errors[id];renderBanks();
+  const gen=authGeneration;
+  try{
+    const res=await bank.fetchAccounts(cred);
+    if(gen!==authGeneration||getBankCreds()[id]?.token!==cred.token)return;
+    const cache=getBankCache();
+    cache[id]={...res,updatedAt:Date.now()};
+    exWriteJson(BANK_CACHE_LS,cache);
+  }catch(e){
+    bankUi.errors[id]=bankErrorText(e);
+  }finally{
+    bankUi.busy[id]=false;
+    renderBanks();
+    updateAll();
+  }
+}
+function refreshBanks(){Object.keys(getBankCreds()).forEach(id=>refreshBank(id));}
+async function connectBank(){
+  const id=document.getElementById('bankSelect')?.value||'monobank';
+  const token=String(document.getElementById('bankToken')?.value||'').replace(/[\s\u00AD\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF]/g,'');
+  const msg=document.getElementById('bankFormMsg');
+  const say=(t,err)=>{if(msg){msg.textContent=t;msg.className='ex-sub'+(err?' err':'');}};
+  if(!token){say(bankTxt('fillToken'),true);return;}
+  const btn=document.getElementById('bankSaveBtn');
+  if(btn)btn.disabled=true;
+  say(bankTxt('checking'));
+  const gen=authGeneration;
+  try{
+    const res=await BANKS[id].fetchAccounts({token});
+    if(gen!==authGeneration||!isSignedIn()){if(btn)btn.disabled=false;say('');return;}
+    const creds=getBankCreds();creds[id]={token,connectedAt:Date.now()};exWriteJson(BANK_KEYS_LS,creds);
+    const cache=getBankCache();cache[id]={...res,updatedAt:Date.now()};exWriteJson(BANK_CACHE_LS,cache);
+    delete bankUi.errors[id];bankUi.formOpen=false;
+    renderBanks();updateAll();
+  }catch(e){
+    say(bankErrorText(e),true);
+    if(btn)btn.disabled=false;
+  }
+}
+function disconnectBank(id){
+  customConfirm(bankTxt('confirmDisconnect'),()=>{
+    const creds=getBankCreds();delete creds[id];exWriteJson(BANK_KEYS_LS,creds);
+    const cache=getBankCache();delete cache[id];exWriteJson(BANK_CACHE_LS,cache);
+    delete bankUi.errors[id];renderBanks();updateAll();
+  });
+}
+function toggleBankForm(open){bankUi.formOpen=!!open;renderBanks();}
+function isBankCollapsed(id){return !!exReadJson(EXCHANGE_UI_LS).collapsed?.['bank:'+id];}
+function toggleBankCollapse(id){
+  const ui=exReadJson(EXCHANGE_UI_LS);ui.collapsed=ui.collapsed||{};
+  const k='bank:'+id;
+  if(ui.collapsed[k])delete ui.collapsed[k];else ui.collapsed[k]=true;
+  exWriteJson(EXCHANGE_UI_LS,ui);renderBanks();
+}
+function bankMoney(amount,cur){
+  const sym={UAH:'₴',USD:'$',EUR:'€',PLN:'zł',GBP:'£'}[cur];
+  const n=fmtD(Math.abs(amount),2).replace(/[.,]00$/,'');
+  const sign=amount<0?'−':'';
+  return sym==='$'||sym==='€'||sym==='£'?sign+sym+n:sign+n+' '+(sym||cur);
+}
+function bankRowHtml(x){
+  const neg=Number(x.balance)<0;
+  const uah=x.cur!=='UAH'?bankAmountUah(Number(x.balance)||0,x.cur):null;
+  let left,sub='';
+  if(x.kind==='card'){
+    const tl=bankTxt('t_'+x.type);
+    left='<span class="bank-dot '+escAttr(x.type)+'"></span>'+escHtml(tl.startsWith('t_')?(x.type||'—'):tl)+(x.last4?' <span class="bank-pan">··'+escHtml(x.last4)+'</span>':'');
+    if(x.creditLimit>0)sub=bankTxt('limitNote').replace('{l}',bankMoney(x.creditLimit,x.cur));
+    if(neg)sub=bankTxt('debt')+(sub?' · '+sub:'');
+  }else{
+    left='<span class="bank-jar">💰</span>'+escHtml(x.title||'—');
+    if(x.goal)sub=bankTxt('of')+' '+bankMoney(x.goal,x.cur);
+  }
+  const prog=x.kind==='jar'&&x.goal>0?'<div class="bank-prog"><span style="width:'+Math.min(100,Math.max(0,x.balance/x.goal*100)).toFixed(1)+'%"></span></div>':'';
+  return '<div class="bank-row"><div class="bank-row-main"><div class="bank-row-left">'+left+'</div>'+
+    '<div class="bank-row-amt'+(neg?' neg':'')+'">'+escHtml(bankMoney(Number(x.balance)||0,x.cur))+
+    (x.cur!=='UAH'?'<span class="bank-row-uah">'+(uah===null?bankTxt('noRate'):'≈ '+fmtN(toDisplayCurr(uah))+' '+getCurrSym())+'</span>':'')+'</div></div>'+
+    (sub?'<div class="ex-upd">'+escHtml(sub)+'</div>':'')+prog+'</div>';
+}
+function renderBanks(){
+  const el=document.getElementById('bankBlock');
+  if(!el)return;
+  const creds=getBankCreds(),cache=getBankCache();
+  const ids=Object.keys(creds).filter(id=>BANKS[id]);
+  let html='';
+  ids.forEach(id=>{
+    const c=cache[id]||{};
+    const busy=!!bankUi.busy[id];
+    const err=bankUi.errors[id];
+    const collapsed=isBankCollapsed(id);
+    const cards=(c.cards||[]).slice().sort((a,b)=>(bankAmountUah(b.balance,b.cur)||0)-(bankAmountUah(a.balance,a.cur)||0));
+    const jars=(c.jars||[]).slice().sort((a,b)=>(bankAmountUah(b.balance,b.cur)||0)-(bankAmountUah(a.balance,a.cur)||0));
+    let total=0;[...cards,...jars].forEach(x=>{const v=bankAmountUah(Number(x.balance)||0,x.cur);if(v!==null)total+=v;});
+    const time=c.updatedAt?new Date(c.updatedAt).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'}):'';
+    const upd=busy?bankTxt('loading'):(time?bankTxt('updated')+' '+time:'');
+    const B=BANKS[id];
+    const chev='<svg class="ex-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    html+='<div class="ex-card bank-card'+(collapsed?' collapsed':'')+'"><div class="ex-top" onclick="toggleBankCollapse(\''+id+'\')"><div class="ex-head">'+
+      '<div class="ex-id"><div class="ex-logo'+(B.logo?' has-img':'')+'">'+escHtml(B.mono)+(B.logo?'<img src="'+B.logo+'" alt="" onerror="this.parentNode.classList.remove(\'has-img\');this.remove()">':'')+'</div>'+
+      '<div class="ex-id-text"><div class="ex-name">'+escHtml(B.name)+chev+'</div>'+(upd?'<div class="ex-upd">'+escHtml(upd)+'</div>':'')+'</div></div>'+
+      '<div class="ex-total" style="color:var(--blue2)">'+fmtN(toDisplayCurr(total))+' '+getCurrSym()+'<span class="ex-total-sub">'+escHtml(bankTxt('summary').replace('{c}',cards.length).replace('{j}',jars.length))+'</span></div></div>'+
+      (err?'<div class="ex-sub err">'+escHtml(err)+'</div>':'');
+    if(collapsed){
+      html+='<div class="ex-more">'+escHtml(bankTxt('showAll').replace('{n}',cards.length+jars.length))+chev+'</div></div></div>';
+      return;
+    }
+    html+='</div>';
+    if(cards.length)html+='<div class="bank-group">'+escHtml(bankTxt('cards'))+'</div>'+cards.map(bankRowHtml).join('');
+    if(jars.length)html+='<div class="bank-group">'+escHtml(bankTxt('jars'))+'</div>'+jars.map(bankRowHtml).join('');
+    html+='<div class="ex-hint">'+escHtml(bankTxt('dupHint'))+'</div>';
+    html+='<div class="ex-actions"><button class="ex-btn" '+(busy?'disabled':'')+' onclick="refreshBank(\''+id+'\',true)">'+bankTxt('refresh')+'</button>'+
+      '<button class="ex-btn danger" onclick="disconnectBank(\''+id+'\')">'+bankTxt('disconnect')+'</button></div></div>';
+  });
+  const free=Object.keys(BANKS).filter(id=>!creds[id]);
+  if(bankUi.formOpen&&free.length){
+    const sel=free.includes(bankUi.formBank)?bankUi.formBank:free[0];
+    html+='<div class="ex-card"><div class="field-group"><div class="field-label">'+bankTxt('bank')+'</div>'+
+      '<select class="field-input" id="bankSelect" onchange="bankUi.formBank=this.value;renderBanks()">'+Object.keys(BANKS).map(id=>'<option value="'+id+'"'+(creds[id]?' disabled':'')+(id===sel?' selected':'')+'>'+escHtml(BANKS[id].name)+'</option>').join('')+'</select></div>'+
+      '<div class="field-group"><div class="field-label">'+bankTxt('token')+'</div><input class="field-input" id="bankToken" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div>'+
+      '<div class="ex-hint">'+escHtml(bankTxt('hint_'+sel))+'</div>'+
+      '<div id="bankFormMsg" class="ex-sub"></div>'+
+      '<div class="ex-actions"><button class="ex-btn" id="bankSaveBtn" onclick="connectBank()">'+bankTxt('save')+'</button>'+
+      '<button class="ex-btn" onclick="toggleBankForm(false)">'+bankTxt('cancel')+'</button></div></div>';
+  }else if(free.length){
+    html+='<button class="add-btn" style="margin:0 0 12px" onclick="toggleBankForm(true)">'+bankTxt('connect')+'</button>';
+  }
+  el.innerHTML=html;
+  unlockCardBody(el.closest('.card-body'));
+}
+setTimeout(()=>{if(!isOffline())refreshBanks();},4500);
+setInterval(()=>{if(!isOffline())refreshBanks();},10*60*1000);
+
 function getCryptoVal(){
   const usdtUsd=val('cryptoUsdt');
   const portfolioUsd=getCryptoPortfolioStats().portfolioUsd;
@@ -6999,7 +7267,8 @@ function getCashVal(){
   const rate=liveRates[cur]||1;
   return amount*rate;
 }
-function getOtherVal(){return val('otherAmount');}
+// Поточний рахунок = введённое вручную + карты и «банки» подключённых банков.
+function getOtherVal(){return val('otherAmount')+getBankTotalUah();}
 
 let _updateTimer=null;
 function updateAll(){
@@ -8351,6 +8620,7 @@ function bootstrapApp(){
     renderSecuritiesCards();
     renderMetalsCards();
     renderLiabilities();
+    try{renderBanks();}catch(e){}
     applyTranslations();
     restoreOrder();
     initDrag();
@@ -10121,6 +10391,7 @@ function removeLiab(id){
   customConfirm(t('confirmDelete'), function(){
     liabilities=liabilities.filter(l=>l.id!==id);
     renderLiabilities();
+    try{renderBanks();}catch(e){}
     updateAll();
     saveData();
   });
@@ -11374,6 +11645,8 @@ function signOutGoogle(){
   // Ключи бирж — чужие финансовые доступы; после выхода на устройстве им не место.
   ls.del('investory_exchange_keys');ls.del('investory_exchange_cache');
   ls.del('investory_access');
+  ls.del('investory_bank_keys');ls.del('investory_bank_cache');
+  try{bankUi.busy={};bankUi.errors={};bankUi.formOpen=false;renderBanks();}catch{}
   try{const a=document.getElementById('adminSection');if(a)a.style.display='none';closeAdminPanel();}catch{}
   try{exchangeUi.busy={};exchangeUi.errors={};exchangeUi.formOpen=false;renderExchanges();}catch{}
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();}catch{}

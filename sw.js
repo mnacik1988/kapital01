@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-38-admin-reauth';
+﻿const CACHE_NAME = 'investory-app-v0-1-39-monobank';
 const APP_SHELL = [
   './',
   './index.html',
@@ -42,7 +42,8 @@ const APP_SHELL = [
   './section-icons/Silver.png',
   './section-icons/Platinum.png',
   './exchange-logos/bybit.png?v=1',
-  './exchange-logos/binance.png?v=1'
+  './exchange-logos/binance.png?v=1',
+  './exchange-logos/monobank.png?v=1'
 ];
 
 // Необязательное. Раньше шрифт лежал в общем списке, и один неудачный запрос к
