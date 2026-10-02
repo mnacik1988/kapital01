@@ -21,10 +21,15 @@ const SLOW_CACHE_MS = 24 * 60 * 60 * 1000;
 // 100 ≈ $1-4/сутки в худшем случае. Держать чуть выше, чем (число тестеров × AI_USER_DAILY_LIMIT).
 // Поднимать по мере роста числа реальных пользователей.
 const AI_GLOBAL_DAILY_CAP = 100;
-// На одно устройство за сутки. Держать так, чтобы один юзер не мог выбрать заметную
-// долю глобального потолка: при 30 хватало трёх человек (или одного, стирающего
-// данные приложения) — теперь нужно десять. Перед релизом: 5 триал / 10 подписка.
-const AI_USER_DAILY_LIMIT = 10;
+// На одного человека за сутки. 3 — решение Александра 02.10.2026 перед выходом
+// бесплатно: запрос стоит ~$0,007, подписок пока нет, а общий потолок в 100
+// запросов теперь делится примерно на 33 человек, а не на 10. Владельцу — 10,
+// чтобы проверять ИИ без упора в лимит.
+const AI_USER_DAILY_LIMIT = 3;
+const AI_OWNER_DAILY_LIMIT = 10;
+function aiDailyLimitFor(userId) {
+  return userId === 'g' + ADMIN_SUB ? AI_OWNER_DAILY_LIMIT : AI_USER_DAILY_LIMIT;
+}
 const AI_IP_PER_MIN = 10;          // всплески с одного IP
 const AUTH_IP_PER_MIN = 20;        // попытки входа с одного IP
 // true с 17.09.2026: запрос к ИИ без проверенного Google-токена не обслуживается.
@@ -691,9 +696,9 @@ async function handleLimit(request, url, env, origin) {
   const used = await readCount(env, 'user:' + userId + ':' + day);
   const globalUsed = await readCount(env, 'global:' + day);
   return json({
-    limit: AI_USER_DAILY_LIMIT,
+    limit: aiDailyLimitFor(userId),
     used,
-    left: Math.max(0, AI_USER_DAILY_LIMIT - used),
+    left: Math.max(0, aiDailyLimitFor(userId) - used),
     globalLeft: Math.max(0, AI_GLOBAL_DAILY_CAP - globalUsed)
   }, 200, origin, 0);
 }
@@ -743,10 +748,11 @@ async function handleAI(request, origin, env) {
   if (userUsed === null) {
     return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
   }
-  if (userUsed >= AI_USER_DAILY_LIMIT) {
+  const userLimit = aiDailyLimitFor(userId);
+  if (userUsed >= userLimit) {
     return json({
       error: 'Ти вичерпав денний ліміт запитів до AI. Спробуй завтра.',
-      limit: { limit: AI_USER_DAILY_LIMIT, used: userUsed, left: 0 }
+      limit: { limit: userLimit, used: userUsed, left: 0 }
     }, 200, origin, 0);
   }
 
@@ -822,7 +828,7 @@ async function handleAI(request, origin, env) {
 
   return json({
     content,
-    limit: { limit: AI_USER_DAILY_LIMIT, used: userUsed + 1, left: Math.max(0, AI_USER_DAILY_LIMIT - userUsed - 1) }
+    limit: { limit: userLimit, used: userUsed + 1, left: Math.max(0, userLimit - userUsed - 1) }
   }, 200, origin, 0);
 }
 
