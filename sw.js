@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-37-admin-panel';
+﻿const CACHE_NAME = 'investory-app-v0-1-38-admin-reauth';
 const APP_SHELL = [
   './',
   './index.html',

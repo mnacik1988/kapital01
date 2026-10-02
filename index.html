@@ -598,6 +598,11 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .admin-btn{padding:10px 14px;border-radius:12px;border:1px solid var(--purple);background:var(--purple);color:#fff;font:700 12px 'Manrope',sans-serif;cursor:pointer;}
 .admin-btn.ghost{background:transparent;color:var(--purple2);border-color:var(--border2);margin-bottom:6px;}
 .admin-btn.danger{background:transparent;color:var(--red);border-color:#f8717155;}
+.admin-tab{min-width:0;font-size:11px;padding:9px 4px;}
+.admin-log{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:9px 11px;margin-bottom:6px;}
+.admin-log.warn{border-color:#f8717166;}
+.admin-log-head{display:flex;justify-content:space-between;gap:8px;font:600 12px 'Manrope',sans-serif;color:var(--text);}
+.admin-log-head span{font:500 10px 'DM Mono',monospace;color:var(--muted2);white-space:nowrap;}
 .admin-msg{font:600 11px 'DM Mono',monospace;color:var(--green2);margin:6px 0;min-height:14px;}
 .admin-msg.err{color:var(--red);}
 .privacy-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange2);line-height:1.6;margin-top:10px;}
@@ -2992,7 +2997,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.37';
+const APP_VERSION = 'v0.1.38';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -11309,6 +11314,7 @@ async function refreshSessionToken(){
 }
 function onGoogleCredential(resp){
   if(!resp||!resp.credential)return;
+  if(window._adminReauthPending){window._adminReauthPending=false;adminCredential(resp.credential);return;}
   setGoogleToken(resp.credential);
   // Сразу меняем часовой токен Google на свою 90-дневную сессию — дальше вход
   // держится на ней и не зависит от One Tap, который в обёртке негде показать.
@@ -11423,6 +11429,7 @@ function renderNativeSignInButton(){
 // лимит ИИ — ради чего вход и делался. Остаётся повторная попытка; запросу без
 // токена сервер всё равно отвечает 401.
 window.onAndroidSignInFailed=function(){
+  if(window._adminReauthPending){window._adminReauthPending=false;adminLoginFailed('Вход отменён');return;}
   const b=document.getElementById('nativeSignInBtn');
   if(b)b.disabled=false;
   const desc=document.getElementById('authGateDesc');
@@ -11782,14 +11789,55 @@ document.addEventListener('visibilitychange',()=>{
 // ══ АДМИН-ПАНЕЛЬ ═════════════════════════════════════════════════════
 // Видна только владельцу: сервер проверяет аккаунт на каждом запросе, кнопка
 // в настройках — лишь удобство. Текст по-русски: панелью пользуется один человек.
-const adminState={tab:'summary',users:[],q:'',offset:0,more:false,cfg:null,openSub:null};
+// Вход в панель — свежим подтверждением Google; сервер выдаёт токен
+// администратора на 30 минут. Он живёт только в памяти: закрыл приложение —
+// при следующем открытии панели снова подтверждение.
+const adminState={tab:'summary',users:[],q:'',offset:0,more:false,cfg:null,openSub:null,token:'',tokenExp:0,logOffset:0,log:[]};
+function adminTokenValid(){return adminState.token&&adminState.tokenExp>Date.now()/1000+30;}
 async function adminFetch(path,body){
+  if(!adminTokenValid()){adminShowLogin();throw new Error('Нужно подтвердить вход');}
   const r=await fetch(AUTH_BASE+path,{method:body?'POST':'GET',
-    headers:{'Content-Type':'application/json',...authHeaders()},body:body?JSON.stringify(body):undefined});
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminState.token},body:body?JSON.stringify(body):undefined});
   const j=await r.json().catch(()=>({}));
+  if(r.status===401){adminState.token='';adminShowLogin();throw new Error('Нужно подтвердить вход');}
   if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
   return j;
 }
+function adminShowLogin(msg){
+  const tabs=document.querySelector('#adminOverlay .admin-tabs');
+  if(tabs)tabs.style.display='none';
+  adminBody('<div class="admin-card" style="text-align:center"><div style="font-size:34px">🔐</div>'+
+    '<div class="admin-user-name" style="white-space:normal;margin:6px 0">Подтверди вход аккаунтом Google</div>'+
+    '<div class="admin-hint">Для админ-панели обычного входа в приложение мало: нужно подтвердить, что это ты. Доступ откроется на 30 минут.</div>'+
+    '<div id="adminGoogleSlot" style="display:flex;justify-content:center;margin-top:14px"></div>'+
+    '<div id="adminMsg" class="admin-msg'+(msg?' err':'')+'">'+escHtml(msg||'')+'</div></div>');
+  const slot=document.getElementById('adminGoogleSlot');
+  if(hasNativeSignIn()){
+    const b=document.createElement('button');
+    b.className='admin-btn';b.textContent='Подтвердить через Google';
+    b.onclick=()=>{window._adminReauthPending=true;adminMsg('Жду ответа Google…');try{window.InveStoryNative.signIn();}catch(e){window._adminReauthPending=false;adminMsg('Вход недоступен',true);}};
+    slot.appendChild(b);
+  }else if(window.google&&google.accounts&&google.accounts.id){
+    window._adminReauthPending=true;
+    try{google.accounts.id.renderButton(slot,{theme:'filled_black',size:'large',shape:'pill',text:'continue_with',width:260,locale:'ru'});}
+    catch(e){adminMsg('Кнопка Google не загрузилась',true);}
+  }else{
+    adminMsg('Вход Google не загрузился. Проверь интернет и открой панель снова.',true);
+  }
+}
+async function adminCredential(idToken){
+  adminMsg('Проверяю…');
+  try{
+    const r=await fetch(AUTH_BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(r.status===403?'Этот аккаунт — не администратор':(j.error||('HTTP '+r.status)));
+    adminState.token=j.token;adminState.tokenExp=j.exp;
+    const tabs=document.querySelector('#adminOverlay .admin-tabs');
+    if(tabs)tabs.style.display='';
+    adminShow(adminState.tab);
+  }catch(e){adminLoginFailed(e.message);}
+}
+function adminLoginFailed(msg){adminShowLogin(msg);}
 function openAdminPanel(){
   try{closeSettings();}catch(e){}
   let ov=document.getElementById('adminOverlay');
@@ -11801,14 +11849,16 @@ function openAdminPanel(){
       '<button class="privacy-close" onclick="closeAdminPanel()">✕</button></div>'+
       '<div class="admin-tabs"><button class="admin-tab" data-tab="summary" onclick="adminShow(\'summary\')">Сводка</button>'+
       '<button class="admin-tab" data-tab="users" onclick="adminShow(\'users\')">Пользователи</button>'+
-      '<button class="admin-tab" data-tab="settings" onclick="adminShow(\'settings\')">Настройки</button></div>'+
+      '<button class="admin-tab" data-tab="settings" onclick="adminShow(\'settings\')">Настройки</button>'+
+      '<button class="admin-tab" data-tab="log" onclick="adminShow(\'log\')">Журнал</button></div>'+
       '<div id="adminBody"></div></div>';
     document.body.appendChild(ov);
   }
   ov.classList.add('open');
-  adminShow(adminState.tab);
+  if(adminTokenValid()){const tabs=ov.querySelector('.admin-tabs');if(tabs)tabs.style.display='';adminShow(adminState.tab);}
+  else adminShowLogin();
 }
-function closeAdminPanel(){document.getElementById('adminOverlay')?.classList.remove('open');}
+function closeAdminPanel(){window._adminReauthPending=false;document.getElementById('adminOverlay')?.classList.remove('open');}
 function adminBody(html){const b=document.getElementById('adminBody');if(b)b.innerHTML=html;}
 function adminMsg(text,isErr){
   const el=document.getElementById('adminMsg');
@@ -11840,6 +11890,7 @@ function adminShow(tab){
   document.querySelectorAll('#adminOverlay .admin-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   if(tab==='summary')adminLoadSummary();
   else if(tab==='users'){adminState.openSub=null;adminLoadUsers(true);}
+  else if(tab==='log')adminLoadLog(true);
   else adminLoadSettings();
 }
 async function adminLoadSummary(){
@@ -11855,7 +11906,7 @@ async function adminLoadSummary(){
       stat(s.subscribed,'подписка')+stat(s.banned,'бан')+stat(d.aiGlobalUsed+' / '+c.aiGlobalCap,'ИИ сегодня')+
       '</div><div class="admin-hint" style="margin-top:12px">Триал для всех: <b>'+(c.trialEnabled?'включён, '+c.trialDays+' дн.':'выключен (без ограничения по времени)')+
       '</b><br>ИИ: <b>'+c.aiDaily+'</b> в день на человека, общий потолок <b>'+c.aiGlobalCap+'</b>.</div>');
-  }catch(e){adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
+  }catch(e){if(adminTokenValid())adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
 }
 async function adminLoadUsers(reset){
   if(reset){adminState.offset=0;adminState.users=[];}
@@ -11866,7 +11917,7 @@ async function adminLoadUsers(reset){
     adminState.users=adminState.users.concat(d.users);
     adminState.more=d.more;adminState.offset+=d.users.length;
     adminRenderList();
-  }catch(e){const l=document.getElementById('adminList');if(l)l.innerHTML='<div class="admin-msg err">'+escHtml(e.message)+'</div>';}
+  }catch(e){const l=document.getElementById('adminList');if(l&&adminTokenValid())l.innerHTML='<div class="admin-msg err">'+escHtml(e.message)+'</div>';}
 }
 function adminSearch(){adminState.q=String(document.getElementById('adminQ')?.value||'').trim();adminLoadUsers(true);}
 function adminRenderList(){
@@ -11966,6 +12017,40 @@ function adminDeleteUser(){
     }catch(e){adminMsg(e.message,true);}
   });
 }
+const ADMIN_ACTIONS={login:'Вход в админ-панель',login_denied:'⚠ Попытка входа чужим аккаунтом',config:'Общие настройки',user_update:'Изменён пользователь',user_delete:'Удалён пользователь'};
+function adminLogDetails(e){
+  const d=e.details||{};
+  if(e.action==='config'&&d.after){
+    const a=d.after;
+    return 'триал '+(a.trialEnabled?'вкл, '+a.trialDays+' дн.':'выкл')+' · ИИ '+a.aiDaily+'/день · потолок '+a.aiGlobalCap;
+  }
+  if(e.action==='user_update'&&d.set){
+    const s=d.set,parts=[];
+    if(s.trialMode!==undefined)parts.push('триал: '+({default:'как у всех',off:'выкл',days:'свой '+(s.trialDays??'')+' дн.'}[s.trialMode]||s.trialMode));
+    if(s.restartTrial)parts.push('триал заново');
+    if(s.aiLimit!==undefined)parts.push('ИИ: '+(s.aiLimit===null?'как у всех':s.aiLimit));
+    if(s.proUntil!==undefined)parts.push('подписка: '+(s.proUntil===null?'нет':s.proUntil>=ADMIN_FOREVER?'навсегда':'до '+adminDate(s.proUntil)));
+    if(s.banned!==undefined)parts.push(s.banned?'БАН':'без бана');
+    return (d.email?d.email+' — ':'')+parts.join(', ');
+  }
+  if(e.action==='user_delete')return d.email||e.target||'';
+  if(e.action==='login_denied')return 'аккаунт '+(e.target||'?');
+  return '';
+}
+async function adminLoadLog(reset){
+  if(reset){adminState.logOffset=0;adminState.log=[];adminBody('<div class="admin-hint">Загрузка…</div>');}
+  try{
+    const d=await adminFetch('/admin/log?offset='+adminState.logOffset);
+    adminState.log=adminState.log.concat(d.log);adminState.logOffset+=d.log.length;
+    if(!adminState.log.length){adminBody('<div class="admin-hint">Журнал пуст.</div>');return;}
+    adminBody('<div class="admin-hint" style="margin-bottom:8px">Все действия в панели: кто входил и что менял. Хранится год.</div>'+
+      adminState.log.map(e=>'<div class="admin-log'+(e.action==='login_denied'?' warn':'')+'"><div class="admin-log-head"><b>'+escHtml(ADMIN_ACTIONS[e.action]||e.action)+'</b><span>'+
+        new Date(e.at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</span></div>'+
+        (adminLogDetails(e)?'<div class="admin-hint">'+escHtml(adminLogDetails(e))+'</div>':'')+
+        '<div class="admin-hint" style="opacity:.7">IP '+escHtml(e.ip||'—')+'</div></div>').join('')+
+      (d.more?'<button class="admin-btn ghost" style="width:100%" onclick="adminLoadLog(false)">Показать ещё</button>':''));
+  }catch(e){if(adminTokenValid())adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
+}
 async function adminLoadSettings(){
   adminBody('<div class="admin-hint">Загрузка…</div>');
   try{
@@ -11981,7 +12066,7 @@ async function adminLoadSettings(){
       '<div id="adminMsg" class="admin-msg"></div>'+
       '<button class="admin-btn" style="width:100%" onclick="adminSaveSettings()">Сохранить</button>'+
       '<div class="admin-hint" style="margin-top:8px">Изменения доходят до сервера за полминуты, у людей — при следующем открытии приложения. Личные настройки пользователя важнее общих.</div>');
-  }catch(e){adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
+  }catch(e){if(adminTokenValid())adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
 }
 async function adminSaveSettings(){
   const n=id=>parseInt(document.getElementById(id).value,10);

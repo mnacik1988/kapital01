@@ -688,7 +688,11 @@ async function ensureSchema(env) {
       ai_limit INTEGER, pro_until INTEGER, banned INTEGER NOT NULL DEFAULT 0, note TEXT,
       ai_total INTEGER NOT NULL DEFAULT 0, ai_day TEXT, ai_day_count INTEGER NOT NULL DEFAULT 0)`),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS users_last_seen ON users(last_seen)'),
-    env.DB.prepare('CREATE TABLE IF NOT EXISTS config (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS config (key TEXT PRIMARY KEY, value TEXT NOT NULL)'),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS admin_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, action TEXT NOT NULL,
+      target TEXT, details TEXT, ip TEXT, ua TEXT)`),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS admin_log_at ON admin_log(at)')
   ]);
   schemaReady = true;
 }
@@ -800,10 +804,73 @@ async function handleMe(request, origin, env) {
 }
 
 // ── Админ-панель ──────────────────────────────────────────────────────
+// Обычной 90-дневной сессии приложения для админки МАЛО: украденный токен или
+// открытый чужими руками телефон не должны открывать управление. Вход в панель —
+// только свежим подтверждением Google (токен Google не старше 10 минут), в обмен
+// на отдельный токен администратора на 30 минут. Обычная сессия его не заменит:
+// у токена другой издатель (iss), и проверяет его отдельная функция.
+const ADMIN_TOKEN_TTL = 30 * 60;
+const ADMIN_LOGIN_MAX_AGE = 10 * 60;
+
+async function signAdminToken(sub, env) {
+  const now = Math.floor(Date.now() / 1000);
+  const exp = now + ADMIN_TOKEN_TTL;
+  const head64 = b64url(new TextEncoder().encode(JSON.stringify({ alg: 'HS256', typ: 'JWT' })));
+  const pay64 = b64url(new TextEncoder().encode(JSON.stringify({ sub, iss: 'investory-admin', iat: now, exp })));
+  const key = await getSessionHmacKey(env);
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(head64 + '.' + pay64));
+  return { token: head64 + '.' + pay64 + '.' + b64url(new Uint8Array(sig)), exp };
+}
+
+async function verifyAdminToken(token, env) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3) return null;
+  let payload;
+  try { payload = JSON.parse(new TextDecoder().decode(b64urlToBytes(parts[1]))); } catch { return null; }
+  if (payload.iss !== 'investory-admin' || payload.sub !== ADMIN_SUB) return null;
+  if (typeof payload.exp !== 'number' || payload.exp < Math.floor(Date.now() / 1000)) return null;
+  try {
+    const key = await getSessionHmacKey(env);
+    const ok = await crypto.subtle.verify('HMAC', key, b64urlToBytes(parts[2]), new TextEncoder().encode(parts[0] + '.' + parts[1]));
+    return ok ? payload.sub : null;
+  } catch { return null; }
+}
+
+// Журнал действий в админке — в той же базе. Хранится год.
+async function adminLog(env, request, action, target, details) {
+  try {
+    await ensureSchema(env);
+    const now = Date.now();
+    await env.DB.prepare('INSERT INTO admin_log (at, action, target, details, ip, ua) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+      .bind(now, action, target || null, details ? JSON.stringify(details).slice(0, 2000) : null,
+        request.headers.get('CF-Connecting-IP') || null, String(request.headers.get('User-Agent') || '').slice(0, 160)).run();
+    if (Math.random() < 0.05) await env.DB.prepare('DELETE FROM admin_log WHERE at < ?').bind(now - 365 * DAY_SEC * 1000).run();
+  } catch { /* журнал не должен ломать действие */ }
+}
+
+async function handleAdminLogin(request, origin, env) {
+  if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
+  if (!env.DB) return json({ error: 'Database not bound' }, 503, origin);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'Invalid body' }, 400, origin); }
+  const idToken = String(body.idToken || '');
+  // Только токен самого Google — наша сессия здесь не принимается.
+  const sub = await verifyGoogleIdToken(idToken, env);
+  if (!sub) return json({ error: 'Подтверждение Google не прошло' }, 401, origin);
+  let iat = 0;
+  try { iat = Number(JSON.parse(new TextDecoder().decode(b64urlToBytes(idToken.split('.')[1]))).iat) || 0; } catch {}
+  if (Math.floor(Date.now() / 1000) - iat > ADMIN_LOGIN_MAX_AGE) return json({ error: 'Подтверждение устарело, войди ещё раз' }, 401, origin);
+  if (sub !== ADMIN_SUB) {
+    await adminLog(env, request, 'login_denied', sub, null);
+    return json({ error: 'Not allowed' }, 403, origin);
+  }
+  await adminLog(env, request, 'login', null, null);
+  return json(await signAdminToken(sub, env), 200, origin, 0);
+}
+
 async function requireAdmin(request, env, origin) {
-  const sub = await verifyAuthToken(bearerToken(request), env);
-  if (!sub) return json({ error: 'Sign in required' }, 401, origin);
-  if (sub !== ADMIN_SUB) return json({ error: 'Not allowed' }, 403, origin);
+  const sub = await verifyAdminToken(bearerToken(request), env);
+  if (!sub) return json({ error: 'admin_auth' }, 401, origin);
   if (!env.DB) return json({ error: 'Database not bound' }, 503, origin);
   await ensureSchema(env);
   return null;
@@ -820,6 +887,7 @@ function adminRow(r, cfg, now, today) {
 }
 
 async function handleAdmin(request, url, origin, env) {
+  if (url.pathname === '/admin/login') return handleAdminLogin(request, origin, env);
   const denied = await requireAdmin(request, env, origin);
   if (denied) return denied;
   const cfg = await getAccessConfig(env);
@@ -863,6 +931,7 @@ async function handleAdmin(request, url, origin, env) {
       await env.DB.prepare('INSERT INTO config (key, value) VALUES (?1, ?2) ON CONFLICT(key) DO UPDATE SET value = ?2')
         .bind('access', JSON.stringify(cleanAccessConfig(next))).run();
       accessCfgCache = null;
+      await adminLog(env, request, 'config', null, { before: cfg, after: cleanAccessConfig(next) });
       return json({ config: await getAccessConfig(env) }, 200, origin, 0);
     }
     return json({ config: cfg }, 200, origin, 0);
@@ -899,6 +968,7 @@ async function handleAdmin(request, url, origin, env) {
     const res = await env.DB.prepare('UPDATE users SET ' + fields.join(', ') + ' WHERE sub = ?').bind(...vals).run();
     if (!res.meta || !res.meta.changes) return json({ error: 'User not found' }, 404, origin);
     const row = await env.DB.prepare('SELECT * FROM users WHERE sub = ?').bind(sub).first();
+    await adminLog(env, request, 'user_update', sub, { email: row.email, set });
     return json({ user: adminRow(row, cfg, now, today) }, 200, origin, 0);
   }
 
@@ -906,8 +976,17 @@ async function handleAdmin(request, url, origin, env) {
     const sub = String(body.sub || '');
     if (!/^\d{5,40}$/.test(sub)) return json({ error: 'Invalid user' }, 400, origin);
     if (sub === ADMIN_SUB) return json({ error: 'Cannot delete the owner' }, 400, origin);
+    const gone = await env.DB.prepare('SELECT email FROM users WHERE sub = ?').bind(sub).first();
     await env.DB.prepare('DELETE FROM users WHERE sub = ?').bind(sub).run();
+    await adminLog(env, request, 'user_delete', sub, { email: gone ? gone.email : null });
     return json({ ok: true }, 200, origin, 0);
+  }
+
+  if (path === '/admin/log' && request.method === 'GET') {
+    const offset = Math.max(0, parseInt(url.searchParams.get('offset'), 10) || 0);
+    const { results } = await env.DB.prepare(
+      'SELECT at, action, target, details, ip, ua FROM admin_log ORDER BY at DESC LIMIT 50 OFFSET ?').bind(offset).all();
+    return json({ log: results.map(r => ({ ...r, details: r.details ? JSON.parse(r.details) : null })), more: results.length === 50 }, 200, origin, 0);
   }
 
   return json({ error: 'Not found' }, 404, origin);
