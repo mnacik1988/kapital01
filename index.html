@@ -604,6 +604,12 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .bp-eaid{background:linear-gradient(135deg,#1aa39a,#0d6660);}
 .bp-miu{background:linear-gradient(180deg,#2f6bff 0 50%,#f2c200 50% 100%);}
 .bank-swipe{font:500 10px 'DM Mono',monospace;color:var(--muted2);text-align:center;margin:-2px 0 2px;}
+/* Глазок «скрыть суммы» */
+.total-wrap{position:relative;}
+.eye-btn{align-self:center;margin-left:10px;width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:1px solid var(--border2);background:var(--bg3);color:var(--muted2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.eye-btn svg{width:17px;height:17px;}
+.eye-btn.on{color:var(--purple2);border-color:var(--purple);}
+body.amounts-hidden :is(.total-amount,#totalChange,.card-value,.result-val,.stock-detail-stat-val,.summary-val,.sd-val,.main-counter-metric-value,.live-val,.diag-stat-val,.diag-row-val,.calc-res-val,.ticker-card-price,.ticker-card-pnl,.ticker-card-qty,.ticker-card-div,.liab-breakdown-val,.chart-stat-val,.chart-total,.liab-stat-val,.liab-net-val,.liab-card-amount,.liab-card-sub,.ex-total,.ex-lg b,.bp-amt,.bp-sub,.bj-amt,.bj-sub,.bank-row-amt,.usdt-balance-main,.usdt-balance-equiv,.section-dyn-value,.section-dyn-chip span:last-child,.history-total,.history-delta,.daily-total,.balance-list-equiv,input[inputmode="decimal"]){filter:blur(7px);user-select:none;-webkit-user-select:none;transition:filter .15s;}
 .bank-add-row{display:flex;gap:8px;margin:0 0 12px;}
 .bank-add-row .add-btn{flex:1;margin:0;}
 .bank-plastic.manual{border:none;text-align:left;cursor:pointer;font:inherit;}
@@ -2041,6 +2047,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="total-wrap">
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-currency" id="totalCurrSym">₴</div>
+    <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
   </div>
   <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
@@ -3055,7 +3062,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.42';
+const APP_VERSION = 'v0.1.43';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3741,6 +3748,7 @@ function applyTranslations(){
   // перезапуска (замечено 03.10 на китайском).
   try{renderCoins();}catch(e){}
   try{renderBanks();}catch(e){}
+  try{applyHideAmounts();}catch(e){}
   try{setText('adminSectionLabel',({uk:'Адміністратор',ru:'Администратор',en:'Administrator',de:'Administrator',zh:'管理员'})[currentLang]||'Адміністратор');}catch(e){}
   translateDynamicUI();
   applyAutoTranslations();
@@ -8855,6 +8863,33 @@ secContainerEl.after(metalsContainerEl);
 // ── INIT ──────────────────────────────────────
 
 // в”Ђв”Ђ INIT в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+// ── Скрыть суммы ─────────────────────────────────────────────────────────
+// Глазок возле общего капитала: все суммы в приложении размываются (показал
+// телефон кому-то — капитал не виден), проценты и названия остаются. Выбор
+// запоминается на этом устройстве.
+const HIDE_AMOUNTS_LS='investory_hide_amounts';
+const EYE_ICONS={
+  open:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+  closed:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12s3.4-6 9-6c1.8 0 3.4.6 4.7 1.4M21 12s-3.4 6-9 6c-1.8 0-3.4-.6-4.7-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20 20 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+};
+function amountsHidden(){try{return localStorage.getItem(HIDE_AMOUNTS_LS)==='1';}catch(e){return false;}}
+function applyHideAmounts(){
+  const hidden=amountsHidden();
+  document.body.classList.toggle('amounts-hidden',hidden);
+  const b=document.getElementById('amountsEyeBtn');
+  if(b){
+    b.innerHTML=hidden?EYE_ICONS.closed:EYE_ICONS.open;
+    b.classList.toggle('on',hidden);
+    const t={uk:['Приховати суми','Показати суми'],ru:['Скрыть суммы','Показать суммы'],en:['Hide amounts','Show amounts'],de:['Beträge ausblenden','Beträge anzeigen'],zh:['隐藏金额','显示金额']}[currentLang]||['Hide amounts','Show amounts'];
+    b.setAttribute('aria-label',hidden?t[1]:t[0]);b.title=hidden?t[1]:t[0];
+  }
+}
+function toggleHideAmounts(){
+  try{localStorage.setItem(HIDE_AMOUNTS_LS,amountsHidden()?'0':'1');}catch(e){}
+  applyHideAmounts();
+}
+
 function bootstrapApp(){
   if(window._kapitalBootstrapped)return;
   window._kapitalBootstrapped=true;
@@ -8864,6 +8899,7 @@ function bootstrapApp(){
       window._kapitalImportInProgress=false;
     }
     loadData();
+    applyHideAmounts();
     loadCapitalHistory();
     // Пока GOOGLE_CLIENT_ID пуст, вызов ничего не делает и приложение
     // работает ровно как раньше — экран входа не появляется.
