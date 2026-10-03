@@ -604,6 +604,15 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .bp-eaid{background:linear-gradient(135deg,#1aa39a,#0d6660);}
 .bp-miu{background:linear-gradient(180deg,#2f6bff 0 50%,#f2c200 50% 100%);}
 .bank-swipe{font:500 10px 'DM Mono',monospace;color:var(--muted2);text-align:center;margin:-2px 0 2px;}
+.bank-add-row{display:flex;gap:8px;margin:0 0 12px;}
+.bank-add-row .add-btn{flex:1;margin:0;}
+.bank-plastic.manual{border:none;text-align:left;cursor:pointer;font:inherit;}
+.bank-plastic.off{opacity:.5;}
+.bp-edit{font-size:12px;opacity:.75;}
+.manual-logo{color:#fff;font:800 13px 'Manrope',sans-serif;letter-spacing:.02em;border:none;}
+.bank-include{display:flex;align-items:center;gap:9px;margin:4px 0 10px;font:600 13px 'Manrope',sans-serif;color:var(--text);}
+.bank-include input{width:19px;height:19px;accent-color:var(--purple);}
+.bank-sheet-sub{font:600 10px 'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin:14px 0 8px;}
 .bank-jars{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .bank-jar-tile{display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:15px;padding:10px;background:var(--bg2);min-width:0;}
 .bj-ring{width:42px;height:42px;flex:0 0 42px;}
@@ -3046,7 +3055,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.40';
+const APP_VERSION = 'v0.1.41';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3127,6 +3136,8 @@ let appTheme = localStorage.getItem('app_theme') || 'dark';
 let liabilities = [];
 let showNetCapital = true;
 let metalsSections = [];
+// Банки без API (Приват, ПУМБ…): человек сам вносит карты и суммы.
+let manualBanks = [];
 function openPaywall(reason){
   refreshAccessState();
   updatePaywallAccessText(reason);
@@ -7059,6 +7070,32 @@ function bankTxt(k){
     loading:{uk:'Оновлюю…',ru:'Обновляю…',en:'Updating…',de:'Aktualisiere…',zh:'正在更新…'},
     updated:{uk:'оновлено',ru:'обновлено',en:'updated',de:'aktualisiert',zh:'更新于'},
     cards:{uk:'Картки',ru:'Карты',en:'Cards',de:'Karten',zh:'银行卡'},
+    addManual:{uk:'+ Додати вручну',ru:'+ Добавить вручную',en:'+ Add manually',de:'+ Manuell hinzufügen',zh:'+ 手动添加'},
+    manualTitle:{uk:'Банк вручну',ru:'Банк вручную',en:'Manual bank',de:'Bank manuell',zh:'手动银行'},
+    manualHint:{uk:'Для банків без API (ПриватБанк, ПУМБ, Ощадбанк…): суми вносите самі, натиснувши на картку.',ru:'Для банков без API (ПриватБанк, ПУМБ, Ощадбанк…): суммы вносите сами, нажав на карту.',en:'For banks without an API: you enter the amounts yourself by tapping a card.',de:'Für Banken ohne API: Beträge selbst eintragen, indem Sie auf eine Karte tippen.',zh:'适用于没有 API 的银行：点击卡片自行输入金额。'},
+    bankName:{uk:'Назва банку',ru:'Название банка',en:'Bank name',de:'Name der Bank',zh:'银行名称'},
+    bankNamePh:{uk:'ПриватБанк',ru:'ПриватБанк',en:'My bank',de:'Meine Bank',zh:'我的银行'},
+    cardLabel:{uk:'Картка: назва або номер',ru:'Карта: название или номер',en:'Card: name or number',de:'Karte: Name oder Nummer',zh:'卡片：名称或卡号'},
+    cardLabelPh:{uk:'Універсальна або 4321',ru:'Универсальная или 4321',en:'Main card or 4321',de:'Hauptkarte oder 4321',zh:'主卡 或 4321'},
+    cardLabelHint:{uk:'Текстом або цифрами — від 4 до 16. Достатньо останніх 4 цифр.',ru:'Текстом или цифрами — от 4 до 16. Достаточно последних 4 цифр.',en:'Text, or 4 to 16 digits. The last 4 digits are enough.',de:'Text oder 4 bis 16 Ziffern. Die letzten 4 genügen.',zh:'文字，或 4–16 位数字。后 4 位即可。'},
+    currency:{uk:'Валюта',ru:'Валюта',en:'Currency',de:'Währung',zh:'货币'},
+    balance:{uk:'Сума на картці',ru:'Сумма на карте',en:'Card balance',de:'Kartensaldo',zh:'卡内余额'},
+    include:{uk:'Враховувати в загальній сумі',ru:'Учитывать в общей сумме',en:'Count in the total',de:'In der Summe zählen',zh:'计入总额'},
+    off:{uk:'не в сумі',ru:'не в сумме',en:'not counted',de:'nicht gezählt',zh:'不计入'},
+    addCard:{uk:'+ Картка',ru:'+ Карта',en:'+ Card',de:'+ Karte',zh:'+ 卡片'},
+    editBank:{uk:'Змінити банк',ru:'Изменить банк',en:'Edit bank',de:'Bank bearbeiten',zh:'编辑银行'},
+    editCard:{uk:'Картка',ru:'Карта',en:'Card',de:'Karte',zh:'卡片'},
+    newCard:{uk:'Нова картка',ru:'Новая карта',en:'New card',de:'Neue Karte',zh:'新卡片'},
+    deleteCard:{uk:'Видалити картку',ru:'Удалить карту',en:'Delete card',de:'Karte löschen',zh:'删除卡片'},
+    deleteBank:{uk:'Видалити банк',ru:'Удалить банк',en:'Delete bank',de:'Bank löschen',zh:'删除银行'},
+    confirmDelCard:{uk:'Видалити цю картку?',ru:'Удалить эту карту?',en:'Delete this card?',de:'Diese Karte löschen?',zh:'删除此卡片？'},
+    confirmDelBank:{uk:'Видалити банк разом з усіма картками?',ru:'Удалить банк вместе со всеми картами?',en:'Delete the bank with all its cards?',de:'Bank mit allen Karten löschen?',zh:'删除该银行及其所有卡片？'},
+    saveBtn:{uk:'Зберегти',ru:'Сохранить',en:'Save',de:'Speichern',zh:'保存'},
+    errBankName:{uk:'Вкажіть назву банку',ru:'Укажите название банка',en:'Enter the bank name',de:'Namen der Bank eingeben',zh:'请输入银行名称'},
+    errLabel:{uk:'Вкажіть назву картки або від 4 до 16 цифр номера',ru:'Укажите название карты или от 4 до 16 цифр номера',en:'Enter a card name or 4 to 16 digits',de:'Kartenname oder 4 bis 16 Ziffern eingeben',zh:'请输入卡片名称或 4–16 位数字'},
+    errBalance:{uk:'Вкажіть суму числом',ru:'Укажите сумму числом',en:'Enter the amount as a number',de:'Betrag als Zahl eingeben',zh:'请输入数字金额'},
+    cardsN:{uk:'{n} карт',ru:'{n} карт',en:'{n} cards',de:'{n} Karten',zh:'{n} 张卡'},
+    offN:{uk:'{n} не в сумі',ru:'{n} не в сумме',en:'{n} not counted',de:'{n} nicht gezählt',zh:'{n} 不计入'},
     swipe:{uk:'← гортайте · {n} карт →',ru:'← листайте · {n} карт →',en:'← swipe · {n} cards →',de:'← wischen · {n} Karten →',zh:'← 滑动 · {n} 张卡 →'},
     limitShort:{uk:'ліміт {l} не враховано',ru:'лимит {l} не учтён',en:'limit {l} not counted',de:'Limit {l} nicht gezählt',zh:'未计入额度 {l}'},
     jars:{uk:'Банки (накопичення)',ru:'Банки (накопления)',en:'Jars (savings)',de:'Spardosen',zh:'储蓄罐'},
@@ -7256,6 +7293,159 @@ function bankJarHtml(x){
   return '<div class="bank-jar-tile">'+ring+'<div class="bj-meta"><div class="bj-title">'+escHtml(x.title||'—')+'</div>'+
     '<div class="bj-amt">'+escHtml(bankMoney(Number(x.balance)||0,x.cur))+'</div>'+(sub?'<div class="bj-sub">'+escHtml(sub)+'</div>':'')+'</div></div>';
 }
+
+// ══ БАНКИ ВРУЧНУЮ ═══════════════════════════════════════════════════════
+// Для банков без API: название банка, карты (название или 4–16 цифр номера),
+// валюта, сумма и галочка «учитывать в общей сумме». Выглядят так же, как
+// карты monobank; хранятся в данных портфеля (manualBanks) — значит, попадают
+// в резервную копию и проходят проверку при импорте.
+const MANUAL_BANK_CURRENCIES=['UAH','USD','EUR','PLN','GBP','CHF','CZK','CNY'];
+function manualCardIncluded(c){return c.include!==false;}
+function getManualBanksTotalUah(){
+  let sum=0;
+  (Array.isArray(manualBanks)?manualBanks:[]).forEach(b=>(b.cards||[]).forEach(c=>{
+    if(!manualCardIncluded(c))return;
+    const v=bankAmountUah(Number(c.balance)||0,c.cur||'UAH');
+    if(v!==null)sum+=v;
+  }));
+  return sum;
+}
+function manualBankInitials(name){
+  const w=String(name||'').trim().split(/\s+/).filter(Boolean);
+  return ((w[0]||'?')[0]+(w[1]?w[1][0]:(w[0]||'').slice(1,2))).toUpperCase();
+}
+function manualBankTint(name){
+  const tints=['#2a2b31','#1f4fa3','#0d6660','#6b3fa0','#9a3412','#374151'];
+  let h=0;for(const ch of String(name||''))h=(h*31+ch.charCodeAt(0))>>>0;
+  return tints[h%tints.length];
+}
+function manualCardLabel(c){
+  const l=String(c.label||'').trim();
+  return /^\d{4,16}$/.test(l)?'··'+l.slice(-4):l;
+}
+function manualPlasticHtml(bank,c){
+  const neg=Number(c.balance)<0;
+  const cur=c.cur||'UAH';
+  const cls=cur==='USD'?'bp-usd':cur==='EUR'?'bp-eur':'';
+  const style=cls?'':' style="background:linear-gradient(135deg,'+manualBankTint(bank.name)+',#0e0f12)"';
+  const uah=cur!=='UAH'?bankAmountUah(Number(c.balance)||0,cur):null;
+  const sub=!manualCardIncluded(c)?bankTxt('off'):(cur!=='UAH'?(uah===null?bankTxt('noRate'):'≈ '+fmtN(toDisplayCurr(uah))+' '+getCurrSym()):'');
+  return '<button class="bank-plastic manual '+cls+(neg?' debt':'')+(manualCardIncluded(c)?'':' off')+'"'+style+' onclick="openManualCardSheet(\''+escAttr(bank.id)+'\',\''+escAttr(c.id)+'\')">'+
+    '<div class="bp-top"><span>'+escHtml(manualCardLabel(c)||'—')+(cur!=='UAH'?' · '+cur:'')+'</span><span class="bp-edit">✎</span></div>'+
+    '<div><div class="bp-amt">'+escHtml(bankMoney(Number(c.balance)||0,cur))+'</div>'+(sub?'<div class="bp-sub">'+escHtml(sub)+'</div>':'')+'</div></button>';
+}
+function renderManualBanksHtml(){
+  let html='';
+  (Array.isArray(manualBanks)?manualBanks:[]).forEach(b=>{
+    const cards=b.cards||[];
+    const collapsed=isBankCollapsed('m:'+b.id);
+    const total=cards.reduce((sum,c)=>{if(!manualCardIncluded(c))return sum;const v=bankAmountUah(Number(c.balance)||0,c.cur||'UAH');return v===null?sum:sum+v;},0);
+    const offN=cards.filter(c=>!manualCardIncluded(c)).length;
+    const chev='<svg class="ex-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    html+='<div class="ex-card bank-card'+(collapsed?' collapsed':'')+'"><div class="ex-top" onclick="toggleBankCollapse(\'m:'+escAttr(b.id)+'\')"><div class="ex-head">'+
+      '<div class="ex-id"><div class="ex-logo manual-logo" style="background:'+manualBankTint(b.name)+'">'+escHtml(manualBankInitials(b.name))+'</div>'+
+      '<div class="ex-id-text"><div class="ex-name">'+escHtml(b.name||'—')+chev+'</div><div class="ex-upd">'+escHtml(bankTxt('manualTitle'))+'</div></div></div>'+
+      '<div class="ex-total" style="color:var(--blue2)">'+fmtN(toDisplayCurr(total))+' '+getCurrSym()+'<span class="ex-total-sub">'+escHtml(bankTxt('cardsN').replace('{n}',cards.length)+(offN?' · '+bankTxt('offN').replace('{n}',offN):''))+'</span></div></div>';
+    if(collapsed){html+='<div class="ex-more">'+escHtml(bankTxt('showAll').replace('{n}',cards.length))+chev+'</div></div></div>';return;}
+    html+='</div>';
+    if(cards.length)html+='<div class="bank-cards">'+cards.map(c=>manualPlasticHtml(b,c)).join('')+'</div>'+
+      (cards.length>2?'<div class="bank-swipe">'+escHtml(bankTxt('swipe').replace('{n}',cards.length))+'</div>':'');
+    html+='<div class="ex-actions"><button class="ex-btn" onclick="openManualCardSheet(\''+escAttr(b.id)+'\',null)">'+bankTxt('addCard')+'</button>'+
+      '<button class="ex-btn" onclick="openManualBankSheet(\''+escAttr(b.id)+'\')">'+bankTxt('editBank')+'</button></div></div>';
+  });
+  return html;
+}
+// Шторка с формой — общая для банка и карты.
+function openBankSheet(title,bodyHtml){
+  closeBankSheet();
+  const ov=document.createElement('div');
+  ov.id='bankSheet';ov.className='privacy-overlay open';
+  ov.addEventListener('click',e=>{if(e.target===ov)closeBankSheet();});
+  ov.innerHTML='<div class="privacy-box"><div class="privacy-head"><div class="privacy-title">'+escHtml(title)+'</div>'+
+    '<button class="privacy-close" onclick="closeBankSheet()">✕</button></div>'+bodyHtml+'</div>';
+  document.body.appendChild(ov);
+}
+function closeBankSheet(){document.getElementById('bankSheet')?.remove();}
+function manualCardFields(c){
+  c=c||{};
+  const cur=c.cur||'UAH';
+  return '<div class="field-group"><div class="field-label">'+bankTxt('cardLabel')+'</div>'+
+      '<input class="field-input" id="mcLabel" maxlength="30" autocomplete="off" placeholder="'+escAttr(bankTxt('cardLabelPh'))+'" value="'+escAttr(c.label||'')+'">'+
+      '<div class="ex-hint" style="margin:4px 0 0">'+escHtml(bankTxt('cardLabelHint'))+'</div></div>'+
+    '<div class="row2"><div class="field-group"><div class="field-label">'+bankTxt('currency')+'</div>'+
+      '<select class="field-input" id="mcCur">'+MANUAL_BANK_CURRENCIES.map(k=>'<option value="'+k+'"'+(k===cur?' selected':'')+'>'+k+'</option>').join('')+'</select></div>'+
+    '<div class="field-group"><div class="field-label">'+bankTxt('balance')+'</div>'+
+      '<input class="field-input" id="mcBalance" inputmode="decimal" placeholder="0" value="'+(c.balance!==undefined&&c.balance!==null?escAttr(fmtMax2(c.balance)):'')+'"></div></div>'+
+    '<label class="bank-include"><input type="checkbox" id="mcInclude"'+(c.include===false?'':' checked')+'> '+escHtml(bankTxt('include'))+'</label>';
+}
+function readManualCardFields(){
+  const label=String(document.getElementById('mcLabel')?.value||'').trim().replace(/\s+/g,' ');
+  const digits=/^\d+$/.test(label);
+  if(!label||(digits&&(label.length<4||label.length>16))||label.length>30)return {err:bankTxt('errLabel')};
+  const raw=String(document.getElementById('mcBalance')?.value||'').trim();
+  const balance=raw===''?0:parseInputNumber(raw);
+  if(!Number.isFinite(balance))return {err:bankTxt('errBalance')};
+  const cur=document.getElementById('mcCur')?.value;
+  return {label,cur:MANUAL_BANK_CURRENCIES.includes(cur)?cur:'UAH',balance:Math.round(balance*100)/100,include:!!document.getElementById('mcInclude')?.checked};
+}
+function manualSheetMsg(t){const el=document.getElementById('mcMsg');if(el)el.textContent=t||'';}
+function persistManualBanks(){closeBankSheet();saveData();renderBanks();updateAll();}
+function newManualId(prefix){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+// Новый банк: название и сразу первая карта.
+function openManualBankSheet(bankId){
+  const b=bankId?manualBanks.find(x=>x.id===bankId):null;
+  const body='<div class="field-group"><div class="field-label">'+bankTxt('bankName')+'</div>'+
+      '<input class="field-input" id="mbName" maxlength="40" autocomplete="off" placeholder="'+escAttr(bankTxt('bankNamePh'))+'" value="'+escAttr(b?b.name:'')+'"></div>'+
+    (b?'':'<div class="bank-sheet-sub">'+escHtml(bankTxt('newCard'))+'</div>'+manualCardFields(null))+
+    '<div id="mcMsg" class="ex-sub err"></div>'+
+    '<div class="ex-actions"><button class="ex-btn" onclick="saveManualBank('+(b?'\''+escAttr(b.id)+'\'':'null')+')">'+bankTxt('saveBtn')+'</button>'+
+    (b?'<button class="ex-btn danger" onclick="deleteManualBank(\''+escAttr(b.id)+'\')">'+bankTxt('deleteBank')+'</button>':'')+'</div>'+
+    (b?'':'<div class="ex-hint">'+escHtml(bankTxt('manualHint'))+'</div>');
+  openBankSheet(b?bankTxt('editBank'):bankTxt('manualTitle'),body);
+}
+function saveManualBank(bankId){
+  const name=String(document.getElementById('mbName')?.value||'').trim().replace(/\s+/g,' ').slice(0,40);
+  if(!name){manualSheetMsg(bankTxt('errBankName'));return;}
+  if(bankId){
+    const b=manualBanks.find(x=>x.id===bankId);
+    if(b)b.name=name;
+  }else{
+    const card=readManualCardFields();
+    if(card.err){manualSheetMsg(card.err);return;}
+    manualBanks.push({id:newManualId('mbank_'),name,cards:[{id:newManualId('mcard_'),...card}]});
+  }
+  persistManualBanks();
+}
+function deleteManualBank(bankId){
+  customConfirm(bankTxt('confirmDelBank'),()=>{manualBanks=manualBanks.filter(x=>x.id!==bankId);persistManualBanks();});
+}
+function openManualCardSheet(bankId,cardId){
+  const b=manualBanks.find(x=>x.id===bankId);
+  if(!b)return;
+  const c=cardId?(b.cards||[]).find(x=>x.id===cardId):null;
+  const body=manualCardFields(c)+'<div id="mcMsg" class="ex-sub err"></div>'+
+    '<div class="ex-actions"><button class="ex-btn" onclick="saveManualCard(\''+escAttr(bankId)+'\','+(c?'\''+escAttr(c.id)+'\'':'null')+')">'+bankTxt('saveBtn')+'</button>'+
+    (c?'<button class="ex-btn danger" onclick="deleteManualCard(\''+escAttr(bankId)+'\',\''+escAttr(c.id)+'\')">'+bankTxt('deleteCard')+'</button>':'')+'</div>';
+  openBankSheet(b.name+' · '+(c?bankTxt('editCard'):bankTxt('newCard')),body);
+}
+function saveManualCard(bankId,cardId){
+  const b=manualBanks.find(x=>x.id===bankId);
+  if(!b)return;
+  const card=readManualCardFields();
+  if(card.err){manualSheetMsg(card.err);return;}
+  b.cards=Array.isArray(b.cards)?b.cards:[];
+  if(cardId){const c=b.cards.find(x=>x.id===cardId);if(c)Object.assign(c,card);}
+  else b.cards.push({id:newManualId('mcard_'),...card});
+  persistManualBanks();
+}
+function deleteManualCard(bankId,cardId){
+  customConfirm(bankTxt('confirmDelCard'),()=>{
+    const b=manualBanks.find(x=>x.id===bankId);
+    if(b)b.cards=(b.cards||[]).filter(x=>x.id!==cardId);
+    persistManualBanks();
+  });
+}
+
 function renderBanks(){
   const el=document.getElementById('bankBlock');
   if(!el)return;
@@ -7291,6 +7481,7 @@ function renderBanks(){
     html+='<div class="ex-actions"><button class="ex-btn" '+(busy?'disabled':'')+' onclick="refreshBank(\''+id+'\',true)">'+bankTxt('refresh')+'</button>'+
       '<button class="ex-btn danger" onclick="disconnectBank(\''+id+'\')">'+bankTxt('disconnect')+'</button></div></div>';
   });
+  html+=renderManualBanksHtml();
   const free=Object.keys(BANKS).filter(id=>!creds[id]);
   if(bankUi.formOpen&&free.length){
     const sel=free.includes(bankUi.formBank)?bankUi.formBank:free[0];
@@ -7301,8 +7492,9 @@ function renderBanks(){
       '<div id="bankFormMsg" class="ex-sub"></div>'+
       '<div class="ex-actions"><button class="ex-btn" id="bankSaveBtn" onclick="connectBank()">'+bankTxt('save')+'</button>'+
       '<button class="ex-btn" onclick="toggleBankForm(false)">'+bankTxt('cancel')+'</button></div></div>';
-  }else if(free.length){
-    html+='<button class="add-btn" style="margin:0 0 12px" onclick="toggleBankForm(true)">'+bankTxt('connect')+'</button>';
+  }else{
+    html+='<div class="bank-add-row">'+(free.length?'<button class="add-btn" onclick="toggleBankForm(true)">'+bankTxt('connect')+'</button>':'')+
+      '<button class="add-btn" onclick="openManualBankSheet(null)">'+bankTxt('addManual')+'</button></div>';
   }
   el.innerHTML=html;
   unlockCardBody(el.closest('.card-body'));
@@ -7333,7 +7525,7 @@ function getCashVal(){
   return amount*rate;
 }
 // Поточний рахунок = введённое вручную + карты и «банки» подключённых банков.
-function getOtherVal(){return val('otherAmount')+getBankTotalUah();}
+function getOtherVal(){return val('otherAmount')+getBankTotalUah()+getManualBanksTotalUah();}
 
 let _updateTimer=null;
 function updateAll(){
@@ -8296,7 +8488,7 @@ function buildStoragePayload(){
     cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),cashCurrency:document.getElementById('cashCurrency')?.value||'UAH',
     otherAmount:sval('otherAmount'),otherName:sval('otherName'),otherNote:sval('otherNote'),
     coins,forexItems,cardOrder,customSections,securitiesSections,
-    hiddenCards,currentLang,appTheme,liabilities,metalsSections,
+    hiddenCards,currentLang,appTheme,liabilities,metalsSections,manualBanks,
     mainCounterMode,mainCounterPinned
   };
 }
@@ -8460,7 +8652,7 @@ function sanitizeDataValue(key,v,depth){
     if(key==='id'||/Id$/.test(key))return isSafeDataId(v)?v:'r_'+Date.now().toString(36)+'_'+(++dataSanitizeSeq);
     if(/date$/i.test(key))return v.replace(/[^0-9TZ:.\-+\/ ]/g,'').slice(0,40);
     if(key==='ticker'||key==='symbol')return v.replace(/[^A-Za-z0-9.\-^=_:]/g,'').slice(0,24);
-    if(/currency$/i.test(key))return v.replace(/[^A-Za-z]/g,'').slice(0,6);
+    if(/currency$/i.test(key)||key==='cur')return v.replace(/[^A-Za-z]/g,'').slice(0,6);
     if(key==='type'||key==='sectionType'||key==='color'||/(Mode|Stage|Status|Period)$/.test(key))return v.replace(/[^\p{L}\p{N}_\-. ]/gu,'').slice(0,60);
     return neutralizeText(v);
   }
@@ -8485,7 +8677,7 @@ function sanitizeDataObject(o,depth){
 function sanitizeStoredData(d){
   if(!isPlainDataObject(d))return d;
   const out=sanitizeDataObject(d,0);
-  ['deposits','coins','forexItems','customSections','securitiesSections','liabilities','metalsSections'].forEach(k=>{
+  ['deposits','coins','forexItems','customSections','securitiesSections','liabilities','metalsSections','manualBanks'].forEach(k=>{
     if(out[k]!==undefined)out[k]=(Array.isArray(out[k])?out[k]:[]).filter(isPlainDataObject);
   });
   // Название ручной монеты — это её тикер: идёт в обработчик нажатия и в заголовки.
@@ -8585,6 +8777,7 @@ function loadData(){
     if(Array.isArray(d.securitiesSections))securitiesSections=d.securitiesSections;
   if(Array.isArray(d.metalsSections))metalsSections=d.metalsSections;
   if(Array.isArray(d.liabilities))liabilities=d.liabilities;
+  if(Array.isArray(d.manualBanks))manualBanks=d.manualBanks;
     if(d.appTheme){appTheme=d.appTheme==='light'?'light':'dark';localStorage.setItem('app_theme',appTheme);applyAppTheme(appTheme);}
     if(Array.isArray(d.cardOrder)){
       const validIds=new Set(['deposit','crypto','usd','forex','cash','other']);
@@ -13780,7 +13973,7 @@ function validateBackupTree(value,state,depth){
 
 function validateMainBackupData(data){
   if(!isPlainBackupObject(data))throw new Error('main data object is missing');
-  const collections=['deposits','coins','forexItems','cardOrder','customSections','securitiesSections','liabilities','metalsSections'];
+  const collections=['deposits','coins','forexItems','cardOrder','customSections','securitiesSections','liabilities','metalsSections','manualBanks'];
   collections.forEach(key=>{
     if(data[key]!==undefined&&!Array.isArray(data[key]))throw new Error(key+' must be an array');
     if(Array.isArray(data[key])&&data[key].length>MAX_BACKUP_COLLECTION_ITEMS)throw new Error(key+' has too many items');
@@ -13788,10 +13981,10 @@ function validateMainBackupData(data){
   if(data.hiddenCards!==undefined&&!isPlainBackupObject(data.hiddenCards))throw new Error('hiddenCards must be an object');
   // Каждая запись — объект, вложенные списки — тоже: null среди монет
   // принимался и ронял отрисовку уже после замены рабочих данных.
-  ['deposits','coins','forexItems','customSections','securitiesSections','liabilities','metalsSections'].forEach(key=>{
+  ['deposits','coins','forexItems','customSections','securitiesSections','liabilities','metalsSections','manualBanks'].forEach(key=>{
     (data[key]||[]).forEach((item,i)=>{
       if(!isPlainBackupObject(item))throw new Error(key+'['+i+'] is not a record');
-      ['items','topups','trades','partialPays','stocks'].forEach(sub=>{
+      ['items','topups','trades','partialPays','stocks','cards'].forEach(sub=>{
         if(item[sub]!==undefined&&!Array.isArray(item[sub]))throw new Error(key+'['+i+'].'+sub+' must be an array');
         (item[sub]||[]).forEach((x,j)=>{if(!isPlainBackupObject(x))throw new Error(key+'['+i+'].'+sub+'['+j+'] is not a record');});
       });
