@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-43-hide-amounts';
+﻿const CACHE_NAME = 'investory-app-v0-1-44-bank-include';
 const APP_SHELL = [
   './',
   './index.html',
