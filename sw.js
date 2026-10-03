@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-41-manual-banks';
+﻿const CACHE_NAME = 'investory-app-v0-1-42-lang-rerender';
 const APP_SHELL = [
   './',
   './index.html',
