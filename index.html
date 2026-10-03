@@ -609,7 +609,24 @@ body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear
 .eye-btn{align-self:center;margin-left:10px;width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:1px solid var(--border2);background:var(--bg3);color:var(--muted2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
 .eye-btn svg{width:17px;height:17px;}
 .eye-btn.on{color:var(--purple2);border-color:var(--purple);}
-body.amounts-hidden :is(.total-amount,#totalChange,.card-value,.result-val,.stock-detail-stat-val,.summary-val,.sd-val,.main-counter-metric-value,.live-val,.diag-stat-val,.diag-row-val,.calc-res-val,.ticker-card-price,.ticker-card-pnl,.ticker-card-qty,.ticker-card-div,.liab-breakdown-val,.chart-stat-val,.chart-total,.liab-stat-val,.liab-net-val,.liab-card-amount,.liab-card-sub,.ex-total,.ex-lg b,.bp-amt,.bp-sub,.bj-amt,.bj-sub,.bank-row-amt,.usdt-balance-main,.usdt-balance-equiv,.section-dyn-value,.section-dyn-chip span:last-child,.history-total,.history-delta,.daily-total,.balance-list-equiv,input[inputmode="decimal"]){filter:blur(7px);user-select:none;-webkit-user-select:none;transition:filter .15s;}
+/* Скрытые суммы заменяются звёздочками, как в приложениях бирж: исходное
+   число становится прозрачным и держит место в разметке, поверх выводится
+   «******». Длина числа при этом не видна. Размытие раньше позволяло
+   угадать порядок суммы по ширине и первым цифрам. */
+body.amounts-hidden :where(#totalChange,.card-value,.result-val,.stock-detail-stat-val,.summary-val,.sd-val,.main-counter-metric-value,.live-val,.diag-stat-val,.diag-row-val,.calc-res-val,.ticker-card-price,.ticker-card-pnl,.ticker-card-qty,.ticker-card-div,.liab-breakdown-val,.chart-stat-val,.chart-total,.liab-stat-val,.liab-net-val,.liab-card-amount,.liab-card-sub,.ex-total,.ex-lg b,.bp-amt,.bp-sub,.bj-amt,.bj-sub,.bank-row-amt,.usdt-balance-main,.usdt-balance-equiv,.section-dyn-value,.section-dyn-chip span:last-child,.history-total,.history-delta,.daily-total,.balance-list-equiv,.live-num,.balance-list-amount,.bank-sheet-amt,.daily-income,.hide-amt){position:relative;color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important;user-select:none;-webkit-user-select:none;}
+.total-mask{display:none;}
+body.amounts-hidden #totalAmount{display:none;}
+body.amounts-hidden .total-mask{display:block;flex:0 0 auto;overflow:visible;padding-right:.08em;}
+/* На цветных картах звёздочки — цветом самой карты. */
+.bank-plastic{--mask-color:#fff;}
+.bp-yellow{--mask-color:#1b1d24;}
+body.amounts-hidden :where(#totalChange,.card-value,.result-val,.stock-detail-stat-val,.summary-val,.sd-val,.main-counter-metric-value,.live-val,.diag-stat-val,.diag-row-val,.calc-res-val,.ticker-card-price,.ticker-card-pnl,.ticker-card-qty,.ticker-card-div,.liab-breakdown-val,.chart-stat-val,.chart-total,.liab-stat-val,.liab-net-val,.liab-card-amount,.liab-card-sub,.ex-total,.ex-lg b,.bp-amt,.bp-sub,.bj-amt,.bj-sub,.bank-row-amt,.usdt-balance-main,.usdt-balance-equiv,.section-dyn-value,.section-dyn-chip span:last-child,.history-total,.history-delta,.daily-total,.balance-list-equiv,.live-num,.balance-list-amount,.bank-sheet-amt,.daily-income,.hide-amt) *{visibility:hidden!important;}
+body.amounts-hidden :where(#totalChange,.card-value,.result-val,.stock-detail-stat-val,.summary-val,.sd-val,.main-counter-metric-value,.live-val,.diag-stat-val,.diag-row-val,.calc-res-val,.ticker-card-price,.ticker-card-pnl,.ticker-card-qty,.ticker-card-div,.liab-breakdown-val,.chart-stat-val,.chart-total,.liab-stat-val,.liab-net-val,.liab-card-amount,.liab-card-sub,.ex-total,.ex-lg b,.bp-amt,.bp-sub,.bj-amt,.bj-sub,.bank-row-amt,.usdt-balance-main,.usdt-balance-equiv,.section-dyn-value,.section-dyn-chip span:last-child,.history-total,.history-delta,.daily-total,.balance-list-equiv,.live-num,.balance-list-amount,.bank-sheet-amt,.daily-income,.hide-amt)::after{content:'******';position:absolute;inset:0;padding:inherit;box-sizing:border-box;visibility:visible;color:var(--mask-color,var(--text));-webkit-text-fill-color:var(--mask-color,var(--text));text-align:inherit;white-space:nowrap;letter-spacing:.04em;pointer-events:none;}
+/* Значения справа от подписи — звёздочки по правому краю, ровным столбцом. */
+body.amounts-hidden :where(.live-val,.result-val,.diag-row-val,.liab-breakdown-val,.calc-res-val,.sd-val,.main-counter-metric-value,.daily-income,.daily-total,.history-total,.history-delta,.bank-row-amt,.section-dyn-chip span:last-child)::after{text-align:right;}
+/* В поле ввода псевдоэлемент не нарисовать — там символы заменяются точками. */
+body.amounts-hidden input[inputmode="decimal"]{-webkit-text-security:disc;}
+@supports not (-webkit-text-security:disc){body.amounts-hidden input[inputmode="decimal"]{filter:blur(7px);}}
 .bank-add-row{display:flex;gap:8px;margin:0 0 12px;}
 .bank-add-row .add-btn{flex:1;margin:0;}
 .bank-plastic.manual{border:none;text-align:left;cursor:pointer;font:inherit;}
@@ -2050,6 +2067,7 @@ body.modern-mockup.theme-light .total-currency{
   </div>
   <div class="total-wrap">
     <div class="total-amount" id="totalAmount">0</div>
+    <div class="total-amount total-mask" aria-hidden="true">******</div>
     <div class="total-currency" id="totalCurrSym">₴</div>
     <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
   </div>
@@ -3066,7 +3084,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.44';
+const APP_VERSION = 'v0.1.45';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -10022,8 +10040,8 @@ function getMetalsCardHtml(s){
       <div style="margin-bottom:3px;"><img src="section-icons/${m==='gold'?'Gold':m==='silver'?'Silver':'Platinum'}.png" style="width:28px;height:28px;object-fit:contain;"></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:${color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">${names[m]}</div>
       <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${byType[m].grams.toFixed(2)}г</div>
-      <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${color};margin-top:2px;">${sym}${fmtN(toDisplayCurr(byType[m].currentVal))}</div>
-      ${mpnl!==0?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:${mpnlColor};">${mpnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(mpnl)))}</div>`:''}
+      <div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${color};margin-top:2px;">${sym}${fmtN(toDisplayCurr(byType[m].currentVal))}</div>
+      ${mpnl!==0?`<div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:9px;color:${mpnlColor};">${mpnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(mpnl)))}</div>`:''}
     </div>`;
   }).join('');
   // Items list with buy price and current value
@@ -10043,9 +10061,9 @@ function getMetalsCardHtml(s){
         <button class="rm-btn" onclick="removeMetalItem('${s.id}',${j})">×</button>
       </div>
       <div style="display:flex;justify-content:space-between;padding:0 16px;font-family:'DM Mono',monospace;font-size:10px;">
-        <span style="color:var(--muted2)">Куплено: ${sym}${fmtN(toDisplayCurr(buyVal))}</span>
-        <span style="color:var(--gold2)">Зараз: ${sym}${fmtN(toDisplayCurr(curVal))}</span>
-        <span style="color:${ipnlCol}">${ipnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(ipnl)))}</span>
+        <span class="hide-amt" style="color:var(--muted2)">Куплено: ${sym}${fmtN(toDisplayCurr(buyVal))}</span>
+        <span class="hide-amt" style="color:var(--gold2)">Зараз: ${sym}${fmtN(toDisplayCurr(curVal))}</span>
+        <span class="hide-amt" style="color:${ipnlCol}">${ipnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(ipnl)))}</span>
       </div>
     </div>`;
   }).join('');
@@ -10845,8 +10863,8 @@ function renderLiabilities(){
         <!-- PROGRESS BAR -->
         <div class="liab-progress-wrap">
           <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;margin-bottom:4px;">
-            <span style="color:var(--green2)">✓ ${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,schedule.paidPrincipal)))}</span>
-            <span style="color:var(--red)">⟳ ${t('liabLeft')}: ${sym}${fmtN(toDisplayCurr(remaining))}</span>
+            <span class="hide-amt" style="color:var(--green2)">✓ ${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,schedule.paidPrincipal)))}</span>
+            <span class="hide-amt" style="color:var(--red)">⟳ ${t('liabLeft')}: ${sym}${fmtN(toDisplayCurr(remaining))}</span>
           </div>
           <div class="liab-progress-bar-bg">
             <div class="liab-progress-bar-fill" style="width:${progress.toFixed(1)}%"></div>
