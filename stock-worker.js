@@ -277,7 +277,7 @@ async function handleRequest(request, env, ctx) {
 
     // Вход и продление сессии — POST, до GET-guard
     if (url.pathname === '/auth' || url.pathname === '/auth/session' || url.pathname === '/auth/refresh') {
-      if (await isRateLimited('auth', ip, AUTH_IP_PER_MIN, 60)) {
+      if (await isRateLimited('auth', ip, AUTH_IP_PER_MIN, 60, env)) {
         return json({ error: 'Too many requests' }, 429, origin, 30);
       }
       return handleAuth(request, url, origin, env);
@@ -285,7 +285,7 @@ async function handleRequest(request, env, ctx) {
 
     // AI proxy — POST only, обрабатывается до GET-guard, со своим строгим лимитом
     if (url.pathname === '/ai') {
-      if (await isRateLimited('ai', ip, AI_IP_PER_MIN, 60)) {
+      if (await isRateLimited('ai', ip, AI_IP_PER_MIN, 60, env)) {
         return json({ error: 'Забагато запитів. Зачекай хвилину.' }, 200, origin, 0);
       }
       return handleAI(request, origin, env);
@@ -294,7 +294,7 @@ async function handleRequest(request, env, ctx) {
     // Пересылка подписанных запросов к биржам, которые не пускают браузер напрямую
     // (Binance). POST — ключ едет в теле, а не в заголовке, и не оседает в логах.
     if (url.pathname === '/exrelay') {
-      if (await isRateLimited('exrelay', ip, EXRELAY_IP_PER_MIN, 60)) {
+      if (await isRateLimited('exrelay', ip, EXRELAY_IP_PER_MIN, 60, env)) {
         return json({ error: 'Too many requests' }, 429, origin, 0);
       }
       return handleExRelay(request, origin, env);
@@ -302,17 +302,17 @@ async function handleRequest(request, env, ctx) {
 
     // Карточка пользователя и админ-панель — свои лимиты частоты, GET и POST.
     if (url.pathname === '/me') {
-      if (await isRateLimited('me', ip, 30, 60)) return json({ error: 'Too many requests' }, 429, origin, 0);
+      if (await isRateLimited('me', ip, 30, 60, env)) return json({ error: 'Too many requests' }, 429, origin, 0);
       return handleMe(request, origin, env);
     }
     if (url.pathname.startsWith('/admin/')) {
-      if (await isRateLimited('admin', ip, 120, 60)) return json({ error: 'Too many requests' }, 429, origin, 0);
+      if (await isRateLimited('admin', ip, 120, 60, env)) return json({ error: 'Too many requests' }, 429, origin, 0);
       return handleAdmin(request, url, origin, env);
     }
 
     if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin);
 
-    if (await isRateLimited('data', ip, DATA_IP_PER_MIN, 60)) {
+    if (await isRateLimited('data', ip, DATA_IP_PER_MIN, 60, env)) {
       return json({ error: 'Too many requests' }, 429, origin, 30);
     }
 
@@ -350,10 +350,22 @@ function isAllowedOrigin(origin) {
   }
 }
 
-// Счётчик запросов через Cache API: работает между запусками воркера,
-// в отличие от Map в памяти (та своя у каждой копии и обнуляется).
-// Best-effort: возможны редкие гонки и счёт отдельный по дата-центрам — для отсечения ботов достаточно.
-async function isRateLimited(kind, ip, limit, windowSec) {
+// Лимит частоты с одного IP. Основной путь — встроенный Rate Limiting binding
+// Cloudflare (бесплатно, работает и на *.workers.dev). Прежний счётчик на Cache
+// API на workers.dev молча ничего не делал — по документации Cloudflare Cache
+// API там не работает, и все лимиты в минуту пропускали всё (аудит 03.10, п.1, п.5).
+// Cache API остаётся запасным путём на случай, если привязки нет (локальные тесты).
+const RL_BINDINGS = { auth: 'RL_AUTH', ai: 'RL_AI', exrelay: 'RL_EXRELAY', me: 'RL_ME', admin: 'RL_ADMIN', data: 'RL_DATA' };
+async function isRateLimited(kind, ip, limit, windowSec, env) {
+  const rl = env && env[RL_BINDINGS[kind]];
+  if (rl && typeof rl.limit === 'function') {
+    try {
+      const { success } = await rl.limit({ key: kind + ':' + ip });
+      return !success;
+    } catch {
+      return false; // сбой ограничителя не должен ломать приложение
+    }
+  }
   try {
     const bucket = Math.floor(Date.now() / (windowSec * 1000));
     const key = new Request('https://ratelimit.internal/' + kind + '/' + encodeURIComponent(ip) + '/' + bucket);
@@ -374,45 +386,56 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
-// Читает счётчик, НЕ увеличивая (для /limit — не тратит квоту записи KV)
-// Возвращает null, если счётчик прочитать НЕ УДАЛОСЬ. Раньше в этом случае
-// возвращался 0 — то есть при отвалившемся хранилище лимиты просто переставали
-// существовать, и платные вызовы шли без ограничения. Защита должна закрываться,
-// а не открываться.
-async function readCount(env, key) {
-  if (!env.AI_LIMITS) return null;
+// ── Счётчики ИИ (D1) ─────────────────────────────────────────────────
+// До 04.10.2026 счётчики жили в KV по схеме «прочитал → записал +1». У KV нет
+// атомарного увеличения: на стенде аудита 30 одновременных запросов прошли все
+// 30, а счётчики показали 1 — не держался ни личный лимит, ни общий потолок
+// расходов. Откат при ошибке Claude записывал старое значение и затирал чужие
+// списания (аудит 03.10, п.1 и п.4). В SQLite одна команда атомарна: увеличение
+// идёт только если счётчик ещё ниже лимита, иначе строка не возвращается — отказ.
+async function counterRead(env, key) {
+  if (!env.DB) return null;
   try {
-    return Number(await env.AI_LIMITS.get(key)) || 0;
+    await ensureSchema(env);
+    const row = await env.DB.prepare('SELECT n FROM ai_counters WHERE k = ?').bind(key).first();
+    return row ? Number(row.n) || 0 : 0;
   } catch {
     return null;
   }
 }
 
-// Резервируем квоту ДО платного вызова. Полностью гонку это не снимает — у KV
-// нет атомарного инкремента, и два одновременных запроса всё ещё могут прочитать
-// одно значение. Но окно сокращается с «всё время ответа Claude» (секунды) до
-// одной записи в KV. Полное решение — Durable Objects: это новый платный ресурс
-// Cloudflare, разворачивать без отдельного разрешения нельзя.
-// Если платный вызов не состоялся, резерв снимается откатом.
-async function reserveCount(env, key, prevValue) {
-  if (!env.AI_LIMITS) return false;
+// true — место занято; false — лимит исчерпан; null — база недоступна.
+async function counterReserve(env, key, day, limit) {
+  if (!env.DB) return null;
+  if (!(limit > 0)) return false;
   try {
-    await env.AI_LIMITS.put(key, String(prevValue + 1), { expirationTtl: DAY_SEC * 2 });
-    return true;
+    await ensureSchema(env);
+    const row = await env.DB.prepare(`INSERT INTO ai_counters (k, day, n) VALUES (?1, ?2, 1)
+      ON CONFLICT(k) DO UPDATE SET n = n + 1 WHERE n < ?3 RETURNING n`)
+      .bind(key, day, limit).first();
+    return !!row;
   } catch {
-    return false;
+    return null;
   }
 }
 
-async function releaseCount(env, key, prevValue) {
-  if (!env.AI_LIMITS) return;
+async function counterRelease(env, key) {
+  if (!env.DB) return;
   try {
-    await env.AI_LIMITS.put(key, String(Math.max(0, prevValue)), { expirationTtl: DAY_SEC * 2 });
+    await env.DB.prepare('UPDATE ai_counters SET n = MAX(0, n - 1) WHERE k = ?').bind(key).run();
   } catch { /* откат не удался — счётчик останется завышенным, это безопасная сторона */ }
 }
 
-// Увеличивает суточный счётчик. KV согласуется не мгновенно — пара лишних запросов
-// может проскочить, для защиты расходов это приемлемо.
+// Старые дни не нужны: держим неделю для /stats.
+async function counterCleanup(env, day) {
+  if (!env.DB) return;
+  try {
+    const cutoff = new Date(Date.parse(day + 'T00:00:00Z') - 7 * DAY_SEC * 1000).toISOString().slice(0, 10);
+    await env.DB.prepare('DELETE FROM ai_counters WHERE day < ?').bind(cutoff).run();
+  } catch {}
+}
+
+
 // Счётчики обращений к провайдерам (api:ДАТА) убраны 02.10.2026 перед закрытым
 // тестом: они писали в KV раз в 5 минут из КАЖДОЙ копии воркера, и при росте
 // числа людей бесплатный лимит записей кончился бы на сотнях пользователей —
@@ -490,8 +513,14 @@ async function getDividendEvents(ticker) {
   }, SLOW_CACHE_MS);
 }
 
+// Несуществующий тикер запоминаем на час: иначе каждый повтор — новый вызов
+// Finnhub, и пачка случайных тикеров выбирала лимит 60/мин за всех (аудит 03.10, п.5).
+const NOT_FOUND_TTL_MS = 60 * 60 * 1000;
+
 async function getStock(ticker, env) {
   if (!env.FINNHUB_KEY) throw new Error('FINNHUB_KEY secret is missing');
+  const nf = MEMORY_CACHE.get('nf:' + ticker);
+  if (nf && Date.now() - nf.savedAt < NOT_FOUND_TTL_MS) throw new Error('Ticker not found');
   return memoize('stock:' + ticker, async () => {
     const base = 'https://finnhub.io/api/v1/';
     const token = encodeURIComponent(env.FINNHUB_KEY);
@@ -504,7 +533,10 @@ async function getStock(ticker, env) {
     // цена была получена — терялась она из-за необязательных полей.
     const quoteRes = await providerFetch(base + 'quote?symbol=' + symbol + '&token=' + token, 2);
     const quote = await quoteRes.json();
-    if (!Number(quote?.c)) throw new Error('Ticker not found');
+    if (!Number(quote?.c)) {
+      MEMORY_CACHE.set('nf:' + ticker, { savedAt: Date.now(), ttl: NOT_FOUND_TTL_MS, value: null });
+      throw new Error('Ticker not found');
+    }
 
     // Профиль и метрики — на сутки. Название компании и валюта не меняются
     // годами, дивидендная доходность — раз в квартал. Держать их в одном ритме
@@ -692,7 +724,9 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS admin_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, action TEXT NOT NULL,
       target TEXT, details TEXT, ip TEXT, ua TEXT)`),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS admin_log_at ON admin_log(at)')
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS admin_log_at ON admin_log(at)'),
+    env.DB.prepare('CREATE TABLE IF NOT EXISTS ai_counters (k TEXT PRIMARY KEY, day TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0)'),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS ai_counters_day ON ai_counters(day)')
   ]);
   schemaReady = true;
 }
@@ -793,7 +827,7 @@ async function handleMe(request, origin, env) {
   let rec = null;
   try { rec = await getUserRecord(env, sub, { touch: true, email: body.email }); } catch {}
   const now = Date.now();
-  const used = await readCount(env, 'user:g' + sub + ':' + todayKey());
+  const used = await counterRead(env, 'user:g' + sub + ':' + todayKey());
   const limit = aiLimitFor(sub, rec, cfg);
   return json({
     access: computeAccess(rec, cfg, now, sub),
@@ -911,7 +945,7 @@ async function handleAdmin(request, url, origin, env) {
       if (sum[st] !== undefined) sum[st]++;
       if (r.ai_day === today) sum.aiToday += r.ai_day_count || 0;
     }
-    const globalUsed = await readCount(env, 'global:' + today);
+    const globalUsed = await counterRead(env, 'global:' + today);
     return json({ summary: sum, aiGlobalUsed: globalUsed || 0, config: cfg }, 200, origin, 0);
   }
 
@@ -1009,7 +1043,9 @@ async function resolveUserId(request, env, fallback) {
 const ADMIN_SUB = '109451412161834737806';
 
 async function handleStats(request, url, env, origin) {
-  const sub = await verifyAuthToken(bearerToken(request), env);
+  // Отдельный 30-минутный токен администратора, как у /admin/* (аудит 03.10, п.14):
+  // обычная 90-дневная сессия сюда больше не пускает.
+  const sub = await verifyAdminToken(bearerToken(request), env);
   if (!sub || sub !== ADMIN_SUB) return json({ error: 'Not allowed' }, 403, origin);
   if (!env.AI_LIMITS) return json({ error: 'KV not bound' }, 503, origin);
 
@@ -1019,7 +1055,7 @@ async function handleStats(request, url, env, origin) {
     const date = new Date(Date.now() - i * DAY_SEC * 1000).toISOString().slice(0, 10);
     const [ai, global_] = await Promise.all([
       env.AI_LIMITS.get('usage:' + date),
-      env.AI_LIMITS.get('global:' + date)
+      counterRead(env, 'global:' + date)
     ]);
     if (!ai && !global_) continue;
     out.push({
@@ -1043,8 +1079,8 @@ async function handleLimit(request, url, env, origin) {
   try { rec = await getUserRecord(env, sub); } catch {}
   const limit = aiLimitFor(sub, rec, cfg);
   const day = todayKey();
-  const used = await readCount(env, 'user:' + userId + ':' + day);
-  const globalUsed = await readCount(env, 'global:' + day);
+  const used = (await counterRead(env, 'user:' + userId + ':' + day)) || 0;
+  const globalUsed = (await counterRead(env, 'global:' + day)) || 0;
   return json({
     limit,
     used,
@@ -1086,46 +1122,39 @@ async function handleAI(request, origin, env) {
   const sub = userId.slice(1);
   const cfg = await getAccessConfig(env);
   let rec = null;
-  try { rec = await getUserRecord(env, sub, { touch: true }); } catch {}
+  // Сбой базы — отказ, а не «свободный доступ»: иначе бан снимался вместе с D1
+  // (аудит 03.10, п.13). Владельца это не касается.
+  try { rec = await getUserRecord(env, sub, { touch: true }); } catch {
+    if (sub !== ADMIN_SUB) return json({ error: 'Сервіс тимчасово недоступний. Спробуй пізніше.' }, 503, origin, 0);
+  }
   const access = computeAccess(rec, cfg, Date.now(), sub);
   if (access.state === 'banned') return json({ error: 'Доступ обмежено.' }, 403, origin, 0);
   if (access.state === 'locked') return json({ error: 'Пробний період завершено.' }, 402, origin, 0);
 
-  // Сначала ЧИТАЕМ оба счётчика и решаем — отказ не тратит квоту записи KV.
-  // null означает «прочитать не удалось»: тогда отказываем. Раньше в этом месте
-  // возвращался 0, и при отвалившемся хранилище лимиты переставали действовать.
-  const globalUsed = await readCount(env, gKey);
-  if (globalUsed === null) {
+  // Атомарный резерв: сначала общий потолок, потом личный лимит. Параллельная
+  // пачка запросов больше не проходит целиком — каждый занимает своё место.
+  const userLimit = aiLimitFor(sub, rec, cfg);
+  const gRes = await counterReserve(env, gKey, day, cfg.aiGlobalCap);
+  if (gRes === null) {
     return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
   }
-  if (globalUsed >= cfg.aiGlobalCap) {
+  if (!gRes) {
     return json({ error: 'Денний ліміт запитів до AI вичерпано. Спробуй завтра.' }, 200, origin, 0);
   }
-  const userUsed = await readCount(env, uKey);
-  if (userUsed === null) {
-    return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
-  }
-  const userLimit = aiLimitFor(sub, rec, cfg);
-  if (userUsed >= userLimit) {
+  const uRes = await counterReserve(env, uKey, day, userLimit);
+  if (uRes !== true) {
+    await counterRelease(env, gKey);
+    if (uRes === null) return json({ error: 'Лічильник лімітів недоступний. Спробуй пізніше.' }, 503, origin, 0);
     return json({
       error: 'Ти вичерпав денний ліміт запитів до AI. Спробуй завтра.',
-      limit: { limit: userLimit, used: userUsed, left: 0 }
+      limit: { limit: userLimit, used: userLimit, left: 0 }
     }, 200, origin, 0);
   }
-
-  // Резервируем ОБА счётчика до обращения к Claude. Раньше запись шла после
-  // ответа, и всё время ожидания (секунды) параллельные запросы видели старое
-  // значение — при остатке в один запрос проходили оба. Теперь окно сузилось до
-  // одной записи в KV. Если резерв не удался, платный вызов не делаем вовсе.
-  if (!await reserveCount(env, gKey, globalUsed) || !await reserveCount(env, uKey, userUsed)) {
-    await releaseCount(env, gKey, globalUsed);
-    await releaseCount(env, uKey, userUsed);
-    return json({ error: 'Не вдалося зарезервувати ліміт. Спробуй ще раз.' }, 503, origin, 0);
-  }
   // Любой выход после этой точки без успешного ответа обязан снять резерв.
+  // Снимается ровно одно место (n - 1), чужие списания не затираются.
   const releaseReservation = async () => {
-    await releaseCount(env, gKey, globalUsed);
-    await releaseCount(env, uKey, userUsed);
+    await counterRelease(env, gKey);
+    await counterRelease(env, uKey);
   };
 
   // Инструкции берём ТОЛЬКО свои. Всё, что прислал клиент, идёт как ДАННЫЕ.
@@ -1182,6 +1211,8 @@ async function handleAI(request, origin, env) {
   // Резерв уже сделан выше — здесь только учёт токенов. Ошибки Anthropic лимит
   // не съедают: на всех путях отказа резерв снимается (см. releaseReservation).
   await recordUsage(env, data?.usage);
+  const userUsed = (await counterRead(env, uKey)) || 1;
+  if (Math.random() < 0.05) await counterCleanup(env, day);
   if (env.DB) {
     try {
       await env.DB.prepare(`UPDATE users SET ai_total = ai_total + 1,
@@ -1192,7 +1223,7 @@ async function handleAI(request, origin, env) {
 
   return json({
     content,
-    limit: { limit: userLimit, used: userUsed + 1, left: Math.max(0, userLimit - userUsed - 1) }
+    limit: { limit: userLimit, used: userUsed, left: Math.max(0, userLimit - userUsed) }
   }, 200, origin, 0);
 }
 

@@ -2203,7 +2203,7 @@ body.modern-mockup.theme-light .total-currency{
       <!-- USDT BALANCE CARD -->
       <div class="usdt-balance-card">
         <input type="hidden" id="cryptoUsdt" value="0">
-        <input type="hidden" id="usdtUah" value="41">
+        <input type="hidden" id="usdtUah" value="41"><input type="hidden" id="usdtRateManual" value="">
         <div class="usdt-balance-top">
           <div class="usdt-balance-info">
             <div class="usdt-balance-title"><img class="ui-inline-icon" src="section-icons/ui-usdt.png?v=1" alt=""> <span id="usdtBalanceCardTitle">USDT баланс</span></div>
@@ -3084,7 +3084,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.45';
+const APP_VERSION = 'v0.1.46';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4869,7 +4869,7 @@ function removeCustomSection(id){
   });
 }
 function getCustomTotal(){
-  return customSections.reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
+  return customSections.reduce((sum,s)=>sum+(parseInputNumber(s.principal)||0),0);
 }
 
 // ── LIVE STOCK PRICES ────────────────────────────────────────
@@ -5078,8 +5078,11 @@ async function fetchUsdUahRate(forceFresh=false){
   }
   // Auto-update USDT rate field in crypto section.
   if(liveRates.USD && liveRates.USD > 10){
+    // Раньше поле обновлялось, только пока в нём '' или '41': после первого
+    // курса оно замерзало навсегда (аудит 03.10, п.6). Теперь живой курс
+    // пишется всегда, кроме случая, когда пользователь задал свой.
     const usdtEl=document.getElementById('usdtUah');
-    if(usdtEl && (!usdtEl.value || usdtEl.value==='41')){
+    if(usdtEl && !usdtRateIsManual()){
       usdtEl.value=liveRates.USD.toFixed(2);
     }
   }
@@ -6321,7 +6324,11 @@ function getSecuritiesTotal(){
 
 // ── TOTALS ────────────────────────────────────
 function cryptoNum(v){return parseInputNumber(v);}
-function getCryptoRate(){return val('usdtUah')||liveRates.USD||usdUahRate||41;}
+function usdtRateIsManual(){return sval('usdtRateManual')==='1';}
+function getCryptoRate(){
+  if(usdtRateIsManual()&&val('usdtUah')>0)return val('usdtUah');
+  return liveRates.USD||val('usdtUah')||usdUahRate||41;
+}
 function getCryptoPortfolioStats(){
   const groups={};
   coins.forEach(c=>{
@@ -7714,13 +7721,13 @@ function _updateAllNow(){
       return;
     }
     if(s.sectionType==='business'){
-      const v=parseFloat(s.amount)||0;
+      const v=parseInputNumber(s.amount)||0;
       setText('customDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
       setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
       updateBizField(s.id,'__noop__',s.biz?.__noop__||0);
       return;
     }
-    const v=parseFloat(s.principal)||0;
+    const v=parseInputNumber(s.principal)||0;
     setText('customDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
     setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
     calcCustomSection(s.id);
@@ -7817,7 +7824,7 @@ function renderCoins(){
     const key=c.name.toUpperCase();
     if(!groups[key])groups[key]={trades:[],totalQty:0,buyQty:0,buyCost:0,curPrice:0,change24h:0,name:key};
     const g=groups[key];
-    const qty=parseFloat(c.qty)||0;
+    const qty=parseInputNumber(c.qty)||0;
     g.trades.push({...c,idx:i,qty});
     g.totalQty+=qty;
     if(qty>0){
@@ -7906,10 +7913,10 @@ function cryptoSellAskText(qty,coin,price){
   return cryptoDetailTxt('sellAsk').replace('{qty}',fmtMax2(qty)).replace('{coin}',coin).replace('{price}',fmtMax2(price));
 }
 function openCryptoDetail(coinKey){
-  const rate=val('usdtUah')||41;
+  const rate=getCryptoRate();
   const group=coins.map((c,i)=>({...c,idx:i})).filter(c=>c.name.toUpperCase()===coinKey);
   if(!group.length)return;
-  const totalQty=group.reduce((s,t)=>s+(parseFloat(t.qty)||0),0);
+  const totalQty=group.reduce((s,t)=>s+(parseInputNumber(t.qty)||0),0);
   // Себестоимость — из общей статистики: продажа уносит свою долю, как у акций.
   const sg=getCryptoPortfolioStats().groups[coinKey]||{};
   const curPrice=Number(group.find(c=>c.curPrice)?.curPrice)||0;
@@ -7936,7 +7943,7 @@ function openCryptoDetail(coinKey){
   html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon big')+' '+cryptoDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
   html+='<div style="display:none">';
   group.forEach(t=>{
-    const qty=parseFloat(t.qty)||0;
+    const qty=parseInputNumber(t.qty)||0;
     const isSell=qty<0;
     html+='<div class="stock-detail-trade"><div>'+
       '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?cryptoDetailTxt('sell'):cryptoDetailTxt('buy'))+' '+Math.abs(qty)+'</div>'+
@@ -8091,17 +8098,23 @@ function sellStock(secId,tickerKey,refIdx){
   const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
   const ownedQty=group.reduce((s,t)=>s+stockNum(t.qty),0);
   if(qty>ownedQty){alert(stockDetailTxt('cannotSellMore')+': '+fmtMax2(ownedQty)+' шт');return;}
-  customConfirm('Продати '+fmtMax2(qty)+' шт по '+getStockCurrencySymbol(saleCurrency)+fmtMax2(price)+'?', function(){
+  // Цена в форме — в гривнах (подпись «(₴)»), а кэш раздела может быть в USD/EUR.
+  // Раньше гривневая сумма записывалась как доллары: капитал вырастал в ~41 раз
+  // (аудит 03.10, п.3).
+  const saleRate=getStockCurrencyRate(saleCurrency)||1;
+  const saleTotalUah=roundMoney(qty*price);
+  const saleCash=roundMoney(saleTotalUah/saleRate);
+  const saleCashTxt=saleCurrency==='UAH'?'':' ≈ '+getStockCurrencySymbol(saleCurrency)+fmtMax2(saleCash);
+  customConfirm('Продати '+fmtMax2(qty)+' шт по ₴'+fmtMax2(price)+'?'+saleCashTxt, function(){
     const ref=sec.items[refIdx];
     sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency,liveOrigPrice:ref?.liveOrigPrice,divYield:ref?.divYield,div:ref?.div,divAbs:ref?.divAbs||0});
     cleanZeroStocks(sec);
-    const totalProfit=roundMoney(qty*price);
-    if(totalProfit>0){
-      addStockSaleCash(sec,totalProfit,saleCurrency);
+    if(saleCash>0){
+      addStockSaleCash(sec,saleCash,saleCurrency);
     }
     closeStockDetail();renderSecuritiesCards();updateAll();saveData();
-    if(totalProfit>0){
-      alert('📈 '+stockDetailTxt('sold')+' '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(totalProfit)+'\n\n💵 '+stockDetailTxt('addedCash'));
+    if(saleCash>0){
+      alert('📈 '+stockDetailTxt('sold')+' '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(saleCash)+'\n\n💵 '+stockDetailTxt('addedCash'));
     }
   });
 }
@@ -8562,7 +8575,7 @@ function buildStoragePayload(){
     buildDate:APP_BUILD_DATE,
     savedAt,
     deposits,
-    cryptoUsdt:sval('cryptoUsdt'),usdtUah:sval('usdtUah'),cryptoCost:sval('cryptoCost'),
+    cryptoUsdt:sval('cryptoUsdt'),usdtUah:sval('usdtUah'),usdtRateManual:sval('usdtRateManual'),cryptoCost:sval('cryptoCost'),
     usdAmount:sval('usdAmount'),usdUah:sval('usdUah'),usdNote:sval('usdNote'),
     cashAmount:sval('cashAmount'),cashNote:sval('cashNote'),cashCurrency:document.getElementById('cashCurrency')?.value||'UAH',
     otherAmount:sval('otherAmount'),otherName:sval('otherName'),otherNote:sval('otherNote'),
@@ -8720,7 +8733,7 @@ function isPlainDataObject(v){
   return proto===Object.prototype||proto===null;
 }
 function isSafeDataId(v){return typeof v==='string'&&/^[A-Za-z0-9_\-:.]{1,120}$/.test(v);}
-function neutralizeText(v){return String(v).replace(/</g,'‹').replace(/>/g,'›').replace(/"/g,'″').replace(/`/g,'ʼ');}
+function neutralizeText(v){return String(v).replace(/</g,'‹').replace(/>/g,'›').replace(/"/g,'″').replace(/`/g,'ʼ').replace(/'/g,'ʼ').replace(/&/g,'＆');}
 function safeCoinSymbol(v){return String(v||'').trim().toUpperCase().replace(/[^A-Z0-9.\-_]/g,'').slice(0,24);}
 var dataSanitizeSeq=0;
 function sanitizeDataValue(key,v,depth){
@@ -8845,7 +8858,7 @@ function loadData(){
     // Ensure all deposits have registeredDate (for existing data without it)
     const todayStr=new Date().toISOString().split('T')[0];
     deposits.forEach(dep=>{if(!dep.openDay)dep.openDay=dep.startDate?String(depLocalDate(dep.startDate).getDate()):'';if(!dep.registeredDate)dep.registeredDate=todayStr;if(!dep.startDate)dep.startDate=migrateDepositStartDate(dep);});
-    sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('cryptoCost',d.cryptoCost);
+    sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('usdtRateManual',d.usdtRateManual==='1'?'1':'');sv('cryptoCost',d.cryptoCost);
     sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
     sv('cashAmount',d.cashAmount);sv('cashNote',d.cashNote);
     if(d.cashCurrency){const el=document.getElementById('cashCurrency');if(el)el.value=d.cashCurrency;}
@@ -10016,6 +10029,7 @@ function getMetalsCardHtml(s){
     const curPriceUah=getMetalItemCurrentPriceUah(it); // live price per gram, fallback to buy price
     const buyVal=grams*buyPrice;              // what you paid
     const curVal=grams*curPriceUah; // current worth
+    if(!byType[it.type])return; // неизвестный металл из старых/чужих данных — пропускаем, а не падаем
     byType[it.type].grams+=grams;
     byType[it.type].buyCost+=buyVal;
     byType[it.type].currentVal+=curVal;
@@ -10365,16 +10379,16 @@ function fillCurrencyFields(){
 
 // ── CALCULATOR: add RUB, CNY ──────────────────────────────
 function runCurrencyWithRates(){
-  const sum=parseFloat(document.getElementById('cur_sum')?.value)||0;
+  const sum=parseInputNumber(document.getElementById('cur_sum')?.value)||0;
   const box=document.getElementById('cur_result');
   if(!sum){box.style.display='none';return;}
   const from=document.getElementById('cur_from')?.value||'uah';
 
   // All rates = UAH per 1 unit of currency
-  const uahPerUsd=parseFloat(document.getElementById('cur_rate')?.value)||(liveRates.USD||41);
-  const uahPerEur=parseFloat(document.getElementById('cur_eur')?.value)||(liveRates.EUR||45);
-  const uahPerRub=parseFloat(document.getElementById('cur_rub')?.value)||(liveRates.RUB||0.44);
-  const uahPerCny=parseFloat(document.getElementById('cur_cny')?.value)||(liveRates.CNY||5.7);
+  const uahPerUsd=parseInputNumber(document.getElementById('cur_rate')?.value)||(liveRates.USD||41);
+  const uahPerEur=parseInputNumber(document.getElementById('cur_eur')?.value)||(liveRates.EUR||45);
+  const uahPerRub=parseInputNumber(document.getElementById('cur_rub')?.value)||(liveRates.RUB||0.44);
+  const uahPerCny=parseInputNumber(document.getElementById('cur_cny')?.value)||(liveRates.CNY||5.7);
 
   const uahPer={uah:1, usd:uahPerUsd, eur:uahPerEur, rub:uahPerRub, cny:uahPerCny};
   const syms={uah:'₴', usd:'$', eur:'€', rub:'₽', cny:'¥'};
@@ -10666,6 +10680,7 @@ function calcLiabSchedule(l, asOf=new Date()){
   let balance=amount, paidPrincipal=0, paidInterest=0, paymentsMade=0;
   const start=l.startDate?new Date(l.startDate):new Date();
   const partials=(l.partialPayments||[])
+    .filter(pp=>pp&&typeof pp==='object')
     .map(pp=>({date:new Date(pp.date),amount:parseInputNumber(pp.amount)}))
     .filter(pp=>!isNaN(pp.date.getTime())&&pp.amount>0)
     .sort((a,b)=>a.date-b.date);
@@ -10928,7 +10943,7 @@ function renderLiabilities(){
           <div class="liab-extra-result" id="${extraId}_result"></div>
         </div>
 
-        <button class="add-btn" style="color:var(--blue2);border-color:#5b9cf640;background:#5b9cf610;margin-top:8px;width:100%;" onclick="openPartialPayModal('${l.id}','${(l.name||'').replace(/'/g,'').replace(/"/g,'')}',${remaining})">
+        <button class="add-btn" style="color:var(--blue2);border-color:#5b9cf640;background:#5b9cf610;margin-top:8px;width:100%;" onclick="openPartialPayModal('${l.id}',null,${Number(remaining)||0})">
           ${t('partialPayBtn')||'+ Часткове погашення'}
         </button>
         <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:8px;width:100%;" onclick="removeLiab('${l.id}')">
@@ -11014,6 +11029,9 @@ function updateBizField(secId,field,val){
 function openPartialPayModal(liabId,liabName,remaining){
   const el=document.getElementById('partial_pay_liab_id');
   if(!el)return;
+  // Имя берём из данных, а не из атрибута onclick: текст из чужого бэкапа
+  // внутри on…="…" мог выйти из JS-строки через HTML-сущность (аудит 03.10, п.2).
+  if(typeof liabName!=='string'){const l=liabilities.find(x=>x.id===liabId);liabName=l?String(l.name||''):'';}
   el.value=liabId||'';
   document.getElementById('partial_pay_title').textContent=t('partialPayTitle')||'Часткове погашення';
   document.getElementById('partial_pay_amount_label').textContent=t('partialPayAmount')||'Сума платежу (₴)';
@@ -11057,7 +11075,7 @@ function updateFamilyField(secId,field,val){
   const idx=customSections.findIndex(s=>s.id===secId);
   if(idx<0)return;
   if(!customSections[idx].family)customSections[idx].family={};
-  customSections[idx].family[field]=parseFloat(val)||0;
+  customSections[idx].family[field]=parseInputNumber(val)||0;
   const f=customSections[idx].family;
   const total=(f.communal||0)+(f.food||0)+(f.entertain||0)+(f.med||0)+(f.kids||0)+(f.alimony||0)+(f.other||0);
   const totalEl=document.getElementById('family_total_'+secId);
@@ -11209,8 +11227,8 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const startupStats=customSections.filter(s=>s.sectionType==='startup').reduce((acc,s)=>{
     const st=getStartupStats(s); acc.value+=st.total; acc.basis+=st.invested; acc.pnl+=st.pnl; return acc;
   },{value:0,basis:0,pnl:0});
-  const businessValue=customSections.filter(s=>s.sectionType==='business').reduce((sum,s)=>sum+(parseFloat(s.amount)||parseFloat(s.principal)||0),0);
-  const otherCustomValue=customSections.filter(s=>!['startup','business'].includes(s.sectionType)).reduce((sum,s)=>sum+(parseFloat(s.principal)||0),0);
+  const businessValue=customSections.filter(s=>s.sectionType==='business').reduce((sum,s)=>sum+(parseInputNumber(s.amount)||parseInputNumber(s.principal)||0),0);
+  const otherCustomValue=customSections.filter(s=>!['startup','business'].includes(s.sectionType)).reduce((sum,s)=>sum+(parseInputNumber(s.principal)||0),0);
   const forexValue=hiddenCards['forex']?0:getForexVal();
   const cashValue=hiddenCards['cash']?0:getCashVal();
   const accountValue=hiddenCards['other']?0:getOtherVal();
@@ -11813,8 +11831,8 @@ function exportPDF(){
     <tr><th>${rTxt('colTicker')}</th><th>${rTxt('colName')}</th><th>${rTxt('colQty')}</th><th>${rTxt('colPrice')}</th><th>${rTxt('colValue')}</th></tr>`;
     visibleSecuritiesSections().forEach(sec=>{
       sec.items.forEach(it=>{
-        const val=(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);
-        html+=`<tr><td>${escHtml(it.ticker||'—')}</td><td>${escHtml(it.liveName||it.name||'—')}</td><td>${it.qty}</td><td>${sym}${fmtN(toDisplayCurr(parseFloat(it.price)||0))}</td><td>${sym}${fmtN(toDisplayCurr(val))}</td></tr>`;
+        const val=(parseInputNumber(it.qty)||0)*(parseInputNumber(it.price)||0);
+        html+=`<tr><td>${escHtml(it.ticker||'—')}</td><td>${escHtml(it.liveName||it.name||'—')}</td><td>${it.qty}</td><td>${sym}${fmtN(toDisplayCurr(parseInputNumber(it.price)||0))}</td><td>${sym}${fmtN(toDisplayCurr(val))}</td></tr>`;
       });
     });
     html+=`</table></div>`;
@@ -13828,8 +13846,8 @@ const _origGetCustomTotal=getCustomTotal;
 getCustomTotal=function(){
   return customSections.reduce((sum,s)=>{
     if(s.sectionType==='startup')return sum+getStartupStats(s).total;
-    if(s.sectionType==='business')return sum+(parseFloat(s.amount)||parseFloat(s.principal)||0);
-    return sum+(parseFloat(s.principal)||0);
+    if(s.sectionType==='business')return sum+(parseInputNumber(s.amount)||parseInputNumber(s.principal)||0);
+    return sum+(parseInputNumber(s.principal)||0);
   },0);
 };
 
@@ -14093,13 +14111,14 @@ function validateMainBackupData(data){
   ['deposits','coins','forexItems','customSections','securitiesSections','liabilities','metalsSections','manualBanks'].forEach(key=>{
     (data[key]||[]).forEach((item,i)=>{
       if(!isPlainBackupObject(item))throw new Error(key+'['+i+'] is not a record');
-      ['items','topups','trades','partialPays','stocks','cards'].forEach(sub=>{
+      ['items','topups','trades','partialPays','partialPayments','stocks','cards'].forEach(sub=>{
         if(item[sub]!==undefined&&!Array.isArray(item[sub]))throw new Error(key+'['+i+'].'+sub+' must be an array');
         (item[sub]||[]).forEach((x,j)=>{if(!isPlainBackupObject(x))throw new Error(key+'['+i+'].'+sub+'['+j+'] is not a record');});
       });
     });
   });
   (data.coins||[]).forEach((c,i)=>{if(typeof c.name!=='string'||!safeCoinSymbol(c.name))throw new Error('coins['+i+'] has no symbol');});
+  (data.metalsSections||[]).forEach((m,i)=>{(m.items||[]).forEach((it,j)=>{if(!['gold','silver','platinum'].includes(it.type))throw new Error('metalsSections['+i+'].items['+j+'] has unknown metal');});});
   const ver=Number(data.storageSchemaVersion);
   if(Number.isFinite(ver)&&ver>STORAGE_SCHEMA_VERSION)throw new Error('backup is from a newer app version');
   if(data.currentLang!==undefined&&!['uk','ru','en','de','zh'].includes(data.currentLang))throw new Error('unsupported language');
@@ -14427,8 +14446,14 @@ function changeUsdtBalance(direction){
 function setCustomUsdtRate(){
   customPrompt(usdtBalanceText('rate'),fmtMax2(getCryptoRate()),function(raw){
     const rate=parseInputNumber(raw);
-    if(rate<=0)return;
-    $('usdtUah').value=roundMoney(rate);
+    // Пусто или 0 — вернуться к живому курсу.
+    if(rate<=0){
+      $('usdtRateManual').value='';
+      if(liveRates.USD>10)$('usdtUah').value=liveRates.USD.toFixed(2);
+    }else{
+      $('usdtUah').value=roundMoney(rate);
+      $('usdtRateManual').value='1';
+    }
     updateAll();saveData();
   });
 }

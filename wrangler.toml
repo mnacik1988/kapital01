@@ -21,3 +21,35 @@ id = "ac103a7abff8418082c6e90fa8baea5b"
 binding = "DB"
 database_name = "investory"
 database_id = "13bad18d-76dd-4210-988a-fc25bc3fd770"
+
+# Лимиты частоты с одного IP (аудит 03.10.2026): Cache API на *.workers.dev не работает.
+# Встроенный Rate Limiting бесплатен; period — только 10 или 60 секунд.
+[[ratelimits]]
+name = "RL_AUTH"
+namespace_id = "4101"
+simple = { limit = 20, period = 60 }
+
+[[ratelimits]]
+name = "RL_AI"
+namespace_id = "4102"
+simple = { limit = 10, period = 60 }
+
+[[ratelimits]]
+name = "RL_EXRELAY"
+namespace_id = "4103"
+simple = { limit = 30, period = 60 }
+
+[[ratelimits]]
+name = "RL_ME"
+namespace_id = "4104"
+simple = { limit = 30, period = 60 }
+
+[[ratelimits]]
+name = "RL_ADMIN"
+namespace_id = "4105"
+simple = { limit = 120, period = 60 }
+
+[[ratelimits]]
+name = "RL_DATA"
+namespace_id = "4106"
+simple = { limit = 60, period = 60 }
