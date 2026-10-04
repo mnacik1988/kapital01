@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-46-audit-fixes';
+﻿const CACHE_NAME = 'investory-app-v0-1-47-metals-nbu';
 const APP_SHELL = [
   './',
   './index.html',

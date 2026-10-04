@@ -326,6 +326,7 @@ async function handleRequest(request, env, ctx) {
       if (url.pathname === '/price') return await handlePrice(url, env, origin);
       if (url.pathname === '/multi') return await handleMulti(url, env, origin);
       if (url.pathname === '/rates') return await handleRates(origin);
+      if (url.pathname === '/metals') return await handleMetals(origin);
       if (url.pathname === '/crypto') return await handleCrypto(url, origin);
       if (url.pathname === '/news') return await handleNews(url, env, origin);
       if (url.pathname === '/limit') return await handleLimit(request, url, env, origin);
@@ -1240,6 +1241,32 @@ async function handleRates(origin) {
     return result;
   });
   return json(rates, 200, origin, 900);
+}
+
+// Банковские металлы по официальной цене НБУ (аудит 03.10, п.7: раньше золото
+// всегда стоило зашитые $97/г). НБУ публикует цену за тройскую унцию в гривнах —
+// это мировая биржевая цена по официальному курсу, поэтому годится и для
+// пользователей вне Украины: приложение переводит гривны в их валюту.
+const TROY_OUNCE_G = 31.1034768;
+const METAL_CODES = { gold: 'XAU', silver: 'XAG', platinum: 'XPT', palladium: 'XPD' };
+async function handleMetals(origin) {
+  const data = await memoize('metals:nbu', async () => {
+    const response = await providerFetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json', 1, 3600);
+    const list = await response.json();
+    const rows = Array.isArray(list) ? list : [];
+    const out = { source: 'NBU', date: '', perGramUah: {} };
+    for (const [metal, cc] of Object.entries(METAL_CODES)) {
+      const row = rows.find(x => x && x.cc === cc);
+      const rate = Number(row && row.rate);
+      if (rate > 0) {
+        out.perGramUah[metal] = round(rate / TROY_OUNCE_G, 4);
+        if (!out.date && /^\d{2}\.\d{2}\.\d{4}$/.test(String(row.exchangedate || ''))) out.date = row.exchangedate;
+      }
+    }
+    if (!out.perGramUah.gold) throw new Error('Metal prices unavailable');
+    return out;
+  }, 6 * 60 * 60 * 1000);
+  return json(data, 200, origin, 3600);
 }
 
 async function handleCrypto(url, origin) {

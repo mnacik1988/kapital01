@@ -627,6 +627,7 @@ body.amounts-hidden :where(.live-val,.result-val,.diag-row-val,.liab-breakdown-v
 /* В поле ввода псевдоэлемент не нарисовать — там символы заменяются точками. */
 body.amounts-hidden input[inputmode="decimal"]{-webkit-text-security:disc;}
 @supports not (-webkit-text-security:disc){body.amounts-hidden input[inputmode="decimal"]{filter:blur(7px);}}
+.metal-price-src{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;}
 .bank-add-row{display:flex;gap:8px;margin:0 0 12px;}
 .bank-add-row .add-btn{flex:1;margin:0;}
 .bank-plastic.manual{border:none;text-align:left;cursor:pointer;font:inherit;}
@@ -2854,6 +2855,7 @@ body.modern-mockup.theme-light .total-currency{
         <button onclick="backupImport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #5b9cf640;background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;">📥 Імпорт даних</button>
       </div>
       <div id="storageHealthInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
+<button type="button" id="rollbackImportBtn" class="add-btn" style="display:none;margin-top:8px;width:100%;" onclick="rollbackImport()"></button>
       <input class="backup-file-input" type="file" id="backupFileInput" accept=".json,application/json" onchange="handleBackupFile(this)">
       </div>
       <!-- Выход стоит после резервного копирования намеренно: человек сначала
@@ -3084,7 +3086,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.46';
+const APP_VERSION = 'v0.1.47';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4058,7 +4060,7 @@ function syncDepositSliderHeight(){
 function _addDepositSlideCore(){
   if(deposits.length>=3){alert(t('maxDep'));return;}
   const id='dep'+Date.now();
-  deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',openDay:'',startDate:'',endDate:'',registeredDate:new Date().toISOString().split('T')[0]});
+  deposits.push({id,name:'',principal:'',rate:'16',months:'12',freq:'12',tax:'0',taxFree:'0',openDay:'',startDate:'',endDate:'',registeredDate:getLocalDateKey()});
   renderDeposits(); goToSlide(deposits.length-1); saveData();
 }
 function addDepositSlide(){
@@ -4833,8 +4835,9 @@ function getCustomCardHtml(s,idx){
           </div>`).join('')}
         <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${t('bizTotal')||'Чистий прибуток'}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;" id="biz_net_${s.id}" style="">0 ₴</span>
+          <span class="hide-amt" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;" id="biz_net_${s.id}">0 ₴</span>
         </div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;">${bizTxt('hint')}</div>
       </div>`:''}
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">${lang.removeSection}</button>
     </div></div>
@@ -5068,6 +5071,7 @@ async function fetchUsdUahRate(forceFresh=false){
   }
 
   if(success&&displayCurrency!=='uah') updateAll();
+  refreshMetalPrices(forceFresh);
   window._rateSource=rateSource||offlineTxt('ratesFallback');
   if(success)saveLiveRatesCache();
   updateNetworkStatusUI(success?'online':'error');
@@ -6395,6 +6399,11 @@ const EXCHANGE_DUST_USD=1;
 
 function exTxt(k){
   const d={
+    dupCoins:{uk:'{list} є і серед монет, внесених вручну, і на біржі. Якщо це ті самі монети — видаліть ручний запис, щоб вони не рахувалися двічі.',
+              ru:'{list} есть и среди монет, внесённых вручную, и на бирже. Если это те же монеты — удалите ручную запись, чтобы они не считались дважды.',
+              en:'{list} appears both in manually added coins and on the exchange. If these are the same coins, remove the manual entry so they are not counted twice.',
+              de:'{list} ist sowohl bei manuell erfassten Coins als auch auf der Börse vorhanden. Sind es dieselben Coins, löschen Sie den manuellen Eintrag, damit sie nicht doppelt zählen.',
+              zh:'{list} 同时出现在手动添加的币和交易所中。如果是同一批币，请删除手动记录，以免重复计算。'},
     title:{uk:'Біржі',ru:'Биржи',en:'Exchanges',de:'Börsen',zh:'交易所'},
     connect:{uk:'+ Підключити біржу',ru:'+ Подключить биржу',en:'+ Connect exchange',de:'+ Börse verbinden',zh:'+ 连接交易所'},
     exchange:{uk:'Біржа',ru:'Биржа',en:'Exchange',de:'Börse',zh:'交易所'},
@@ -7044,6 +7053,12 @@ function renderExchanges(){
   }else if(free.length){
     html+='<button class="add-btn" style="margin:0" onclick="toggleExchangeForm(true)">'+exTxt('connect')+'</button>';
   }
+  // Та же монета вручную и на бирже — возможно, посчитана дважды.
+  try{
+    const manual=new Set(Object.values(getCryptoPortfolioStats().groups||{}).filter(g=>g.totalQty>0).map(g=>g.name));
+    const dup=[...new Set(getExchangeHoldings().filter(h=>h.qty>0).map(h=>String(h.coin||'').toUpperCase()))].filter(c=>c&&manual.has(c));
+    if(dup.length)html+='<div class="ex-hint">'+escHtml(exTxt('dupCoins').replace('{list}',dup.slice(0,6).join(', ')))+'</div>';
+  }catch(e){}
   html+='</div>';
   el.innerHTML=html;
   unlockCardBody(el.closest('.card-body'));
@@ -7099,6 +7114,11 @@ const bankUi={formOpen:false,formBank:'',busy:{},errors:{}};
 const ISO_CURRENCY={980:'UAH',840:'USD',978:'EUR',985:'PLN',826:'GBP',156:'CNY',756:'CHF',203:'CZK',643:'RUB'};
 function bankTxt(k){
   const d={
+    creditDup:{uk:'Борг за кредитною карткою вже віднято тут. Якщо цей кредит записано ще й у «Зобов’язаннях», він врахується двічі.',
+               ru:'Долг по кредитной карте уже вычтен здесь. Если этот кредит записан ещё и в «Обязательствах», он учтётся дважды.',
+               en:'The credit card debt is already subtracted here. If this credit is also listed under “Liabilities”, it will be counted twice.',
+               de:'Die Kreditkartenschuld ist hier bereits abgezogen. Steht dieser Kredit zusätzlich unter „Verbindlichkeiten“, wird er doppelt gezählt.',
+               zh:'信用卡欠款已在此扣除。如果该贷款也记录在“负债”中，将被重复计算。'},
     connect:{uk:'+ Підключити банк',ru:'+ Подключить банк',en:'+ Connect bank',de:'+ Bank verbinden',zh:'+ 连接银行'},
     bank:{uk:'Банк',ru:'Банк',en:'Bank',de:'Bank',zh:'银行'},
     token:{uk:'Токен API',ru:'Токен API',en:'API token',de:'API-Token',zh:'API 令牌'},
@@ -7562,6 +7582,7 @@ function renderBanks(){
       (cards.length>2?'<div class="bank-swipe">'+escHtml(bankTxt('swipe').replace('{n}',cards.length))+'</div>':'');
     if(jars.length)html+='<div class="bank-group">'+escHtml(bankTxt('jars'))+'</div><div class="bank-jars">'+jars.map(({x,i})=>bankJarHtml(x,id,i)).join('')+'</div>';
     html+='<div class="ex-hint">'+escHtml(bankTxt('dupHint'))+'</div>';
+    if(cards.some(({x})=>x.creditLimit>0&&Number(x.balance)<0&&bankItemIncluded(id,x)))html+='<div class="ex-hint">'+escHtml(bankTxt('creditDup'))+'</div>';
     html+='<div class="ex-actions"><button class="ex-btn" '+(busy?'disabled':'')+' onclick="refreshBank(\''+id+'\',true)">'+bankTxt('refresh')+'</button>'+
       '<button class="ex-btn danger" onclick="disconnectBank(\''+id+'\')">'+bankTxt('disconnect')+'</button></div></div>';
   });
@@ -7611,24 +7632,39 @@ function getCashVal(){
 // Поточний рахунок = введённое вручную + карты и «банки» подключённых банков.
 function getOtherVal(){return val('otherAmount')+getBankTotalUah()+getManualBanksTotalUah();}
 
-let _updateTimer=null;
+// Части общего капитала (₴) — ровно то, что складывается в шапке. Раньше ИИ и
+// баннер «нетто» считали итог по-своему и расходились с шапкой (аудит п.10, п.16).
+function getCapitalParts(){
+  const p={
+    dep:hiddenCards['deposit']?0:getAllDepositsTotal(),
+    crypto:hiddenCards['crypto']?0:getCryptoVal(),
+    usd:hiddenCards['usd']?0:getUsdVal(),
+    forex:hiddenCards['forex']?0:getForexVal(),
+    cash:hiddenCards['cash']?0:getCashVal(),
+    other:hiddenCards['other']?0:getOtherVal(),
+    custom:getCustomTotal(),
+    securities:getSecuritiesTotal(),
+    metals:getMetalsTotalUah()
+  };
+  p.total=p.dep+p.crypto+p.usd+p.forex+p.cash+p.other+p.custom+p.securities+p.metals;
+  return p;
+}
+
+let _updateTimer=null,_updatePending=false;
 function updateAll(){
-  if(_updateTimer)return; // throttle: max once per 100ms
-  _updateTimer=setTimeout(()=>{_updateTimer=null;},100);
+  // Не чаще раза в 100 мс, но последний вызов в окне не теряется: раньше после
+  // двух быстрых вводов шапка оставалась со старой суммой (аудит п.17).
+  if(_updateTimer){_updatePending=true;return;}
+  _updateTimer=setTimeout(()=>{
+    _updateTimer=null;
+    if(_updatePending){_updatePending=false;updateAll();}
+  },100);
   _updateAllNow();
 }
 function _updateAllNow(){
-  const dep=hiddenCards['deposit']?0:getAllDepositsTotal();
-  const crypto=hiddenCards['crypto']?0:getCryptoVal();
-  const usd=hiddenCards['usd']?0:getUsdVal();
-  const forex=hiddenCards['forex']?0:getForexVal();
-  const cash=hiddenCards['cash']?0:getCashVal();
-  const other=hiddenCards['other']?0:getOtherVal();
-  const custom=getCustomTotal();
   processSecurityIncomeAccruals();
-  const securities=getSecuritiesTotal();
-  const metals=getMetalsTotalUah();
-  const total=dep+crypto+usd+forex+cash+other+custom+securities+metals;
+  const P=getCapitalParts();
+  const {dep,crypto,usd,forex,cash,other,custom,securities,metals,total}=P;
   const nonZero=[dep,crypto,usd,forex,cash,other,custom,securities,metals].filter(v=>v>0).length;
 
   // Display in selected currency
@@ -7721,9 +7757,10 @@ function _updateAllNow(){
       return;
     }
     if(s.sectionType==='business'){
-      const v=parseInputNumber(s.amount)||0;
-      setText('customDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
-      setText('customPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
+      const net=bizNetMonthly(s);
+      setText('customDisplay_'+s.id, (net<0?'−':'')+fmtN(toDisplayCurr(Math.abs(net)))+' '+sym+bizTxt('mo'));
+      setText('customPct_'+s.id, (net<0?'−':'')+fmtN(toDisplayCurr(Math.abs(net*12)))+' '+sym+' '+bizTxt('yr'));
+      $('customPct_'+s.id)?.classList.add('hide-amt');
       updateBizField(s.id,'__noop__',s.biz?.__noop__||0);
       return;
     }
@@ -7933,7 +7970,7 @@ function openCryptoDetail(coinKey){
   let html='<div class="stock-detail-grid">'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--purple2)">$'+fmtCoinPrice(curPrice)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('price')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+totalQty+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('qty')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+fmtN(Math.round(curVal*rate))+' ₴</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('value')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal*rate))+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('value')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">$'+fmtCoinPrice(avgBuy)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('avg')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'')+'$'+fmtN(Math.round(pnl))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+(ch>=0?'var(--green2)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('change24')+'</div></div>'+
@@ -8618,12 +8655,12 @@ function migrateDeposit(dep,index){
   if(!out.name)out.name='';
   if(!out.depCurrency)out.depCurrency='UAH';
   out.depCurrency=String(out.depCurrency).toUpperCase();
-  out.topups=ensureArray(out.topups).map(tp=>({amount:parseInputNumber(tp?.amount),date:tp?.date||new Date().toISOString().split('T')[0]}));
+  out.topups=ensureArray(out.topups).map(tp=>({amount:parseInputNumber(tp?.amount),date:tp?.date||getLocalDateKey()}));
   out.interestTo=normalizeDepositMode(out.interestTo);
   out.interestModeHistory=getDepositModeHistory(out);
   if(!out.openDay)out.openDay=out.startDate?String(depLocalDate(out.startDate).getDate()):'';
   if(!out.startDate)out.startDate=migrateDepositStartDate(out);
-  if(!out.registeredDate)out.registeredDate=new Date().toISOString().split('T')[0];
+  if(!out.registeredDate)out.registeredDate=getLocalDateKey();
   return out;
 }
 function migrateSecuritySection(sec,index){
@@ -8832,7 +8869,11 @@ function _saveDataNow(){
     const payload=buildStoragePayload();
     const next=JSON.stringify(payload);
     const prev=localStorage.getItem(STORAGE_KEY);
-    if(prev&&prev!==next)localStorage.setItem(STORAGE_PREV_KEY,prev);
+    const prevAt=Number(localStorage.getItem('kapital_v6_prev_at'))||0;
+    if(prev&&prev!==next&&(!localStorage.getItem(STORAGE_PREV_KEY)||Date.now()-prevAt>24*60*60*1000)){
+      localStorage.setItem(STORAGE_PREV_KEY,prev);
+      localStorage.setItem('kapital_v6_prev_at',String(Date.now()));
+    }
     localStorage.setItem(STORAGE_KEY,next);
     localStorage.setItem('kapital_last_saved_at',payload.savedAt);
     localStorage.setItem('kapital_schema_version',String(STORAGE_SCHEMA_VERSION));
@@ -8856,7 +8897,7 @@ function loadData(){
     const sv=(id,v)=>{if(v!==undefined&&$(id))$(id).value=v;};
     if(Array.isArray(d.deposits)&&d.deposits.length)deposits=d.deposits;
     // Ensure all deposits have registeredDate (for existing data without it)
-    const todayStr=new Date().toISOString().split('T')[0];
+    const todayStr=getLocalDateKey();
     deposits.forEach(dep=>{if(!dep.openDay)dep.openDay=dep.startDate?String(depLocalDate(dep.startDate).getDate()):'';if(!dep.registeredDate)dep.registeredDate=todayStr;if(!dep.startDate)dep.startDate=migrateDepositStartDate(dep);});
     sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('usdtRateManual',d.usdtRateManual==='1'?'1':'');sv('cryptoCost',d.cryptoCost);
     sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
@@ -8920,8 +8961,9 @@ function updateStorageHealthUI(){
     storageTxt('app')+': '+appVersion
   ];
   if(migratedText)parts.push(storageTxt('migrated')+': '+migratedText);
-  if(rollback)parts.push(storageTxt('rollback'));
   el.textContent=parts.join(' · ');
+  const rbBtn=document.getElementById('rollbackImportBtn');
+  if(rbBtn){rbBtn.style.display=rollback?'':'none';rbBtn.textContent=rollbackTxt('btn');}
 }
 
 // ── SECURITIES CONTAINER ─────────────────────
@@ -9900,10 +9942,59 @@ function addDefaultSecuritiesCard(){
 }
 
 // ── PRECIOUS METALS ───────────────────────────────────────
-// Live prices per gram (USD) — fetched or fallback
-let metalPrices={gold:0,silver:0,platinum:0};
-// Fallback prices per gram in USD
-const METAL_FALLBACK={gold:97,silver:1.1,platinum:32};
+// Цена за грамм в гривнах — официальная цена НБУ через воркер (/metals), раз
+// в 6 часов, с кэшем на устройстве. До 04.10.2026 здесь были зашитые константы
+// ($97/г за золото при реальных ~$134): оценка и P&L были выдуманными, а цена
+// покупки как запасной вариант не срабатывала никогда (аудит 03.10, п.7).
+// Нет цены НБУ — оцениваем по цене покупки и честно пишем об этом.
+const METAL_PRICES_LS='investory_metal_prices';
+const METAL_PRICES_TTL_MS=6*60*60*1000;
+let metalPriceCache=null;
+function getMetalPriceCache(){
+  if(metalPriceCache)return metalPriceCache;
+  metalPriceCache={perGramUah:{},date:'',at:0};
+  try{
+    const c=JSON.parse(localStorage.getItem(METAL_PRICES_LS)||'null');
+    if(c&&c.perGramUah&&typeof c.perGramUah==='object'){
+      ['gold','silver','platinum'].forEach(m=>{const v=Number(c.perGramUah[m]);if(v>0&&v<1e7)metalPriceCache.perGramUah[m]=v;});
+      metalPriceCache.date=/^\d{2}\.\d{2}\.\d{4}$/.test(String(c.date||''))?c.date:'';
+      metalPriceCache.at=Number(c.at)||0;
+    }
+  }catch(e){}
+  return metalPriceCache;
+}
+let metalPricesLoading=false;
+async function refreshMetalPrices(force=false){
+  const c=getMetalPriceCache();
+  if(metalPricesLoading||!WORKER_URL)return false;
+  if(!force&&c.at&&Date.now()-c.at<METAL_PRICES_TTL_MS&&c.perGramUah.gold)return false;
+  metalPricesLoading=true;
+  try{
+    const r=await fetch(WORKER_URL.replace(/\/$/,'')+'/metals');
+    if(!r.ok)return false;
+    const d=await r.json();
+    const next={perGramUah:{},date:'',at:Date.now()};
+    ['gold','silver','platinum'].forEach(m=>{const v=Number(d?.perGramUah?.[m]);if(v>0&&v<1e7)next.perGramUah[m]=v;});
+    if(!next.perGramUah.gold)return false;
+    next.date=/^\d{2}\.\d{2}\.\d{4}$/.test(String(d.date||''))?d.date:'';
+    metalPriceCache=next;
+    try{localStorage.setItem(METAL_PRICES_LS,JSON.stringify(next));}catch(e){}
+    if(metalsSections.length){renderMetalsCards();updateAll();}
+    return true;
+  }catch(e){return false;}
+  finally{metalPricesLoading=false;}
+}
+function metalPriceSourceText(){
+  const c=getMetalPriceCache();
+  const T={
+    uk:['Ціна НБУ на {date}','Ціну НБУ ще не отримано — оцінка за ціною покупки'],
+    ru:['Цена НБУ на {date}','Цена НБУ ещё не получена — оценка по цене покупки'],
+    en:['NBU price as of {date}','NBU price not loaded yet — valued at purchase price'],
+    de:['NBU-Preis vom {date}','NBU-Preis noch nicht geladen — Bewertung zum Kaufpreis'],
+    zh:['乌克兰国家银行价格 {date}','尚未获取央行价格 — 按买入价估值']
+  }[currentLang]||['NBU price as of {date}','NBU price not loaded yet — valued at purchase price'];
+  return c.perGramUah.gold?T[0].replace('{date}',c.date||'—'):T[1];
+}
 const METAL_NAMES={uk:{gold:'Золото',silver:'Срібло',platinum:'Платина'},ru:{gold:'Золото',silver:'Серебро',platinum:'Платина'},en:{gold:'Gold',silver:'Silver',platinum:'Platinum'},de:{gold:'Gold',silver:'Silber',platinum:'Platin'},zh:{gold:'黄金',silver:'白银',platinum:'铂金'}};
 const METAL_COLORS={gold:'#e8c97a',silver:'#a0aec0',platinum:'#b794f4'};
 
@@ -9977,8 +10068,7 @@ function removeMetalsCard(secId){
 }
 
 function getMetalPriceUah(type){
-  const usd=metalPrices[type]||METAL_FALLBACK[type]||0;
-  return usd*(usdUahRate||41);
+  return getMetalPriceCache().perGramUah[type]||0;
 }
 
 function getMetalItemCurrentPriceUah(it){
@@ -10117,6 +10207,7 @@ function getMetalsCardHtml(s){
           <span class="result-key">${t('metalTotalGrams')}</span>
           <span class="result-val">${totalGrams.toFixed(2)} г</span>
         </div>
+        <div class="metal-price-src">${escHtml(metalPriceSourceText())}${['gold','silver','platinum'].filter(m=>byType[m].grams&&getMetalPriceUah(m)).map(m=>` · ${names[m]} <span class="hide-amt">${sym}${fmtN(toDisplayCurr(getMetalPriceUah(m)))}</span>/г`).join('')}</div>
       </div>
       <div style="margin-bottom:12px;">${itemRows}</div>`:''}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
@@ -10553,7 +10644,7 @@ function toggleSecTrades(id){
 function openTopUpModal(depId){
   document.getElementById('topup_dep_id').value=depId;
   // Set default date to today, max = today (no future dates)
-  const today=new Date().toISOString().split('T')[0];
+  const today=getLocalDateKey();
   document.getElementById('topup_date_input').value=today;
   document.getElementById('topup_date_input').max=today;
   // Set min date to deposit start date
@@ -10580,7 +10671,7 @@ function confirmTopUp(){
   const date=document.getElementById('topup_date_input').value;
   if(!amount||!date){alert('Вкажіть суму і дату');return;}
   // Block future dates
-  const today=new Date().toISOString().split('T')[0];
+  const today=getLocalDateKey();
   if(date>today){alert('Не можна вказати майбутню дату поповнення');return;}
   const idx=deposits.findIndex(d=>d.id===depId);
   if(idx<0)return;
@@ -10734,7 +10825,7 @@ function getLiabRemaining(l){
 }
 
 function openLiabModal(editId){
-  const today=new Date().toISOString().split('T')[0];
+  const today=getLocalDateKey();
   document.getElementById('liab_start_input').value=today;
   document.getElementById('liab_name_input').value='';
   document.getElementById('liab_amount_input').value='';
@@ -10833,8 +10924,9 @@ function renderLiabilities(){
   if(banner){
     banner.style.display=liabilities.length?'flex':'none';
     if(liabilities.length){
-      // Get gross total from updateAll's last computed total
-      const grossTotal=parseFloat(document.getElementById('totalAmount')?.textContent?.replace(/\s/g,'')||0)*((usdUahRate||41)/toDisplayCurr(usdUahRate||41))||0;
+      // Брутто — напрямую, а не из текста шапки: обратный пересчёт через
+      // округлённый курс давал в EUR €1 593 вместо €1 875 (аудит п.16).
+      const grossTotal=getCapitalParts().total;
       document.getElementById('liabNetAmount').textContent=sym+fmtN(toDisplayCurr(Math.max(0,grossTotal-totalDebt)));
       document.getElementById('liabTotalDebtAmount').textContent='-'+sym+fmtN(toDisplayCurr(totalDebt));
     }
@@ -10992,8 +11084,7 @@ updateAll=function(){
     const netEl=document.getElementById('liabNetAmount');
     const debtEl=document.getElementById('liabTotalDebtAmount');
     const sym=getCurrSym();
-    const grossDisp=parseFloat(document.getElementById('totalAmount')?.textContent?.replace(/[\s,]/g,'')||0);
-    const grossUah=grossDisp/(getCurrRate()||1);
+    const grossUah=getCapitalParts().total;
     if(netEl)netEl.textContent=sym+fmtN(toDisplayCurr(Math.max(0,grossUah-totalDebt)));
     if(debtEl)debtEl.textContent='-'+sym+fmtN(toDisplayCurr(totalDebt));
   }
@@ -11009,20 +11100,35 @@ function autoFillForexRate(){
 }
 
 // ── BUSINESS SECTION ─────────────────────────────────────
+function bizNetMonthly(s){
+  const b=(s&&s.biz)||{};
+  return parseInputNumber(b.profit)-parseInputNumber(b.rent)-parseInputNumber(b.salary)-parseInputNumber(b.tax)-parseInputNumber(b.expense);
+}
+function bizTxt(key){
+  const T={
+    uk:{mo:'/міс',yr:'за рік',hint:'Прибуток не входить у капітал: гроші враховуються там, де лежать — на рахунку чи готівкою.'},
+    ru:{mo:'/мес',yr:'за год',hint:'Прибыль не входит в капитал: деньги учитываются там, где лежат — на счёте или наличными.'},
+    en:{mo:'/mo',yr:'per year',hint:'Profit is not added to capital: the money counts where it is kept — account or cash.'},
+    de:{mo:'/Mon.',yr:'pro Jahr',hint:'Gewinn zählt nicht zum Kapital: Geld wird dort erfasst, wo es liegt — Konto oder Bargeld.'},
+    zh:{mo:'/月',yr:'每年',hint:'利润不计入资本：资金按其存放位置计入——账户或现金。'}
+  };
+  return (T[currentLang]||T.uk)[key];
+}
 function updateBizField(secId,field,val){
   const idx=customSections.findIndex(s=>s.id===secId);
   if(idx<0)return;
   if(!customSections[idx].biz)customSections[idx].biz={};
   if(field&&field!=='__noop__')customSections[idx].biz[field]=parseInputNumber(val);
-  const b=customSections[idx].biz;
-  const net=(parseInputNumber(b.profit))-(parseInputNumber(b.rent))-(parseInputNumber(b.salary))-(parseInputNumber(b.tax))-(parseInputNumber(b.expense));
+  const net=bizNetMonthly(customSections[idx]);
   const netEl=document.getElementById('biz_net_'+secId);
   if(netEl){
-    netEl.textContent=(net>=0?'+':'-')+getCurrSym()+fmtN(toDisplayCurr(Math.abs(net)));
+    netEl.textContent=(net>=0?'+':'-')+getCurrSym()+fmtN(toDisplayCurr(Math.abs(net)))+bizTxt('mo');
     netEl.style.color=net>=0?'var(--green2)':'var(--red)';
   }
-  customSections[idx].amount=Math.max(0,net);
-  customSections[idx].principal=customSections[idx].amount;
+  // amount — месячная прибыль для показа; principal обнуляем, чтобы ни один
+  // расчёт капитала не подхватил её как актив.
+  customSections[idx].amount=net;
+  customSections[idx].principal=0;
   if(field&&field!=='__noop__'){updateAll();saveData();}
 }
 
@@ -11037,7 +11143,7 @@ function openPartialPayModal(liabId,liabName,remaining){
   document.getElementById('partial_pay_amount_label').textContent=t('partialPayAmount')||'Сума платежу (₴)';
   document.getElementById('partial_pay_info').textContent=(liabName||'')+' · '+t('liabLeft')+': '+getCurrSym()+fmtN(toDisplayCurr(remaining||0));
   document.getElementById('partial_pay_amount').value='';
-  document.getElementById('partial_pay_date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('partial_pay_date').value=getLocalDateKey();
   document.getElementById('partialPayModal').classList.add('open');
 }
 function closePartialPayModal(){document.getElementById('partialPayModal').classList.remove('open');}
@@ -11190,8 +11296,12 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const exchangeUsd=getExchangeTotalUsd();
   // Монеты с биржи: в стоимость — да, в базу — по текущей цене. Цену покупки
   // биржа не отдаёт, и без этого весь баланс считался бы прибылью.
-  const cryptoValue=(cryptoStats.portfolioUsd+exchangeUsd)*cryptoRate;
-  const cryptoBasis=(cryptoStats.remainingCostUsd+exchangeUsd)*cryptoRate;
+  // USDT-баланс входит в итог шапки — значит, и сюда; скрытая карточка крипты
+  // не считается нигде (аудит п.20: спарклайн и «Портфель» расходились с итогом).
+  const cryptoHidden=!!hiddenCards['crypto'];
+  const usdtUsd=val('cryptoUsdt');
+  const cryptoValue=cryptoHidden?0:(cryptoStats.portfolioUsd+exchangeUsd+usdtUsd)*cryptoRate;
+  const cryptoBasis=cryptoHidden?0:(cryptoStats.remainingCostUsd+exchangeUsd+usdtUsd)*cryptoRate;
   const cryptoDetailSrc=Object.fromEntries(Object.entries(cryptoStats.groups||{}).map(([k,g])=>[k,{qty:Math.max(0,Number(g.totalQty)||0),unitValue:Number(g.curPrice)||0,scale:cryptoRate}]));
   // Отдельный ключ «биржа:монета», чтобы не смешаться с введёнными вручную.
   getExchangeHoldings().forEach(h=>{if(h.qty>0&&h.usd>0&&!h.noPrice)cryptoDetailSrc[h.exchange+':'+h.coin]={qty:h.qty,unitValue:h.usd/h.qty,scale:cryptoRate};});
@@ -11227,7 +11337,7 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const startupStats=customSections.filter(s=>s.sectionType==='startup').reduce((acc,s)=>{
     const st=getStartupStats(s); acc.value+=st.total; acc.basis+=st.invested; acc.pnl+=st.pnl; return acc;
   },{value:0,basis:0,pnl:0});
-  const businessValue=customSections.filter(s=>s.sectionType==='business').reduce((sum,s)=>sum+(parseInputNumber(s.amount)||parseInputNumber(s.principal)||0),0);
+  const businessValue=0; // бизнес-раздел — месячная прибыль, в капитал не входит
   const otherCustomValue=customSections.filter(s=>!['startup','business'].includes(s.sectionType)).reduce((sum,s)=>sum+(parseInputNumber(s.principal)||0),0);
   const forexValue=hiddenCards['forex']?0:getForexVal();
   const cashValue=hiddenCards['cash']?0:getCashVal();
@@ -11863,7 +11973,7 @@ function exportPDF(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download='InveStory_'+new Date().toISOString().split('T')[0]+'.html';
+  a.download='InveStory_'+getLocalDateKey()+'.html';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -12238,20 +12348,21 @@ async function fetchNewsContext(){
 function buildPortfolioContext(){
   try{
     const fmt=n=>(n||0).toLocaleString('uk-UA',{minimumFractionDigits:0,maximumFractionDigits:0});
-    const sym=getCurrSym?getCurrSym():'₴';
-    const deps=getDepositsTotal?getDepositsTotal():0;
-    const crypto=getCryptoTotal?getCryptoTotal():0;
-    const usd=getUsdTotal?getUsdTotal():0;
-    const forex=getForexTotal?getForexTotal():0;
-    const cash=getCashTotal?getCashTotal():0;
-    const other=getCurrentTotal?getCurrentTotal():0;
-    const stocks=getSecuritiesTotal?getSecuritiesTotal():0;
-    const metals=getMetalsTotalUah?getMetalsTotalUah():0;
+    // Все суммы приложения хранятся в гривнах. Раньше они подписывались символом
+    // валюты показа: при показе в USD ИИ видел «415 000 $» вместо ₴ (аудит п.10).
+    const sym='₴';
+    const P=getCapitalParts();
+    const deps=P.dep,crypto=P.crypto,usd=P.usd,forex=P.forex,cash=P.cash,other=P.other,stocks=P.securities,metals=P.metals;
+    const startups=customSections.filter(s=>s.sectionType==='startup').reduce((sum,s)=>sum+getStartupStats(s).total,0);
+    const customOther=Math.max(0,P.custom-startups);
+    const bizMonthly=customSections.filter(s=>s.sectionType==='business').reduce((sum,s)=>sum+bizNetMonthly(s),0);
     const liab=getLiabilitiesTotal?getLiabilitiesTotal():0;
-    const gross=deps+crypto+usd+forex+cash+other+stocks+metals;
+    const gross=P.total;
     const net=gross-liab;
-    const lines=[`Портфель (${new Date().toLocaleDateString('uk-UA')}):`,
-      `Загальний капітал: ${fmt(net)} ${sym}`,`Активи: ${fmt(gross)} ${sym}`,``];
+    const dispCur=String(displayCurrency||'uah').toUpperCase();
+    const lines=[`Портфель (${new Date().toLocaleDateString('uk-UA')}). Усі суми — в гривнях (₴).`];
+    if(dispCur!=='UAH'&&getCurrRate()>0)lines.push(`Користувач дивиться суми в ${dispCur}: 1 ${dispCur} = ${(1/getCurrRate()).toFixed(2)} ₴. Відповідай у ${dispCur}, перераховуючи за цим курсом.`);
+    lines.push(`Загальний капітал (активи, як у шапці застосунку): ${fmt(gross)} ${sym}`,`Чистий капітал (мінус зобов'язання): ${fmt(net)} ${sym}`,``);
     if(deps>0)lines.push(`• Депозити: ${fmt(deps)} ${sym}`);
     if(stocks>0)lines.push(`• Акції/Облігації: ${fmt(stocks)} ${sym}`);
     if(crypto>0)lines.push(`• Крипто: ${fmt(crypto)} ${sym}`);
@@ -12259,7 +12370,10 @@ function buildPortfolioContext(){
     if(forex>0)lines.push(`• Валюти: ${fmt(forex)} ${sym}`);
     if(cash>0)lines.push(`• Готівка: ${fmt(cash)} ${sym}`);
     if(metals>0)lines.push(`• Метали: ${fmt(metals)} ${sym}`);
-    if(other>0)lines.push(`• Інше: ${fmt(other)} ${sym}`);
+    if(other>0)lines.push(`• Поточний рахунок: ${fmt(other)} ${sym}`);
+    if(startups>0)lines.push(`• Стартапи: ${fmt(startups)} ${sym}`);
+    if(customOther>0)lines.push(`• Власні розділи: ${fmt(customOther)} ${sym}`);
+    if(bizMonthly)lines.push(`• Бізнес: чистий прибуток ${fmt(bizMonthly)} ${sym}/міс (дохід, не входить у капітал)`);
     if(liab>0)lines.push(`• Зобов'язання: -${fmt(liab)} ${sym}`);
     // Курси — без них ІІ не може перерахувати гривні в позиції та навпаки
     try{
@@ -12297,7 +12411,7 @@ function buildPortfolioContext(){
     // Акції та облігації — поштучно, з цінами й валютою
     try{
       const stockRows=[],bondRows=[];
-      (securitiesSections||[]).forEach(sec=>{
+      visibleSecuritiesSections().forEach(sec=>{
         if(isBondSection(sec)){
           (sec.items||[]).forEach(it=>{
             const b=getBondItemStats(it);
@@ -12330,10 +12444,11 @@ function buildPortfolioContext(){
     // Крипто — поштучно
     try{
       const cRows=[];
-      (coins||[]).forEach(c=>{
-        if(!c||!(c.qty>0))return;
-        cRows.push(`  ${c.name}: ${c.qty} @ $${c.curPrice} (ціни крипти в USD)`+
-          (c.buyPrice>0?`, куплено @ $${c.buyPrice}`:''));
+      if(!hiddenCards['crypto'])Object.values(getCryptoPortfolioStats().groups||{}).forEach(g=>{
+        const q=Math.max(0,g.totalQty);
+        if(!(q>0))return;
+        cRows.push(`  ${g.name}: ${+q.toFixed(8)} @ $${g.curPrice} (ціни крипти в USD)`+
+          (g.avgBuy>0?`, середня ціна купівлі $${+g.avgBuy.toFixed(6)}`:''));
       });
       getExchangeHoldings().forEach(h=>{
         cRows.push(`  ${h.coin}: ${h.qty} на біржі ${EXCHANGES[h.exchange]?.name||h.exchange}`+(h.usd>0?` ≈ $${Math.round(h.usd)}`:''));
@@ -13015,23 +13130,17 @@ function renderDiagnostics(){
   const sym=getCurrSym();
 
   // Calculate totals
-  const dep=hiddenCards['deposit']?0:getAllDepositsTotal();
-  const crypto=hiddenCards['crypto']?0:getCryptoVal();
-  const usd=hiddenCards['usd']?0:getUsdVal();
-  const forex=hiddenCards['forex']?0:getForexVal();
-  const cash=hiddenCards['cash']?0:getCashVal();
-  const other=hiddenCards['other']?0:getOtherVal();
-  const custom=getCustomTotal();
-  const securities=getSecuritiesTotal();
-  const metals=getMetalsTotalUah();
-  const total=dep+crypto+usd+forex+cash+other+custom+securities+metals;
+  const {dep,crypto,usd,forex,cash,other,custom,securities,metals,total}=getCapitalParts();
   const debt=getLiabilitiesTotal();
   const net=total-debt;
 
   // Period stats use the nearest saved point on or before the target date.
   recordDailySnapshot(total);
   const today=getLocalDateKey();
-  const yesterdayEntry=getHistoryEntryBefore(today);
+  // «Сьогодні» — только против свежей записи (не старше двух дней), как в шапке:
+  // иначе после недели без открытия неделя выдавалась за сутки (аудит п.19).
+  const yesterdayRaw=getHistoryEntryBefore(today);
+  const yesterdayEntry=yesterdayRaw&&yesterdayRaw.date>=addDaysKey(-2)?yesterdayRaw:null;
   const dailyChange=yesterdayEntry?(total-yesterdayEntry.total):null;
   const dailyChangePct=yesterdayEntry&&yesterdayEntry.total>0?(dailyChange/yesterdayEntry.total*100):0;
   const weekStats=getPeriodChangeStats(total,7);
@@ -13846,7 +13955,7 @@ const _origGetCustomTotal=getCustomTotal;
 getCustomTotal=function(){
   return customSections.reduce((sum,s)=>{
     if(s.sectionType==='startup')return sum+getStartupStats(s).total;
-    if(s.sectionType==='business')return sum+(parseInputNumber(s.amount)||parseInputNumber(s.principal)||0);
+    if(s.sectionType==='business')return sum; // месячная прибыль — не капитал
     return sum+(parseInputNumber(s.principal)||0);
   },0);
 };
@@ -14006,6 +14115,24 @@ function collectBackupPayload(){
     storage,
     data:main,
     capitalHistory:storage.cap_history?JSON.parse(storage.cap_history):[]
+  });
+}
+function rollbackTxt(key){
+  const T={
+    btn:{uk:'↶ Відкотити останній імпорт',ru:'↶ Откатить последний импорт',en:'↶ Undo last import',de:'↶ Letzten Import rückgängig machen',zh:'↶ 撤销上次导入'},
+    ask:{uk:'Повернути дані до стану перед останнім імпортом ({when})? Поточні дані буде замінено.',ru:'Вернуть данные к состоянию перед последним импортом ({when})? Текущие данные будут заменены.',en:'Restore data to the state before the last import ({when})? Current data will be replaced.',de:'Daten auf den Stand vor dem letzten Import ({when}) zurücksetzen? Aktuelle Daten werden ersetzt.',zh:'将数据恢复到上次导入之前的状态（{when}）？当前数据将被替换。'},
+    none:{uk:'Немає копії для відкату.',ru:'Нет копии для отката.',en:'No copy to restore.',de:'Keine Kopie zum Zurücksetzen.',zh:'没有可恢复的副本。'}
+  };
+  return (T[key]&&(T[key][currentLang]||T[key].uk))||key;
+}
+function rollbackImport(){
+  let rb=null;
+  try{rb=JSON.parse(localStorage.getItem(STORAGE_ROLLBACK_KEY)||'null');}catch(e){}
+  if(!rb||!rb.storage||!rb.storage.kapital_v6){alert(rollbackTxt('none'));return;}
+  const when=rb.exportedAt?new Date(rb.exportedAt).toLocaleString(liabDateLocale()):'—';
+  customConfirm(rollbackTxt('ask').replace('{when}',when),function(){
+    if(!restoreBackupPayload(normalizeBackupPayload(rb))){alert(backupTxt('badFormat'));return;}
+    setTimeout(function(){location.reload();},300);
   });
 }
 function createRollbackSnapshot(){
