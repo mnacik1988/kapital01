@@ -1,9 +1,17 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-47-metals-nbu';
-const APP_SHELL = [
+﻿const CACHE_NAME = 'investory-app-v0-1-48-speed-i18n';
+// Ядро — без него приложение не откроется офлайн. Установка строгая: не
+// скачалось ядро — новый воркер не ставится, прежняя версия остаётся.
+const CORE = [
   './',
   './index.html',
-  './manifest.json',
+  './manifest.json'
+];
+// Картинки и страницы — по возможности, поштучно. Раньше они шли в общем
+// строгом списке: пропади в будущем выпуске хоть одна иконка, установка падала
+// бы каждый раз, и все застряли бы на старой версии (аудит 03.10, п.23).
+const APP_SHELL = [
   './icons/icon-384.png',
+  './icons/icon-152.png',
   './privacy-policy.html',
   './terms-disclaimer.html',
   './panel-icons/1.png?v=4',
@@ -68,8 +76,9 @@ self.addEventListener('install', event => {
     // копию СТАРОГО index.html и складывал её в новый кэш — страница застревала
     // на прошлой версии до следующего выпуска. Поймано 28.09: v0.1.18 выложена,
     // у Александра после десяти перезапусков — v0.1.17.
-    await cache.addAll(APP_SHELL.map(url => new Request(url, { cache: 'reload' })));
-    // Необязательное — по возможности, поштучно, ошибки не мешают установке.
+    await cache.addAll(CORE.map(url => new Request(url, { cache: 'reload' })));
+    // Остальное — по возможности, поштучно, ошибки не мешают установке.
+    await Promise.all(APP_SHELL.map(url => cache.add(new Request(url, { cache: 'reload' })).catch(() => null)));
     await Promise.all(OPTIONAL_ASSETS.map(url => cache.add(url).catch(() => null)));
     // skipWaiting только после успешной установки.
     await self.skipWaiting();
@@ -94,10 +103,18 @@ self.addEventListener('fetch', event => {
   if (url.origin === location.origin) {
     event.respondWith(
       caches.match(req).then(cached => cached || fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+        // В кэш — только удачные ответы: 404/500 раньше оседали до следующей версии.
+        if (res.ok && res.type === 'basic') {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+        }
         return res;
-      }).catch(() => caches.match('./index.html')))
+      }).catch(() => {
+        // index.html — только вместо страницы. Картинке или файлу HTML вместо
+        // них не поможет, а мешает понять, что именно не загрузилось.
+        if (req.mode === 'navigate') return caches.match('./index.html');
+        return Response.error();
+      }))
     );
     return;
   }

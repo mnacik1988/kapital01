@@ -627,6 +627,8 @@ body.amounts-hidden :where(.live-val,.result-val,.diag-row-val,.liab-breakdown-v
 /* В поле ввода псевдоэлемент не нарисовать — там символы заменяются точками. */
 body.amounts-hidden input[inputmode="decimal"]{-webkit-text-security:disc;}
 @supports not (-webkit-text-security:disc){body.amounts-hidden input[inputmode="decimal"]{filter:blur(7px);}}
+.app-update-banner{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:500;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:var(--bg2);border:1px solid var(--purple);box-shadow:0 8px 30px #0006;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);max-width:520px;margin:0 auto;}
+.app-update-banner button{flex-shrink:0;padding:8px 14px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
 .metal-price-src{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;}
 .bank-add-row{display:flex;gap:8px;margin:0 0 12px;}
 .bank-add-row .add-btn{flex:1;margin:0;}
@@ -3086,7 +3088,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.47';
+const APP_VERSION = 'v0.1.48';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3551,6 +3553,14 @@ Object.assign(EXTRA_I18N,{
 });
 
 Object.assign(EXTRA_I18N,{
+  'ДИНАМІКА КАПІТАЛУ':{uk:'ДИНАМІКА КАПІТАЛУ',ru:'ДИНАМИКА КАПИТАЛА',en:'CAPITAL DYNAMICS',de:'KAPITALENTWICKLUNG',zh:'资本动态'},
+  'ПДФО':{uk:'ПДФО',ru:'НДФЛ',en:'PIT',de:'ESt',zh:'个税'},
+  'Швидка навігація':{uk:'Швидка навігація',ru:'Быстрая навигация',en:'Quick navigation',de:'Schnellnavigation',zh:'快速导航'},
+  'Наприклад: ОВДП, Інвест-фонд...':{uk:'Наприклад: ОВДП, Інвест-фонд...',ru:'Например: ОВГЗ, Инвестфонд...',en:'E.g.: bonds, investment fund...',de:'Z. B.: Anleihen, Investmentfonds...',zh:'例如：国债、投资基金...'},
+  'Питай про портфель...':{uk:'Питай про портфель...',ru:'Спроси о портфеле...',en:'Ask about your portfolio...',de:'Frag zu deinem Portfolio...',zh:'询问你的投资组合...'},
+  'Налаштування':{uk:'Налаштування',ru:'Настройки',en:'Settings',de:'Einstellungen',zh:'设置'},
+  'Ввести вручну':{uk:'Ввести вручну',ru:'Ввести вручную',en:'Enter manually',de:'Manuell eingeben',zh:'手动输入'},
+  '↺ Спробувати ще раз':{uk:'↺ Спробувати ще раз',ru:'↺ Попробовать ещё раз',en:'↺ Try again',de:'↺ Erneut versuchen',zh:'↺ 重试'},
   'Розділ':{uk:'Розділ',ru:'Раздел',en:'Section',de:'Bereich',zh:'部分'},
   'Динаміка':{uk:'Динаміка',ru:'Динамика',en:'Dynamics',de:'Dynamik',zh:'动态'},
   'Калькулятор':{uk:'Калькулятор',ru:'Калькулятор',en:'Calculator',de:'Rechner',zh:'计算器'},
@@ -3560,7 +3570,10 @@ Object.assign(EXTRA_I18N,{
   'Создать':{uk:'Створити',ru:'Создать',en:'Create',de:'Erstellen',zh:'创建'},
   'Кальк.':{uk:'Кальк.',ru:'Кальк.',en:'Calc',de:'Rechn.',zh:'计算'}
 });
+let _autoI18nCache=null,_autoI18nSig='';
 function getAutoI18nMap(){
+  const sig=Object.keys(EXTRA_I18N).length+':'+Object.keys(LANGS.uk||{}).length+':'+Object.keys(LANGS).length;
+  if(_autoI18nCache&&_autoI18nSig===sig)return _autoI18nCache.map;
   const map={...EXTRA_I18N};
   Object.entries(LANGS.uk||{}).forEach(([key,ukVal])=>{
     if(typeof ukVal!=='string'||!ukVal.trim())return;
@@ -3569,6 +3582,11 @@ function getAutoI18nMap(){
     Object.keys(LANGS).forEach(lang=>rec[lang]=(LANGS[lang]&&LANGS[lang][key])||ukVal);
     map[ukVal]=rec;
   });
+  // Обратный индекс «перевод → исходник»; первый найденный побеждает, как
+  // раньше у Object.entries(...).find.
+  const reverse=new Map();
+  Object.entries(map).forEach(([src,rec])=>Object.values(rec).forEach(v=>{if(!reverse.has(v))reverse.set(v,src);}));
+  _autoI18nCache={map,reverse};_autoI18nSig=sig;
   return map;
 }
 function translateAutoValue(src){
@@ -3580,8 +3598,7 @@ function findAutoSource(value, stored){
   if(stored)return stored;
   const map=getAutoI18nMap();
   if(map[value])return value;
-  const hit=Object.entries(map).find(([,rec])=>Object.values(rec).includes(value));
-  return hit?hit[0]:null;
+  return _autoI18nCache.reverse.get(value)||null;
 }
 function applyAutoTranslations(root=document.body){
   if(!root)return;
@@ -3636,6 +3653,32 @@ function startAutoI18nObserver(){
 }
 
 let currentLang='uk';
+// Строка на текущем языке из набора {uk,ru,en,de,zh} — для текстов с
+// подстановками, которые словарём автоперевода не поймать (аудит п.24).
+function trx(o){return (o&&(o[currentLang]||o.uk))||'';}
+const UNIT_TXT={
+  pcs:{uk:'шт',ru:'шт',en:'pcs',de:'Stk.',zh:'股'},
+  g:{uk:'г',ru:'г',en:'g',de:'g',zh:'克'},
+  perMonth:{uk:'/міс',ru:'/мес',en:'/mo',de:'/Mon.',zh:'/月'},
+  perSec:{uk:'/с',ru:'/с',en:'/s',de:'/s',zh:'/秒'}
+};
+// Ошибки воркера приходят по-украински — переводим известные на клиенте.
+const SERVER_ERR_I18N={
+  'Сервіс входу тимчасово недоступний. Спробуй за хвилину.':{ru:'Сервис входа временно недоступен. Попробуй через минуту.',en:'Sign-in service is temporarily unavailable. Try again in a minute.',de:'Anmeldedienst vorübergehend nicht verfügbar. Versuche es in einer Minute erneut.',zh:'登录服务暂时不可用，请一分钟后再试。'},
+  'Забагато запитів. Зачекай хвилину.':{ru:'Слишком много запросов. Подожди минуту.',en:'Too many requests. Please wait a minute.',de:'Zu viele Anfragen. Warte eine Minute.',zh:'请求过多，请稍等一分钟。'},
+  'Увійди через Google, щоб користуватися AI.':{ru:'Войди через Google, чтобы пользоваться AI.',en:'Sign in with Google to use AI.',de:'Melde dich mit Google an, um die KI zu nutzen.',zh:'请使用 Google 登录以使用 AI。'},
+  'Доступ обмежено.':{ru:'Доступ ограничен.',en:'Access restricted.',de:'Zugriff eingeschränkt.',zh:'访问受限。'},
+  'Пробний період завершено.':{ru:'Пробный период завершён.',en:'Trial period has ended.',de:'Testzeitraum beendet.',zh:'试用期已结束。'},
+  'Сервіс тимчасово недоступний. Спробуй пізніше.':{ru:'Сервис временно недоступен. Попробуй позже.',en:'Service temporarily unavailable. Try again later.',de:'Dienst vorübergehend nicht verfügbar. Versuche es später.',zh:'服务暂时不可用，请稍后再试。'},
+  'Лічильник лімітів недоступний. Спробуй пізніше.':{ru:'Счётчик лимитов недоступен. Попробуй позже.',en:'Limit counter unavailable. Try again later.',de:'Limitzähler nicht verfügbar. Versuche es später.',zh:'额度计数器不可用，请稍后再试。'},
+  'Денний ліміт запитів до AI вичерпано. Спробуй завтра.':{ru:'Дневной лимит запросов к AI исчерпан. Попробуй завтра.',en:'The daily AI request limit is used up. Try again tomorrow.',de:'Das tägliche KI-Anfragelimit ist erreicht. Versuche es morgen.',zh:'今日 AI 请求额度已用完，请明天再试。'},
+  'Ти вичерпав денний ліміт запитів до AI. Спробуй завтра.':{ru:'Ты исчерпал дневной лимит запросов к AI. Попробуй завтра.',en:'You have used your daily AI requests. Try again tomorrow.',de:'Du hast dein tägliches KI-Limit aufgebraucht. Versuche es morgen.',zh:'你今天的 AI 请求次数已用完，请明天再试。'},
+  'Порожня відповідь від моделі':{ru:'Пустой ответ модели',en:'Empty response from the model',de:'Leere Antwort des Modells',zh:'模型返回为空'}
+};
+function translateServerError(msg){
+  const rec=SERVER_ERR_I18N[String(msg||'')];
+  return rec&&currentLang!=='uk'?(rec[currentLang]||msg):msg;
+}
 function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LANGS['uk'][key]||key;}
 const UI_TEXT={
   depOpenDay:{uk:'Число нарахування',ru:'Число начисления',en:'Interest day',de:'Zinstag',zh:'计息日'},
@@ -3775,6 +3818,7 @@ function applyTranslations(){
   // перезапуска (замечено 03.10 на китайском).
   try{renderCoins();}catch(e){}
   try{renderBanks();}catch(e){}
+  try{renderCryptoStatus();}catch(e){}
   try{applyHideAmounts();}catch(e){}
   try{setText('adminSectionLabel',({uk:'Адміністратор',ru:'Администратор',en:'Administrator',de:'Administrator',zh:'管理员'})[currentLang]||'Адміністратор');}catch(e){}
   translateDynamicUI();
@@ -4580,7 +4624,7 @@ function calcLive(depId){
   setText('liveInterest_'+depId,'+'+fmtLive(sim.totalGross,depSym)+' ('+sim.completedCaps+' '+uiText('accrualsShort')+')');
   setText('liveTaxLive_'+depId,'−'+fmtLive(sim.totalTax,depSym)+' ('+Math.round(tax*100)+'%)');
   setText('liveNet_'+depId,'+'+fmtLive(sim.totalNet,depSym));
-  setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' '+depSym+'/с');
+  setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' '+depSym+trx(UNIT_TXT.perSec));
   setText('livePerDay_'+depId,'+'+fmtLive(perDay,depSym));
   setText('livePerMonth_'+depId,'+'+fmtLive(perMonth,depSym));
   // Приписки «с завтра» больше нет: переключение действует сразу, и весь
@@ -4671,7 +4715,13 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
 function startLiveTicker(depId){
   if(liveIntervals[depId])clearInterval(liveIntervals[depId]);
   calcLive(depId);
-  liveIntervals[depId]=setInterval(()=>calcLive(depId),100);
+  liveIntervals[depId]=setInterval(()=>{
+    if(document.hidden)return;
+    const m=$('liveMain_'+depId);
+    // Счётчик показан, но спрятан свёрнутой карточкой или слайдером — не считаем.
+    if(m&&m.style.display!=='none'&&!m.offsetParent)return;
+    calcLive(depId);
+  },1000);
 }
 function toggleDepCalc(depId){
   const toggle=$('depCalcToggle_'+depId), body=$('depCalcBody_'+depId);
@@ -5192,16 +5242,16 @@ async function fetchTickerForInput(secId){
       </div>`;}
     return;
   }
-  if(btn){btn.className='ticker-fetch-btn loading';btn.textContent='⏳ Запит...';}
-  if(info){info.className='stock-price-info visible';info.innerHTML=`<div class="spi-meta" style="color:var(--blue2)">⏳ Запит до Claude... (~10 сек)</div>`;}
+  if(btn){btn.className='ticker-fetch-btn loading';btn.textContent='⏳ '+trx({uk:'Запит...',ru:'Запрос...',en:'Loading...',de:'Lädt...',zh:'请求中...'});}
+  if(info){info.className='stock-price-info visible';info.innerHTML=`<div class="spi-meta" style="color:var(--blue2)">⏳ ${trx({uk:'Отримуємо ціну...',ru:'Получаем цену...',en:'Fetching price...',de:'Preis wird geladen...',zh:'正在获取价格...'})}</div>`;}
   stockLastError='';
   let data=null;
   try{ data=await fetchStockPrice(ticker); }catch(e){stockLastError=e.message;}
-  if(btn){btn.className='ticker-fetch-btn';btn.textContent='🔍 Отримати ціну';}
+  if(btn){btn.className='ticker-fetch-btn';btn.textContent='🔍 '+trx({uk:'Отримати ціну',ru:'Получить цену',en:'Get price',de:'Preis abrufen',zh:'获取价格'});}
   if(!data){
-    const errMsg=stockLastError||'Обидва джерела недоступні';
+    const errMsg=stockLastError||trx({uk:'Обидва джерела недоступні',ru:'Оба источника недоступны',en:'Both sources are unavailable',de:'Beide Quellen nicht verfügbar',zh:'两个数据源均不可用'});
     if(info){info.className='stock-price-info visible';info.innerHTML=
-      `<div class="spi-name" style="color:var(--red)">⚠ Не вдалося отримати дані для "${ticker}"</div>`+
+      `<div class="spi-name" style="color:var(--red)">⚠ ${trx({uk:'Не вдалося отримати дані для',ru:'Не удалось получить данные для',en:'Could not get data for',de:'Keine Daten erhalten für',zh:'无法获取数据：'})} "${ticker}"</div>`+
       `<div class="spi-meta" style="color:var(--muted2);word-break:break-all;font-size:9px;margin-top:4px">${escHtml(errMsg)}</div>`+
       `<div style="display:flex;gap:8px;margin-top:8px;">
         <button onclick="fetchTickerForInput('${secId}')" style="flex:1;background:#4ecb8d20;border:1px solid #4ecb8d40;border-radius:8px;padding:7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);cursor:pointer;">↺ Спробувати ще раз</button>
@@ -5233,11 +5283,11 @@ async function fetchTickerForInput(secId){
         ${data.currency==='USD'?`<span style="color:var(--muted);font-size:10px"> ≈ ${fmtN(Math.round(priceUah))} ₴</span>`:''}
         <span class="spi-change ${changeClass}">${changeSign}${ch.toFixed(2)} (${changeSign}${chp.toFixed(2)}%)</span>
       </div>
-      <div class="spi-meta">Курс USD/₴: ${usdUahRate.toFixed(2)} · Оновлено: ${new Date().toLocaleTimeString(reportLocale())}</div>
-      ${data.divYield>0?`<div class="spi-div">💰 Дивіденди: ${data.divYield.toFixed(2)}% річних · ≈${fmtD(divYieldAbs,2)} ₴/акція/рік</div>${divDateLine}`:'<div class="spi-div" style="color:var(--muted)">— '+t('divNone')+'</div>'}
+      <div class="spi-meta">${trx({uk:'Курс',ru:'Курс',en:'Rate',de:'Kurs',zh:'汇率'})} USD/₴: ${usdUahRate.toFixed(2)} · ${trx({uk:'Оновлено',ru:'Обновлено',en:'Updated',de:'Aktualisiert',zh:'更新于'})}: ${new Date().toLocaleTimeString(reportLocale())}</div>
+      ${data.divYield>0?`<div class="spi-div">💰 ${trx({uk:'Дивіденди',ru:'Дивиденды',en:'Dividends',de:'Dividenden',zh:'股息'})}: ${data.divYield.toFixed(2)}% ${trx({uk:'річних',ru:'годовых',en:'per year',de:'p. a.',zh:'年化'})} · ≈${fmtD(divYieldAbs,2)} ₴/${trx({uk:'акція/рік',ru:'акция/год',en:'share/yr',de:'Aktie/Jahr',zh:'股/年'})}</div>${divDateLine}`:'<div class="spi-div" style="color:var(--muted)">— '+t('divNone')+'</div>'}
     `;
   }
-  }catch(e){console.error('fetchTicker:',e);const info=$('stockInfo_'+secId);if(info)info.innerHTML='<div style="color:var(--red);font-size:10px">❌ Помилка</div>';}
+  }catch(e){console.error('fetchTicker:',e);const info=$('stockInfo_'+secId);if(info)info.innerHTML='<div style="color:var(--red);font-size:10px">❌ '+trx({uk:'Помилка',ru:'Ошибка',en:'Error',de:'Fehler',zh:'错误'})+'</div>';}
 }
 
 async function refreshAllStockPrices(secId){
@@ -5275,7 +5325,7 @@ async function refreshAllStockPrices(secId){
   renderSecuritiesCards();updateAll();saveData();
   if(btn)btn.textContent='⟳ Оновити';
   const st=$('refreshStatus_'+secId);
-  if(st)st.textContent=updated?`Оновл. ${sec.lastRefresh}`:'Помилка оновлення';
+  if(st)st.textContent=updated?trx({uk:'Оновл.',ru:'Обновл.',en:'Upd.',de:'Akt.',zh:'更新'})+' '+sec.lastRefresh:trx({uk:'Помилка оновлення',ru:'Ошибка обновления',en:'Update error',de:'Aktualisierungsfehler',zh:'更新错误'});
   }catch(e){console.error('refreshAll:',e);const btn=$('refreshAllBtn_'+secId);if(btn)btn.textContent='⟳ Оновити';}
 }
 
@@ -5865,13 +5915,13 @@ function getSecCardHtml(s,idx){
       return `<div class="ticker-card" onclick="openStockDetail('${s.id}','${escAttr(String(key).replace(/[^A-Za-z0-9.\-^=_:]/g,''))}')">
         <div class="ticker-card-head">
           <span class="ticker-card-sym">${escHtml(g.ticker)||'—'}</span>
-          <span class="ticker-card-qty">${fmtMax2(totalQty)} шт</span>
+          <span class="ticker-card-qty">${fmtMax2(totalQty)} ${trx(UNIT_TXT.pcs)}</span>
         </div>
         <div class="ticker-card-name">${escHtml(g.name)}</div>
         <div class="ticker-card-price" style="color:${pnlCol}">${sym}${fmtN(toDisplayCurr(curVal))}</div>
         <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
         ${avgBuy>0?`<div class="ticker-card-div">Ø ${sym}${fmtN(toDisplayCurr(avgBuy))}</div>`:''}
-        ${divMonth>0?`<div class="ticker-card-div">${uiIconHtml('dividend','tiny-png-icon')} ~${sym}${fmtN(toDisplayCurr(divMonth))}/міс</div>`:''}
+        ${divMonth>0?`<div class="ticker-card-div">${uiIconHtml('dividend','tiny-png-icon')} ~${sym}${fmtN(toDisplayCurr(divMonth))}${trx(UNIT_TXT.perMonth)}</div>`:''}
       </div>`;
     }).join('')+
     '</div>'+
@@ -5958,7 +6008,7 @@ function getBondCardHtml(s,idx){
       return `<div class="ticker-card">
         <div class="ticker-card-head">
           <span class="ticker-card-sym">${name}</span>
-          <span class="ticker-card-qty">${fmtN(r.qty)} шт</span>
+          <span class="ticker-card-qty">${fmtN(r.qty)} ${trx(UNIT_TXT.pcs)}</span>
         </div>
         ${isin?`<div class="ticker-card-name">${isin}</div>`:''}
         <div class="ticker-card-price">${nativeSym}${fmtN(r.marketValueNative)} · ${sym}${fmtN(toDisplayCurr(r.marketValue))}</div>
@@ -7777,8 +7827,8 @@ function _updateAllNow(){
     setText('secPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
   });
 
-  // Record daily snapshot for chart
-  recordDailySnapshot(total);
+  // Record daily snapshot for chart — с задержкой 1,5 с (последний итог побеждает)
+  scheduleDailySnapshot(total);
   renderChart();
 
   // Update metals display
@@ -8088,7 +8138,7 @@ function openStockDetail(secId, tickerKey){
   document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+escHtml(ticker)+'</span> '+escHtml(name);
   let html='<div class="stock-detail-grid">'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('value')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtMax2(totalQty)+' шт</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('qty')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtMax2(totalQty)+' '+trx(UNIT_TXT.pcs)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('qty')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtDisplayMoney2(curPrice)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('price')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtDisplayMoney2(avgBuy)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('avg')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
@@ -8134,7 +8184,7 @@ function sellStock(secId,tickerKey,refIdx){
   const items=sec.items.map((it,j)=>({...it,origIdx:j}));
   const group=items.filter(it=>(it.ticker||('__'+it.origIdx))===tickerKey);
   const ownedQty=group.reduce((s,t)=>s+stockNum(t.qty),0);
-  if(qty>ownedQty){alert(stockDetailTxt('cannotSellMore')+': '+fmtMax2(ownedQty)+' шт');return;}
+  if(qty>ownedQty){alert(stockDetailTxt('cannotSellMore')+': '+fmtMax2(ownedQty)+' '+trx(UNIT_TXT.pcs));return;}
   // Цена в форме — в гривнах (подпись «(₴)»), а кэш раздела может быть в USD/EUR.
   // Раньше гривневая сумма записывалась как доллары: капитал вырастал в ~41 раз
   // (аудит 03.10, п.3).
@@ -8142,7 +8192,7 @@ function sellStock(secId,tickerKey,refIdx){
   const saleTotalUah=roundMoney(qty*price);
   const saleCash=roundMoney(saleTotalUah/saleRate);
   const saleCashTxt=saleCurrency==='UAH'?'':' ≈ '+getStockCurrencySymbol(saleCurrency)+fmtMax2(saleCash);
-  customConfirm('Продати '+fmtMax2(qty)+' шт по ₴'+fmtMax2(price)+'?'+saleCashTxt, function(){
+  customConfirm(trx({uk:'Продати',ru:'Продать',en:'Sell',de:'Verkaufen',zh:'卖出'})+' '+fmtMax2(qty)+' '+trx(UNIT_TXT.pcs)+' '+trx({uk:'по',ru:'по',en:'at',de:'zu',zh:'单价'})+' ₴'+fmtMax2(price)+'?'+saleCashTxt, function(){
     const ref=sec.items[refIdx];
     sec.items.push({name:ref?.liveName||ref?.name||'',ticker:ref?.ticker||'',qty:-Math.abs(qty),price,buyPrice:price,tradeType:'sell',liveName:ref?.liveName,liveChange:ref?.liveChange,liveCurrency:ref?.liveCurrency,liveOrigPrice:ref?.liveOrigPrice,divYield:ref?.divYield,div:ref?.div,divAbs:ref?.divAbs||0});
     cleanZeroStocks(sec);
@@ -8151,7 +8201,7 @@ function sellStock(secId,tickerKey,refIdx){
     }
     closeStockDetail();renderSecuritiesCards();updateAll();saveData();
     if(saleCash>0){
-      alert('📈 '+stockDetailTxt('sold')+' '+fmtMax2(qty)+' шт за '+getStockCurrencySymbol(saleCurrency)+fmtMax2(saleCash)+'\n\n💵 '+stockDetailTxt('addedCash'));
+      alert('📈 '+stockDetailTxt('sold')+' '+fmtMax2(qty)+' '+trx(UNIT_TXT.pcs)+' '+trx({uk:'за',ru:'за',en:'for',de:'für',zh:'共'})+' '+getStockCurrencySymbol(saleCurrency)+fmtMax2(saleCash)+'\n\n💵 '+stockDetailTxt('addedCash'));
     }
   });
 }
@@ -10040,7 +10090,7 @@ function sellMetalFromForm(secId){
   const grams=roundMoney(parseInputNumber(gramsEl?.value));
   if(!grams||grams<=0)return;
   const held=roundMoney(getMetalHeldGrams(section,type));
-  if(grams>held){alert('Не можна продати більше ніж є: '+fmtMax2(held)+' г');return;}
+  if(grams>held){alert(trx({uk:'Не можна продати більше ніж є',ru:'Нельзя продать больше, чем есть',en:'Cannot sell more than owned',de:'Mehr verkaufen als vorhanden ist nicht möglich',zh:'卖出数量不能超过持有量'})+': '+fmtMax2(held)+' '+trx(UNIT_TXT.g));return;}
   let left=grams;
   for(let i=section.items.length-1;i>=0&&left>0;i--){
     const it=section.items[i];
@@ -10143,7 +10193,7 @@ function getMetalsCardHtml(s){
     return `<div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;">
       <div style="margin-bottom:3px;"><img src="section-icons/${m==='gold'?'Gold':m==='silver'?'Silver':'Platinum'}.png" style="width:28px;height:28px;object-fit:contain;"></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:${color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">${names[m]}</div>
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${byType[m].grams.toFixed(2)}г</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${byType[m].grams.toFixed(2)} ${trx(UNIT_TXT.g)}</div>
       <div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${color};margin-top:2px;">${sym}${fmtN(toDisplayCurr(byType[m].currentVal))}</div>
       ${mpnl!==0?`<div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:9px;color:${mpnlColor};">${mpnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(mpnl)))}</div>`:''}
     </div>`;
@@ -10161,12 +10211,12 @@ function getMetalsCardHtml(s){
     return `<div class="metal-item-row" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="metal-dot" style="background:${METAL_COLORS[it.type]};flex-shrink:0;"></div>
-        <div style="flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);">${names[it.type]} · ${fmtD(grams)}г</div>
+        <div style="flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);">${names[it.type]} · ${fmtD(grams)} ${trx(UNIT_TXT.g)}</div>
         <button class="rm-btn" onclick="removeMetalItem('${s.id}',${j})">×</button>
       </div>
       <div style="display:flex;justify-content:space-between;padding:0 16px;font-family:'DM Mono',monospace;font-size:10px;">
-        <span class="hide-amt" style="color:var(--muted2)">Куплено: ${sym}${fmtN(toDisplayCurr(buyVal))}</span>
-        <span class="hide-amt" style="color:var(--gold2)">Зараз: ${sym}${fmtN(toDisplayCurr(curVal))}</span>
+        <span class="hide-amt" style="color:var(--muted2)">${trx({uk:'Куплено',ru:'Куплено',en:'Bought',de:'Gekauft',zh:'买入'})}: ${sym}${fmtN(toDisplayCurr(buyVal))}</span>
+        <span class="hide-amt" style="color:var(--gold2)">${trx({uk:'Зараз',ru:'Сейчас',en:'Now',de:'Jetzt',zh:'现值'})}: ${sym}${fmtN(toDisplayCurr(curVal))}</span>
         <span class="hide-amt" style="color:${ipnlCol}">${ipnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(ipnl)))}</span>
       </div>
     </div>`;
@@ -10178,7 +10228,7 @@ function getMetalsCardHtml(s){
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${t('metalsBtn')||'Дорогоцінні метали'}</div>
         <div class="card-value">${sym}${fmtN(toDisplayCurr(totalCur))}</div>
-        <div class="card-pct" style="color:${pnlColor}">${pnlSign}${pnlPct.toFixed(1)}% · ${totalGrams.toFixed(1)}г</div>
+        <div class="card-pct" style="color:${pnlColor}">${pnlSign}${pnlPct.toFixed(1)}% · ${totalGrams.toFixed(1)} ${trx(UNIT_TXT.g)}</div>
       </div>
       ${getCardSparklineHtml('metals')}
       <div class="card-actions">
@@ -10192,7 +10242,7 @@ function getMetalsCardHtml(s){
       <div style="display:flex;gap:8px;margin-bottom:12px;">${metaSummary}</div>
       <div class="result-box" style="margin-bottom:12px;">
         <div class="result-row">
-          <span class="result-key">Куплено за</span>
+          <span class="result-key">${trx({uk:'Куплено за',ru:'Куплено за',en:'Bought for',de:'Gekauft für',zh:'买入成本'})}</span>
           <span class="result-val" style="color:var(--muted2)">${sym}${fmtN(toDisplayCurr(totalBuy))}</span>
         </div>
         <div class="result-row">
@@ -10205,9 +10255,9 @@ function getMetalsCardHtml(s){
         </div>
         <div class="result-row">
           <span class="result-key">${t('metalTotalGrams')}</span>
-          <span class="result-val">${totalGrams.toFixed(2)} г</span>
+          <span class="result-val">${totalGrams.toFixed(2)} ${trx(UNIT_TXT.g)}</span>
         </div>
-        <div class="metal-price-src">${escHtml(metalPriceSourceText())}${['gold','silver','platinum'].filter(m=>byType[m].grams&&getMetalPriceUah(m)).map(m=>` · ${names[m]} <span class="hide-amt">${sym}${fmtN(toDisplayCurr(getMetalPriceUah(m)))}</span>/г`).join('')}</div>
+        <div class="metal-price-src">${escHtml(metalPriceSourceText())}${['gold','silver','platinum'].filter(m=>byType[m].grams&&getMetalPriceUah(m)).map(m=>` · ${names[m]} <span class="hide-amt">${sym}${fmtN(toDisplayCurr(getMetalPriceUah(m)))}</span>/${trx(UNIT_TXT.g)}`).join('')}</div>
       </div>
       <div style="margin-bottom:12px;">${itemRows}</div>`:''}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
@@ -10239,8 +10289,8 @@ function getMetalsCardHtml(s){
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button class="add-btn" onclick="addMetalItem('${s.id}')">+ Додати</button>
-          <button class="add-btn" style="color:var(--red);border-color:#f8717130;" onclick="sellMetalFromForm('${s.id}')">− Продати</button>
+          <button class="add-btn" onclick="addMetalItem('${s.id}')">+ ${trx({uk:'Додати',ru:'Добавить',en:'Add',de:'Hinzufügen',zh:'添加'})}</button>
+          <button class="add-btn" style="color:var(--red);border-color:#f8717130;" onclick="sellMetalFromForm('${s.id}')">− ${trx({uk:'Продати',ru:'Продать',en:'Sell',de:'Verkaufen',zh:'卖出'})}</button>
         </div>
       </div>
       <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:12px" onclick="removeMetalsCard('${s.id}')">${t('removeSection')}</button>
@@ -10483,7 +10533,13 @@ function runCurrencyWithRates(){
 
   const uahPer={uah:1, usd:uahPerUsd, eur:uahPerEur, rub:uahPerRub, cny:uahPerCny};
   const syms={uah:'₴', usd:'$', eur:'€', rub:'₽', cny:'¥'};
-  const names={uah:'Гривня', usd:'Долар', eur:'Євро', rub:'Рубль', cny:'Юань'};
+  const names=trx({
+    uk:{uah:'Гривня',usd:'Долар',eur:'Євро',rub:'Рубль',cny:'Юань'},
+    ru:{uah:'Гривна',usd:'Доллар',eur:'Евро',rub:'Рубль',cny:'Юань'},
+    en:{uah:'Hryvnia',usd:'Dollar',eur:'Euro',rub:'Ruble',cny:'Yuan'},
+    de:{uah:'Hrywnja',usd:'Dollar',eur:'Euro',rub:'Rubel',cny:'Yuan'},
+    zh:{uah:'格里夫纳',usd:'美元',eur:'欧元',rub:'卢布',cny:'人民币'}
+  });
 
   // Convert: sum in "from" currency → UAH → each target currency
   const fromRate=uahPer[from]||1;
@@ -10669,10 +10725,10 @@ function confirmTopUp(){
   const depId=document.getElementById('topup_dep_id').value;
   const amount=parseInputNumber(document.getElementById('topup_amount_input').value);
   const date=document.getElementById('topup_date_input').value;
-  if(!amount||!date){alert('Вкажіть суму і дату');return;}
+  if(!amount||!date){alert(trx({uk:'Вкажіть суму і дату',ru:'Укажите сумму и дату',en:'Enter the amount and date',de:'Betrag und Datum angeben',zh:'请输入金额和日期'}));return;}
   // Block future dates
   const today=getLocalDateKey();
-  if(date>today){alert('Не можна вказати майбутню дату поповнення');return;}
+  if(date>today){alert(trx({uk:'Не можна вказати майбутню дату поповнення',ru:'Нельзя указать будущую дату пополнения',en:'The top-up date cannot be in the future',de:'Das Einzahlungsdatum darf nicht in der Zukunft liegen',zh:'充值日期不能晚于今天'}));return;}
   const idx=deposits.findIndex(d=>d.id===depId);
   if(idx<0)return;
   // Block dates before deposit start
@@ -11448,7 +11504,7 @@ function getSparklineSeries(key){
       })
       .filter(v=>Number.isFinite(v)&&v>=0);
   }
-  const current=getSectionPerformanceSnapshot().sections[key];
+  const current=(_sparkPerf||getSectionPerformanceSnapshot()).sections[key];
   if(current&&Number.isFinite(Number(current.value))){
     const cur=Number(current.value);
     if(!series.length||Math.abs(series[series.length-1]-cur)>0.0001)series.push(cur);
@@ -11479,10 +11535,25 @@ function getCardSparklineHtml(key){
   const color=flat?'var(--muted2)':(key==='debts'?delta<=0?'var(--green2)':'var(--red)':delta>=0?'var(--green2)':'var(--red)');
   return `<div class="card-sparkline${flat?' flat':''}" data-spark-key="${key}" style="color:${color}"><svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><g class="spark-grid">${ticks}</g><path d="${d}"></path></svg></div>`;
 }
+let _sparkPerf=null;
 function refreshCardSparklines(){
+  try{_sparkPerf=getSectionPerformanceSnapshot();}catch(e){_sparkPerf=null;}
+  try{refreshCardSparklinesNow();}finally{_sparkPerf=null;}
+}
+function refreshCardSparklinesNow(){
   const keys=['deposits','crypto','usd','forex','cash','account','stocks','bonds','ovdp','metals','startups','business','custom','debts'];
   keys.forEach(key=>{
-    document.querySelectorAll(`[data-spark-key="${key}"]`).forEach(el=>{el.outerHTML=getCardSparklineHtml(key);});
+    const els=document.querySelectorAll(`[data-spark-key="${key}"]`);
+    if(!els.length)return;
+    const html=getCardSparklineHtml(key);
+    els.forEach(el=>{
+      if(el.__sparkHtml===html)return;
+      const tpl=document.createElement('template');tpl.innerHTML=html;
+      const next=tpl.content.firstElementChild;
+      if(!next)return;
+      next.__sparkHtml=html;
+      el.replaceWith(next);
+    });
   });
 }
 function clonePerfSections(sections){
@@ -11646,6 +11717,18 @@ function getSectionDayDelta(current,key){
   return {change,pct:baseValue>0?(change/baseValue*100):0};
 }
 
+let _dailySnapTimer=null,_dailySnapTotal=0,_dailySnapFlushBound=false;
+function flushDailySnapshot(){
+  if(!_dailySnapTimer)return;
+  clearTimeout(_dailySnapTimer);_dailySnapTimer=null;
+  try{recordDailySnapshot(_dailySnapTotal);refreshCardSparklines();}catch(e){}
+}
+function scheduleDailySnapshot(total){
+  _dailySnapTotal=total;
+  if(!_dailySnapFlushBound){_dailySnapFlushBound=true;window.addEventListener('pagehide',flushDailySnapshot);}
+  if(_dailySnapTimer)return;
+  _dailySnapTimer=setTimeout(flushDailySnapshot,1500);
+}
 function recordDailySnapshot(total){
   if(!capitalHistoryLoaded)loadCapitalHistory();
   const today=getLocalDateKey();
@@ -11822,15 +11905,15 @@ function showOnboarding(){
     <div style="width:100%;max-width:480px;padding:0 16px;">
       <div style="text-align:center;margin-bottom:32px;">
         <div style="font-size:56px;margin-bottom:12px;">💰</div>
-        <div style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">Капітал</div>
-        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);line-height:1.6;">Відстежуйте всі свої активи<br>в одному місці</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">InveStory</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted2);line-height:1.6;">${trx({uk:'Відстежуйте всі свої активи<br>в одному місці',ru:'Отслеживайте все свои активы<br>в одном месте',en:'Track all your assets<br>in one place',de:'Behalten Sie alle Ihre Vermögenswerte<br>an einem Ort im Blick',zh:'在一个地方<br>追踪你的全部资产'})}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
         ${[
-          ['🏦','Депозити','Додайте банківський вклад з живим лічильником'],
-          ['📈','Акції','Відстежуйте портфель з онлайн цінами'],
-          ['💎','Метали','Золото, срібло, платина — все в одному місці'],
-          ['⚠️','Кредити','Контролюйте борги і часткові погашення'],
+          ['🏦',trx({uk:'Депозити',ru:'Депозиты',en:'Deposits',de:'Einlagen',zh:'存款'}),trx({uk:'Додайте банківський вклад з живим лічильником',ru:'Добавьте банковский вклад с живым счётчиком',en:'Add a bank deposit with a live counter',de:'Bankeinlage mit Live-Zähler hinzufügen',zh:'添加带实时计数器的银行存款'})],
+          ['📈',trx({uk:'Акції',ru:'Акции',en:'Stocks',de:'Aktien',zh:'股票'}),trx({uk:'Відстежуйте портфель з онлайн цінами',ru:'Отслеживайте портфель с онлайн-ценами',en:'Track your portfolio with live prices',de:'Portfolio mit Live-Kursen verfolgen',zh:'用实时价格追踪投资组合'})],
+          ['💎',trx({uk:'Метали',ru:'Металлы',en:'Metals',de:'Edelmetalle',zh:'贵金属'}),trx({uk:'Золото, срібло, платина — все в одному місці',ru:'Золото, серебро, платина — всё в одном месте',en:'Gold, silver, platinum — all in one place',de:'Gold, Silber, Platin — alles an einem Ort',zh:'黄金、白银、铂金——集中管理'})],
+          ['⚠️',trx({uk:'Кредити',ru:'Кредиты',en:'Loans',de:'Kredite',zh:'贷款'}),trx({uk:'Контролюйте борги і часткові погашення',ru:'Контролируйте долги и частичные погашения',en:'Keep track of debts and partial repayments',de:'Schulden und Teilrückzahlungen im Blick behalten',zh:'管理债务和部分还款'})],
         ].map(([i,n,d])=>`
           <div style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;">
             <div style="font-size:22px;flex-shrink:0;">${i}</div>
@@ -11839,10 +11922,10 @@ function showOnboarding(){
           </div>`).join('')}
       </div>
       <button onclick="finishOnboarding()" style="width:100%;background:linear-gradient(135deg,var(--gold),#c9a84c);border:none;border-radius:16px;padding:16px;font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;color:#0a0a0f;cursor:pointer;">
-        Почати →
+        ${trx({uk:'Почати',ru:'Начать',en:'Start',de:'Los geht’s',zh:'开始'})} →
       </button>
       <button onclick="finishOnboarding()" style="width:100%;background:transparent;border:none;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;">
-        Вже користуюсь
+        ${trx({uk:'Вже користуюсь',ru:'Уже пользуюсь',en:'I already use it',de:'Ich nutze es bereits',zh:'我已在使用'})}
       </button>
     </div>
   `;
@@ -12987,18 +13070,18 @@ async function sendAIMessage(){
     if(data.limit){aiLimitInfo=data.limit;_updateAILimitUI();}
     if(data.error){
       aiMessages.pop();
-      _addAIBubble('assistant','⚠️ '+data.error);
+      _addAIBubble('assistant','⚠️ '+translateServerError(data.error));
     }else if(data.content){
       aiMessages.push({role:'assistant',content:data.content});
       _addAIBubble('assistant',data.content);
     }else{
       aiMessages.pop();
-      _addAIBubble('assistant','⚠️ Порожня відповідь. Спробуй ще раз.');
+      _addAIBubble('assistant','⚠️ '+trx({uk:'Порожня відповідь. Спробуй ще раз.',ru:'Пустой ответ. Попробуй ещё раз.',en:'Empty response. Please try again.',de:'Leere Antwort. Versuche es erneut.',zh:'回复为空，请重试。'}));
     }
   }catch{
     if(typingEl)typingEl.remove();
     aiMessages.pop();
-    _addAIBubble('assistant','❌ Помилка з\'єднання з Claude.');
+    _addAIBubble('assistant','❌ '+trx({uk:'Помилка з’єднання з AI.',ru:'Ошибка соединения с AI.',en:'Connection error with AI.',de:'Verbindungsfehler zur KI.',zh:'与 AI 连接出错。'}));
   }finally{
     aiTyping=false;
     if(sendBtn)sendBtn.disabled=false;
@@ -13264,7 +13347,7 @@ function renderDiagnostics(){
       <button class="diag-history-btn" onclick="openCapitalHistory()">
         <div class="diag-stat-val">${diagIconHtml('history','')}</div>
         <div class="diag-stat-lbl">Історія графіка</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px;">${capitalHistory.length} записів</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px;">${capitalHistory.length} ${trx({uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'})}</div>
       </button>
       <div class="diag-stat">
         <div class="diag-stat-val" style="color:var(--green2)">+${sym}${fmtN(toDisplayCurr(stockDivMonth))}<span style="font-size:9px;color:var(--muted);font-weight:400;">${diagMonthUnit()}</span></div>
@@ -13274,7 +13357,7 @@ function renderDiagnostics(){
       <div class="diag-stat">
         <div class="diag-stat-val" style="color:var(--blue2)">+${sym}${fmtN(toDisplayCurr(dailyDepIncome))}</div>
         <div class="diag-stat-lbl">Дохід/день (деп. після податку)</div>
-        ${dailyDepIncomeGross!==dailyDepIncome?`<div style="font-size:8px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">до податку: +${sym}${fmtN(toDisplayCurr(dailyDepIncomeGross))}</div>`:''}
+        ${dailyDepIncomeGross!==dailyDepIncome?`<div style="font-size:8px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">${trx({uk:'до податку',ru:'до налога',en:'before tax',de:'vor Steuer',zh:'税前'})}: +${sym}${fmtN(toDisplayCurr(dailyDepIncomeGross))}</div>`:''}
       </div>
       <div class="diag-stat diag-passive-banner">
         <div class="diag-stat-val" style="color:var(--gold2);font-size:20px;">+${sym}${fmtN(toDisplayCurr(combinedMonth))}<span style="font-size:11px;color:var(--muted);font-weight:400;"> ${diagMonthWord()}</span></div>
@@ -13553,6 +13636,15 @@ function cryptoRefreshText(key){
   return dict[key]?.[currentLang]||dict[key]?.uk||key;
 }
 
+let cryptoStatusState=null;
+function renderCryptoStatus(){
+  const status=document.getElementById('cryptoRefreshStatus');
+  const st=cryptoStatusState;
+  if(!status||!st)return;
+  const part=st.got<st.total?' '+st.got+' '+cryptoRefreshText('of')+' '+st.total:'';
+  status.innerHTML='<span class="live-dot" style="width:5px;height:5px;"></span> '+(st.updated?cryptoRefreshText('updated')+part+' · '+new Date(st.at).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'}):cryptoRefreshText('failed'));
+  status.style.color=!st.updated?'var(--red)':(part?'var(--orange2)':'var(--green2)');
+}
 async function refreshCryptoPrices(forceFresh=false){
   const btn=$('cryptoRefreshBtn');
   const status=$('cryptoRefreshStatus');
@@ -13657,9 +13749,10 @@ async function refreshCryptoPrices(forceFresh=false){
       // Сколько монет получили цену — иначе ненайденная монета молча
       // оставалась со старой ценой под надписью «Оновлено».
       const got=names.filter(n=>fresh[n]).length;
-      const part=got<names.length?' '+got+' '+cryptoRefreshText('of')+' '+names.length:'';
-      status.innerHTML='<span class="live-dot" style="width:5px;height:5px;"></span> '+(updated?cryptoRefreshText('updated')+part+' · '+new Date().toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'}):cryptoRefreshText('failed'));
-      status.style.color=!updated?'var(--red)':(part?'var(--orange2)':'var(--green2)');
+      // Запоминаем состояние, а не готовый текст: после смены языка строка
+      // перерисовывается на новом (аудит п.24).
+      cryptoStatusState={updated:!!updated,got,total:names.length,at:Date.now()};
+      renderCryptoStatus();
     }
   }catch(e){
     console.error('refreshCrypto:',e);
@@ -13916,7 +14009,7 @@ getCustomCardHtml=function(s,idx){
           </div>
         </div>
         <div style="background:linear-gradient(135deg,#2dd4bf12,#5b9cf610);border:1px solid #2dd4bf35;border-radius:14px;padding:14px;margin-top:12px;">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--teal2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;"><img src="section-icons/section-cash.png" style="width:13px;height:13px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupExitCash')}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--teal2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;"><img src="section-icons/section-cash.png?v=1" style="width:13px;height:13px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupExitCash')}</div>
           <div style="display:flex;gap:8px;align-items:center;">
             <input class="field-input" type="text" id="startupExitCash_${s.id}" value="${s.startupExitCash||''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setStartupField(${idx},'startupExitCash',this.value)">
             <select class="field-input" id="startupExitCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setStartupExitCurrency(${idx},this.value)">
@@ -13931,8 +14024,8 @@ getCustomCardHtml=function(s,idx){
             oninput="customSections[${idx}].startupNote=this.value;saveData()">
         </div>
         <div class="result-box" style="margin-top:12px;">
-          <div class="result-row"><span class="result-key"><img src="section-icons/ui-dividend-income.png" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupInvested')}</span><span class="result-val">${nativeSym}${fmtN(st.investedNative)} · ${sym}${fmtN(toDisplayCurr(st.invested))}</span></div>
-          <div class="result-row"><span class="result-key"><img src="section-icons/ui-percent.png" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupCurrentShare')}</span><span class="result-val" style="color:var(--teal2)">${st.equity}% = ${nativeSym}${fmtN(st.activeValueNative)} · ${sym}${fmtN(toDisplayCurr(st.currentValue))}</span></div>
+          <div class="result-row"><span class="result-key"><img src="section-icons/ui-dividend-income.png?v=1" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupInvested')}</span><span class="result-val">${nativeSym}${fmtN(st.investedNative)} · ${sym}${fmtN(toDisplayCurr(st.invested))}</span></div>
+          <div class="result-row"><span class="result-key"><img src="section-icons/ui-percent.png?v=1" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupCurrentShare')}</span><span class="result-val" style="color:var(--teal2)">${st.equity}% = ${nativeSym}${fmtN(st.activeValueNative)} · ${sym}${fmtN(toDisplayCurr(st.currentValue))}</span></div>
           ${st.exitCashNative?`<div class="result-row"><span class="result-key">${uiText('startupExitCash')}</span><span class="result-val green">${exitSym}${fmtN(st.exitCashNative)} · ${sym}${fmtN(toDisplayCurr(st.exitCash))}</span></div>`:''}
           <div class="result-row"><span class="result-key">${uiText('startupTotalValue')}</span><span class="result-val blue">${sym}${fmtN(toDisplayCurr(st.total))}</span></div>
           <div class="result-row"><span class="result-key">P&L</span><span class="result-val" style="color:${pnlColor}">${st.pnl>=0?'+':'-'}${sym}${fmtN(toDisplayCurr(Math.abs(st.pnl)))} (${st.pnl>=0?'+':''}${st.pnlPct.toFixed(1)}%)</span></div>
@@ -14459,7 +14552,7 @@ async function fetchCoinPrice(){
       <div style="font-family:'DM Mono',monospace;">
         <div style="font-size:14px;font-weight:700;color:var(--purple2);">${name} · $${data.price.toLocaleString('en-US',{maximumFractionDigits:2})}</div>
         <div style="font-size:10px;color:${chCol};margin-top:2px;">24h: ${ch>=0?'+':''}${ch.toFixed(2)}%</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:4px;">Джерело: CoinGecko · ${new Date().toLocaleTimeString()}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;">${trx({uk:'Оновлено',ru:'Обновлено',en:'Updated',de:'Aktualisiert',zh:'更新于'})} · ${new Date().toLocaleTimeString(appLocale())}</div>
       </div>`;
   }
   }catch(e){console.error('fetchCoinPrice:',e);const p=$('cryptoLivePreview');if(p)p.innerHTML='<div style="font-family:DM Mono,monospace;font-size:10px;color:var(--red)">❌ Помилка завантаження</div>';}
@@ -14609,10 +14702,32 @@ updateAll=function(){
 setTimeout(bootstrapApp,0);
 setTimeout(()=>{try{recordSectionHourlySnapshot();refreshCardSparklines();fitStableMoneyAmounts();renderUsdtBalanceCard();}catch(e){}},450);
 
+// Плашка «Доступна нова версія». HTML отдаётся из кэша, поэтому новая версия
+// раньше открывалась только со второго запуска (аудит п.23). Теперь, когда
+// новый воркер встал, человеку предлагают обновиться сразу.
+function showAppUpdateBanner(){
+  if(document.getElementById('appUpdateBanner'))return;
+  const T={uk:['Доступна нова версія','Оновити'],ru:['Доступна новая версия','Обновить'],en:['New version available','Update'],de:['Neue Version verfügbar','Aktualisieren'],zh:['有新版本','更新']}[currentLang]||['New version available','Update'];
+  const el=document.createElement('div');
+  el.id='appUpdateBanner';
+  el.className='app-update-banner';
+  el.innerHTML='<span></span><button type="button"></button>';
+  el.querySelector('span').textContent=T[0];
+  const b=el.querySelector('button');b.textContent=T[1];
+  b.onclick=()=>{try{_saveDataNow();}catch(e){}location.reload();};
+  document.body.appendChild(el);
+}
 if('serviceWorker' in navigator){
   // updateViaCache:'none' — проверять новую версию воркера всегда по сети,
   // не доверяя 10-минутному кэшу GitHub Pages.
-  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{});
+  const hadSwController=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    // Приложение подолгу живёт открытым — проверяем обновление при возврате.
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{});});
+  }).catch(()=>{});
+  // Первая установка тоже меняет контроллер — плашку показываем только при
+  // смене уже работавшей версии.
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadSwController)showAppUpdateBanner();});
 }
 // Save data before app closes
 window.addEventListener('beforeunload',()=>{if(!window._kapitalImportInProgress)_saveDataNow();});
@@ -15033,15 +15148,20 @@ function renderMainCounter(){
   if(dots)dots.style.display='none';
   if(nav)nav.style.display='none';
   alt.style.display='';
-  alt.innerHTML=getPortfolioMainCounterHtml();
+  const html=getPortfolioMainCounterHtml();
+  if(alt.__mcHtml!==html){alt.innerHTML=html;alt.__mcHtml=html;}
 }
 
 if(typeof updateAll==='function'&&!window.__mainCounterUpdateWrapped){
   window.__mainCounterUpdateWrapped=true;
   const _updateAllBeforeMainCounter=updateAll;
+  let mainCounterPending=false;
   updateAll=function(...args){
     const res=_updateAllBeforeMainCounter.apply(this,args);
-    setTimeout(()=>{try{renderMainCounter();}catch(e){}},0);
+    if(!mainCounterPending){
+      mainCounterPending=true;
+      setTimeout(()=>{mainCounterPending=false;try{renderMainCounter();}catch(e){}},120);
+    }
     return res;
   };
 }
