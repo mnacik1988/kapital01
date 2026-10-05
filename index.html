@@ -655,6 +655,7 @@ body.amounts-hidden input[inputmode="decimal"]{-webkit-text-security:disc;}
 .pw2-plan.on .pw2-pn{color:var(--green2);}
 .pw2-trial{margin:14px 0 12px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);}
 .pw2-cta{width:100%;border:none;border-radius:16px;padding:16px;font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#0a0a0f;background:linear-gradient(135deg,var(--gold),#c9a84c);box-shadow:0 10px 30px #e8c97a33;cursor:pointer;}
+.pw2-sec{display:block;width:100%;margin-top:8px;background:none;border:none;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold2);cursor:pointer;padding:6px;}
 .pw2-fine{font-family:'DM Mono',monospace;font-size:9.5px;line-height:1.55;color:var(--muted);text-align:center;margin-top:12px;}
 .pw2-links{display:flex;justify-content:center;gap:16px;margin-top:10px;flex-wrap:wrap;}
 .pw2-links button{background:none;border:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);text-decoration:underline;text-decoration-color:#ffffff30;text-underline-offset:3px;cursor:pointer;padding:4px 0;}
@@ -3051,7 +3052,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.51';
+const APP_VERSION = 'v0.1.52';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3137,10 +3138,11 @@ let manualBanks = [];
 // Карты и «банки» подключённых банков, которые человек НЕ считает в общей
 // сумме: { "monobank:<id>": {include:false} }. В данных портфеля — значит, в бэкапе.
 let bankCardPrefs = {};
-function openPaywall(reason){
+function openPaywall(reason,mode){
   refreshAccessState();
   updatePaywallAccessText(reason);
   paywallReason=reason||'';
+  paywallMode=mode||(accessState===ACCESS_STATES.LOCKED?'locked':'upgrade');
   renderPaywall();
   const el=document.getElementById('paywallOverlay');
   if(!el)return;
@@ -12598,8 +12600,14 @@ function applyServerAccess(){
   updateAccessUI();
   const adminSec=document.getElementById('adminSection');
   if(adminSec)adminSec.style.display=readServerAccess()?.isAdmin?'':'none';
-  if(state===ACCESS_STATES.LOCKED)openPaywall(serverAccessReason());
-  else{updatePaywallAccessText();document.getElementById('paywallOverlay')?.classList.remove('open');}
+  scheduleTrialEndCheck();
+  if(state===ACCESS_STATES.LOCKED)openPaywall(serverAccessReason(),'locked');
+  else{
+    updatePaywallAccessText();
+    // Экран первого захода не закрываем — его закрывает человек.
+    if(paywallMode!=='intro')document.getElementById('paywallOverlay')?.classList.remove('open');
+    maybeShowPaywallIntro();
+  }
 }
 setInterval(()=>{syncServerAccess();},6*3600*1000);
 document.addEventListener('visibilitychange',()=>{
@@ -12891,8 +12899,29 @@ async function adminLoadSettings(){
       '<div class="admin-hint">Один запрос стоит около $0,007. 100 запросов ≈ $0,70 в сутки.</div></div>'+
       '<div id="adminMsg" class="admin-msg"></div>'+
       '<button class="admin-btn" style="width:100%" onclick="adminSaveSettings()">Сохранить</button>'+
+      '<div class="admin-label" style="margin-top:16px">Как это видят люди</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+        '<button class="admin-btn ghost" onclick="adminPreviewPaywall(\'intro\')">Первый заход</button>'+
+        '<button class="admin-btn ghost" onclick="adminPreviewPaywall(\'locked\')">Триал закончился</button></div>'+
       '<div class="admin-hint" style="margin-top:8px">Изменения доходят до сервера за полминуты, у людей — при следующем открытии приложения. Личные настройки пользователя важнее общих.</div>');
   }catch(e){if(adminTokenValid())adminBody('<div class="admin-msg err">'+escHtml(e.message)+'</div>');}
+}
+// Предпросмотр экрана подписки: на время показа подменяем решение сервера
+// в памяти, ничего не сохраняя.
+function adminPreviewPaywall(mode){
+  const real=readServerAccess;
+  const fake=Object.assign({},real()||{},mode==='locked'?{state:'locked',days:adminState.cfg?.trialDays||14}:{state:'trial',days:adminState.cfg?.trialDays||14,endsAt:Date.now()+86400000*(adminState.cfg?.trialDays||14)});
+  readServerAccess=()=>fake;
+  document.getElementById('adminOverlay')?.classList.remove('open');
+  try{
+    if(mode==='locked')openPaywall(serverAccessReason(),'locked');else openPaywall('','intro');
+    // В превью крестик есть всегда.
+    const box=document.getElementById('pwBox');
+    if(box){
+      box.querySelector('.pw2-close')?.remove();
+      box.insertAdjacentHTML('afterbegin','<button class="pw2-close" type="button" onclick="document.getElementById(\'paywallOverlay\').classList.remove(\'open\')" aria-label="Close">✕</button>');
+    }
+  }finally{readServerAccess=real;refreshAccessState();}
 }
 async function adminSaveSettings(){
   const n=id=>parseInt(document.getElementById(id).value,10);
@@ -13417,7 +13446,25 @@ function updateAccessUI(){
 // и цены НБУ есть только в Украине — французу они ни о чём не говорят.
 // Цены — из Google Play через мост InveStoryBilling, когда он появится; до
 // этого показываем базовые долларовые.
-let paywallPlan='yearly',paywallReason='';
+let paywallPlan='yearly',paywallReason='',paywallMode='upgrade';
+// Экран показывается сам: (1) один раз при первом заходе, если включён пробный
+// период — «14 днів безкоштовно, потім підписка»; (2) когда пробный период
+// закончился — и тогда без крестика (решение Александра 05.10.2026).
+function paywallIntroKey(){return 'investory_paywall_intro_'+(getGoogleSub()||'anon');}
+function maybeShowPaywallIntro(){
+  if(refreshAccessState()!==ACCESS_STATES.TRIAL)return;
+  try{if(localStorage.getItem(paywallIntroKey()))return;localStorage.setItem(paywallIntroKey(),'1');}catch(e){return;}
+  setTimeout(()=>openPaywall('','intro'),600);
+}
+let trialEndTimer=null;
+function scheduleTrialEndCheck(){
+  clearTimeout(trialEndTimer);
+  const srv=readServerAccess();
+  if(!srv||srv.state!=='trial'||!srv.endsAt)return;
+  const ms=Number(srv.endsAt)-Date.now()+1000;
+  // Триал кончается, пока приложение открыто, — экран подписки сразу.
+  if(ms>0&&ms<2147483647)trialEndTimer=setTimeout(()=>{refreshAccessState();updateAccessUI();if(accessState===ACCESS_STATES.LOCKED)openPaywall(serverAccessReason(),'locked');},ms);
+}
 function isUkraineUser(){
   try{
     const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';
@@ -13472,13 +13519,20 @@ function pwTxt(key){
     restore:{uk:'Відновити покупку',ru:'Восстановить покупку',en:'Restore purchase',de:'Kauf wiederherstellen',zh:'恢复购买'},
     terms:{uk:'Умови',ru:'Условия',en:'Terms',de:'Bedingungen',zh:'条款'},
     privacy:{uk:'Конфіденційність',ru:'Конфиденциальность',en:'Privacy',de:'Datenschutz',zh:'隐私'},
-    banned:{uk:'Доступ обмежено',ru:'Доступ ограничен',en:'Access restricted',de:'Zugriff eingeschränkt',zh:'访问受限'}
+    banned:{uk:'Доступ обмежено',ru:'Доступ ограничен',en:'Access restricted',de:'Zugriff eingeschränkt',zh:'访问受限'},
+    startFree:{uk:'Почати безкоштовно',ru:'Начать бесплатно',en:'Start for free',de:'Kostenlos starten',zh:'免费开始'},
+    subNow:{uk:'або оформити підписку зараз',ru:'или оформить подписку сейчас',en:'or subscribe now',de:'oder jetzt abonnieren',zh:'或立即订阅'},
+    fineIntro:{uk:'Без оплати й без картки. Коли пробний період закінчиться,<br>оберіть тариф, щоб продовжити.',ru:'Без оплаты и без карты. Когда пробный период закончится,<br>выберите тариф, чтобы продолжить.',en:'No payment, no card. When the trial ends,<br>choose a plan to continue.',de:'Ohne Zahlung, ohne Karte. Nach dem Testzeitraum<br>wählen Sie einen Tarif.',zh:'无需付款，无需绑卡。试用结束后，<br>选择套餐即可继续使用。'}
   };
   return trx(T[key]);
 }
 function selectPaywallPlan(plan){paywallPlan=plan==='monthly'?'monthly':'yearly';renderPaywall();}
 function paywallCta(){
-  if(!readServerAccess()&&!localStorage.getItem('trial_start'))return handlePaywallPrimary();
+  // Первый заход: пробный период уже идёт на сервере — просто пускаем в приложение.
+  if(paywallMode==='intro'&&refreshAccessState()!==ACCESS_STATES.LOCKED){
+    document.getElementById('paywallOverlay')?.classList.remove('open');
+    return;
+  }
   requestSubscription(paywallPlan);
 }
 function renderPaywall(){
@@ -13487,7 +13541,7 @@ function renderPaywall(){
   const srv=readServerAccess();
   const banned=!!(srv&&srv.state==='banned');
   const locked=refreshAccessState()===ACCESS_STATES.LOCKED;
-  const canTrial=!srv&&!localStorage.getItem('trial_start');
+  const intro=paywallMode==='intro'&&!locked;
   const ua=isUkraineUser();
   const pr=getPaywallPrices();
   const n=getPaywallTrialDays();
@@ -13500,7 +13554,7 @@ function renderPaywall(){
     ?'<div class="pw2-title">⛔ '+escHtml(pwTxt('banned'))+'</div>'
     :'<img class="pw2-appicon" src="icons/icon-384.png" alt=""><div class="pw2-title">InveStory <b>Premium</b></div>';
   const reason=locked&&paywallReason?'<div class="pw2-reason">'+escHtml(paywallReason)+'</div>':'';
-  box.innerHTML='<button class="pw2-close" type="button" onclick="handlePaywallClose()" aria-label="Close">✕</button>'+
+  box.innerHTML=(locked&&!banned?'':'<button class="pw2-close" type="button" onclick="handlePaywallClose()" aria-label="Close">✕</button>')+
     '<div class="pw2-head">'+head+'<div class="pw2-sub">'+pwTxt('sub')+'</div>'+reason+'</div>'+
     (banned?'':
     '<div class="pw2-feats">'+feats+'</div>'+
@@ -13508,9 +13562,10 @@ function renderPaywall(){
       '<button type="button" class="pw2-plan'+(paywallPlan==='monthly'?' on':'')+'" onclick="selectPaywallPlan(\'monthly\')"><div class="pw2-pl">'+pwTxt('month')+'</div><div class="pw2-pp">'+escHtml(pr.monthly)+'</div><div class="pw2-pn">'+pwTxt('perMonth')+'</div></button>'+
       '<button type="button" class="pw2-plan'+(paywallPlan==='yearly'?' on':'')+'" onclick="selectPaywallPlan(\'yearly\')"><span class="pw2-tag">−'+pr.save+'%</span><div class="pw2-pl">'+pwTxt('year')+'</div><div class="pw2-pp">'+escHtml(pr.yearly)+'</div><div class="pw2-pn">'+(pr.yearlyPerMonth?escHtml(pr.yearlyPerMonth)+' '+pwTxt('perMo'):'&nbsp;')+'</div></button>'+
     '</div>'+
-    (canTrial?'<div class="pw2-trial">✓ '+pwTxt('trial').replace('{n}',n)+'</div>':'<div style="height:14px"></div>')+
-    '<button class="pw2-cta" type="button" onclick="paywallCta()">'+pwTxt(canTrial?'tryBtn':'subBtn')+'</button>'+
-    '<div class="pw2-fine">'+(canTrial?pwTxt('fineTrial'):pwTxt('fine')).replace('{p}',escHtml(planPrice))+'</div>')+
+    (intro?'<div class="pw2-trial">✓ '+pwTxt('trial').replace('{n}',n)+'</div>':'<div style="height:14px"></div>')+
+    '<button class="pw2-cta" type="button" onclick="paywallCta()">'+pwTxt(intro?'startFree':'subBtn')+'</button>'+
+    (intro?'<button class="pw2-sec" type="button" onclick="requestSubscription(paywallPlan)">'+pwTxt('subNow')+'</button>':'')+
+    '<div class="pw2-fine">'+(intro?pwTxt('fineIntro'):pwTxt('fine').replace('{p}',escHtml(planPrice)))+'</div>')+
     '<div class="pw2-links"><button type="button" onclick="handlePaywallRestore()">'+pwTxt('restore')+'</button>'+
       '<button type="button" onclick="openLegalPolicy()">'+pwTxt('terms')+'</button>'+
       '<button type="button" onclick="openPrivacyPolicy()">'+pwTxt('privacy')+'</button></div>';
@@ -13537,7 +13592,7 @@ function checkTrial(){
   updateAccessUI();
   if(state!==ACCESS_STATES.LOCKED)return;
   // Решение сервера уже есть — предложение «начать триал» не нужно.
-  if(readServerAccess()){setTimeout(()=>openPaywall(serverAccessReason()),500);return;}
+  if(readServerAccess()){setTimeout(()=>openPaywall(serverAccessReason(),'locked'),500);return;}
   // Вошёл, но сервер ещё не ответил (первый запуск) — ждём /me: решение
   // примет applyServerAccess. Иначе экран подписки мелькал у тех, кому
   // сервер тут же откроет всё бесплатно.
