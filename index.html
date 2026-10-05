@@ -629,6 +629,36 @@ body.amounts-hidden input[inputmode="decimal"]{-webkit-text-security:disc;}
 @supports not (-webkit-text-security:disc){body.amounts-hidden input[inputmode="decimal"]{filter:blur(7px);}}
 .app-update-banner{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:500;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:var(--bg2);border:1px solid var(--purple);box-shadow:0 8px 30px #0006;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);max-width:520px;margin:0 auto;}
 .app-update-banner button{flex-shrink:0;padding:8px 14px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+/* Экран подписки v2 */
+.paywall-box.pw2{max-height:94vh;max-height:94dvh;overflow-y:auto;padding:22px 20px calc(26px + env(safe-area-inset-bottom));background:var(--app-bg-gradient);background-color:var(--bg2);}
+.pw2-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#ffffff10;border:1px solid var(--border2);color:var(--muted2);font-size:14px;cursor:pointer;}
+.pw2-head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:6px;}
+.pw2-appicon{width:60px;height:60px;border-radius:17px;box-shadow:0 10px 30px #e8c97a26,0 0 0 1px #ffffff14;}
+.pw2-title{margin-top:12px;font-size:23px;font-weight:800;color:var(--text);}
+.pw2-title b{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.pw2-sub{margin-top:6px;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--muted2);line-height:1.55;}
+.pw2-reason{margin-top:10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--orange2);line-height:1.5;}
+.pw2-feats{margin-top:18px;background:#ffffff06;border:1px solid var(--border);border-radius:18px;padding:4px 14px;}
+.pw2-feat{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);text-align:left;}
+.pw2-feat:last-child{border-bottom:none;}
+.pw2-feat img{width:28px;height:28px;object-fit:contain;flex-shrink:0;}
+.pw2-ft{font-size:13.5px;font-weight:700;color:var(--text);}
+.pw2-fs{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-top:2px;}
+.pw2-plans{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+.pw2-plan{position:relative;border-radius:16px;padding:16px 10px 13px;background:var(--bg2);border:1px solid var(--border2);text-align:center;cursor:pointer;font-family:inherit;color:var(--text);}
+.pw2-plan.on{border:1.5px solid var(--gold);background:linear-gradient(180deg,#e8c97a14,var(--bg2));}
+.pw2-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:9px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--gold);color:#0a0a0f;}
+.pw2-pl{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:.12em;text-transform:uppercase;}
+.pw2-pp{font-size:25px;font-weight:800;margin-top:6px;}
+.pw2-plan.on .pw2-pp{color:var(--gold2);}
+.pw2-pn{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-top:4px;}
+.pw2-plan.on .pw2-pn{color:var(--green2);}
+.pw2-trial{margin:14px 0 12px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--green2);}
+.pw2-cta{width:100%;border:none;border-radius:16px;padding:16px;font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#0a0a0f;background:linear-gradient(135deg,var(--gold),#c9a84c);box-shadow:0 10px 30px #e8c97a33;cursor:pointer;}
+.pw2-fine{font-family:'DM Mono',monospace;font-size:9.5px;line-height:1.55;color:var(--muted);text-align:center;margin-top:12px;}
+.pw2-links{display:flex;justify-content:center;gap:16px;margin-top:10px;flex-wrap:wrap;}
+.pw2-links button{background:none;border:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);text-decoration:underline;text-decoration-color:#ffffff30;text-underline-offset:3px;cursor:pointer;padding:4px 0;}
+.bank-ua-link{display:block;margin:8px auto 0;background:none;border:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
 .metal-price-src{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;}
 .bank-add-row{display:flex;gap:8px;margin:0 0 12px;}
 .bank-add-row .add-btn{flex:1;margin:0;}
@@ -2536,7 +2566,8 @@ body.modern-mockup.theme-light .total-currency{
 
 <!-- PAYWALL -->
 <div class="paywall-overlay" id="paywallOverlay" onclick="closePaywallIfOutside(event)">
-  <div class="paywall-box">
+  <div class="paywall-box pw2" id="pwBox"></div>
+  <div class="paywall-box" id="pwLegacy" style="display:none">
     <div class="paywall-crown">👑</div>
     <div class="paywall-title" id="pw_title">30 днів безкоштовно</div>
     <div class="paywall-sub" id="pw_sub">Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.</div>
@@ -2557,14 +2588,14 @@ body.modern-mockup.theme-light .total-currency{
     <div class="price-cards">
       <div class="price-card">
         <div class="price-period">Місяць</div>
-        <div class="price-value">$2.99</div>
+        <div class="price-value">$4.99</div>
         <div class="price-sub">на місяць</div>
       </div>
       <div class="price-card featured">
         <div class="price-badge">ВИГІДНО</div>
         <div class="price-period">Рік</div>
-        <div class="price-value">$24.99</div>
-        <div class="price-sub">на рік · економія 30%</div>
+        <div class="price-value">$47.99</div>
+        <div class="price-sub">на рік · економія 20%</div>
       </div>
     </div>
     <div class="price-note">Після 30 днів можна обрати зручний тариф</div>
@@ -3053,14 +3084,14 @@ body.modern-mockup.theme-light .total-currency{
     <div class="price-cards">
       <div class="price-card">
         <div class="price-period">Місяць</div>
-        <div class="price-value">$2.99</div>
+        <div class="price-value">$4.99</div>
         <div class="price-sub">на місяць</div>
       </div>
       <div class="price-card featured">
         <div class="price-badge">ВИГІДНО</div>
         <div class="price-period">Рік</div>
-        <div class="price-value">$24.99</div>
-        <div class="price-sub">на рік · економія 30%</div>
+        <div class="price-value">$47.99</div>
+        <div class="price-sub">на рік · економія 20%</div>
       </div>
     </div>
     <div class="price-note">Після 30 днів можна обрати зручний тариф</div>
@@ -3088,7 +3119,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.49';
+const APP_VERSION = 'v0.1.50';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3177,6 +3208,8 @@ let bankCardPrefs = {};
 function openPaywall(reason){
   refreshAccessState();
   updatePaywallAccessText(reason);
+  paywallReason=reason||'';
+  renderPaywall();
   const el=document.getElementById('paywallOverlay');
   if(!el)return;
   el.style.cssText='';
@@ -3397,7 +3430,7 @@ const EXTRA_I18N={
       'Історія графіка':{uk:'Історія графіка',ru:'История графика',en:'Chart history',de:'Diagrammverlauf',zh:'图表历史'},
   'записів':{uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'},
 'на місяць':{uk:'на місяць',ru:'в месяц',en:'per month',de:'pro Monat',zh:'每月'},
-  'на рік · економія 30%':{uk:'на рік · економія 30%',ru:'в год · экономия 30%',en:'per year · save 30%',de:'pro Jahr · 30% sparen',zh:'每年 · 节省 30%'},
+  'на рік · економія 20%':{uk:'на рік · економія 20%',ru:'в год · экономия 30%',en:'per year · save 30%',de:'pro Jahr · 30% sparen',zh:'每年 · 节省 30%'},
   'Після 30 днів можна обрати зручний тариф':{uk:'Після 30 днів можна обрати зручний тариф',ru:'После 30 дней можно выбрать удобный тариф',en:'After 30 days, choose the plan that suits you',de:'Nach 30 Tagen wählen Sie den passenden Tarif',zh:'30 天后可选择适合您的方案'},
 'Капітал':{uk:'InveStory',ru:'InveStory',en:'InveStory',de:'InveStory',zh:'InveStory'},
   '📉 ДИНАМІКА КАПІТАЛУ':{uk:'📉 ДИНАМІКА КАПІТАЛУ',ru:'📉 ДИНАМИКА КАПИТАЛА',en:'📉 CAPITAL DYNAMICS',de:'📉 KAPITALENTWICKLUNG',zh:'📉 资本动态'},
@@ -3819,6 +3852,7 @@ function applyTranslations(){
   try{renderCoins();}catch(e){}
   try{renderBanks();}catch(e){}
   try{renderCryptoStatus();}catch(e){}
+  try{renderPaywall();}catch(e){}
   try{applyHideAmounts();}catch(e){}
   try{setText('adminSectionLabel',({uk:'Адміністратор',ru:'Администратор',en:'Administrator',de:'Administrator',zh:'管理员'})[currentLang]||'Адміністратор');}catch(e){}
   translateDynamicUI();
@@ -7164,6 +7198,7 @@ const bankUi={formOpen:false,formBank:'',busy:{},errors:{}};
 const ISO_CURRENCY={980:'UAH',840:'USD',978:'EUR',985:'PLN',826:'GBP',156:'CNY',756:'CHF',203:'CZK',643:'RUB'};
 function bankTxt(k){
   const d={
+    connectUa:{uk:'Підключити monobank (Україна)',ru:'Подключить monobank (Украина)',en:'Connect monobank (Ukraine)',de:'monobank verbinden (Ukraine)',zh:'连接 monobank（乌克兰）'},
     creditDup:{uk:'Борг за кредитною карткою вже віднято тут. Якщо цей кредит записано ще й у «Зобов’язаннях», він врахується двічі.',
                ru:'Долг по кредитной карте уже вычтен здесь. Если этот кредит записан ещё и в «Обязательствах», он учтётся дважды.',
                en:'The credit card debt is already subtracted here. If this credit is also listed under “Liabilities”, it will be counted twice.',
@@ -7648,8 +7683,10 @@ function renderBanks(){
       '<div class="ex-actions"><button class="ex-btn" id="bankSaveBtn" onclick="connectBank()">'+bankTxt('save')+'</button>'+
       '<button class="ex-btn" onclick="toggleBankForm(false)">'+bankTxt('cancel')+'</button></div></div>';
   }else{
-    html+='<div class="bank-add-row">'+(free.length?'<button class="add-btn" onclick="toggleBankForm(true)">'+bankTxt('connect')+'</button>':'')+
-      '<button class="add-btn" onclick="openManualBankSheet(null)">'+bankTxt('addManual')+'</button></div>';
+    const uaUser=isUkraineUser()||Object.keys(creds).length>0;
+    html+='<div class="bank-add-row">'+(free.length&&uaUser?'<button class="add-btn" onclick="toggleBankForm(true)">'+bankTxt('connect')+'</button>':'')+
+      '<button class="add-btn" onclick="openManualBankSheet(null)">'+bankTxt('addManual')+'</button></div>'+
+      (free.length&&!uaUser?'<button class="bank-ua-link" type="button" onclick="toggleBankForm(true)">'+bankTxt('connectUa')+'</button>':'');
   }
   el.innerHTML=html;
   unlockCardBody(el.closest('.card-body'));
@@ -12621,7 +12658,8 @@ async function syncServerAccess(){
     const d=await r.json();
     if(gen!==authGeneration||!d||!d.access)return;
     localStorage.setItem(SERVER_ACCESS_KEY,JSON.stringify({sub:getGoogleSub(),state:d.access.state,
-      endsAt:d.access.endsAt||null,until:d.access.until||null,days:d.access.days??null,isAdmin:!!d.isAdmin,at:Date.now()}));
+      endsAt:d.access.endsAt||null,until:d.access.until||null,days:d.access.days??null,isAdmin:!!d.isAdmin,
+      country:/^[A-Z]{2}$/.test(String(d.country||''))?d.country:'',trialDays:Number.isInteger(d.trialDays)?d.trialDays:null,at:Date.now()}));
     if(d.ai&&typeof d.ai.left==='number'){aiLimitInfo={limit:d.ai.limit,used:d.ai.used,left:d.ai.left};try{_updateAILimitUI();}catch(e){}}
     applyServerAccess();
   }catch(e){}
@@ -13444,6 +13482,112 @@ function updateAccessUI(){
     devStatus.style.color=state===ACCESS_STATES.LOCKED?'var(--red)':'var(--green2)';
   }
 }
+
+// ── Экран подписки (вариант 1, выбран Александром 05.10.2026) ────────────
+// Модель: сейчас всё бесплатно; потом пробный период (длина — из админки) и
+// дальше всё по подписке. Возможности на экране зависят от страны: monobank
+// и цены НБУ есть только в Украине — французу они ни о чём не говорят.
+// Цены — из Google Play через мост InveStoryBilling, когда он появится; до
+// этого показываем базовые долларовые.
+let paywallPlan='yearly',paywallReason='';
+function isUkraineUser(){
+  try{
+    const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';
+    if(/^Europe\/(Kyiv|Kiev|Uzhgorod|Zaporozhye)$/.test(tz))return true;
+  }catch(e){}
+  const langs=(navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||'']).join(',');
+  if(/-UA\b/i.test(langs))return true;
+  const srv=readServerAccess();
+  return !!(srv&&srv.country==='UA');
+}
+function getPaywallPrices(){
+  try{
+    const p=window.InveStoryBilling?.getPrices?.();
+    const d=typeof p==='string'?JSON.parse(p):p;
+    if(d&&d.monthly&&d.yearly)return {monthly:String(d.monthly),yearly:String(d.yearly),yearlyPerMonth:String(d.yearlyPerMonth||''),save:Number(d.savePct)||20};
+  }catch(e){}
+  return {monthly:'$4.99',yearly:'$47.99',yearlyPerMonth:'$4.00',save:20};
+}
+function getPaywallTrialDays(){
+  const srv=readServerAccess();
+  if(srv&&srv.state==='trial'&&Number(srv.days)>0)return Number(srv.days);
+  if(srv&&Number.isInteger(srv.trialDays)&&srv.trialDays>0)return srv.trialDays;
+  return 14;
+}
+function pwTxt(key){
+  const T={
+    sub:{uk:'Весь капітал — в одному місці,<br>оновлюється сам',ru:'Весь капитал — в одном месте,<br>обновляется сам',en:'All your wealth in one place,<br>updated automatically',de:'Ihr ganzes Vermögen an einem Ort,<br>automatisch aktuell',zh:'全部资产集中一处，<br>自动更新'},
+    aiT:{uk:'AI-помічник по портфелю',ru:'AI-помощник по портфелю',en:'AI portfolio assistant',de:'KI-Portfolioassistent',zh:'AI 投资组合助手'},
+    aiS:{uk:'Аналіз, розрахунки, відповіді на питання',ru:'Анализ, расчёты, ответы на вопросы',en:'Analysis, calculations, answers',de:'Analysen, Berechnungen, Antworten',zh:'分析、计算、解答'},
+    exT:{uk:'Біржі підключаються самі',ru:'Биржи подключаются сами',en:'Crypto exchanges sync',de:'Krypto-Börsen synchronisieren',zh:'交易所自动同步'},
+    exS:{uk:'Binance, Bybit — тільки на читання',ru:'Binance, Bybit — только чтение',en:'Binance, Bybit — read-only keys',de:'Binance, Bybit — nur Lesezugriff',zh:'Binance、Bybit——只读密钥'},
+    monoT:{uk:'Картки monobank',ru:'Карты monobank',en:'monobank cards',de:'monobank-Karten',zh:'monobank 银行卡'},
+    monoS:{uk:'Баланси й «банки» без ручного вводу',ru:'Балансы и «банки» без ручного ввода',en:'Balances and jars without manual input',de:'Salden und Sparbüchsen ohne Eingabe',zh:'余额和存钱罐无需手动输入'},
+    accT:{uk:'Усі рахунки в одній сумі',ru:'Все счета в одной сумме',en:'Every account in one total',de:'Alle Konten in einer Summe',zh:'所有账户一目了然'},
+    accS:{uk:'Картки, готівка, депозити, кредити, валюти',ru:'Карты, наличные, депозиты, кредиты, валюты',en:'Cards, cash, deposits, loans, currencies',de:'Karten, Bargeld, Einlagen, Kredite, Währungen',zh:'银行卡、现金、存款、贷款、外币'},
+    priceT:{uk:'Живі ціни',ru:'Живые цены',en:'Live prices',de:'Live-Kurse',zh:'实时价格'},
+    priceUa:{uk:'Акції, крипта, метали за курсом НБУ',ru:'Акции, крипта, металлы по курсу НБУ',en:'Stocks, crypto, metals at NBU rates',de:'Aktien, Krypto, Metalle zum NBU-Kurs',zh:'股票、加密货币、按乌克兰央行价格计的金属'},
+    priceIntl:{uk:'Акції, крипта, золото й срібло',ru:'Акции, крипта, золото и серебро',en:'Stocks, crypto, gold and silver',de:'Aktien, Krypto, Gold und Silber',zh:'股票、加密货币、黄金和白银'},
+    chT:{uk:'Динаміка й діагностика',ru:'Динамика и диагностика',en:'Charts & diagnostics',de:'Charts & Diagnose',zh:'走势与诊断'},
+    chS:{uk:'Графіки, звіти, прибуток по кожному розділу',ru:'Графики, отчёты, прибыль по каждому разделу',en:'Growth, reports, profit per asset class',de:'Verlauf, Berichte, Gewinn je Anlageklasse',zh:'图表、报告、各类资产收益'},
+    month:{uk:'Місяць',ru:'Месяц',en:'Monthly',de:'Monatlich',zh:'月付'},
+    year:{uk:'Рік',ru:'Год',en:'Yearly',de:'Jährlich',zh:'年付'},
+    perMonth:{uk:'щомісяця',ru:'ежемесячно',en:'per month',de:'pro Monat',zh:'每月'},
+    perMo:{uk:'/ міс',ru:'/ мес',en:'/ month',de:'/ Monat',zh:'/ 月'},
+    trial:{uk:'Перші {n} днів — безкоштовно',ru:'Первые {n} дней — бесплатно',en:'First {n} days free',de:'Die ersten {n} Tage kostenlos',zh:'前 {n} 天免费'},
+    tryBtn:{uk:'Спробувати безкоштовно',ru:'Попробовать бесплатно',en:'Start free trial',de:'Kostenlos testen',zh:'免费试用'},
+    subBtn:{uk:'Оформити підписку',ru:'Оформить подписку',en:'Subscribe',de:'Abonnieren',zh:'订阅'},
+    fineTrial:{uk:'Потім {p}. Підписка продовжується автоматично,<br>скасувати можна будь-коли в Google Play.',ru:'Затем {p}. Подписка продлевается автоматически,<br>отменить можно в любой момент в Google Play.',en:'Then {p}. Renews automatically,<br>cancel anytime in Google Play.',de:'Danach {p}. Verlängert sich automatisch,<br>jederzeit in Google Play kündbar.',zh:'之后 {p}。自动续订，<br>可随时在 Google Play 取消。'},
+    fine:{uk:'{p}. Підписка продовжується автоматично,<br>скасувати можна будь-коли в Google Play.',ru:'{p}. Подписка продлевается автоматически,<br>отменить можно в любой момент в Google Play.',en:'{p}. Renews automatically,<br>cancel anytime in Google Play.',de:'{p}. Verlängert sich automatisch,<br>jederzeit in Google Play kündbar.',zh:'{p}。自动续订，<br>可随时在 Google Play 取消。'},
+    perYearP:{uk:'{v} на рік',ru:'{v} в год',en:'{v} per year',de:'{v} pro Jahr',zh:'每年 {v}'},
+    perMonthP:{uk:'{v} на місяць',ru:'{v} в месяц',en:'{v} per month',de:'{v} pro Monat',zh:'每月 {v}'},
+    restore:{uk:'Відновити покупку',ru:'Восстановить покупку',en:'Restore purchase',de:'Kauf wiederherstellen',zh:'恢复购买'},
+    terms:{uk:'Умови',ru:'Условия',en:'Terms',de:'Bedingungen',zh:'条款'},
+    privacy:{uk:'Конфіденційність',ru:'Конфиденциальность',en:'Privacy',de:'Datenschutz',zh:'隐私'},
+    banned:{uk:'Доступ обмежено',ru:'Доступ ограничен',en:'Access restricted',de:'Zugriff eingeschränkt',zh:'访问受限'}
+  };
+  return trx(T[key]);
+}
+function selectPaywallPlan(plan){paywallPlan=plan==='monthly'?'monthly':'yearly';renderPaywall();}
+function paywallCta(){
+  if(!readServerAccess()&&!localStorage.getItem('trial_start'))return handlePaywallPrimary();
+  requestSubscription(paywallPlan);
+}
+function renderPaywall(){
+  const box=document.getElementById('pwBox');
+  if(!box)return;
+  const srv=readServerAccess();
+  const banned=!!(srv&&srv.state==='banned');
+  const locked=refreshAccessState()===ACCESS_STATES.LOCKED;
+  const canTrial=!srv&&!localStorage.getItem('trial_start');
+  const ua=isUkraineUser();
+  const pr=getPaywallPrices();
+  const n=getPaywallTrialDays();
+  const feat=(icon,tk,sk)=>'<div class="pw2-feat"><img src="section-icons/'+icon+'.png?v=1" alt=""><div><div class="pw2-ft">'+pwTxt(tk)+'</div><div class="pw2-fs">'+(sk.startsWith('~')?sk.slice(1):pwTxt(sk))+'</div></div></div>';
+  const feats=feat('AI','aiT','aiS')+feat('section-crypto','exT','exS')+
+    (ua?feat('section-account','monoT','monoS'):feat('section-account','accT','accS'))+
+    feat('section-metals','priceT',ua?'priceUa':'priceIntl')+feat('section-diagnostics','chT','chS');
+  const planPrice=paywallPlan==='yearly'?pwTxt('perYearP').replace('{v}',pr.yearly):pwTxt('perMonthP').replace('{v}',pr.monthly);
+  const head=banned
+    ?'<div class="pw2-title">⛔ '+escHtml(pwTxt('banned'))+'</div>'
+    :'<img class="pw2-appicon" src="icons/icon-384.png" alt=""><div class="pw2-title">InveStory <b>Premium</b></div>';
+  const reason=locked&&paywallReason?'<div class="pw2-reason">'+escHtml(paywallReason)+'</div>':'';
+  box.innerHTML='<button class="pw2-close" type="button" onclick="handlePaywallClose()" aria-label="Close">✕</button>'+
+    '<div class="pw2-head">'+head+'<div class="pw2-sub">'+pwTxt('sub')+'</div>'+reason+'</div>'+
+    (banned?'':
+    '<div class="pw2-feats">'+feats+'</div>'+
+    '<div class="pw2-plans">'+
+      '<button type="button" class="pw2-plan'+(paywallPlan==='monthly'?' on':'')+'" onclick="selectPaywallPlan(\'monthly\')"><div class="pw2-pl">'+pwTxt('month')+'</div><div class="pw2-pp">'+escHtml(pr.monthly)+'</div><div class="pw2-pn">'+pwTxt('perMonth')+'</div></button>'+
+      '<button type="button" class="pw2-plan'+(paywallPlan==='yearly'?' on':'')+'" onclick="selectPaywallPlan(\'yearly\')"><span class="pw2-tag">−'+pr.save+'%</span><div class="pw2-pl">'+pwTxt('year')+'</div><div class="pw2-pp">'+escHtml(pr.yearly)+'</div><div class="pw2-pn">'+(pr.yearlyPerMonth?escHtml(pr.yearlyPerMonth)+' '+pwTxt('perMo'):'&nbsp;')+'</div></button>'+
+    '</div>'+
+    (canTrial?'<div class="pw2-trial">✓ '+pwTxt('trial').replace('{n}',n)+'</div>':'<div style="height:14px"></div>')+
+    '<button class="pw2-cta" type="button" onclick="paywallCta()">'+pwTxt(canTrial?'tryBtn':'subBtn')+'</button>'+
+    '<div class="pw2-fine">'+(canTrial?pwTxt('fineTrial'):pwTxt('fine')).replace('{p}',escHtml(planPrice))+'</div>')+
+    '<div class="pw2-links"><button type="button" onclick="handlePaywallRestore()">'+pwTxt('restore')+'</button>'+
+      '<button type="button" onclick="openLegalPolicy()">'+pwTxt('terms')+'</button>'+
+      '<button type="button" onclick="openPrivacyPolicy()">'+pwTxt('privacy')+'</button></div>';
+}
+
 function updatePaywallAccessText(reason){
   const srv=readServerAccess();
   const locked=refreshAccessState()===ACCESS_STATES.LOCKED&&(Boolean(localStorage.getItem('trial_start'))||!!srv);
@@ -13473,6 +13617,10 @@ function checkTrial(){
   setTimeout(()=>openPaywall(accessTxt('expired')),500);
 }
 function showTrialOffer(){
+  // Пробный период теперь включает и считает сервер (админка). У вошедшего
+  // пользователя старое локальное предложение «30 днів» только мелькало до
+  // ответа /me — и называло не тот срок.
+  if(typeof isSignedIn==='function'&&isSignedIn())return;
   const el=document.getElementById('trialOverlay');
   if(el)el.style.display='flex';
 }

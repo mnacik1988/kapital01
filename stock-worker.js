@@ -870,6 +870,10 @@ async function handleMe(request, origin, env) {
   const limit = aiLimitFor(sub, rec, cfg);
   return json({
     access: computeAccess(rec, cfg, now, sub),
+    // Страна запроса (Cloudflare по IP) — экран подписки показывает возможности,
+    // доступные в этой стране (monobank и цены НБУ — только для Украины).
+    country: String((request.cf && request.cf.country) || '').slice(0, 2),
+    trialDays: cfg.trialDays,
     ai: { limit, used: used || 0, left: Math.max(0, limit - (used || 0)) },
     isAdmin: sub === ADMIN_SUB,
     serverTime: now
