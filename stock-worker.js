@@ -729,6 +729,13 @@ async function ensureSchema(env) {
     env.DB.prepare('CREATE TABLE IF NOT EXISTS ai_counters (k TEXT PRIMARY KEY, day TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ai_counters_day ON ai_counters(day)')
   ]);
+  // Откуда заходит человек (Android / веб) и с какого устройства — 05.10.2026:
+  // в админке появились незнакомые аккаунты, и без этого не отличить робота
+  // проверки Google Play от живого человека в веб-версии. Колонки добавляются
+  // к уже существующей таблице; если они есть, ALTER просто падает — это норма.
+  for (const col of ['platform TEXT', 'device TEXT']) {
+    try { await env.DB.prepare('ALTER TABLE users ADD COLUMN ' + col).run(); } catch {}
+  }
   schemaReady = true;
 }
 
@@ -818,6 +825,31 @@ async function rememberVerifiedEmail(env, sub, idToken) {
   } catch { /* карточка не должна мешать входу */ }
 }
 
+// Платформа — по Origin (его ставит браузер, страница подделать не может),
+// устройство — коротко из User-Agent. Только для админки, ничего не решает.
+function clientInfo(request, origin) {
+  let platform = 'web';
+  if (origin === 'https://appassets.androidplatform.net') platform = 'android';
+  else if (/^https?:\/\/(localhost|127\.0\.0\.1)(:|$)/.test(origin)) platform = 'dev';
+  const ua = String(request.headers.get('User-Agent') || '');
+  let device = '';
+  const and = ua.match(/Android ([\d.]+)(?:; ([^;)]+))?/);
+  const ios = ua.match(/(iPhone|iPad)[^)]*? OS (\d+(?:_\d+)?)/);
+  const model = and && and[2] ? and[2].replace(/ Build\/.*$/, '').trim() : '';
+  if (and) device = 'Android ' + and[1] + (model && model !== 'K' && model !== 'wv' ? ' · ' + model : '');
+  else if (ios) device = ios[1] + ' · iOS ' + ios[2].replace('_', '.');
+  else if (/Windows/.test(ua)) device = 'Windows';
+  else if (/Macintosh/.test(ua)) device = 'Mac';
+  else if (/Linux/.test(ua)) device = 'Linux';
+  if (!and && !ios) {
+    const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : '';
+    if (br) device += (device ? ' · ' : '') + br;
+  }
+  if (/; wv\)/.test(ua)) device += ' · WebView';
+  device = device.replace(/[^\w .,:()+\-·]/g, '').slice(0, 60);
+  return { platform, device };
+}
+
 // Что приложение узнаёт о себе при запуске: доступ, лимит ИИ, админ ли.
 async function handleMe(request, origin, env) {
   const sub = await verifyAuthToken(bearerToken(request), env);
@@ -827,6 +859,12 @@ async function handleMe(request, origin, env) {
   const cfg = await getAccessConfig(env);
   let rec = null;
   try { rec = await getUserRecord(env, sub, { touch: true, email: body.email }); } catch {}
+  if (rec && env.DB) {
+    const ci = clientInfo(request, origin);
+    if (rec.platform !== ci.platform || rec.device !== ci.device) {
+      try { await env.DB.prepare('UPDATE users SET platform = ?2, device = ?3 WHERE sub = ?1').bind(sub, ci.platform, ci.device).run(); } catch {}
+    }
+  }
   const now = Date.now();
   const used = await counterRead(env, 'user:g' + sub + ':' + todayKey());
   const limit = aiLimitFor(sub, rec, cfg);
@@ -917,6 +955,7 @@ function adminRow(r, cfg, now, today) {
     trialMode: r.trial_mode, trialDays: r.trial_days, trialStart: r.trial_start,
     aiLimit: r.ai_limit, proUntil: r.pro_until, banned: !!r.banned, note: r.note || '',
     aiTotal: r.ai_total, aiToday: r.ai_day === today ? r.ai_day_count : 0,
+    platform: r.platform || '', device: r.device || '',
     access: computeAccess(r, cfg, now, r.sub)
   };
 }
