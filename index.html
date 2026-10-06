@@ -3053,7 +3053,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.55';
+const APP_VERSION = 'v0.1.56';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -13219,7 +13219,7 @@ function renderDiagnostics(){
     stockDivAnn+=getStockSectionStats(sec).totalDiv;
   });
   const stockDivMonth=stockDivAnn/12;
-  const depMonthIncome=dailyDepIncome*30.44;
+  const depMonthIncome=dailyDepIncome*daysInCurrentMonth();
   const combinedMonth=depMonthIncome+stockDivMonth;
 
   // Блок «Середня ціна покупки» удалён: всё, что он показывал, уже есть на
@@ -15119,6 +15119,7 @@ function getPortfolioDividendsMonth(){
     return sum+(Number(st.totalDiv)||0)/12;
   },0);
 }
+function daysInCurrentMonth(){const n=new Date();return new Date(n.getFullYear(),n.getMonth()+1,0).getDate();}
 function getPortfolioDepositIncome(){
   const now=new Date();
   let daily=0;
@@ -15131,7 +15132,7 @@ function getPortfolioDepositIncome(){
       daily+=getDepositAmountUah(d,Number(sim.dailyNet)||0);
     }catch(e){}
   });
-  return {daily,month:daily*30.44};
+  return {daily,month:daily*daysInCurrentMonth()};
 }
 function getPortfolioTotalIncome(){
   let stocksPnl=0;
