@@ -310,7 +310,12 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .daily-section{margin-top:14px;}
 .daily-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
 .daily-scroll{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scroll-behavior:smooth;}
-.daily-row{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;}
+/* Колонки фиксированной ширины (в ch — от размера шрифта): раньше строки
+   тянулись flex'ом, и значок капитализации 💰 у даты сдвигал зелёную колонку. */
+.daily-row{display:grid;grid-template-columns:11ch 16ch minmax(0,1fr);align-items:center;column-gap:6px;padding:6px 10px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;}
+.daily-row>.daily-date{white-space:nowrap;overflow:hidden;}
+.daily-row>.daily-income{white-space:nowrap;}
+.daily-row>.daily-total{justify-self:end;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .daily-row:last-child{border-bottom:none;}
 .daily-date{color:var(--muted2);}
 .daily-income{color:var(--green2);}
@@ -3053,7 +3058,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.57';
+const APP_VERSION = 'v0.1.58';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
