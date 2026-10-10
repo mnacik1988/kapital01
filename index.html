@@ -3058,7 +3058,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.60';
+const APP_VERSION = 'v0.1.61';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -12546,7 +12546,7 @@ async function syncServerAccess(){
   try{
     const r=await fetch(AUTH_BASE+'/me',{method:'POST',
       headers:{'Content-Type':'application/json',...authHeaders()},
-      body:JSON.stringify({email:getGoogleEmail()})});
+      body:'{}'});
     if(!r.ok)return;
     const d=await r.json();
     if(gen!==authGeneration||!d||!d.access)return;
