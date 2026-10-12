@@ -14721,6 +14721,7 @@ var CLOUD_I18N={
   offerBody:{uk:'У хмарі є копія від {when}{dev}. Відновити її на цьому пристрої?',ru:'В облаке есть копия от {when}{dev}. Восстановить её на этом устройстве?',en:'There is a backup from {when}{dev}. Restore it on this device?',de:'Es gibt eine Sicherung vom {when}{dev}. Auf diesem Gerät wiederherstellen?',zh:'云端有一份 {when}{dev} 的备份。要在此设备上恢复吗？'},
   offerYes:{uk:'Відновити',ru:'Восстановить',en:'Restore',de:'Wiederherstellen',zh:'恢复'},
   offerNo:{uk:'Почати з нуля',ru:'Начать с нуля',en:'Start fresh',de:'Neu beginnen',zh:'重新开始'},
+  offerHint:{uk:'Копія нікуди не зникне: відновити її можна пізніше в Налаштуваннях → Хмарна копія.',ru:'Копия никуда не денется: восстановить её можно позже в Настройках → Облачная копия.',en:'The backup is not going anywhere: you can restore it later in Settings → Cloud backup.',de:'Die Sicherung bleibt erhalten: Sie können sie später unter Einstellungen → Cloud-Sicherung wiederherstellen.',zh:'备份不会丢失：您之后可在“设置 → 云端备份”中恢复。'},
   conflictTitle:{uk:'У хмарі вже є інша копія',ru:'В облаке уже есть другая копия',en:'A different backup already exists',de:'In der Cloud liegt bereits eine andere Sicherung',zh:'云端已有另一份备份'},
   conflictBody:{uk:'У хмарі збережена копія від {when}{dev}. Вона відрізняється від даних на цьому пристрої. Що зробити?',ru:'В облаке сохранена копия от {when}{dev}. Она отличается от данных на этом устройстве. Что сделать?',en:'The cloud has a backup from {when}{dev}. It differs from the data on this device. What would you like to do?',de:'In der Cloud liegt eine Sicherung vom {when}{dev}. Sie unterscheidet sich von den Daten auf diesem Gerät. Was möchten Sie tun?',zh:'云端有一份 {when}{dev} 的备份，与本设备上的数据不同。您想怎么做？'},
   conflictRestore:{uk:'Відновити з хмари (дані тут буде замінено)',ru:'Восстановить из облака (данные здесь будут заменены)',en:'Restore from cloud (data here will be replaced)',de:'Aus der Cloud wiederherstellen (Daten hier werden ersetzt)',zh:'从云端恢复（此处数据将被替换）'},
@@ -14986,7 +14987,8 @@ function cloudAskRestore(latest){
   if(!cloudCanPrompt()){if(CLOUD.promptRetry++<12)setTimeout(()=>cloudAskRestore(latest),20000);return;}
   CLOUD.offer=latest;
   cloudSheet(cloudTxt('offerTitle'),'<div style="color:var(--muted);">'+escHtml(cloudTxt('offerBody',{when:cloudWhen(latest.savedAt),dev:cloudDev(latest)}))+'</div>'+
-    cloudBtn(cloudTxt('offerYes'),'cloudOfferRestore()','primary')+cloudBtn(cloudTxt('offerNo'),'cloudOfferDecline()'));
+    cloudBtn(cloudTxt('offerYes'),'cloudOfferRestore()','primary')+cloudBtn(cloudTxt('offerNo'),'cloudOfferDecline()')+
+    '<div style="margin-top:12px;font-size:10px;color:var(--muted);text-align:center;">'+escHtml(cloudTxt('offerHint'))+'</div>');
 }
 function cloudOfferRestore(){
   closeBankSheet();
@@ -14998,6 +15000,7 @@ function cloudOfferDecline(){
   closeBankSheet();
   cloudPatch({declined:true,decided:true,enabled:false});
   renderCloudBackupUI();
+  cloudToast(cloudTxt('offerHint'));
 }
 
 // Приложение хотело отправить копию, а в облаке лежит другая (с другого телефона
