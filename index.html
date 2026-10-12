@@ -2579,7 +2579,7 @@ body.modern-mockup.theme-light .total-currency{
       </div>
       <div class="paywall-feature">
         <div class="paywall-feature-icon">🔒</div>
-        <div><div class="paywall-feature-text" id="pw_b3">Локальне збереження даних</div><div class="paywall-feature-sub" id="pw_b3sub">Ваші фінансові дані залишаються на пристрої</div></div>
+        <div><div class="paywall-feature-text" id="pw_b3">Локальне збереження даних</div><div class="paywall-feature-sub" id="pw_b3sub">Дані зберігаються на пристрої; хмарна копія — за бажанням</div></div>
       </div>
     </div>
     <div class="price-cards">
@@ -2887,6 +2887,7 @@ body.modern-mockup.theme-light .total-currency{
       <div id="storageHealthInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
 <button type="button" id="rollbackImportBtn" class="add-btn" style="display:none;margin-top:8px;width:100%;" onclick="rollbackImport()"></button>
       <input class="backup-file-input" type="file" id="backupFileInput" accept=".json,application/json" onchange="handleBackupFile(this)">
+      <div id="cloudBackupBox" style="margin-top:16px;"></div>
       </div>
       <!-- Выход стоит после резервного копирования намеренно: человек сначала
            видит, чем сохранить данные, и только потом кнопку, которая его отсюда
@@ -2895,6 +2896,7 @@ body.modern-mockup.theme-light .total-currency{
         <div class="settings-group-title" id="set_auth_label">👤 ОБЛІКОВИЙ ЗАПИС</div>
         <div id="authAccountLine" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:10px;text-align:center;"></div>
         <button id="authSignOutBtn" onclick="confirmSignOut()" style="width:100%;padding:11px;border-radius:10px;border:1px solid #f8717155;background:#f871711a;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--red);cursor:pointer;">Вийти з облікового запису</button>
+        <button id="authDeleteBtn" onclick="openDeleteAccountSheet()" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.05em;color:var(--muted);cursor:pointer;">Видалити акаунт</button>
       </div>
       <div class="app-version-card">
         <span class="app-version-label" id="appVersionLabel">Версія застосунку</span>
@@ -3068,7 +3070,7 @@ body.modern-mockup.theme-light .total-currency{
   <div class="auth-gate-title">InveStory</div>
   <div class="auth-gate-desc" id="authGateDesc">Увійдіть, щоб користуватися застосунком</div>
   <div id="googleBtnSlot"></div>
-  <div class="auth-gate-note" id="authGateNote">Ми отримуємо лише ім'я, пошту та ідентифікатор облікового запису. Дані портфеля залишаються на пристрої.</div>
+  <div class="auth-gate-note" id="authGateNote">Ми отримуємо лише ім'я, пошту та ідентифікатор облікового запису. Дані портфеля зберігаються на пристрої; хмарну копію можна ввімкнути за бажанням.</div>
 </div>
 
 <!-- TRIAL OVERLAY -->
@@ -3077,7 +3079,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.64';
+const APP_VERSION = 'v0.1.65';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3215,7 +3217,7 @@ const LANGS={
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
     deleteDep:'Видалити цей депозит?',
-    calcTitle:'Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Ваші фінансові дані залишаються на пристрої',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',
+    calcTitle:'Калькулятор',calcSimple:'Простий',calcCompound:'Складний %',calcCurrency:'Валюта',calcSum:'Сума (₴)',calcRate:'Ставка % / рік',calcMonths:'Термін (міс)',calcCapitaliz:'Капіталізація',calcTax:'Податок на прибуток (%)',calcTaxFree:'Без податку = 0%',calcTaxFreePh:'Неоподатк. мінімум ₴',calcCurSum:'Сума',calcCurUsd:'Курс USD/₴',calcCurEur:'Євро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертую з',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Долар',calcCurFromEur:'€ Євро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Щомісяця',calcQuarterly:'Щокварталу',calcYearly:'Щорічно',calcNoCapitaliz:'Без капіт.',pwTitle:'30 днів безкоштовно',pwSub:'Усі можливості доступні з першого дня. Після пробного періоду оберіть зручний тариф.',pwB1:'30 днів безкоштовної версії',pwB1sub:'Без обмежень під час пробного періоду',pwB2:'Контроль усіх активів в одному місці',pwB2sub:'Депозити, валюта, крипто, акції, кредити та метали',pwB3:'Локальне збереження даних',pwB3sub:'Дані зберігаються на пристрої; хмарна копія — за бажанням',pwPerMonth:'/ місяць',pwPerYear:'/ рік',pwBtn:'Почати 30 днів безкоштовно',pwRestore:'Відновити покупку',
     secQtyShares:'Кількість акцій',secPriceAuto:'авто',secPriceCurrent:'Поточна ціна (₴)',secDivPct:'Дивіденди (% річних)',secTicker:'Тікер: AAPL, MSFT...',secFetchBtn:'🔍 Отримати ціну',secRefreshBtn:'⟳ Оновити',stockRefreshedAt:'Оновл.',stockNeverRefreshed:'Ціни не оновлювались',divPayDate:'Виплата',divUpcoming:'Майбутня',divNone:'Дивіденди не виплачуються',metalType:'Метал',metalGrams:'Кількість (г)',metalPrice:'Ціна купівлі (₴/г)',metalAdd:'+ Додати метал',metalTotalValue:'Загальна вартість',metalTotalGrams:'Загальна кількість',metalGramsUnit:'г',secBuyPrice:'Ціна купівлі (₴)',pickerTitle:'➕ Новий розділ',metalStocksDesc:'NYSE, NASDAQ, дивіденди',metalBondsDesc:'Корпоративні, державні',metalOvdpDesc:'Державні облігації України',metalMetalsDesc:'Золото, срібло, платина',metalBizDesc:'Власна справа, частка',metalCustomDesc:'Будь-який актив',metalsBtn:'Дорогоцінні метали',divIncome:'Дивідендний дохід',divAnnual:'Річний дохід (за ціною)',divAbs:'Абс. дивіденд ($/акція)',divMonthly:'В місяць',perYear:'/рік',
   },
   ru:{
@@ -3256,7 +3258,7 @@ const LANGS={
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
     deleteDep:'Удалить этот депозит?',
-    calcTitle:'Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Ваши финансовые данные остаются на устройстве',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',
+    calcTitle:'Калькулятор',calcSimple:'Простой',calcCompound:'Сложный %',calcCurrency:'Валюта',calcSum:'Сумма (₴)',calcRate:'Ставка % / год',calcMonths:'Срок (мес)',calcCapitaliz:'Капитализация',calcTax:'Налог на прибыль (%)',calcTaxFree:'Без налога = 0%',calcTaxFreePh:'Необл. минимум ₴',calcCurSum:'Сумма',calcCurUsd:'Курс USD/₴',calcCurEur:'Евро/₴',calcCurRub:'₽ Рубль/₴',calcCurCny:'¥ Юань/₴',calcCurFrom:'Конвертирую из',calcCurFromUah:'₴ Гривня',calcCurFromUsd:'$ Доллар',calcCurFromEur:'€ Евро',calcCurFromRub:'₽ Рубль',calcCurFromCny:'¥ Юань',calcMonthly:'Ежемесячно',calcQuarterly:'Ежеквартально',calcYearly:'Ежегодно',calcNoCapitaliz:'Без капит.',pwTitle:'30 дней бесплатно',pwSub:'Все возможности доступны с первого дня. После пробного периода выберите удобный тариф.',pwB1:'30 дней бесплатной версии',pwB1sub:'Без ограничений во время пробного периода',pwB2:'Контроль всех активов в одном месте',pwB2sub:'Депозиты, валюта, крипто, акции, кредиты и металлы',pwB3:'Локальное хранение данных',pwB3sub:'Данные хранятся на устройстве; облачная копия — по желанию',pwPerMonth:'/ месяц',pwPerYear:'/ год',pwBtn:'Начать 30 дней бесплатно',pwRestore:'Восстановить покупку',
     secQtyShares:'Количество акций',secPriceAuto:'авто',secPriceCurrent:'Текущая цена (₴)',secDivPct:'Дивиденды (% годовых)',secTicker:'Тикер: AAPL, MSFT...',secFetchBtn:'🔍 Получить цену',secRefreshBtn:'⟳ Обновить',stockRefreshedAt:'Обновл.',stockNeverRefreshed:'Цены не обновлялись',divPayDate:'Выплата',divUpcoming:'Будущая',divNone:'Дивиденды не выплачиваются',metalType:'Металл',metalGrams:'Количество (г)',metalPrice:'Цена покупки (₴/г)',metalAdd:'+ Добавить металл',metalTotalValue:'Общая стоимость',metalTotalGrams:'Общее количество',metalGramsUnit:'г',secBuyPrice:'Цена покупки (₴)',pickerTitle:'➕ Новый раздел',metalStocksDesc:'NYSE, NASDAQ, дивиденды',metalBondsDesc:'Корпоративные, государственные',metalOvdpDesc:'Государственные облигации Украины',metalMetalsDesc:'Золото, серебро, платина',metalBizDesc:'Собственное дело, доля',metalCustomDesc:'Любой актив',metalsBtn:'Драгоценные металлы',divIncome:'Дивидендный доход',divAnnual:'Годовой доход (по цене)',divAbs:'Абс. дивиденд ($/акция)',divMonthly:'В месяц',perYear:'/год',
   },
   en:{
@@ -3297,7 +3299,7 @@ const LANGS={
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
     deleteDep:'Delete this deposit?',
-    calcTitle:'Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your financial data stays on your device',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',
+    calcTitle:'Calculator',calcSimple:'Simple',calcCompound:'Compound %',calcCurrency:'Currency',calcSum:'Amount (₴)',calcRate:'Rate % / year',calcMonths:'Term (months)',calcCapitaliz:'Compounding',calcTax:'Income tax (%)',calcTaxFree:'No tax = 0%',calcTaxFreePh:'Tax-free minimum',calcCurSum:'Amount',calcCurUsd:'USD/₴ rate',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Convert from',calcCurFromUah:'₴ Hryvnia',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Ruble',calcCurFromCny:'¥ Yuan',calcMonthly:'Monthly',calcQuarterly:'Quarterly',calcYearly:'Yearly',calcNoCapitaliz:'No compounding',pwTitle:'30 days free',pwSub:'All features are available from day one. After the trial, choose the plan that works for you.',pwB1:'30 days of the free version',pwB1sub:'No limits during the trial period',pwB2:'All assets in one place',pwB2sub:'Deposits, currency, crypto, stocks, loans and metals',pwB3:'Local data storage',pwB3sub:'Your data is stored on your device; a cloud backup is optional',pwPerMonth:'/ month',pwPerYear:'/ year',pwBtn:'Start 30 days free',pwRestore:'Restore purchase',
     secQtyShares:'Number of shares',secPriceAuto:'auto',secPriceCurrent:'Current price (₴)',secDivPct:'Dividends (% annual)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Get price',secRefreshBtn:'⟳ Refresh',stockRefreshedAt:'Updated',stockNeverRefreshed:'Prices not refreshed',divPayDate:'Payment',divUpcoming:'Upcoming',divNone:'No dividends paid',metalType:'Metal',metalGrams:'Amount (g)',metalPrice:'Buy price (₴/g)',metalAdd:'+ Add metal',metalTotalValue:'Total value',metalTotalGrams:'Total amount',metalGramsUnit:'g',secBuyPrice:'Buy price (₴)',pickerTitle:'➕ New section',metalStocksDesc:'NYSE, NASDAQ, dividends',metalBondsDesc:'Corporate, government bonds',metalOvdpDesc:'Ukrainian government bonds',metalMetalsDesc:'Gold, silver, platinum',metalBizDesc:'Own business, equity share',metalCustomDesc:'Any asset type',metalsBtn:'Precious Metals',divIncome:'Dividend Income',divAnnual:'Annual Income (by price)',divAbs:'Abs. dividend ($/share)',divMonthly:'Per month',perYear:'/year',
   },
   de:{
@@ -3305,7 +3307,7 @@ const LANGS={
     liveCnt:'Live-Zähler',addDeposit:'+ Einlage',deleteDep:'Einlage löschen?',maxDep:'Max. 3 Einlagen',
     deposit:'Einlage',depositAll:'Einlage (gesamt)',confirmDelete:'Abschnitt löschen?',removeSection:'✕ Löschen',
     stocksBtn:'Aktien',bondsBtn:'Anleihen',ovdpBtn:'Staatsanleihen',businessBtn:'Geschäft',addCustom:'Eigener Abschnitt',
-    calcTitle:'Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfügbar. Wählen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschränkungen während der Testphase',pwB2:'Alle Vermögenswerte an einem Ort',pwB2sub:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Finanzdaten bleiben auf Ihrem Gerät',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',
+    calcTitle:'Rechner',calcSimple:'Einfach',calcCompound:'Zinseszins %',calcCurrency:'Währung',calcSum:'Betrag (₴)',calcRate:'Zinssatz % / Jahr',calcMonths:'Laufzeit (Monate)',calcCapitaliz:'Kapitalisierung',calcTax:'Einkommensteuer (%)',calcTaxFree:'Ohne Steuer = 0%',calcTaxFreePh:'Steuerfreier Mindestbetrag',calcCurSum:'Betrag',calcCurUsd:'USD/₴ Kurs',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'Umrechnen von',calcCurFromUah:'₴ Hrywnja',calcCurFromUsd:'$ Dollar',calcCurFromEur:'€ Euro',calcCurFromRub:'₽ Rubel',calcCurFromCny:'¥ Yuan',calcMonthly:'Monatlich',calcQuarterly:'Vierteljährlich',calcYearly:'Jährlich',calcNoCapitaliz:'Ohne Kapitalis.',pwTitle:'30 Tage kostenlos',pwSub:'Alle Funktionen sind ab dem ersten Tag verfügbar. Wählen Sie nach der Testphase den passenden Tarif.',pwB1:'30 Tage kostenlose Version',pwB1sub:'Keine Einschränkungen während der Testphase',pwB2:'Alle Vermögenswerte an einem Ort',pwB2sub:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',pwB3:'Lokale Datenspeicherung',pwB3sub:'Ihre Daten liegen auf Ihrem Gerät; eine Cloud-Sicherung ist optional',pwPerMonth:'/ Monat',pwPerYear:'/ Jahr',pwBtn:'30 Tage kostenlos starten',pwRestore:'Kauf wiederherstellen',
     secQtyShares:'Anzahl der Aktien',secPriceAuto:'auto',secPriceCurrent:'Aktueller Preis (₴)',secDivPct:'Dividenden (% jährlich)',secTicker:'Ticker: AAPL, MSFT...',secFetchBtn:'🔍 Preis abrufen',secRefreshBtn:'⟳ Aktualisieren',stockRefreshedAt:'Aktualis.',stockNeverRefreshed:'Preise nicht aktualisiert',divPayDate:'Zahlung',divUpcoming:'Bevorstehend',divNone:'Keine Dividenden',metalType:'Metall',metalGrams:'Menge (g)',metalPrice:'Kaufpreis (₴/g)',metalAdd:'+ Metall hinzufügen',metalTotalValue:'Gesamtwert',metalTotalGrams:'Gesamtmenge',metalGramsUnit:'g',secBuyPrice:'Kaufpreis (₴)',pickerTitle:'➕ Neuer Abschnitt',metalStocksDesc:'NYSE, NASDAQ, Dividenden',metalBondsDesc:'Unternehmens-, Staatsanleihen',metalOvdpDesc:'Ukrainische Staatsanleihen',metalMetalsDesc:'Gold, Silber, Platin',metalBizDesc:'Eigenes Unternehmen, Anteil',metalCustomDesc:'Beliebiger Vermögenswert',metalsBtn:'Edelmetalle',perYear:'/Jahr',divMonthly:'Pro Monat',divAbs:'Abs. Dividende ($/Aktie)',divAnnual:'Jahreseinkommen (nach Preis)',divIncome:'Dividendeneinkommen',newSection:'Neuer Abschnitt',newSectionSub:'Wie eine Einlage — mit Zinsen und Datum',
     sectionNameLabel:'Abschnittsname',iconLabel:'Symbol',createSection:'Erstellen',cancel:'Abbrechen',
     cryptoName:'Krypto',totalUsdtInv:'USDT-Gesamtinvestition',rateUsdtUah:'USDT/₴ Kurs',
@@ -3346,7 +3348,7 @@ const LANGS={
     liveCnt:'实时计数器',addDeposit:'+ 存款',deleteDep:'删除存款?',maxDep:'最多3个存款',
     deposit:'存款',depositAll:'存款（合计）',confirmDelete:'删除此部分?',removeSection:'✕ 删除',
     stocksBtn:'股票',bondsBtn:'债券',ovdpBtn:'国债',businessBtn:'商业',addCustom:'自定义部分',
-    calcTitle:'计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'免费使用 30 天',pwSub:'从第一天起即可使用全部功能。试用期结束后，选择适合您的方案。',pwB1:'30 天免费版',pwB1sub:'试用期间不受限制',pwB2:'在一个地方管理所有资产',pwB2sub:'存款、货币、加密货币、股票、贷款和贵金属',pwB3:'本地数据存储',pwB3sub:'您的财务数据保留在设备上',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'开始 30 天免费使用',pwRestore:'恢复购买',
+    calcTitle:'计算器',calcSimple:'简单',calcCompound:'复利 %',calcCurrency:'货币',calcSum:'金额 (₴)',calcRate:'年利率 %',calcMonths:'期限（月）',calcCapitaliz:'复利频率',calcTax:'所得税 (%)',calcTaxFree:'免税 = 0%',calcTaxFreePh:'免税最低额',calcCurSum:'金额',calcCurUsd:'USD/₴汇率',calcCurEur:'EUR/₴',calcCurRub:'₽ RUB/₴',calcCurCny:'¥ CNY/₴',calcCurFrom:'从以下货币转换',calcCurFromUah:'₴ 格里夫纳',calcCurFromUsd:'$ 美元',calcCurFromEur:'€ 欧元',calcCurFromRub:'₽ 卢布',calcCurFromCny:'¥ 人民币',calcMonthly:'每月',calcQuarterly:'每季度',calcYearly:'每年',calcNoCapitaliz:'无复利',pwTitle:'免费使用 30 天',pwSub:'从第一天起即可使用全部功能。试用期结束后，选择适合您的方案。',pwB1:'30 天免费版',pwB1sub:'试用期间不受限制',pwB2:'在一个地方管理所有资产',pwB2sub:'存款、货币、加密货币、股票、贷款和贵金属',pwB3:'本地数据存储',pwB3sub:'数据保存在您的设备上；云端备份为可选项',pwPerMonth:'/ 月',pwPerYear:'/ 年',pwBtn:'开始 30 天免费使用',pwRestore:'恢复购买',
     secQtyShares:'股票数量',secPriceAuto:'自动',secPriceCurrent:'当前价格（₴）',secDivPct:'股息（年%）',secTicker:'代码: AAPL, MSFT...',secFetchBtn:'🔍 获取价格',secRefreshBtn:'⟳ 刷新',stockRefreshedAt:'已更新',stockNeverRefreshed:'价格未更新',divPayDate:'付款日',divUpcoming:'即将到来',divNone:'不派息',metalType:'金属',metalGrams:'数量（克）',metalPrice:'购买价格（₴/克）',metalAdd:'+ 添加金属',metalTotalValue:'总价值',metalTotalGrams:'总数量',metalGramsUnit:'克',secBuyPrice:'购买价格（₴）',pickerTitle:'➕ 新部分',metalStocksDesc:'纽交所，纳斯达克，股息',metalBondsDesc:'企业债、国债',metalOvdpDesc:'乌克兰国债',metalMetalsDesc:'黄金、白银、铂金',metalBizDesc:'自有企业、股权份额',metalCustomDesc:'任何资产类型',metalsBtn:'贵金属',perYear:'/年',divMonthly:'每月',divAbs:'绝对股息（$/股）',divAnnual:'年收入（按价格）',divIncome:'股息收入',newSection:'新部分',newSectionSub:'像存款一样——有利率和日期',
     sectionNameLabel:'部分名称',iconLabel:'图标',createSection:'创建',cancel:'取消',
     cryptoName:'加密货币',totalUsdtInv:'USDT总投资',rateUsdtUah:'USDT/₴汇率',
@@ -3418,7 +3420,7 @@ const EXTRA_I18N={
   'Контроль усіх активів в одному місці':{uk:'Контроль усіх активів в одному місці',ru:'Контроль всех активов в одном месте',en:'All assets in one place',de:'Alle Vermögenswerte an einem Ort',zh:'在一个地方管理所有资产'},
   'Депозити, валюта, крипто, акції, кредити та метали':{uk:'Депозити, валюта, крипто, акції, кредити та метали',ru:'Депозиты, валюта, крипто, акции, кредиты и металлы',en:'Deposits, currency, crypto, stocks, loans and metals',de:'Einlagen, Währungen, Krypto, Aktien, Kredite und Metalle',zh:'存款、货币、加密货币、股票、贷款和贵金属'},
   'Локальне збереження даних':{uk:'Локальне збереження даних',ru:'Локальное хранение данных',en:'Local data storage',de:'Lokale Datenspeicherung',zh:'本地数据存储'},
-  'Ваші фінансові дані залишаються на пристрої':{uk:'Ваші фінансові дані залишаються на пристрої',ru:'Ваши финансовые данные остаются на устройстве',en:'Your financial data stays on your device',de:'Ihre Finanzdaten bleiben auf Ihrem Gerät',zh:'您的财务数据保留在设备上'},
+  'Дані зберігаються на пристрої; хмарна копія — за бажанням':{uk:'Дані зберігаються на пристрої; хмарна копія — за бажанням',ru:'Данные хранятся на устройстве; облачная копия — по желанию',en:'Your data is stored on your device; a cloud backup is optional',de:'Ihre Daten liegen auf Ihrem Gerät; eine Cloud-Sicherung ist optional',zh:'数据保存在您的设备上；云端备份为可选项'},
   'Швидка аналітика доходів, боргів і динаміки капіталу':{uk:'Швидка аналітика доходів, боргів і динаміки капіталу',ru:'Быстрая аналитика доходов, долгов и динамики капитала',en:'Fast analytics for income, debt and capital dynamics',de:'Schnelle Analyse von Einnahmen, Schulden und Kapitalentwicklung',zh:'快速分析收入、债务和资本变化'},
   'Дані зберігаються локально на вашому пристрої':{uk:'Дані зберігаються локально на вашому пристрої',ru:'Данные хранятся локально на вашем устройстве',en:'Data is stored locally on your device',de:'Daten werden lokal auf Ihrem Gerät gespeichert',zh:'数据本地保存在您的设备上'},
   'Почати 30 днів безкоштовно →':{uk:'Почати 30 днів безкоштовно →',ru:'Начать 30 дней бесплатно →',en:'Start 30 days free →',de:'30 Tage kostenlos starten →',zh:'开始 30 天免费使用 →'},
@@ -3812,6 +3814,7 @@ function applyTranslations(){
   try{renderBanks();}catch(e){}
   try{renderCryptoStatus();}catch(e){}
   try{renderPaywall();}catch(e){}
+  try{renderCloudBackupUI();}catch(e){}
   try{applyHideAmounts();}catch(e){}
   try{setText('adminSectionLabel',({uk:'Адміністратор',ru:'Администратор',en:'Administrator',de:'Administrator',zh:'管理员'})[currentLang]||'Адміністратор');}catch(e){}
   translateDynamicUI();
@@ -8929,6 +8932,7 @@ function _saveDataNow(){
     localStorage.setItem('kapital_schema_version',String(STORAGE_SCHEMA_VERSION));
     localStorage.setItem('kapital_last_app_version',APP_VERSION);
     updateStorageHealthUI();
+    try{cloudOnSave();}catch(e2){}
   }catch(e){
     if(e.name==='QuotaExceededError'||e.code===22){
       console.error('localStorage full');
@@ -9216,9 +9220,11 @@ function applySettingsLabels(lang){
       txt('authAccountLine',getGoogleEmail()||'Google');
       txt('set_auth_label',si.authLbl);
       txt('authSignOutBtn',si.signOutBtn);
+      try{txt('authDeleteBtn',cloudTxt('delBtn'));}catch(e){}
     }
   }
   updateStorageHealthUI();
+  try{renderCloudBackupUI();}catch(e){}
 }
 function setLangFromSettings(lang){
   setLang(lang);
@@ -9260,7 +9266,7 @@ function setDisplayCurrency(cur){
 const PRIVACY_I18N={
  "en": {
   "title": "Privacy Policy",
-  "updated": "Updated: October 2, 2026",
+  "updated": "Updated: October 12, 2026",
   "note": "Contact: mnacik1988@gmail.com · Online version: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -9273,11 +9279,19 @@ const PRIVACY_I18N={
    ],
    [
     "Your account on our server",
-    "When you sign in, we create an account record on our server: your Google account identifier, email address, dates of your first and latest visit, the number of AI requests, your access status (trial, subscription) and settings made by the administrator (for example, a personal limit or a block). It is needed to provide access, apply limits and prevent abuse. The record is kept while you use the app and is deleted at your request."
+    "When you sign in, we create an account record on our server: your Google account identifier, email address, dates of your first and latest visit, the number of AI requests, your access status (trial, subscription) and settings made by the administrator (for example, a personal limit or a block). It is needed to provide access, apply limits and prevent abuse. The record is kept while you use the app and is deleted when you delete your account (Settings → Delete account) or at your request."
    ],
    [
     "Your portfolio data",
-    "Everything you enter — deposits, coins, stocks, loans, notes and other values — is stored only on your device. We do not upload your portfolio to our servers, except the summary described in \"AI assistant\" when you use it."
+    "Everything you enter — deposits, coins, stocks, loans, notes and other values — is stored on your device. We upload it to our server only if you turn on the optional cloud backup (see “Cloud backup (optional)” below), and we send the summary described in “AI assistant” when you use it."
+   ],
+   [
+    "Cloud backup (optional)",
+    "If you turn on cloud backup, a copy of your portfolio data — the same content as a file export: deposits, coins, stocks, loans, notes, chart history and app settings — is uploaded to our server and linked to your Google account identifier, so you can restore it after changing or losing your phone. The copy is encrypted on our server. The encryption key is held by the service operator, who can technically decrypt the copy; we do not read it, sell it or share it, and use it only to restore your data for you. Exchange API keys, bank tokens and purchase information are never included — they stay only on your device. We keep up to 3 latest copies. The backup is off until you agree to it; you can turn it off and delete all copies at any time in Settings, and the copies are deleted automatically when you delete your account."
+   ],
+   [
+    "Deleting your account and data",
+    "You can delete your account in the app: Settings → Delete account. This permanently removes from our server your account record, all cloud backups, your AI request counters and administrator-log entries that refer to you. Data stored on your device is erased only if you choose that option. You can also request deletion by email at mnacik1988@gmail.com or on the web page https://mnacik1988.github.io/kapital01/delete-account.html. Our infrastructure provider may keep technical database backups for a limited period (up to 30 days) before they are overwritten. Deleting your account does not cancel subscriptions bought through Google Play or the App Store — cancel those in the store."
    ],
    [
     "Exchange connections",
@@ -9309,7 +9323,7 @@ const PRIVACY_I18N={
    ],
    [
     "Retention and deletion",
-    "Data on your device stays until you delete it — in the app settings, by clearing the app data or by uninstalling the app. Signing out removes sign-in data and exchange keys from the device. Daily counters on our server are deleted automatically within the periods stated above; your account record is kept while you use the app. You can ask us to delete any data related to you by email."
+    "Data on your device stays until you delete it — in the app settings, by clearing the app data or by uninstalling the app. Signing out removes sign-in data and exchange keys from the device. Daily counters on our server are deleted automatically within the periods stated above; your account record is kept while you use the app. You can delete your account and all data on our server yourself in the app (Settings → Delete account), or ask us to delete any data related to you by email. Cloud backups, if you turned them on, are kept until you delete them in Settings or delete your account."
    ],
    [
     "Your rights",
@@ -9335,7 +9349,7 @@ const PRIVACY_I18N={
  },
  "uk": {
   "title": "Політика конфіденційності",
-  "updated": "Оновлено: 2 жовтня 2026",
+  "updated": "Оновлено: 12 жовтня 2026",
   "note": "Контакт: mnacik1988@gmail.com · Онлайн-версія: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -9348,11 +9362,19 @@ const PRIVACY_I18N={
    ],
    [
     "Ваш обліковий запис на сервері",
-    "Коли ви входите, ми створюємо на своєму сервері картку облікового запису: ідентифікатор облікового запису Google, адресу пошти, дати першого й останнього входу, кількість запитів до AI, ваш статус доступу (пробний період, підписка) і налаштування, зроблені адміністратором (наприклад, особистий ліміт або блокування). Вона потрібна, щоб надавати доступ, застосовувати ліміти й запобігати зловживанням. Картка зберігається, доки ви користуєтеся застосунком, і видаляється на ваш запит."
+    "Коли ви входите, ми створюємо на своєму сервері картку облікового запису: ідентифікатор облікового запису Google, адресу пошти, дати першого й останнього входу, кількість запитів до AI, ваш статус доступу (пробний період, підписка) і налаштування, зроблені адміністратором (наприклад, особистий ліміт або блокування). Вона потрібна, щоб надавати доступ, застосовувати ліміти й запобігати зловживанням. Картка зберігається, доки ви користуєтеся застосунком, і видаляється, коли ви видаляєте обліковий запис (Налаштування → Видалити акаунт) або на ваш запит."
    ],
    [
     "Дані вашого портфеля",
-    "Усе, що ви вводите, — депозити, монети, акції, кредити, нотатки та інші значення — зберігається лише на вашому пристрої. Ми не завантажуємо портфель на свої сервери, окрім зведення, описаного в розділі «AI-асистент», коли ви ним користуєтеся."
+    "Усе, що ви вводите, — депозити, монети, акції, кредити, нотатки та інші значення — зберігається на вашому пристрої. Ми завантажуємо це на свій сервер лише якщо ви ввімкнете необовʼязкову хмарну копію (див. розділ «Хмарна копія (за бажанням)» нижче), а також надсилаємо зведення, описане в розділі «AI-асистент», коли ви ним користуєтеся."
+   ],
+   [
+    "Хмарна копія (за бажанням)",
+    "Якщо ви ввімкнете хмарну копію, копія даних вашого портфеля — той самий склад, що й у файловому експорті: депозити, монети, акції, кредити, нотатки, історія графіка та налаштування застосунку — завантажується на наш сервер і привʼязується до ідентифікатора вашого облікового запису Google, щоб ви могли відновити дані після зміни чи втрати телефона. Копія зберігається на сервері в зашифрованому вигляді. Ключ шифрування має оператор сервісу, який технічно може розшифрувати копію; ми її не читаємо, не продаємо й нікому не передаємо та використовуємо лише для відновлення ваших даних. Ключі API бірж, токени банків і дані про покупки в копію ніколи не потрапляють — вони залишаються лише на вашому пристрої. Ми зберігаємо до 3 останніх копій. Поки ви не погодитеся, копія вимкнена; вимкнути її та видалити всі копії можна будь-коли в Налаштуваннях, а під час видалення облікового запису копії видаляються автоматично."
+   ],
+   [
+    "Видалення облікового запису й даних",
+    "Ви можете видалити обліковий запис у застосунку: Налаштування → Видалити акаунт. Це остаточно видаляє з нашого сервера картку облікового запису, усі хмарні копії, лічильники запитів до AI і записи журналу адміністратора, що стосуються вас. Дані на вашому пристрої стираються лише якщо ви оберете цей варіант. Видалення також можна попросити листом на mnacik1988@gmail.com або на сторінці https://mnacik1988.github.io/kapital01/delete-account.html. Наш інфраструктурний провайдер може зберігати технічні резервні копії бази обмежений час (до 30 днів), доки вони не перезапишуться. Видалення облікового запису не скасовує підписки, оформлені через Google Play чи App Store, — скасуйте їх у магазині."
    ],
    [
     "Підключення бірж",
@@ -9384,7 +9406,7 @@ const PRIVACY_I18N={
    ],
    [
     "Строки зберігання та видалення",
-    "Дані на пристрої зберігаються, доки ви їх не видалите — у налаштуваннях застосунку, очищенням даних застосунку або його видаленням. Вихід з облікового запису видаляє з пристрою дані входу та ключі бірж. Денні лічильники на нашому сервері видаляються автоматично у строки, вказані вище; картка облікового запису зберігається, доки ви користуєтеся застосунком. Ви можете попросити видалити будь-які повʼязані з вами дані поштою."
+    "Дані на пристрої зберігаються, доки ви їх не видалите — у налаштуваннях застосунку, очищенням даних застосунку або його видаленням. Вихід з облікового запису видаляє з пристрою дані входу та ключі бірж. Денні лічильники на нашому сервері видаляються автоматично у строки, вказані вище; картка облікового запису зберігається, доки ви користуєтеся застосунком. Ви можете самі видалити обліковий запис і всі дані на нашому сервері в застосунку (Налаштування → Видалити акаунт) або попросити видалити будь-які повʼязані з вами дані поштою. Хмарні копії, якщо ви їх увімкнули, зберігаються, доки ви не видалите їх у Налаштуваннях або не видалите обліковий запис."
    ],
    [
     "Ваші права",
@@ -9410,7 +9432,7 @@ const PRIVACY_I18N={
  },
  "ru": {
   "title": "Политика конфиденциальности",
-  "updated": "Обновлено: 2 октября 2026",
+  "updated": "Обновлено: 12 октября 2026",
   "note": "Контакт: mnacik1988@gmail.com · Онлайн-версия: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -9423,11 +9445,19 @@ const PRIVACY_I18N={
    ],
    [
     "Ваш аккаунт на сервере",
-    "Когда вы входите, мы создаём на своём сервере карточку аккаунта: идентификатор аккаунта Google, адрес почты, даты первого и последнего входа, количество запросов к AI, ваш статус доступа (пробный период, подписка) и настройки, сделанные администратором (например, личный лимит или блокировка). Она нужна, чтобы предоставлять доступ, применять лимиты и предотвращать злоупотребления. Карточка хранится, пока вы пользуетесь приложением, и удаляется по вашему запросу."
+    "Когда вы входите, мы создаём на своём сервере карточку аккаунта: идентификатор аккаунта Google, адрес почты, даты первого и последнего входа, количество запросов к AI, ваш статус доступа (пробный период, подписка) и настройки, сделанные администратором (например, личный лимит или блокировка). Она нужна, чтобы предоставлять доступ, применять лимиты и предотвращать злоупотребления. Карточка хранится, пока вы пользуетесь приложением, и удаляется, когда вы удаляете аккаунт (Настройки → Удалить аккаунт) или по вашему запросу."
    ],
    [
     "Данные вашего портфеля",
-    "Всё, что вы вводите, — депозиты, монеты, акции, кредиты, заметки и другие значения — хранится только на вашем устройстве. Мы не загружаем портфель на свои серверы, кроме сводки, описанной в разделе «AI-ассистент», когда вы им пользуетесь."
+    "Всё, что вы вводите, — депозиты, монеты, акции, кредиты, заметки и другие значения — хранится на вашем устройстве. Мы загружаем это на свой сервер только если вы включите необязательную облачную копию (см. раздел «Облачная копия (по желанию)» ниже), а также отправляем сводку, описанную в разделе «AI-ассистент», когда вы им пользуетесь."
+   ],
+   [
+    "Облачная копия (по желанию)",
+    "Если вы включите облачную копию, копия данных вашего портфеля — тот же состав, что и в файловом экспорте: депозиты, монеты, акции, кредиты, заметки, история графика и настройки приложения — загружается на наш сервер и привязывается к идентификатору вашего аккаунта Google, чтобы вы могли восстановить данные после смены или потери телефона. Копия хранится на сервере в зашифрованном виде. Ключ шифрования есть у оператора сервиса, который технически может расшифровать копию; мы её не читаем, не продаём и никому не передаём и используем только для восстановления ваших данных. Ключи API бирж, токены банков и данные о покупках в копию никогда не попадают — они остаются только на вашем устройстве. Мы храним до 3 последних копий. Пока вы не согласитесь, копия выключена; выключить её и удалить все копии можно в любой момент в Настройках, а при удалении аккаунта копии удаляются автоматически."
+   ],
+   [
+    "Удаление аккаунта и данных",
+    "Вы можете удалить аккаунт в приложении: Настройки → Удалить аккаунт. Это безвозвратно удаляет с нашего сервера карточку аккаунта, все облачные копии, счётчики запросов к AI и записи журнала администратора, относящиеся к вам. Данные на вашем устройстве стираются, только если вы выберете этот вариант. Удаление можно также запросить письмом на mnacik1988@gmail.com или на странице https://mnacik1988.github.io/kapital01/delete-account.html. Наш инфраструктурный провайдер может хранить технические резервные копии базы ограниченное время (до 30 дней), пока они не будут перезаписаны. Удаление аккаунта не отменяет подписки, оформленные через Google Play или App Store, — отмените их в магазине."
    ],
    [
     "Подключение бирж",
@@ -9459,7 +9489,7 @@ const PRIVACY_I18N={
    ],
    [
     "Сроки хранения и удаление",
-    "Данные на устройстве хранятся, пока вы их не удалите — в настройках приложения, очисткой данных приложения или его удалением. Выход из аккаунта удаляет с устройства данные входа и ключи бирж. Дневные счётчики на нашем сервере удаляются автоматически в сроки, указанные выше; карточка аккаунта хранится, пока вы пользуетесь приложением. Вы можете попросить удалить любые связанные с вами данные по почте."
+    "Данные на устройстве хранятся, пока вы их не удалите — в настройках приложения, очисткой данных приложения или его удалением. Выход из аккаунта удаляет с устройства данные входа и ключи бирж. Дневные счётчики на нашем сервере удаляются автоматически в сроки, указанные выше; карточка аккаунта хранится, пока вы пользуетесь приложением. Вы можете сами удалить аккаунт и все данные на нашем сервере в приложении (Настройки → Удалить аккаунт) или попросить удалить любые связанные с вами данные по почте. Облачные копии, если вы их включили, хранятся, пока вы не удалите их в Настройках или не удалите аккаунт."
    ],
    [
     "Ваши права",
@@ -9485,7 +9515,7 @@ const PRIVACY_I18N={
  },
  "de": {
   "title": "Datenschutzrichtlinie",
-  "updated": "Aktualisiert: 2. Oktober 2026",
+  "updated": "Aktualisiert: 12. Oktober 2026",
   "note": "Kontakt: mnacik1988@gmail.com · Online-Version: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -9498,11 +9528,19 @@ const PRIVACY_I18N={
    ],
    [
     "Ihr Konto auf unserem Server",
-    "Bei der Anmeldung legen wir auf unserem Server einen Kontodatensatz an: Ihre Google-Konto-ID, E-Mail-Adresse, Datum des ersten und letzten Besuchs, Anzahl der KI-Anfragen, Ihren Zugangsstatus (Testphase, Abonnement) und Einstellungen des Administrators (z. B. ein persönliches Limit oder eine Sperre). Er dient dazu, Zugang zu gewähren, Grenzen anzuwenden und Missbrauch zu verhindern. Der Datensatz bleibt bestehen, solange Sie die App nutzen, und wird auf Ihren Wunsch gelöscht."
+    "Bei der Anmeldung legen wir auf unserem Server einen Kontodatensatz an: Ihre Google-Konto-ID, E-Mail-Adresse, Datum des ersten und letzten Besuchs, Anzahl der KI-Anfragen, Ihren Zugangsstatus (Testphase, Abonnement) und Einstellungen des Administrators (z. B. ein persönliches Limit oder eine Sperre). Er dient dazu, Zugang zu gewähren, Grenzen anzuwenden und Missbrauch zu verhindern. Der Datensatz bleibt bestehen, solange Sie die App nutzen, und wird gelöscht, wenn Sie Ihr Konto löschen (Einstellungen → Konto löschen) oder auf Ihren Wunsch."
    ],
    [
     "Ihre Portfoliodaten",
-    "Alles, was Sie eingeben — Einlagen, Coins, Aktien, Kredite, Notizen und andere Werte — wird nur auf Ihrem Gerät gespeichert. Wir laden Ihr Portfolio nicht auf unsere Server hoch, außer der unter „KI-Assistent“ beschriebenen Zusammenfassung, wenn Sie ihn nutzen."
+    "Alles, was Sie eingeben — Einlagen, Coins, Aktien, Kredite, Notizen und andere Werte — wird auf Ihrem Gerät gespeichert. Wir laden es nur dann auf unseren Server hoch, wenn Sie die optionale Cloud-Sicherung aktivieren (siehe „Cloud-Sicherung (optional)“ unten); außerdem senden wir die unter „KI-Assistent“ beschriebene Zusammenfassung, wenn Sie ihn nutzen."
+   ],
+   [
+    "Cloud-Sicherung (optional)",
+    "Wenn Sie die Cloud-Sicherung aktivieren, wird eine Kopie Ihrer Portfoliodaten — mit demselben Inhalt wie ein Dateiexport: Einlagen, Coins, Aktien, Kredite, Notizen, Diagrammverlauf und App-Einstellungen — auf unseren Server hochgeladen und mit Ihrer Google-Konto-ID verknüpft, damit Sie sie nach einem Telefonwechsel oder -verlust wiederherstellen können. Die Kopie wird auf unserem Server verschlüsselt gespeichert. Den Schlüssel besitzt der Betreiber des Dienstes, der die Kopie technisch entschlüsseln kann; wir lesen sie nicht, verkaufen sie nicht und geben sie nicht weiter, sondern nutzen sie nur, um Ihre Daten für Sie wiederherzustellen. API-Schlüssel von Börsen, Bank-Tokens und Kaufdaten sind nie enthalten — sie bleiben nur auf Ihrem Gerät. Wir speichern bis zu 3 neueste Kopien. Solange Sie nicht zugestimmt haben, ist die Sicherung aus; Sie können sie jederzeit in den Einstellungen ausschalten und alle Kopien löschen, und beim Löschen Ihres Kontos werden die Kopien automatisch gelöscht."
+   ],
+   [
+    "Löschen von Konto und Daten",
+    "Sie können Ihr Konto in der App löschen: Einstellungen → Konto löschen. Dadurch werden Ihr Kontodatensatz, alle Cloud-Sicherungen, Ihre KI-Anfragezähler und Einträge des Administratorprotokolls, die sich auf Sie beziehen, endgültig von unserem Server entfernt. Daten auf Ihrem Gerät werden nur gelöscht, wenn Sie diese Option wählen. Die Löschung können Sie auch per E-Mail an mnacik1988@gmail.com oder über https://mnacik1988.github.io/kapital01/delete-account.html beantragen. Unser Infrastrukturanbieter kann technische Datenbank-Sicherungen für begrenzte Zeit (bis zu 30 Tage) aufbewahren, bis sie überschrieben werden. Das Löschen des Kontos kündigt keine über Google Play oder den App Store abgeschlossenen Abonnements — kündigen Sie diese im Store."
    ],
    [
     "Börsenverbindungen",
@@ -9534,7 +9572,7 @@ const PRIVACY_I18N={
    ],
    [
     "Speicherdauer und Löschung",
-    "Daten auf Ihrem Gerät bleiben, bis Sie sie löschen — in den App-Einstellungen, durch Löschen der App-Daten oder Deinstallation. Abmelden entfernt Anmeldedaten und Börsenschlüssel vom Gerät. Tageszähler auf unserem Server werden automatisch innerhalb der oben genannten Fristen gelöscht; Ihr Kontodatensatz bleibt bestehen, solange Sie die App nutzen. Sie können per E-Mail die Löschung aller Sie betreffenden Daten verlangen."
+    "Daten auf Ihrem Gerät bleiben, bis Sie sie löschen — in den App-Einstellungen, durch Löschen der App-Daten oder Deinstallation. Abmelden entfernt Anmeldedaten und Börsenschlüssel vom Gerät. Tageszähler auf unserem Server werden automatisch innerhalb der oben genannten Fristen gelöscht; Ihr Kontodatensatz bleibt bestehen, solange Sie die App nutzen. Sie können Ihr Konto und alle Daten auf unserem Server selbst in der App löschen (Einstellungen → Konto löschen) oder per E-Mail die Löschung aller Sie betreffenden Daten verlangen. Cloud-Sicherungen werden, falls Sie sie aktiviert haben, aufbewahrt, bis Sie sie in den Einstellungen oder mit Ihrem Konto löschen."
    ],
    [
     "Ihre Rechte",
@@ -9560,7 +9598,7 @@ const PRIVACY_I18N={
  },
  "zh": {
   "title": "隐私政策",
-  "updated": "更新日期：2026年10月2日",
+  "updated": "更新日期：2026年10月12日",
   "note": "联系方式：mnacik1988@gmail.com · 在线版本：https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -9573,11 +9611,19 @@ const PRIVACY_I18N={
    ],
    [
     "您在我们服务器上的账户",
-    "登录时，我们会在服务器上创建账户记录：您的 Google 账户标识、电子邮箱地址、首次和最近访问日期、AI 请求次数、访问状态（试用、订阅）以及管理员所做的设置（例如个人限额或封禁）。它用于提供访问权限、实施限制并防止滥用。在您使用应用期间保留，应您的要求删除。"
+    "登录时，我们会在服务器上创建账户记录：您的 Google 账户标识、电子邮箱地址、首次和最近访问日期、AI 请求次数、访问状态（试用、订阅）以及管理员所做的设置（例如个人限额或封禁）。它用于提供访问权限、实施限制并防止滥用。在您使用应用期间保留，在您删除账户（设置 → 删除账号）或应您的要求时删除。"
    ],
    [
     "您的投资组合数据",
-    "您输入的所有内容——存款、币种、股票、贷款、备注及其他数值——仅保存在您的设备上。除您使用“AI 助手”时发送的摘要外，我们不会将您的投资组合上传到我们的服务器。"
+    "您输入的所有内容——存款、币种、股票、贷款、备注及其他数值——保存在您的设备上。只有在您开启可选的云端备份时（见下文“云端备份（可选）”），我们才会将其上传到服务器；使用“AI 助手”时还会发送其中所述的摘要。"
+   ],
+   [
+    "云端备份（可选）",
+    "如果您开启云端备份，您的投资组合数据副本（内容与文件导出相同：存款、币种、股票、贷款、备注、图表历史和应用设置）会上传到我们的服务器，并与您的 Google 账户标识绑定，以便您在更换或丢失手机后恢复。副本在服务器上加密存储。加密密钥由服务运营方持有，运营方在技术上可以解密副本；我们不会阅读、出售或共享副本，只用于为您恢复数据。交易所 API 密钥、银行令牌和购买信息绝不会包含在内——它们只保留在您的设备上。我们最多保留最近 3 份副本。在您同意之前备份处于关闭状态；您可随时在“设置”中关闭并删除所有副本，删除账户时副本会被自动删除。"
+   ],
+   [
+    "删除账户和数据",
+    "您可以在应用内删除账户：设置 → 删除账号。这会从我们的服务器永久删除您的账户记录、所有云端备份、AI 请求计数以及与您相关的管理员日志条目。仅当您选择该选项时，才会清除您设备上的数据。您也可以发送邮件至 mnacik1988@gmail.com，或通过 https://mnacik1988.github.io/kapital01/delete-account.html 申请删除。我们的基础设施提供商可能会在有限时间内（最长 30 天）保留数据库的技术备份，直至被覆盖。删除账户不会取消通过 Google Play 或 App Store 购买的订阅，请在商店中取消。"
    ],
    [
     "交易所连接",
@@ -9609,7 +9655,7 @@ const PRIVACY_I18N={
    ],
    [
     "保存期限与删除",
-    "设备上的数据会一直保留，直到您在应用设置中删除、清除应用数据或卸载应用。退出登录会从设备上删除登录数据和交易所密钥。我们服务器上的每日计数会在上述期限内自动删除；账户记录在您使用应用期间保留。您可以通过电子邮件要求删除与您相关的任何数据。"
+    "设备上的数据会一直保留，直到您在应用设置中删除、清除应用数据或卸载应用。退出登录会从设备上删除登录数据和交易所密钥。我们服务器上的每日计数会在上述期限内自动删除；账户记录在您使用应用期间保留。您可以在应用内自行删除账户及我们服务器上的所有数据（设置 → 删除账号），也可以通过电子邮件要求删除与您相关的任何数据。如果您开启了云端备份，备份会保留到您在设置中删除或删除账户为止。"
    ],
    [
     "您的权利",
@@ -12119,7 +12165,7 @@ function onGoogleCredential(resp){
   setGoogleToken(resp.credential);
   // Сразу меняем часовой токен Google на свою 90-дневную сессию — дальше вход
   // держится на ней и не зависит от One Tap, который в обёртке негде показать.
-  exchangeForSessionToken(resp.credential).then(()=>{fetchAILimit();syncServerAccess();});
+  exchangeForSessionToken(resp.credential).then(()=>{fetchAILimit();syncServerAccess();try{cloudStartup();}catch(e){}});
   hideAuthGate();
 }
 // Мост для Android-обёртки: Google блокирует свой вход внутри WebView как
@@ -12128,27 +12174,27 @@ function onGoogleCredential(resp){
 window.onAndroidGoogleCredential=function(idToken){onGoogleCredential({credential:idToken});};
 const AUTH_GATE_I18N={
   uk:{desc:'Увійдіть, щоб користуватися застосунком',
-      note:'Ми отримуємо лише імʼя, пошту та ідентифікатор облікового запису. Дані портфеля залишаються на пристрої.',
+      note:'Ми отримуємо лише імʼя, пошту та ідентифікатор облікового запису. Дані портфеля зберігаються на пристрої; хмарну копію можна ввімкнути за бажанням.',
       failed:'Не вдалося завантажити вхід Google. Перевірте зʼєднання.',
       retry:'Спробувати ще раз',skip:'Продовжити без входу',
       signIn:'Увійти через Google',cancelled:'Вхід скасовано'},
   ru:{desc:'Войдите, чтобы пользоваться приложением',
-      note:'Мы получаем только имя, почту и идентификатор аккаунта. Данные портфеля остаются на устройстве.',
+      note:'Мы получаем только имя, почту и идентификатор аккаунта. Данные портфеля хранятся на устройстве; облачную копию можно включить по желанию.',
       failed:'Не удалось загрузить вход Google. Проверьте соединение.',
       retry:'Попробовать ещё раз',skip:'Продолжить без входа',
       signIn:'Войти через Google',cancelled:'Вход отменён'},
   en:{desc:'Sign in to use the app',
-      note:'We only receive your name, email and account ID. Portfolio data stays on your device.',
+      note:'We only receive your name, email and account ID. Portfolio data is stored on your device; a cloud backup is optional.',
       failed:'Could not load Google sign-in. Check your connection.',
       retry:'Try again',skip:'Continue without signing in',
       signIn:'Sign in with Google',cancelled:'Sign-in cancelled'},
   de:{desc:'Melden Sie sich an, um die App zu nutzen',
-      note:'Wir erhalten nur Name, E-Mail und Konto-ID. Ihre Portfoliodaten bleiben auf dem Gerät.',
+      note:'Wir erhalten nur Name, E-Mail und Konto-ID. Ihre Portfoliodaten werden auf Ihrem Gerät gespeichert; eine Cloud-Sicherung ist optional.',
       failed:'Google-Anmeldung konnte nicht geladen werden. Prüfen Sie die Verbindung.',
       retry:'Erneut versuchen',skip:'Ohne Anmeldung fortfahren',
       signIn:'Mit Google anmelden',cancelled:'Anmeldung abgebrochen'},
   zh:{desc:'请登录以使用应用',
-      note:'我们仅获取您的姓名、邮箱和账户标识。投资组合数据仍保留在本设备上。',
+      note:'我们仅获取您的姓名、邮箱和账户标识。投资组合数据保存在您的设备上；云端备份为可选项。',
       failed:'无法加载 Google 登录。请检查网络连接。',
       retry:'重试',skip:'不登录继续',
       signIn:'使用 Google 登录',cancelled:'登录已取消'}
@@ -12181,6 +12227,8 @@ function signOutGoogle(){
   try{exchangeUi.busy={};exchangeUi.errors={};exchangeUi.formOpen=false;renderExchanges();}catch{}
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();}catch{}
   aiLimitInfo=null;
+  // Облачная копия: сбрасываем таймеры и показанное. Сама копия на сервере остаётся.
+  try{if(CLOUD){if(CLOUD.timer){clearTimeout(CLOUD.timer);CLOUD.timer=null;}CLOUD.list=null;CLOUD.msg='';CLOUD.started=-1;CLOUD.consentAsked=false;CLOUD.conflictShown=false;renderCloudBackupUI();}}catch(e){}
   showAuthGate();
 }
 function showAuthGate(){
@@ -14622,6 +14670,503 @@ function handleBackupFile(input){
   input.value='';
 }
 
+// ── CLOUD BACKUP + УДАЛЕНИЕ АККАУНТА (v0.1.65) ───────────────────────
+// Зачем: сменил или потерял телефон — вошёл тем же Google-аккаунтом и вернул
+// портфель, а не вбивает активы заново. Пароля нет: личность — Google sub.
+// Копию шифрует сервер (см. stock-worker.js). В копию идёт ТОЛЬКО то же, что и в
+// файловый экспорт: ключи бирж и банков (investory_exchange_keys / investory_bank_keys)
+// в BACKUP_STORAGE_KEYS не входят и сюда не попадают.
+//
+// var, а не const/let: saveData() срабатывает при старте раньше, чем скрипт дойдёт
+// до этого места, — с const вышел бы TDZ. Хуки в других местах обёрнуты в try/catch
+// и проверяют CLOUD.
+var CLOUD_KEY='investory_cloud';
+var CLOUD_THROTTLE_MS=30000;        // как часто смотрим, изменились ли данные
+var CLOUD_MIN_GAP_MS=10*60*1000;    // автокопия — не чаще раза в 10 минут (цены монет меняют данные постоянно)
+var CLOUD_MAX_BYTES=900*1024;       // как на воркере
+var CLOUD_LEAN_DROP=['kapital_v6_prev','kapital_pre_migration_backup','kapital_migration_log','live_rates_cache','kapital_test_checklist'];
+var CLOUD_HEAVY_DROP=['cap_history','section_hourly_history'];
+var CLOUD={timer:null,busy:false,list:null,msg:'',started:-1,consentAsked:false,conflictShown:false,promptRetry:0};
+
+var CLOUD_I18N={
+  title:{uk:'☁️ ХМАРНА КОПІЯ',ru:'☁️ ОБЛАЧНАЯ КОПИЯ',en:'☁️ CLOUD BACKUP',de:'☁️ CLOUD-SICHERUNG',zh:'☁️ 云端备份'},
+  auto:{uk:'Автоматично зберігати копію в хмарі',ru:'Автоматически сохранять копию в облаке',en:'Automatically back up to the cloud',de:'Automatisch in der Cloud sichern',zh:'自动备份到云端'},
+  hintOff:{uk:'Вимкнено. Увімкніть, щоб відновити дані на новому телефоні після входу через Google.',ru:'Выключено. Включите, чтобы восстановить данные на новом телефоне после входа через Google.',en:'Off. Turn it on to restore your data on a new phone after signing in with Google.',de:'Aus. Aktivieren Sie es, um Ihre Daten nach der Google-Anmeldung auf einem neuen Telefon wiederherzustellen.',zh:'已关闭。开启后，换新手机并用 Google 登录即可恢复数据。'},
+  last:{uk:'Остання копія: {when}',ru:'Последняя копия: {when}',en:'Last backup: {when}',de:'Letzte Sicherung: {when}',zh:'最近备份：{when}'},
+  none:{uk:'Копія ще не створена.',ru:'Копия ещё не создана.',en:'No backup yet.',de:'Noch keine Sicherung.',zh:'尚未创建备份。'},
+  otherDevice:{uk:'На сервері є копія з іншого пристрою: {when}',ru:'На сервере есть копия с другого устройства: {when}',en:'The server has a backup from another device: {when}',de:'Auf dem Server liegt eine Sicherung von einem anderen Gerät: {when}',zh:'服务器上有来自其他设备的备份：{when}'},
+  saveNow:{uk:'☁️ Зберегти зараз',ru:'☁️ Сохранить сейчас',en:'☁️ Back up now',de:'☁️ Jetzt sichern',zh:'☁️ 立即备份'},
+  restoreBtn:{uk:'↻ Відновити з копії',ru:'↻ Восстановить из копии',en:'↻ Restore from backup',de:'↻ Aus Sicherung wiederherstellen',zh:'↻ 从备份恢复'},
+  deleteCopy:{uk:'Видалити копію з сервера',ru:'Удалить копию с сервера',en:'Delete the backup from the server',de:'Sicherung vom Server löschen',zh:'从服务器删除备份'},
+  deleteCopyAsk:{uk:'Видалити всі хмарні копії? Дані на цьому пристрої залишаться.',ru:'Удалить все облачные копии? Данные на этом устройстве останутся.',en:'Delete all cloud backups? Your data on this device stays.',de:'Alle Cloud-Sicherungen löschen? Ihre Daten auf diesem Gerät bleiben erhalten.',zh:'删除所有云端备份？本设备上的数据会保留。'},
+  deleted:{uk:'Хмарні копії видалено.',ru:'Облачные копии удалены.',en:'Cloud backups deleted.',de:'Cloud-Sicherungen gelöscht.',zh:'云端备份已删除。'},
+  saved:{uk:'✅ Копію збережено',ru:'✅ Копия сохранена',en:'✅ Backup saved',de:'✅ Sicherung gespeichert',zh:'✅ 备份已保存'},
+  working:{uk:'Зачекайте…',ru:'Подождите…',en:'Please wait…',de:'Bitte warten…',zh:'请稍候…'},
+  errNet:{uk:'Не вдалося зв’язатися із сервером. Спробуйте пізніше.',ru:'Не удалось связаться с сервером. Попробуйте позже.',en:'Could not reach the server. Try again later.',de:'Server nicht erreichbar. Versuchen Sie es später erneut.',zh:'无法连接服务器，请稍后再试。'},
+  errAuth:{uk:'Потрібно увійти знову.',ru:'Нужно войти снова.',en:'Please sign in again.',de:'Bitte melden Sie sich erneut an.',zh:'请重新登录。'},
+  errTooLarge:{uk:'Копія завелика для хмари. Скористайтеся експортом у файл.',ru:'Копия слишком большая для облака. Воспользуйтесь экспортом в файл.',en:'The backup is too large for the cloud. Use file export instead.',de:'Die Sicherung ist zu groß für die Cloud. Nutzen Sie den Dateiexport.',zh:'备份过大，无法保存到云端。请使用文件导出。'},
+  errLimit:{uk:'Сьогодні вичерпано ліміт збережень. Спробуйте завтра.',ru:'Сегодня исчерпан лимит сохранений. Попробуйте завтра.',en:'Today’s backup limit is reached. Try again tomorrow.',de:'Das Tageslimit für Sicherungen ist erreicht. Versuchen Sie es morgen erneut.',zh:'今日备份次数已达上限，请明天再试。'},
+  errUnavail:{uk:'Хмарна копія тимчасово недоступна.',ru:'Облачная копия временно недоступна.',en:'Cloud backup is temporarily unavailable.',de:'Die Cloud-Sicherung ist vorübergehend nicht verfügbar.',zh:'云端备份暂时不可用。'},
+  errRestore:{uk:'Не вдалося відновити: ',ru:'Не удалось восстановить: ',en:'Restore failed: ',de:'Wiederherstellung fehlgeschlagen: ',zh:'恢复失败：'},
+  noCopies:{uk:'У хмарі немає копій.',ru:'В облаке нет копий.',en:'There are no backups in the cloud.',de:'In der Cloud gibt es keine Sicherungen.',zh:'云端没有备份。'},
+  consentTitle:{uk:'Зберігати резервну копію в хмарі?',ru:'Хранить резервную копию в облаке?',en:'Keep a backup in the cloud?',de:'Sicherung in der Cloud speichern?',zh:'在云端保存备份？'},
+  consentBody:{uk:'Щоб не втратити дані при зміні чи втраті телефона, ми можемо зберігати копію вашого портфеля на нашому сервері в зашифрованому вигляді. Вона привʼязана до вашого акаунта Google — після входу на новому телефоні ви повернете всі дані. Ключі бірж і банків у копію не потрапляють: вони залишаються лише на вашому пристрої. Вимкнути та видалити копію можна будь-коли в Налаштуваннях.',
+    ru:'Чтобы не потерять данные при смене или потере телефона, мы можем хранить копию вашего портфеля на нашем сервере в зашифрованном виде. Она привязана к вашему аккаунту Google — после входа на новом телефоне вы вернёте все данные. Ключи бирж и банков в копию не попадают: они остаются только на вашем устройстве. Отключить и удалить копию можно в любой момент в Настройках.',
+    en:'So you do not lose your data if you change or lose your phone, we can keep an encrypted copy of your portfolio on our server. It is tied to your Google account — after signing in on a new phone you get everything back. Exchange and bank keys are never included: they stay only on your device. You can turn this off and delete the copy any time in Settings.',
+    de:'Damit Sie Ihre Daten bei einem Telefonwechsel oder -verlust nicht verlieren, können wir eine verschlüsselte Kopie Ihres Portfolios auf unserem Server speichern. Sie ist an Ihr Google-Konto gebunden – nach der Anmeldung auf einem neuen Telefon erhalten Sie alles zurück. Börsen- und Bankschlüssel sind nie enthalten: Sie bleiben nur auf Ihrem Gerät. Sie können dies jederzeit in den Einstellungen ausschalten und die Kopie löschen.',
+    zh:'为避免更换或丢失手机时丢失数据，我们可以在服务器上保存您投资组合的加密副本。副本与您的 Google 账号绑定——在新手机上登录后即可找回全部数据。交易所和银行的密钥不会包含在副本中，只保留在您的设备上。您可随时在“设置”中关闭并删除该副本。'},
+  consentYes:{uk:'Увімкнути',ru:'Включить',en:'Turn on',de:'Aktivieren',zh:'开启'},
+  consentNo:{uk:'Не зараз',ru:'Не сейчас',en:'Not now',de:'Nicht jetzt',zh:'暂不'},
+  offerTitle:{uk:'Знайдено копію ваших даних',ru:'Найдена копия ваших данных',en:'We found a backup of your data',de:'Sicherung Ihrer Daten gefunden',zh:'找到您的数据备份'},
+  offerBody:{uk:'У хмарі є копія від {when}{dev}. Відновити її на цьому пристрої?',ru:'В облаке есть копия от {when}{dev}. Восстановить её на этом устройстве?',en:'There is a backup from {when}{dev}. Restore it on this device?',de:'Es gibt eine Sicherung vom {when}{dev}. Auf diesem Gerät wiederherstellen?',zh:'云端有一份 {when}{dev} 的备份。要在此设备上恢复吗？'},
+  offerYes:{uk:'Відновити',ru:'Восстановить',en:'Restore',de:'Wiederherstellen',zh:'恢复'},
+  offerNo:{uk:'Почати з нуля',ru:'Начать с нуля',en:'Start fresh',de:'Neu beginnen',zh:'重新开始'},
+  conflictTitle:{uk:'У хмарі вже є інша копія',ru:'В облаке уже есть другая копия',en:'A different backup already exists',de:'In der Cloud liegt bereits eine andere Sicherung',zh:'云端已有另一份备份'},
+  conflictBody:{uk:'У хмарі збережена копія від {when}{dev}. Вона відрізняється від даних на цьому пристрої. Що зробити?',ru:'В облаке сохранена копия от {when}{dev}. Она отличается от данных на этом устройстве. Что сделать?',en:'The cloud has a backup from {when}{dev}. It differs from the data on this device. What would you like to do?',de:'In der Cloud liegt eine Sicherung vom {when}{dev}. Sie unterscheidet sich von den Daten auf diesem Gerät. Was möchten Sie tun?',zh:'云端有一份 {when}{dev} 的备份，与本设备上的数据不同。您想怎么做？'},
+  conflictRestore:{uk:'Відновити з хмари (дані тут буде замінено)',ru:'Восстановить из облака (данные здесь будут заменены)',en:'Restore from cloud (data here will be replaced)',de:'Aus der Cloud wiederherstellen (Daten hier werden ersetzt)',zh:'从云端恢复（此处数据将被替换）'},
+  conflictReplace:{uk:'Замінити хмарну копію моїми даними',ru:'Заменить облачную копию моими данными',en:'Replace the cloud backup with my data',de:'Cloud-Sicherung durch meine Daten ersetzen',zh:'用我的数据替换云端备份'},
+  conflictLater:{uk:'Вирішити пізніше',ru:'Решить позже',en:'Decide later',de:'Später entscheiden',zh:'稍后决定'},
+  pickTitle:{uk:'Відновити з копії',ru:'Восстановить из копии',en:'Restore from a backup',de:'Aus Sicherung wiederherstellen',zh:'从备份恢复'},
+  pickAsk:{uk:'Відновити дані з копії від {when}? Поточні дані на цьому пристрої буде замінено (це можна скасувати: «Відкотити останній імпорт»).',ru:'Восстановить данные из копии от {when}? Текущие данные на этом устройстве будут заменены (это можно отменить: «Откатить последний импорт»).',en:'Restore data from the backup of {when}? Current data on this device will be replaced (you can undo it: “Undo last import”).',de:'Daten aus der Sicherung vom {when} wiederherstellen? Die aktuellen Daten auf diesem Gerät werden ersetzt (rückgängig: „Letzten Import rückgängig machen“).',zh:'从 {when} 的备份恢复数据？此设备上的当前数据将被替换（可通过“撤销上次导入”还原）。'},
+  delBtn:{uk:'Видалити акаунт',ru:'Удалить аккаунт',en:'Delete account',de:'Konto löschen',zh:'删除账号'},
+  delBody:{uk:'Буде безповоротно видалено ваш обліковий запис на нашому сервері: картку користувача (пошту, ідентифікатор, статуси, лічильники) і всі хмарні копії. Якщо дані ще потрібні — спершу зробіть експорт у файл. Підписки в магазині застосунків це не скасовує — скасуйте їх у Google Play чи App Store.',
+    ru:'Будет безвозвратно удалена ваша учётная запись на нашем сервере: карточка пользователя (почта, идентификатор, статусы, счётчики) и все облачные копии. Если данные ещё нужны — сначала сделайте экспорт в файл. Подписки в магазине приложений это не отменяет — отмените их в Google Play или App Store.',
+    en:'This permanently deletes your account on our server: your user record (email, ID, statuses, counters) and all cloud backups. If you still need your data, export it to a file first. It does not cancel store subscriptions — cancel those in Google Play or the App Store.',
+    de:'Dadurch wird Ihr Konto auf unserem Server endgültig gelöscht: Ihr Nutzerdatensatz (E-Mail, ID, Status, Zähler) und alle Cloud-Sicherungen. Wenn Sie Ihre Daten noch brauchen, exportieren Sie sie zuerst in eine Datei. Abos in App-Stores werden dadurch nicht gekündigt – kündigen Sie diese in Google Play oder im App Store.',
+    zh:'这将永久删除您在我们服务器上的账号：用户记录（邮箱、标识、状态、计数）以及所有云端备份。如果仍需要数据，请先导出为文件。此操作不会取消应用商店中的订阅，请在 Google Play 或 App Store 中取消。'},
+  delLocal:{uk:'Також стерти дані портфеля на цьому пристрої',ru:'Также стереть данные портфеля на этом устройстве',en:'Also erase my portfolio data on this device',de:'Portfoliodaten auf diesem Gerät ebenfalls löschen',zh:'同时清除此设备上的投资组合数据'},
+  delConfirm:{uk:'Видалити назавжди',ru:'Удалить навсегда',en:'Delete permanently',de:'Endgültig löschen',zh:'永久删除'},
+  delErr:{uk:'Не вдалося видалити акаунт. Спробуйте пізніше.',ru:'Не удалось удалить аккаунт. Попробуйте позже.',en:'Could not delete the account. Try again later.',de:'Das Konto konnte nicht gelöscht werden. Versuchen Sie es später erneut.',zh:'无法删除账号，请稍后再试。'},
+  delOwner:{uk:'Акаунт власника застосунку видалити не можна.',ru:'Аккаунт владельца приложения удалить нельзя.',en:'The app owner’s account cannot be deleted.',de:'Das Konto des App-Inhabers kann nicht gelöscht werden.',zh:'无法删除应用所有者的账号。'}
+};
+function cloudTxt(key,vars){
+  const d=CLOUD_I18N[key];
+  let s=(d&&(d[currentLang]||d.uk))||key;
+  if(vars)Object.keys(vars).forEach(k=>{s=s.split('{'+k+'}').join(vars[k]);});
+  return s;
+}
+function cloudWhen(ms){
+  try{return new Date(ms).toLocaleString(appLocale(),{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+  catch(e){return String(ms);}
+}
+function cloudDev(m){
+  const d=m&&(m.device||m.platform);
+  return d?' ('+d+')':'';
+}
+
+// Состояние хранится отдельно от данных портфеля и в бэкап не входит. Привязано к
+// аккаунту: другой вход на этом устройстве начинает с чистого листа.
+function cloudRead(){
+  let s=null;
+  try{s=JSON.parse(localStorage.getItem(CLOUD_KEY)||'null');}catch(e){}
+  const sub=getGoogleSub();
+  if(!s||typeof s!=='object'||s.sub!==sub)s={sub,enabled:false,decided:false,declined:false,base:0,sig:'',lastAt:0};
+  return s;
+}
+function cloudPatch(p){
+  const s=Object.assign(cloudRead(),p);
+  try{localStorage.setItem(CLOUD_KEY,JSON.stringify(s));}catch(e){}
+  return s;
+}
+
+// Пусто ли приложение. ГЛАВНАЯ ЗАЩИТА: пустое (только что установленное) приложение
+// никогда не загружает копию — иначе оно затёрло бы хорошую копию с другого телефона.
+// Нечитаемые данные считаем пустыми по той же причине.
+function cloudIsLocalEmpty(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return true;
+    const d=JSON.parse(raw);
+    if(!d||typeof d!=='object')return true;
+    const pos=v=>parseInputNumber(v)>0;
+    // Свежее приложение само создаёт пустой вклад и пустую секцию акций — это НЕ данные.
+    if((d.deposits||[]).some(x=>x&&(pos(x.principal)||String(x.name||'').trim()||(x.topups||[]).length)))return false;
+    if((d.securitiesSections||[]).some(x=>x&&((x.items||[]).length||pos(x.stockCashAmount)||pos(x.incomeAmount)||x.id!=='sec_stocks_default')))return false;
+    if(['coins','forexItems','customSections','liabilities','metalsSections','manualBanks'].some(k=>Array.isArray(d[k])&&d[k].length>0))return false;
+    if(['cryptoUsdt','usdAmount','cashAmount','otherAmount'].some(k=>pos(d[k])))return false;
+    return true;
+  }catch(e){return true;}
+}
+
+// «Отпечаток» данных без поля savedAt (оно меняется при каждом сохранении) + день:
+// не изменилось — копию не шлём; одна копия в сутки при пустяковых правках истории.
+function cloudHash(str){
+  let h=0x811c9dc5;
+  for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193);}
+  return (h>>>0).toString(16)+':'+str.length;
+}
+function cloudSignature(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return '';
+    const d=JSON.parse(raw);
+    delete d.savedAt;
+    return cloudHash(JSON.stringify(d))+'|'+new Date().toISOString().slice(0,10);
+  }catch(e){return '';}
+}
+
+async function cloudPack(text){
+  const raw=new TextEncoder().encode(text);
+  if(typeof CompressionStream==='function'){
+    try{
+      const cs=new CompressionStream('gzip');
+      const w=cs.writable.getWriter();
+      w.write(raw);w.close();
+      return {enc:'gz',bytes:new Uint8Array(await new Response(cs.readable).arrayBuffer())};
+    }catch(e){}
+  }
+  return {enc:'raw',bytes:raw};
+}
+async function cloudUnpack(enc,bytes){
+  let buf=bytes;
+  if(enc==='gz'){
+    if(typeof DecompressionStream!=='function')throw new Error('gzip is not supported by this browser');
+    const ds=new DecompressionStream('gzip');
+    const w=ds.writable.getWriter();
+    w.write(bytes);w.close();
+    buf=new Uint8Array(await new Response(ds.readable).arrayBuffer());
+  }
+  return new TextDecoder().decode(buf);
+}
+
+// Копия — тот же состав, что и файловый экспорт, но легче: без дублей и служебных
+// копий. Проверяется теми же правилами, что и импорт (иначе расхождение вылезет
+// в момент, когда человек пытается восстановиться).
+async function cloudBuild(heavy){
+  const p=collectBackupPayload();
+  CLOUD_LEAN_DROP.forEach(k=>{delete p.storage[k];});
+  if(heavy)CLOUD_HEAVY_DROP.forEach(k=>{delete p.storage[k];});
+  delete p.data;delete p.capitalHistory;
+  validateBackupPayload(JSON.parse(JSON.stringify(p)));
+  return cloudPack(JSON.stringify(p));
+}
+
+async function cloudApi(path,opts){
+  opts=opts||{};
+  const h=authHeaders();
+  if(!h.Authorization)return null;
+  const init={method:opts.method||'GET',headers:Object.assign({},h)};
+  if(opts.body!==undefined){
+    init.body=opts.body;
+    init.headers['Content-Type']=(typeof opts.body==='string')?'application/json':'application/octet-stream';
+  }
+  return fetch(AUTH_BASE+path,init);
+}
+
+function cloudToast(msg){
+  try{
+    const old=document.getElementById('cloudToast');if(old)old.remove();
+    const el=document.createElement('div');
+    el.id='cloudToast';el.textContent=msg;
+    el.style.cssText='position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:86vw;z-index:700;'+
+      "padding:11px 16px;border-radius:12px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;box-shadow:0 8px 28px #0008;text-align:center;";
+    document.body.appendChild(el);
+    setTimeout(()=>{el.remove();},4500);
+  }catch(e){}
+}
+
+// Отправка. opts.manual — человек нажал сам; opts.force — заменить копию в облаке.
+async function cloudUpload(opts){
+  const r=await cloudUploadOnce(opts||{});
+  // На сервере пусто, а у нас устаревший base (копию удалили с другого устройства) — один повтор с base=0.
+  if(r&&r.retry)return cloudUploadOnce(Object.assign({},opts,{base:0,retried:true}));
+  return r;
+}
+async function cloudUploadOnce(opts){
+  if(CLOUD.busy||window._kapitalImportInProgress)return {skipped:'busy'};
+  if(!isSignedIn()||isOffline())return {skipped:'offline'};
+  let st=cloudRead();
+  if(!opts.manual&&!st.enabled)return {skipped:'off'};
+  if(cloudIsLocalEmpty())return {skipped:'empty'};
+  CLOUD.busy=true;
+  renderCloudBackupUI();
+  try{
+    let pack=await cloudBuild(false);
+    if(pack.bytes.length>CLOUD_MAX_BYTES)pack=await cloudBuild(true);
+    if(pack.bytes.length>CLOUD_MAX_BYTES){CLOUD.msg='errTooLarge';return {error:'too_large'};}
+    const sig=cloudSignature();
+    const base=opts.base!==undefined?opts.base:st.base;
+    const q='?enc='+pack.enc+'&v='+encodeURIComponent(APP_VERSION)+'&base='+(base||0)+(opts.force?'&force=1':'');
+    const r=await cloudApi('/backup/save'+q,{method:'POST',body:pack.bytes});
+    if(!r){CLOUD.msg='errAuth';return {error:'auth'};}
+    let d={};try{d=await r.json();}catch(e){}
+    if(r.status===200&&d.ok){
+      cloudPatch({base:d.savedAt,sig,lastAt:Date.now()});
+      CLOUD.msg='';CLOUD.conflictShown=false;
+      cloudRefreshList();
+      return {ok:true};
+    }
+    if(r.status===409){
+      if(!d.latest&&!opts.retried)return {retry:true};
+      CLOUD.msg='';
+      if(d.latest)cloudAskConflict(d.latest);
+      return {conflict:true};
+    }
+    CLOUD.msg=r.status===401?'errAuth':r.status===413?'errTooLarge':r.status===429?'errLimit':r.status===503?'errUnavail':'errNet';
+    return {error:r.status};
+  }catch(e){
+    CLOUD.msg='errNet';
+    return {error:'net'};
+  }finally{
+    CLOUD.busy=false;
+    renderCloudBackupUI();
+  }
+}
+
+async function cloudRefreshList(){
+  try{
+    const r=await cloudApi('/backup/list');
+    if(r&&r.status===200){CLOUD.list=(await r.json()).backups||[];}
+  }catch(e){}
+  renderCloudBackupUI();
+}
+
+// Восстановление: тем же путём, что и импорт файла (проверка, снимок для отката).
+async function cloudRestore(meta){
+  const r=await cloudApi('/backup/get?id='+encodeURIComponent(meta.id));
+  if(!r||r.status!==200)throw new Error('server '+(r?r.status:'auth'));
+  const bytes=new Uint8Array(await r.arrayBuffer());
+  const text=await cloudUnpack(meta.enc,bytes);
+  let raw;try{raw=JSON.parse(text);}catch(e){throw new Error('damaged copy');}
+  const payload=sanitizeBackupAccessState(normalizeBackupPayload(raw));
+  if(!payload)throw new Error('unknown format');
+  validateBackupPayload(payload);
+  // Лёгкая копия могла не нести историю графика — не стираем локальную.
+  const keep={};
+  CLOUD_HEAVY_DROP.forEach(k=>{if(!(payload.storage&&payload.storage[k])){const v=localStorage.getItem(k);if(v)keep[k]=v;}});
+  if(!restoreBackupPayload(payload))throw new Error('restore failed');
+  Object.keys(keep).forEach(k=>localStorage.setItem(k,keep[k]));
+  // sig='restored': после перезагрузки запоминаем отпечаток, не отправляя ту же копию снова.
+  cloudPatch({enabled:true,decided:true,declined:false,base:meta.savedAt,sig:'restored',lastAt:Date.now()});
+  setTimeout(()=>location.reload(),400);
+}
+function cloudRestoreById(meta,fromSheet){
+  closeBankSheet();
+  customConfirm(cloudTxt('pickAsk',{when:cloudWhen(meta.savedAt)}),()=>{
+    CLOUD.msg='working';renderCloudBackupUI();
+    cloudRestore(meta).catch(e=>{
+      CLOUD.msg='';renderCloudBackupUI();
+      cloudToast(cloudTxt('errRestore')+(e&&e.message?e.message:''));
+    });
+  });
+}
+
+// ── Окна ──────────────────────────────────────────────────────────────
+function cloudSheet(title,inner){
+  openBankSheet(title,'<div style="font-family:\'DM Mono\',monospace;font-size:11px;line-height:1.6;color:var(--text);">'+inner+'</div>');
+}
+function cloudBtn(label,onclick,kind){
+  const col=kind==='danger'?'var(--red)':kind==='primary'?'var(--green2)':'var(--muted)';
+  const bd=kind==='danger'?'#f8717155':kind==='primary'?'#4ecb8d55':'var(--border2)';
+  const bg=kind==='danger'?'#f871711a':kind==='primary'?'#4ecb8d1a':'transparent';
+  return '<button type="button" onclick="'+onclick+'" style="width:100%;margin-top:8px;padding:12px;border-radius:10px;border:1px solid '+bd+';background:'+bg+';font-family:\'DM Mono\',monospace;font-size:11px;color:'+col+';cursor:pointer;">'+escHtml(label)+'</button>';
+}
+function cloudCanPrompt(){
+  if(document.getElementById('bankSheet'))return false;
+  const g=document.getElementById('authGate');if(g&&g.classList.contains('open'))return false;
+  const pw=document.getElementById('paywallOverlay');if(pw&&pw.classList.contains('open'))return false;
+  return true;
+}
+
+function cloudAskConsent(){
+  if(CLOUD.consentAsked)return;
+  if(!cloudCanPrompt()){if(CLOUD.promptRetry++<12)setTimeout(cloudAskConsent,20000);return;}
+  CLOUD.consentAsked=true;
+  cloudSheet(cloudTxt('consentTitle'),'<div style="color:var(--muted);">'+escHtml(cloudTxt('consentBody'))+'</div>'+
+    cloudBtn(cloudTxt('consentYes'),'cloudConsent(true)','primary')+cloudBtn(cloudTxt('consentNo'),'cloudConsent(false)'));
+}
+function cloudConsent(yes){
+  closeBankSheet();
+  if(yes){cloudPatch({enabled:true,decided:true});cloudUpload({});}
+  else cloudPatch({enabled:false,decided:true});
+  renderCloudBackupUI();
+}
+
+function cloudAskRestore(latest){
+  if(!cloudCanPrompt()){if(CLOUD.promptRetry++<12)setTimeout(()=>cloudAskRestore(latest),20000);return;}
+  CLOUD.offer=latest;
+  cloudSheet(cloudTxt('offerTitle'),'<div style="color:var(--muted);">'+escHtml(cloudTxt('offerBody',{when:cloudWhen(latest.savedAt),dev:cloudDev(latest)}))+'</div>'+
+    cloudBtn(cloudTxt('offerYes'),'cloudOfferRestore()','primary')+cloudBtn(cloudTxt('offerNo'),'cloudOfferDecline()'));
+}
+function cloudOfferRestore(){
+  closeBankSheet();
+  const m=CLOUD.offer;if(!m)return;
+  CLOUD.msg='working';renderCloudBackupUI();
+  cloudRestore(m).catch(e=>{CLOUD.msg='';renderCloudBackupUI();cloudToast(cloudTxt('errRestore')+(e&&e.message?e.message:''));});
+}
+function cloudOfferDecline(){
+  closeBankSheet();
+  cloudPatch({declined:true,decided:true,enabled:false});
+  renderCloudBackupUI();
+}
+
+// Приложение хотело отправить копию, а в облаке лежит другая (с другого телефона
+// или уже после нашей последней). Молча не затираем ни ту, ни другую сторону.
+function cloudAskConflict(latest){
+  if(CLOUD.conflictShown)return;
+  if(!cloudCanPrompt())return;
+  CLOUD.conflictShown=true;CLOUD.offer=latest;
+  cloudSheet(cloudTxt('conflictTitle'),'<div style="color:var(--muted);">'+escHtml(cloudTxt('conflictBody',{when:cloudWhen(latest.savedAt),dev:cloudDev(latest)}))+'</div>'+
+    cloudBtn(cloudTxt('conflictRestore'),'cloudConflictRestore()','primary')+
+    cloudBtn(cloudTxt('conflictReplace'),'cloudConflictReplace()','danger')+
+    cloudBtn(cloudTxt('conflictLater'),'closeBankSheet()'));
+}
+function cloudConflictRestore(){const m=CLOUD.offer;if(m)cloudRestoreById(m);}
+function cloudConflictReplace(){
+  closeBankSheet();
+  cloudPatch({decided:true,enabled:true});
+  cloudUpload({manual:true,force:true}).then(r=>{if(r&&r.ok)cloudToast(cloudTxt('saved'));});
+}
+
+async function cloudOpenRestorePicker(){
+  CLOUD.msg='working';renderCloudBackupUI();
+  let list=null;
+  try{
+    const r=await cloudApi('/backup/list');
+    if(r&&r.status===200)list=(await r.json()).backups||[];
+    else CLOUD.msg=r&&r.status===401?'errAuth':r&&r.status===503?'errUnavail':'errNet';
+  }catch(e){CLOUD.msg='errNet';}
+  if(list){CLOUD.msg='';CLOUD.list=list;}
+  renderCloudBackupUI();
+  if(!list)return;
+  if(!list.length){cloudToast(cloudTxt('noCopies'));return;}
+  CLOUD.pick=list;
+  const rows=list.map((m,i)=>'<button type="button" onclick="cloudPick('+i+')" style="width:100%;margin-top:8px;padding:12px;border-radius:10px;border:1px solid var(--border2);background:transparent;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text);cursor:pointer;text-align:left;">'+
+    escHtml(cloudWhen(m.savedAt))+'<br><span style="color:var(--muted);font-size:10px;">'+escHtml((m.device||m.platform||'')+(m.appVersion?' · '+m.appVersion:''))+'</span></button>').join('');
+  cloudSheet(cloudTxt('pickTitle'),rows);
+}
+function cloudPick(i){const m=(CLOUD.pick||[])[i];if(m)cloudRestoreById(m);}
+
+// ── Планировщик автокопии ─────────────────────────────────────────────
+// Вызывается из saveData(). Не «по таймеру после каждого нажатия», а раз в
+// CLOUD_THROTTLE_MS: поток частых сохранений (цены монет) не отодвигает отправку вечно.
+function cloudOnSave(){
+  if(!CLOUD||CLOUD.timer||!isSignedIn())return;
+  CLOUD.timer=setTimeout(cloudTick,CLOUD_THROTTLE_MS);
+}
+async function cloudTick(){
+  CLOUD.timer=null;
+  if(!isSignedIn())return;
+  const st=cloudRead();
+  if(!st.decided){if(!cloudIsLocalEmpty())cloudAskConsent();return;}
+  if(!st.enabled)return;
+  if(cloudSignature()===st.sig)return;
+  const wait=CLOUD_MIN_GAP_MS-(Date.now()-(st.lastAt||0));
+  if(wait>0){CLOUD.timer=setTimeout(cloudTick,wait+1000);return;}
+  await cloudUpload({});
+}
+document.addEventListener('visibilitychange',function(){
+  try{
+    // Уходим в фон — досылаем накопленное сразу, не дожидаясь таймера.
+    if(document.visibilityState==='hidden'&&CLOUD&&CLOUD.timer){clearTimeout(CLOUD.timer);CLOUD.timer=null;cloudTick();}
+  }catch(e){}
+});
+
+// Один раз за вход: смотрим, что лежит в облаке.
+async function cloudStartup(){
+  if(!CLOUD||!authEnabled()||!isSignedIn())return;
+  const gen=authGeneration;
+  if(CLOUD.started===gen)return;
+  CLOUD.started=gen;
+  if(isOffline()){CLOUD.started=-1;return;}
+  let list;
+  try{
+    const r=await cloudApi('/backup/list');
+    if(gen!==authGeneration)return;
+    if(!r||r.status!==200){if(r&&r.status===503)CLOUD.msg='errUnavail';renderCloudBackupUI();return;}
+    list=(await r.json()).backups||[];
+  }catch(e){CLOUD.started=-1;return;}
+  CLOUD.list=list;
+  let st=cloudRead();
+  if(st.sig==='restored')st=cloudPatch({sig:cloudSignature(),lastAt:Date.now()});
+  const latest=list[0]||null;
+  const empty=cloudIsLocalEmpty();
+  if(latest&&empty&&!st.declined)cloudAskRestore(latest);
+  else if(!st.decided&&!empty)cloudAskConsent();
+  else if(st.enabled&&(!latest||st.sig!==cloudSignature()))CLOUD.timer=CLOUD.timer||setTimeout(cloudTick,4000);
+  renderCloudBackupUI();
+}
+
+// ── Настройки ─────────────────────────────────────────────────────────
+function renderCloudBackupUI(){
+  const box=document.getElementById('cloudBackupBox');
+  if(!box||!CLOUD)return;
+  if(!authEnabled()||!hasEverSignedIn()){box.innerHTML='';return;}
+  const st=cloudRead();
+  const latest=CLOUD.list&&CLOUD.list[0];
+  let status='';
+  if(CLOUD.msg==='working')status=cloudTxt('working');
+  else if(CLOUD.msg)status=cloudTxt(CLOUD.msg);
+  else if(!st.enabled&&!latest)status=cloudTxt('hintOff');
+  else if(latest){
+    status=cloudTxt('last',{when:cloudWhen(latest.savedAt)})+cloudDev(latest);
+    if(st.base&&latest.savedAt!==st.base)status+='\n'+cloudTxt('otherDevice',{when:cloudWhen(latest.savedAt)});
+  }else status=cloudTxt('none');
+  const b=(label,fn)=>'<button type="button" onclick="'+fn+'" '+(CLOUD.busy?'disabled ':'')+'style="flex:1;padding:10px;border-radius:10px;border:1px solid #5b9cf640;background:#5b9cf610;font-family:\'DM Mono\',monospace;font-size:10px;color:var(--blue2);cursor:pointer;">'+escHtml(label)+'</button>';
+  box.innerHTML=
+    '<div class="settings-group-title" style="margin-top:6px;">'+escHtml(cloudTxt('title'))+'</div>'+
+    '<label style="display:flex;align-items:center;gap:10px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text);cursor:pointer;margin-bottom:6px;">'+
+      '<input type="checkbox" id="cloudAutoChk" '+(st.enabled?'checked ':'')+'onchange="cloudToggle(this.checked)" style="width:18px;height:18px;"> '+escHtml(cloudTxt('auto'))+'</label>'+
+    '<div id="cloudStatusLine" style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted);margin:6px 0 10px;white-space:pre-line;">'+escHtml(status)+'</div>'+
+    '<div style="display:flex;gap:8px;">'+b(cloudTxt('saveNow'),'cloudSaveNow()')+b(cloudTxt('restoreBtn'),'cloudOpenRestorePicker()')+'</div>'+
+    '<button type="button" onclick="cloudDeleteCopies()" style="width:100%;margin-top:8px;padding:8px;border:none;background:transparent;font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted);text-decoration:underline;cursor:pointer;">'+escHtml(cloudTxt('deleteCopy'))+'</button>';
+}
+function cloudToggle(on){
+  cloudPatch({enabled:!!on,decided:true,declined:false});
+  CLOUD.msg='';
+  if(on)cloudUpload({});
+  renderCloudBackupUI();
+}
+function cloudSaveNow(){
+  CLOUD.conflictShown=false;CLOUD.msg='';
+  cloudUpload({manual:true}).then(r=>{
+    if(r&&r.ok){cloudToast(cloudTxt('saved'));}
+    else if(r&&r.skipped==='empty'){cloudToast(cloudTxt('none'));}
+  });
+}
+function cloudDeleteCopies(){
+  customConfirm(cloudTxt('deleteCopyAsk'),async()=>{
+    try{
+      const r=await cloudApi('/backup/delete',{method:'POST',body:'{}'});
+      if(r&&r.status===200){
+        cloudPatch({base:0,sig:'',lastAt:0,enabled:false});
+        CLOUD.list=[];CLOUD.msg='';renderCloudBackupUI();cloudToast(cloudTxt('deleted'));
+      }else{CLOUD.msg=r&&r.status===401?'errAuth':'errNet';renderCloudBackupUI();}
+    }catch(e){CLOUD.msg='errNet';renderCloudBackupUI();}
+  });
+}
+
+// ── Удаление аккаунта (требование Google Play и App Store) ────────────
+function openDeleteAccountSheet(){
+  cloudSheet(cloudTxt('delBtn'),'<div style="color:var(--muted);">'+escHtml(cloudTxt('delBody'))+'</div>'+
+    '<label style="display:flex;align-items:flex-start;gap:10px;margin-top:14px;cursor:pointer;"><input type="checkbox" id="delLocalChk" style="width:18px;height:18px;flex:none;"> <span>'+escHtml(cloudTxt('delLocal'))+'</span></label>'+
+    '<div id="delErrLine" style="color:var(--red);margin-top:10px;min-height:14px;"></div>'+
+    cloudBtn(cloudTxt('delConfirm'),'doDeleteAccount()','danger')+cloudBtn((t('cancel')||'Cancel'),'closeBankSheet()'));
+}
+async function doDeleteAccount(){
+  const wipe=!!(document.getElementById('delLocalChk')||{}).checked;
+  const err=document.getElementById('delErrLine');
+  const fail=k=>{if(err)err.textContent=cloudTxt(k);};
+  try{
+    const r=await cloudApi('/account/delete',{method:'POST',body:JSON.stringify({confirm:true})});
+    if(!r)return fail('errAuth');
+    if(r.status===403)return fail('delOwner');
+    if(r.status!==200)return fail(r.status===401?'errAuth':'delErr');
+  }catch(e){return fail('errNet');}
+  try{localStorage.removeItem(CLOUD_KEY);}catch(e){}
+  closeBankSheet();closeSettings();
+  if(wipe){
+    window._kapitalImportInProgress=true;   // не даём saveData() переписать данные на выходе
+    if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
+    BACKUP_STORAGE_KEYS.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
+    try{localStorage.removeItem(STORAGE_ROLLBACK_KEY);}catch(e){}
+    signOutGoogle();
+    setTimeout(()=>location.reload(),300);
+  }else{
+    signOutGoogle();
+  }
+}
+
 function devResetAll(){
   if(!ENABLE_DEV_TOOLS)return;
   customConfirm('⚠️ Видалити ВСІ дані? Це незворотна дія!', function(){
@@ -14823,6 +15368,8 @@ updateAll=function(){
 
 // Final app start after every module/override is declared
 setTimeout(bootstrapApp,0);
+// Облачная копия: через пару секунд после старта смотрим, что лежит в облаке.
+setTimeout(function(){try{cloudStartup();}catch(e){}},3500);
 setTimeout(()=>{try{recordSectionHourlySnapshot();refreshCardSparklines();fitStableMoneyAmounts();renderUsdtBalanceCard();}catch(e){}},450);
 
 // Плашка «Доступна нова версія». HTML отдаётся из кэша, поэтому новая версия

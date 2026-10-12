@@ -307,6 +307,15 @@ async function handleRequest(request, env, ctx) {
       if (await isRateLimited('me', ip, 30, 60, env)) return json({ error: 'Too many requests' }, 429, origin, 0);
       return handleMe(request, origin, env);
     }
+    // Облачная копия данных и удаление аккаунта — только с входом, свои лимиты.
+    if (url.pathname.startsWith('/backup/')) {
+      if (await isRateLimited('data', ip, DATA_IP_PER_MIN, 60, env)) return json({ error: 'Too many requests' }, 429, origin, 0);
+      return handleBackup(request, url, origin, env);
+    }
+    if (url.pathname === '/account/delete') {
+      if (await isRateLimited('auth', ip, AUTH_IP_PER_MIN, 60, env)) return json({ error: 'Too many requests' }, 429, origin, 0);
+      return handleAccountDelete(request, origin, env);
+    }
     if (url.pathname.startsWith('/admin/')) {
       if (await isRateLimited('admin', ip, 120, 60, env)) return json({ error: 'Too many requests' }, 429, origin, 0);
       return handleAdmin(request, url, origin, env);
@@ -736,7 +745,13 @@ async function ensureSchema(env) {
       target TEXT, details TEXT, ip TEXT, ua TEXT)`),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS admin_log_at ON admin_log(at)'),
     env.DB.prepare('CREATE TABLE IF NOT EXISTS ai_counters (k TEXT PRIMARY KEY, day TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0)'),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS ai_counters_day ON ai_counters(day)')
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS ai_counters_day ON ai_counters(day)'),
+    // Облачная копия данных пользователя (с 12.10.2026). data — зашифрованный блок
+    // «iv.шифртекст» (base64url); сервер содержимого не разбирает.
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS backups (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, sub TEXT NOT NULL, saved_at INTEGER NOT NULL,
+      device TEXT, platform TEXT, app_version TEXT, enc TEXT NOT NULL, size INTEGER NOT NULL, data TEXT NOT NULL)`),
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS backups_sub ON backups(sub, id)')
   ]);
   // Откуда заходит человек (Android / веб) и с какого устройства — 05.10.2026:
   // в админке появились незнакомые аккаунты, и без этого не отличить робота
@@ -890,6 +905,178 @@ async function handleMe(request, origin, env) {
     isAdmin: sub === ADMIN_SUB,
     serverTime: now
   }, 200, origin, 0);
+}
+
+// ── Облачная копия данных и удаление аккаунта ─────────────────────────
+// Зачем: сменил или потерял телефон — вошёл тем же Google-аккаунтом и вернул
+// портфель, а не вбивает активы заново. Пароля нет: личность — Google sub из
+// проверенного токена. Копию шифрует СЕРВЕР ключом BACKUP_KEY (секрет Cloudflare,
+// не в репозитории), поэтому в консоли D1 и в любых выгрузках базы это набор
+// байтов; шифртекст привязан к sub (AAD), чужую строку другому не подсунуть.
+// Честно: владелец ключа технически может расшифровать — это решение Александра
+// (12.10.2026), политика конфиденциальности говорит об этом прямо.
+// Сжатие и проверку формата делает приложение: воркер на бесплатном тарифе имеет
+// 10 мс процессорного времени, разбирать мегабайты JSON ему нельзя.
+// Хранится BACKUP_KEEP последних копий — страховка от случайной перезаписи.
+const BACKUP_KEEP = 3;
+const BACKUP_MAX_BYTES = 900 * 1024;   // копия после сжатия, до шифрования
+const BACKUP_DAILY_SAVES = 150;        // сохранений в сутки на человека (защита записей D1)
+const BACKUP_ENC_RE = /^(gz|raw)$/;
+let backupKeyCache = null;
+
+function bytesToB64url(bytes) {
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function getBackupKey(env) {
+  if (backupKeyCache) return backupKeyCache;
+  const bin = atob(String(env.BACKUP_KEY || '').trim());
+  if (bin.length !== 32) throw new Error('BACKUP_KEY must be 32 bytes in base64');
+  const raw = new Uint8Array(32);
+  for (let i = 0; i < 32; i++) raw[i] = bin.charCodeAt(i);
+  backupKeyCache = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+  return backupKeyCache;
+}
+
+async function sealBackup(env, sub, bytes) {
+  const key = await getBackupKey(env);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv, additionalData: new TextEncoder().encode(sub) }, key, bytes));
+  return bytesToB64url(iv) + '.' + bytesToB64url(ct);
+}
+
+async function openBackup(env, sub, sealed) {
+  const [ivPart, ctPart] = String(sealed).split('.');
+  const key = await getBackupKey(env);
+  const plain = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: b64urlToBytes(ivPart), additionalData: new TextEncoder().encode(sub) },
+    key, b64urlToBytes(ctPart));
+  return new Uint8Array(plain);
+}
+
+function backupMeta(r) {
+  return { id: r.id, savedAt: r.saved_at, device: r.device || '', platform: r.platform || '',
+           appVersion: r.app_version || '', enc: r.enc, size: r.size };
+}
+
+function bytesResponse(bytes, origin) {
+  return new Response(bytes, { status: 200, headers: {
+    ...responseHeaders(origin, 0), 'Content-Type': 'application/octet-stream' } });
+}
+
+async function handleBackup(request, url, origin, env) {
+  const sub = await verifyAuthToken(bearerToken(request), env);
+  if (!sub) return json({ error: 'Sign in required' }, 401, origin);
+  if (!env.DB) return json({ error: 'Storage unavailable' }, 503, origin);
+  try { await getBackupKey(env); } catch { return json({ error: 'Backup is not configured' }, 503, origin); }
+  await ensureSchema(env);
+  const path = url.pathname;
+
+  if (path === '/backup/list' && request.method === 'GET') {
+    const { results } = await env.DB.prepare(
+      'SELECT id, saved_at, device, platform, app_version, enc, size FROM backups WHERE sub = ? ORDER BY id DESC LIMIT ?')
+      .bind(sub, BACKUP_KEEP).all();
+    return json({ backups: results.map(backupMeta), serverTime: Date.now() }, 200, origin, 0);
+  }
+
+  if (path === '/backup/get' && request.method === 'GET') {
+    const id = parseInt(url.searchParams.get('id'), 10);
+    if (!Number.isInteger(id) || id < 1) return json({ error: 'Invalid id' }, 400, origin);
+    const row = await env.DB.prepare('SELECT data FROM backups WHERE id = ? AND sub = ?').bind(id, sub).first();
+    if (!row) return json({ error: 'Not found' }, 404, origin);
+    let bytes;
+    try { bytes = await openBackup(env, sub, row.data); }
+    catch { return json({ error: 'Copy cannot be decrypted' }, 500, origin); }
+    return bytesResponse(bytes, origin);
+  }
+
+  if (path === '/backup/save' && request.method === 'POST') {
+    const enc = url.searchParams.get('enc') || 'raw';
+    if (!BACKUP_ENC_RE.test(enc)) return json({ error: 'Invalid format' }, 400, origin);
+    const declared = parseInt(request.headers.get('Content-Length') || '0', 10);
+    if (declared > BACKUP_MAX_BYTES) return json({ error: 'too_large', maxBytes: BACKUP_MAX_BYTES }, 413, origin);
+    const bytes = new Uint8Array(await request.arrayBuffer());
+    if (bytes.length < 2) return json({ error: 'Empty copy' }, 400, origin);
+    if (bytes.length > BACKUP_MAX_BYTES) return json({ error: 'too_large', maxBytes: BACKUP_MAX_BYTES }, 413, origin);
+
+    const reserved = await counterReserve(env, 'bk:' + sub, todayKey(), BACKUP_DAILY_SAVES);
+    if (reserved === null) return json({ error: 'Temporarily unavailable' }, 503, origin);
+    if (reserved === false) return json({ error: 'daily_limit' }, 429, origin);
+
+    const force = url.searchParams.get('force') === '1';
+    const base = Math.max(0, parseInt(url.searchParams.get('base'), 10) || 0);
+    const latest = await env.DB.prepare('SELECT MAX(saved_at) AS m FROM backups WHERE sub = ?').bind(sub).first();
+    const latestAt = latest && latest.m ? Number(latest.m) : 0;
+    const savedAt = Math.max(Date.now(), latestAt + 1);
+    const sealed = await sealBackup(env, sub, bytes);
+    const ci = clientInfo(request, origin);
+    const appVersion = String(url.searchParams.get('v') || '').replace(/[^\w.\-]/g, '').slice(0, 20);
+
+    // Вставка идёт ТОЛЬКО если копия на сервере всё ещё та, которую видело приложение
+    // (base). Проверка и запись — одна атомарная команда: две копии приложения не
+    // затрут друг друга. force=1 — человек сам решил заменить.
+    const res = await env.DB.prepare(`INSERT INTO backups (sub, saved_at, device, platform, app_version, enc, size, data)
+      SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8
+      WHERE ?9 = 1 OR COALESCE((SELECT MAX(saved_at) FROM backups WHERE sub = ?1), 0) = ?10`)
+      .bind(sub, savedAt, ci.device, ci.platform, appVersion, enc, bytes.length, sealed, force ? 1 : 0, base).run();
+    if (!res.meta || !res.meta.changes) {
+      await counterRelease(env, 'bk:' + sub);
+      const cur = await env.DB.prepare(
+        'SELECT id, saved_at, device, platform, app_version, enc, size FROM backups WHERE sub = ? ORDER BY id DESC LIMIT 1').bind(sub).first();
+      return json({ error: 'conflict', latest: cur ? backupMeta(cur) : null }, 409, origin, 0);
+    }
+    await env.DB.prepare(
+      'DELETE FROM backups WHERE sub = ?1 AND id NOT IN (SELECT id FROM backups WHERE sub = ?1 ORDER BY id DESC LIMIT ?2)')
+      .bind(sub, BACKUP_KEEP).run();
+    return json({ ok: true, savedAt }, 200, origin, 0);
+  }
+
+  if (path === '/backup/delete' && request.method === 'POST') {
+    const res = await env.DB.prepare('DELETE FROM backups WHERE sub = ?').bind(sub).run();
+    return json({ ok: true, removed: res.meta ? res.meta.changes : 0 }, 200, origin, 0);
+  }
+
+  return json({ error: 'Not found' }, 404, origin);
+}
+
+// Удаление аккаунта самим человеком — требование Google Play и App Store.
+// Стирает всё, что сервер о нём хранит: карточку, облачные копии, счётчики ИИ;
+// сессии гасит отзывом. Журнал админа не трогаем — в нём только действия владельца.
+// Владельца не удаляем (как и в админке): иначе потерять доступ к панели.
+async function deleteAccountData(env, sub, { revoke = true, purgeLog = true } = {}) {
+  await ensureSchema(env);
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM backups WHERE sub = ?').bind(sub),
+    env.DB.prepare('DELETE FROM ai_counters WHERE k LIKE ?').bind('user:g' + sub + ':%'),
+    env.DB.prepare('DELETE FROM ai_counters WHERE k = ?').bind('bk:' + sub),
+    env.DB.prepare('DELETE FROM users WHERE sub = ?').bind(sub)
+  ]);
+  // Записи журнала админа, где человек назван целью (с его почтой в деталях), — тоже
+  // его данные: при удалении по его просьбе стираем. При удалении АДМИНОМ запись о
+  // самом удалении остаётся — это след действий владельца.
+  if (purgeLog) await env.DB.prepare('DELETE FROM admin_log WHERE target = ?').bind(sub).run();
+  if (revoke && env.AI_LIMITS) {
+    await env.AI_LIMITS.put('revoke:' + sub, String(Math.floor(Date.now() / 1000)),
+      { expirationTtl: SESSION_TOKEN_TTL + 86400 });
+  }
+}
+
+async function handleAccountDelete(request, origin, env) {
+  if (request.method !== 'POST') return json({ error: 'POST required' }, 405, origin);
+  const sub = await verifyAuthToken(bearerToken(request), env);
+  if (!sub) return json({ error: 'Sign in required' }, 401, origin);
+  if (!env.DB) return json({ error: 'Storage unavailable' }, 503, origin);
+  if (sub === ADMIN_SUB) return json({ error: 'owner_account' }, 403, origin);
+  let body = {};
+  try { body = await request.json(); } catch {}
+  if (body.confirm !== true) return json({ error: 'Confirmation required' }, 400, origin);
+  await deleteAccountData(env, sub);
+  return json({ ok: true }, 200, origin, 0);
 }
 
 // ── Админ-панель ──────────────────────────────────────────────────────
@@ -1067,7 +1254,7 @@ async function handleAdmin(request, url, origin, env) {
     if (!/^\d{5,40}$/.test(sub)) return json({ error: 'Invalid user' }, 400, origin);
     if (sub === ADMIN_SUB) return json({ error: 'Cannot delete the owner' }, 400, origin);
     const gone = await env.DB.prepare('SELECT email FROM users WHERE sub = ?').bind(sub).first();
-    await env.DB.prepare('DELETE FROM users WHERE sub = ?').bind(sub).run();
+    await deleteAccountData(env, sub, { revoke: false, purgeLog: false });   // карточка + облачные копии + счётчики (сессии не гасим — как раньше)
     await adminLog(env, request, 'user_delete', sub, { email: gone ? gone.email : null });
     return json({ ok: true }, 200, origin, 0);
   }
