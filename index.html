@@ -2179,7 +2179,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-info" onclick="toggleCard('deposit')">
         <div class="card-name" data-i18n="depositAll">Депозит (всього)</div>
         <div class="card-value" id="depositDisplay">0 ₴</div>
-        <div class="card-pct" id="depositPct">0% від капіталу</div>
+        <div class="card-pct" id="depositPct">0.0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_deposits" data-spark-key="deposits"></div>
       <div class="card-actions">
@@ -2201,7 +2201,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-info" onclick="toggleCard('crypto')">
         <div class="card-name" data-i18n="cryptoName">Крипто</div>
         <div class="card-value" id="cryptoDisplay">0 ₴</div>
-        <div class="card-pct" id="cryptoPct">0% від капіталу</div>
+        <div class="card-pct" id="cryptoPct">0.0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_crypto" data-spark-key="crypto"></div>
       <div class="card-actions">
@@ -2256,7 +2256,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-info" onclick="toggleCard('usd')">
         <div class="card-name" data-i18n="usdName">USD · Доларові заощадження</div>
         <div class="card-value" id="usdDisplay">0 ₴</div>
-        <div class="card-pct" id="usdPct">0% від капіталу</div>
+        <div class="card-pct" id="usdPct">0.0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_usd" data-spark-key="forex"></div>
       <div class="card-actions">
@@ -2295,7 +2295,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-info" onclick="toggleCard('forex')">
         <div class="card-name" data-i18n="forexName">Валютні накопичення</div>
         <div class="card-value" id="forexDisplay">0 ₴</div>
-        <div class="card-pct" id="forexPct">0% від капіталу</div>
+        <div class="card-pct" id="forexPct">0.0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_forex" data-spark-key="forex"></div>
       <div class="card-actions">
@@ -2346,7 +2346,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-info" onclick="toggleCard('cash')">
         <div class="card-name" data-i18n="cashName">Готівка (₴)</div>
         <div class="card-value" id="cashDisplay">0 ₴</div>
-        <div class="card-pct" id="cashPct">0% від капіталу</div>
+        <div class="card-pct" id="cashPct">0.0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_cash" data-spark-key="cash"></div>
       <div class="card-actions">
@@ -2385,7 +2385,7 @@ body.modern-mockup.theme-light .total-currency{
       <div class="card-info" onclick="toggleCard('other')">
         <div class="card-name" data-i18n="currentAcc">Поточний рахунок</div>
         <div class="card-value" id="otherDisplay">0 ₴</div>
-        <div class="card-pct" id="otherPct">0% від капіталу</div>
+        <div class="card-pct" id="otherPct">0.0% від капіталу</div>
       </div>
       <div class="card-sparkline" id="spark_account" data-spark-key="account"></div>
       <div class="card-actions">
@@ -3058,7 +3058,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.61';
+const APP_VERSION = 'v0.1.62';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3191,7 +3191,7 @@ const LANGS={
     incomeDays:'Дохід по днях (останні 30 днів)',yield:'⚡ Дохідність',
     secName:'Назва',secQty:'Кількість',secPrice:'Ціна (₴)',secDiv:'Дивіденди (%)',secTotal:'Вартість',secActions:'Дія',
     addSecItem:'+ Додати позицію',removeSection:'✕ Видалити розділ',
-    secNamePh:'Apple, AAPL...',assets:'активів',pctOfCapital:'% від капіталу',
+    secNamePh:'Apple, AAPL...',assets:'активів',pctOfCapital:'від капіталу',
     perSec:'В секунду',perDay:'В день (сьогодні)',taxLabel:'Податок',accruedPct:'Нараховано %',netProfitLabel:'Чистий прибуток',
     daysPassed:'минуло',daysLeft:'залишилось',days:'дн',
     maxDep:'Максимум 3 депозити',depName:'Назва депозиту',depPlaceholder:'Депозит',
@@ -3232,7 +3232,7 @@ const LANGS={
     incomeDays:'Доход по дням (последние 30 дней)',yield:'⚡ Доходность',
     secName:'Название',secQty:'Количество',secPrice:'Цена (₴)',secDiv:'Дивиденды (%)',secTotal:'Стоимость',secActions:'Действие',
     addSecItem:'+ Добавить позицию',removeSection:'✕ Удалить раздел',
-    secNamePh:'Apple, AAPL...',assets:'активов',pctOfCapital:'% от капитала',
+    secNamePh:'Apple, AAPL...',assets:'активов',pctOfCapital:'от капитала',
     perSec:'В секунду',perDay:'В день (сегодня)',taxLabel:'Налог',accruedPct:'Начислено %',netProfitLabel:'Чистая прибыль',
     daysPassed:'прошло',daysLeft:'осталось',days:'дн',
     maxDep:'Максимум 3 депозита',depName:'Название депозита',depPlaceholder:'Депозит',
@@ -3273,7 +3273,7 @@ const LANGS={
     incomeDays:'Daily Income (last 30 days)',yield:'⚡ Yield',
     secName:'Name',secQty:'Qty',secPrice:'Price (₴)',secDiv:'Dividends (%)',secTotal:'Value',secActions:'Action',
     addSecItem:'+ Add Position',removeSection:'✕ Delete Section',
-    secNamePh:'Apple, AAPL...',assets:'assets',pctOfCapital:'% of capital',
+    secNamePh:'Apple, AAPL...',assets:'assets',pctOfCapital:'of capital',
     perSec:'Per second',perDay:'Per day (today)',taxLabel:'Tax',accruedPct:'Accrued %',netProfitLabel:'Net profit',
     daysPassed:'passed',daysLeft:'left',days:'d',
     maxDep:'Maximum 3 deposits',depName:'Deposit Name',depPlaceholder:'Deposit',
@@ -3315,7 +3315,7 @@ const LANGS={
     calcTitle:'Zinseszinsrechner',totalSum:'Gesamtbetrag',taxBase:'Steuerbasis',
     perSecond:'Pro Sekunde',perDay:'Pro Tag',perSec:'Pro Sekunde',
     secName:'Name',secQty:'Menge',secPrice:'Preis (₴)',secDiv:'Dividende (%)',secTotal:'Wert',
-    addSecItem:'+ Position hinzufügen',secNamePh:'Apple, AAPL...',assets:'Aktiva',pctOfCapital:'% des Kapitals',
+    addSecItem:'+ Position hinzufügen',secNamePh:'Apple, AAPL...',assets:'Aktiva',pctOfCapital:'des Kapitals',
     taxLabel:'Steuer',accruedPct:'Aufgelaufen %',netProfitLabel:'Nettogewinn',
     daysPassed:'vergangen',daysLeft:'verbleibend',days:'T',
     maxDep:'Max. 3 Einlagen',depName:'Einlagenname',depPlaceholder:'Einlage',
@@ -3356,7 +3356,7 @@ const LANGS={
     calcTitle:'复利计算器',totalSum:'总金额',
     perSecond:'每秒',perDay:'每天',perSec:'每秒',
     secName:'名称',secQty:'数量',secPrice:'价格 (₴)',secDiv:'股息 (%)',secTotal:'总值',
-    addSecItem:'+ 添加头寸',secNamePh:'苹果, AAPL...',assets:'资产',pctOfCapital:'占总资产%',
+    addSecItem:'+ 添加头寸',secNamePh:'苹果, AAPL...',assets:'资产',pctOfCapital:'占总资产',
     taxLabel:'税款',accruedPct:'累计利息%',netProfitLabel:'净利润',
     daysPassed:'已过',daysLeft:'剩余',days:'天',
     maxDep:'最多3个存款',depName:'存款名称',depPlaceholder:'存款',
@@ -3860,7 +3860,10 @@ const fmtMax2=n=>{
   const v=roundMoney(n);
   return v.toLocaleString('uk-UA',{minimumFractionDigits:0,maximumFractionDigits:2});
 };
-const pct=(v,total)=>total?((v/total*100).toFixed(1)+'%'):'0%';
+const pct=(v,total)=>(total?(v/total*100):0).toFixed(1)+'%';
+// Знак и цвет прибыли: ноль — серый и без «+», чтобы не читался как рост
+const toneColor=v=>v>0.004?'var(--green2)':v<-0.004?'var(--red)':'var(--muted2)';
+const toneSign=v=>v>0.004?'+':'';
 
 // ── STATE ────────────────────────────────────
 let coins=[], forexItems=[], cardOrder=[], customSections=[], securitiesSections=[];
@@ -4759,7 +4762,7 @@ function getCustomCardHtml(s,idx){
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${escHtml(s.name)}</div>
         <div class="card-value" id="customDisplay_${s.id}">0 ₴</div>
-        <div class="card-pct" id="customPct_${s.id}">0% ${lang.pctOfCapital}</div>
+        <div class="card-pct" id="customPct_${s.id}">0.0% ${lang.pctOfCapital}</div>
       </div>
       ${getCardSparklineHtml(getCustomSparklineKey(s))}
       <div class="card-actions">
@@ -4882,10 +4885,10 @@ function calcCustomSection(id){
   const taxAmt=taxBase*tax, net=interest-taxAmt;
   const eff=P&&tt?(net/P/tt*100):0;
   const sym=getCurrSym();
-  setText('cust-total_'+id,    sym+fmtN(toDisplayCurr(A)));
-  setText('cust-interest_'+id, '+'+sym+fmtN(toDisplayCurr(interest)));
-  setText('cust-tax_'+id,      '−'+sym+fmtN(toDisplayCurr(taxAmt)));
-  setText('cust-net_'+id,      '+'+sym+fmtN(toDisplayCurr(net)));
+  setText('cust-total_'+id,    fmtN(toDisplayCurr(A))+' '+sym);
+  setText('cust-interest_'+id, '+'+fmtN(toDisplayCurr(interest))+' '+sym);
+  setText('cust-tax_'+id,      '−'+fmtN(toDisplayCurr(taxAmt))+' '+sym);
+  setText('cust-net_'+id,      '+'+fmtN(toDisplayCurr(net))+' '+sym);
   setText('cust-eff_'+id,      eff.toFixed(2)+'%');
 }
 function removeCustomSection(id){
@@ -5893,22 +5896,22 @@ function getSecCardHtml(s,idx){
           <span class="ticker-card-qty">${fmtMax2(totalQty)} ${trx(UNIT_TXT.pcs)}</span>
         </div>
         <div class="ticker-card-name">${escHtml(g.name)}</div>
-        <div class="ticker-card-price" style="color:${pnlCol}">${sym}${fmtN(toDisplayCurr(curVal))}</div>
-        <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
-        ${avgBuy>0?`<div class="ticker-card-div">Ø ${sym}${fmtN(toDisplayCurr(avgBuy))}</div>`:''}
-        ${divMonth>0?`<div class="ticker-card-div">${uiIconHtml('dividend','tiny-png-icon')} ~${sym}${fmtN(toDisplayCurr(divMonth))}${trx(UNIT_TXT.perMonth)}</div>`:''}
+        <div class="ticker-card-price" style="color:${pnlCol}">${fmtN(toDisplayCurr(curVal))} ${sym}</div>
+        <div class="ticker-card-pnl" style="color:${pnlCol}">${pnl!==null?(pnl>=0?'+':'-')+fmtN(toDisplayCurr(Math.abs(pnl)))+' '+sym+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)':'—'}</div>
+        ${avgBuy>0?`<div class="ticker-card-div">Ø ${fmtN(toDisplayCurr(avgBuy))} ${sym}</div>`:''}
+        ${divMonth>0?`<div class="ticker-card-div">${uiIconHtml('dividend','tiny-png-icon')} ~${fmtN(toDisplayCurr(divMonth))} ${sym}${trx(UNIT_TXT.perMonth)}</div>`:''}
       </div>`;
     }).join('')+
     '</div>'+
     '<div class="sec-summary-divs"><div class="sd-label">'+uiIconHtml('dividend','app-png-icon')+' '+cleanIconText(t('divIncome'))+'</div>'+
-    '<div class="sd-row"><span class="sd-key">'+t('divAnnual')+'</span><span class="sd-val">+'+sym+fmtN(toDisplayCurr(totalDiv))+' '+t('perYear')+'</span></div>'+
-    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+sym+fmtN(toDisplayCurr(totalDivAbs))+' '+t('perYear')+'</span></div>':'')+
-    '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+sym+fmtN(toDisplayCurr(totalDiv/12))+'</span></div>'+
+    '<div class="sd-row"><span class="sd-key">'+t('divAnnual')+'</span><span class="sd-val">+'+fmtN(toDisplayCurr(totalDiv))+' '+sym+' '+t('perYear')+'</span></div>'+
+    (totalDivAbs>0?'<div class="sd-row"><span class="sd-key">'+t('divAbs')+'</span><span class="sd-val">+'+fmtN(toDisplayCurr(totalDivAbs))+' '+sym+' '+t('perYear')+'</span></div>':'')+
+    '<div class="sd-row"><span class="sd-key">'+t('divMonthly')+'</span><span class="sd-val">~'+fmtN(toDisplayCurr(totalDiv/12))+' '+sym+'</span></div>'+
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
-    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(holdingsTotal))+'</span></div>'+
-    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockSaleCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
-    (incomeAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockDividendBalanceShort')+'</span><span class="result-val gold">'+getStockCurrencySymbol(incomeCur)+fmtMax2(incomeAmount)+' · '+sym+fmtN(toDisplayCurr(incomeTotal))+'</span></div>':'')+
+    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(toDisplayCurr(holdingsTotal))+' '+sym+'</span></div>'+
+    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockSaleCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+fmtN(toDisplayCurr(stockCashTotal))+' '+sym+'</span></div>':'')+
+    (incomeAmount>0?'<div class="result-row"><span class="result-key">'+uiText('stockDividendBalanceShort')+'</span><span class="result-val gold">'+getStockCurrencySymbol(incomeCur)+fmtMax2(incomeAmount)+' · '+fmtN(toDisplayCurr(incomeTotal))+' '+sym+'</span></div>':'')+
     '</div>'+
     (hasTickers?`<div class="auto-refresh-bar">
       <span class="refresh-status" id="refreshStatus_${s.id}">${s.lastRefresh?t('stockRefreshedAt')+' '+s.lastRefresh:t('stockNeverRefreshed')}</span>
@@ -5922,7 +5925,7 @@ function getSecCardHtml(s,idx){
       <div class="card-icon">${sectionIconHtml(s,s.icon)}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${escHtml(s.name)}</div>
-        <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(total))}</div>
+        <div class="card-value" id="secDisplay_${s.id}">${fmtN(toDisplayCurr(total))} ${sym}</div>
         <div class="card-pct" id="secPct_${s.id}">—</div>
       </div>
       ${getCardSparklineHtml('stocks')}
@@ -5942,9 +5945,9 @@ function getSecCardHtml(s,idx){
             ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${stockCashCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
           </select>
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('stockSaleCashHint')}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+fmtN(toDisplayCurr(stockCashTotal))+' '+sym):uiText('stockSaleCashHint')}</div>
       </div>
-      <div style="background:linear-gradient(135deg,#e8c97a14,#4ecb8d0c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div class="sec-cash-title" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('dividend','app-png-icon')} ${cleanIconText(uiText('stockDividendBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('≈ '+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('stockDividendHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+      <div style="background:linear-gradient(135deg,#e8c97a14,#4ecb8d0c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div class="sec-cash-title" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('dividend','app-png-icon')} ${cleanIconText(uiText('stockDividendBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('≈ '+fmtN(toDisplayCurr(incomeTotal))+' '+sym+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('stockDividendHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${lang.addSecItem}</div>
         <div class="ticker-search-row">
           <input class="ticker-search-input field-input" type="text" id="secName_${s.id}" placeholder="${t('secTicker')}">
@@ -5986,10 +5989,10 @@ function getBondCardHtml(s,idx){
           <span class="ticker-card-qty">${fmtN(r.qty)} ${trx(UNIT_TXT.pcs)}</span>
         </div>
         ${isin?`<div class="ticker-card-name">${isin}</div>`:''}
-        <div class="ticker-card-price">${nativeSym}${fmtN(r.marketValueNative)} · ${sym}${fmtN(toDisplayCurr(r.marketValue))}</div>
-        <div class="ticker-card-pnl" style="color:${pnlCol}">${r.pnl>=0?'+':'-'}${sym}${fmtN(toDisplayCurr(Math.abs(r.pnl)))} P&L</div>
-        <div class="ticker-card-div">${uiText('bondCouponIncome')}: ~${sym}${fmtN(toDisplayCurr(r.couponAnnual))}</div>
-        ${r.accrued>0?`<div class="ticker-card-div" style="color:var(--gold2)">${uiText('bondAccrued')}: +${sym}${fmtN(toDisplayCurr(r.accrued))} · ${r.accruedDays} ${uiText('daysShort')}</div>`:''}
+        <div class="ticker-card-price">${nativeSym}${fmtN(r.marketValueNative)} · ${fmtN(toDisplayCurr(r.marketValue))} ${sym}</div>
+        <div class="ticker-card-pnl" style="color:${pnlCol}">${r.pnl>=0?'+':'-'}${fmtN(toDisplayCurr(Math.abs(r.pnl)))} ${sym} P&L</div>
+        <div class="ticker-card-div">${uiText('bondCouponIncome')}: ~${fmtN(toDisplayCurr(r.couponAnnual))} ${sym}</div>
+        ${r.accrued>0?`<div class="ticker-card-div" style="color:var(--gold2)">${uiText('bondAccrued')}: +${fmtN(toDisplayCurr(r.accrued))} ${sym} · ${r.accruedDays} ${uiText('daysShort')}</div>`:''}
         ${r.it.maturityDate?`<div class="ticker-card-div">${uiText('bondMaturity')}: ${escapeHtml(r.it.maturityDate)}${r.daysToMaturity!==null?(r.daysToMaturity>0?` · ${r.daysToMaturity} ${uiText('daysShort')}`:` · ${uiText('bondMatured')}`):''}</div>`:''}
         <div class="ticker-card-tools">
           <button class="mini-btn edit" onclick="event.stopPropagation();openBondEdit('${s.id}',${r.idx})">
@@ -6005,15 +6008,15 @@ function getBondCardHtml(s,idx){
     }).join('')+
     '</div>'+
     '<div class="sec-summary-divs"><div class="sd-label">📜 '+(s.type==='ovdp'?t('ovdpBtn'):t('bondsBtn'))+'</div>'+
-    '<div class="sd-row"><span class="sd-key">'+uiText('bondMarketValue')+'</span><span class="sd-val">'+sym+fmtN(toDisplayCurr(stats.holdingsTotal))+'</span></div>'+
-    '<div class="sd-row"><span class="sd-key">'+uiText('bondCouponIncome')+'</span><span class="sd-val">~'+sym+fmtN(toDisplayCurr(stats.couponAnnual))+'</span></div>'+
-    (stats.accruedTotal>0?'<div class="sd-row"><span class="sd-key">'+uiText('bondAccrued')+'</span><span class="sd-val" style="color:var(--gold2)">+'+sym+fmtN(toDisplayCurr(stats.accruedTotal))+'</span></div>':'')+
-    '<div class="sd-row"><span class="sd-key">'+uiText('bondMaturityValue')+'</span><span class="sd-val">'+sym+fmtN(toDisplayCurr(stats.maturityValue))+'</span></div>'+
+    '<div class="sd-row"><span class="sd-key">'+uiText('bondMarketValue')+'</span><span class="sd-val">'+fmtN(toDisplayCurr(stats.holdingsTotal))+' '+sym+'</span></div>'+
+    '<div class="sd-row"><span class="sd-key">'+uiText('bondCouponIncome')+'</span><span class="sd-val">~'+fmtN(toDisplayCurr(stats.couponAnnual))+' '+sym+'</span></div>'+
+    (stats.accruedTotal>0?'<div class="sd-row"><span class="sd-key">'+uiText('bondAccrued')+'</span><span class="sd-val" style="color:var(--gold2)">+'+fmtN(toDisplayCurr(stats.accruedTotal))+' '+sym+'</span></div>':'')+
+    '<div class="sd-row"><span class="sd-key">'+uiText('bondMaturityValue')+'</span><span class="sd-val">'+fmtN(toDisplayCurr(stats.maturityValue))+' '+sym+'</span></div>'+
     '</div>'+
     '<div class="result-box" style="margin-top:10px">'+
-    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+sym+fmtN(toDisplayCurr(stats.holdingsTotal))+'</span></div>'+
-    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+sym+fmtN(toDisplayCurr(stockCashTotal))+'</span></div>':'')+
-    (incomeAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCouponBalanceShort')+'</span><span class="result-val gold">'+getStockCurrencySymbol(incomeCur)+fmtMax2(incomeAmount)+' · '+sym+fmtN(toDisplayCurr(incomeTotal))+'</span></div>':'')+
+    '<div class="result-row"><span class="result-key">'+lang.totalUah+'</span><span class="result-val blue">'+fmtN(toDisplayCurr(stats.holdingsTotal))+' '+sym+'</span></div>'+
+    (stockCashAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCashShort')+'</span><span class="result-val green">'+getStockCurrencySymbol(stockCashCur)+fmtMax2(stockCashAmount)+' · '+fmtN(toDisplayCurr(stockCashTotal))+' '+sym+'</span></div>':'')+
+    (incomeAmount>0?'<div class="result-row"><span class="result-key">'+uiText('bondCouponBalanceShort')+'</span><span class="result-val gold">'+getStockCurrencySymbol(incomeCur)+fmtMax2(incomeAmount)+' · '+fmtN(toDisplayCurr(incomeTotal))+' '+sym+'</span></div>':'')+
     '</div>'
   ):'';
 
@@ -6023,7 +6026,7 @@ function getBondCardHtml(s,idx){
       <div class="card-icon">${sectionIconHtml(s,s.icon||'📜')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${escHtml(s.name)}</div>
-        <div class="card-value" id="secDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(stats.total))}</div>
+        <div class="card-value" id="secDisplay_${s.id}">${fmtN(toDisplayCurr(stats.total))} ${sym}</div>
         <div class="card-pct" id="secPct_${s.id}">—</div>
       </div>
       ${getCardSparklineHtml(s.type==='ovdp'?'ovdp':'bonds')}
@@ -6043,9 +6046,9 @@ function getBondCardHtml(s,idx){
             ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${stockCashCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
           </select>
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+sym+fmtN(toDisplayCurr(stockCashTotal))):uiText('bondCashHint')}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${stockCashAmount?('≈ '+fmtN(toDisplayCurr(stockCashTotal))+' '+sym):uiText('bondCashHint')}</div>
       </div>
-      <div style="background:linear-gradient(135deg,#e8c97a14,#5b9cf60c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('percent','app-png-icon')} ${cleanIconText(uiText('bondCouponBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('≈ '+sym+fmtN(toDisplayCurr(incomeTotal))+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('bondCouponHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
+      <div style="background:linear-gradient(135deg,#e8c97a14,#5b9cf60c);border:1px solid #e8c97a35;border-radius:14px;padding:14px;margin-top:12px;">\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold2);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${uiIconHtml('percent','app-png-icon')} ${cleanIconText(uiText('bondCouponBalance'))}</div>\n        <div class="field-group" style="margin-bottom:8px;">\n          <div class="field-label">${uiText('incomePayoutPeriod')}</div>\n          ${securityIncomeDropdownHtml(s.id,incomePeriod)}\n        </div>\n        <div style="display:flex;gap:8px;align-items:center;">\n          <input class="field-input" type="text" id="secIncomeAmount_${s.id}" value="${incomeAmount?fmtMax2(incomeAmount):''}" placeholder="0" inputmode="decimal" style="flex:1;" oninput="setSecurityIncomeAmount('${s.id}',this.value)">\n          <select class="field-input" id="secIncomeCurrency_${s.id}" style="width:96px;padding:10px 4px;" onchange="setSecurityIncomeCurrency('${s.id}',this.value)">\n            ${STOCK_CASH_CURRENCIES.map(cur=>`<option value="${cur}" ${incomeCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}\n          </select>\n        </div>\n        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${incomeAmount?('≈ '+fmtN(toDisplayCurr(incomeTotal))+' '+sym+' · '+securityIncomePeriodLabel(incomePeriod)):uiText('bondCouponHint')}</div>\n      </div>\n      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px;">
         <div class="calc-title">${uiText('bondAddTitle')}</div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:10px;">${uiText('bondManualMode')}</div>
         <div class="field-group">
@@ -7775,11 +7778,11 @@ function _updateAllNow(){
   customSections.forEach(s=>{
     if(s.sectionType==='startup'){
       const st=getStartupStats(s);
-      const pnlColor=st.pnl>=0?'var(--green2)':'var(--red)';
-      setText('customDisplay_'+s.id, sym+fmtN(toDisplayCurr(st.total)));
+      const pnlColor=toneColor(st.pnl);
+      setText('customDisplay_'+s.id, fmtN(toDisplayCurr(st.total))+' '+sym);
       const pctEl=$('customPct_'+s.id);
       if(pctEl){
-        pctEl.textContent=(st.pnl>=0?'+':'')+st.pnlPct.toFixed(1)+'%';
+        pctEl.textContent=toneSign(st.pnl)+st.pnlPct.toFixed(1)+'%';
         pctEl.style.color=pnlColor;
       }
       return;
@@ -7801,7 +7804,7 @@ function _updateAllNow(){
   // Update securities display
   visibleSecuritiesSections().forEach(s=>{
     const v=getSecuritiesSectionTotal(s);
-    setText('secDisplay_'+s.id, sym+fmtN(toDisplayCurr(v)));
+    setText('secDisplay_'+s.id, fmtN(toDisplayCurr(v))+' '+sym);
     setText('secPct_'+s.id, pct(v,total)+' '+t('pctOfCapital'));
   });
 
@@ -7814,7 +7817,7 @@ function _updateAllNow(){
     const v=getMetalsSectionTotalUah(s);
     const el=document.getElementById('card-'+s.id+' .card-value');
     const valEl=document.querySelector('#card-'+s.id+' .card-value');
-    if(valEl)valEl.textContent=sym+fmtN(toDisplayCurr(v));
+    if(valEl)valEl.textContent=fmtN(toDisplayCurr(v))+' '+sym;
   });
 
   saveData();
@@ -7998,7 +8001,7 @@ function openCryptoDetail(coinKey){
   let html='<div class="stock-detail-grid">'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--purple2)">$'+fmtCoinPrice(curPrice)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('price')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+totalQty+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('qty')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal*rate))+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('value')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+fmtN(toDisplayCurr(curVal*rate))+' '+sym+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('value')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">$'+fmtCoinPrice(avgBuy)+'</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('avg')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'')+'$'+fmtN(Math.round(pnl))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+(ch>=0?'var(--green2)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</div><div class="stock-detail-stat-lbl">'+cryptoDetailTxt('change24')+'</div></div>'+
@@ -8115,12 +8118,12 @@ function openStockDetail(secId, tickerKey){
 
   document.getElementById('stockDetailTitle').innerHTML='<span style="color:var(--green2)">'+escHtml(ticker)+'</span> '+escHtml(name);
   let html='<div class="stock-detail-grid">'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+sym+fmtN(toDisplayCurr(curVal))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('value')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--green2)">'+fmtN(toDisplayCurr(curVal))+' '+sym+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('value')+'</div></div>'+
     '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtMax2(totalQty)+' '+trx(UNIT_TXT.pcs)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('qty')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtDisplayMoney2(curPrice)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('price')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+sym+fmtDisplayMoney2(avgBuy)+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('avg')+'</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'-')+sym+fmtN(toDisplayCurr(Math.abs(pnl)))+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
-    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+sym+fmtN(toDisplayCurr(divMonth))+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('divMonth')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtDisplayMoney2(curPrice)+' '+sym+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('price')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val">'+fmtDisplayMoney2(avgBuy)+' '+sym+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('avg')+'</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:'+pnlCol+'">'+(pnl>=0?'+':'-')+fmtN(toDisplayCurr(Math.abs(pnl)))+' '+sym+'</div><div class="stock-detail-stat-lbl">P&L ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(1)+'%)</div></div>'+
+    '<div class="stock-detail-stat"><div class="stock-detail-stat-val" style="color:var(--gold2)">'+fmtN(toDisplayCurr(divMonth))+' '+sym+'</div><div class="stock-detail-stat-lbl">'+stockDetailTxt('divMonth')+'</div></div>'+
     '</div>';
 
   html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:12px 0 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="const el=this.nextElementSibling;const a=this.querySelector(\'.arr\');if(el.style.display===\'none\'){el.style.display=\'block\';a.textContent=\'▼\';}else{el.style.display=\'none\';a.textContent=\'▶\';}">'+uiIconHtml('trade','stock-detail-section-icon')+' '+stockDetailTxt('trades')+' ('+group.length+')<span class="arr" style="font-size:10px;">▶</span></div>';
@@ -8131,7 +8134,7 @@ function openStockDetail(secId, tickerKey){
     const isSell=qty<0||(t.tradeType==='sell');
     html+='<div class="stock-detail-trade"><div>'+
       '<div style="font-family:DM Mono,monospace;font-size:11px;color:'+(isSell?'var(--red)':'var(--green2)')+';font-weight:600">'+(isSell?stockDetailTxt('sell'):stockDetailTxt('buy'))+' '+fmtMax2(Math.abs(qty))+' шт</div>'+
-      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+sym+fmtDisplayMoney2(bp):'—')+'</div>'+
+      '<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted)">'+(bp>0?'по '+fmtDisplayMoney2(bp)+' '+sym:'—')+'</div>'+
       '</div><button class="rm-btn" onclick="removeSecItem(\''+secId+'\','+t.origIdx+');closeStockDetail()">×</button></div>';
   });
 
@@ -8313,7 +8316,7 @@ function renderForex(){
     const rate=(liveRates[cur]&&liveRates[cur]>0)?liveRates[cur]:parseInputNumber(f.rate);
     return s+amount*rate;
   },0);
-  setText('forexTotal',sym+fmtN(toDisplayCurr(total)));
+  setText('forexTotal',fmtN(toDisplayCurr(total))+' '+sym);
   if(!forexItems.length){el.innerHTML='';return;}
   el.innerHTML='<div class="balance-list-cards">'+forexItems.map((f,i)=>{
     const cur=f.cur?.toUpperCase()||'EUR';
@@ -8327,7 +8330,7 @@ function renderForex(){
         <span class="balance-list-code">${FSYM[f.cur]||''} ${cur}</span>
       </div>
       <div class="balance-list-amount">${fmtD(amount)} ${cur}</div>
-      <div class="balance-list-equiv">${sym}${fmtN(toDisplayCurr(valueUah))}</div>
+      <div class="balance-list-equiv">${fmtN(toDisplayCurr(valueUah))} ${sym}</div>
       <div class="balance-list-rate">1 ${cur} = ${liveRate.toFixed(2)} ₴ ${isLive?'●':''}</div>
       <div class="balance-list-actions">
         <button class="balance-list-btn minus" onclick="subtractForex(${i})">−</button>
@@ -9959,7 +9962,7 @@ function resetTestChecklist(){
 
 function getTotalInCurrency(totalUah){
   if(displayCurrency==='uah')return fmtN(Math.round(totalUah))+' ₴';
-  return getCurrSym()+fmtN(toDisplayCurr(totalUah));
+  return fmtN(toDisplayCurr(totalUah))+' '+getCurrSym();
 }
 
 // ── DEFAULT SECTION ON FIRST LOAD ────────────────────────
@@ -10156,22 +10159,22 @@ function getMetalsCardHtml(s){
   const totalGrams=Object.values(byType).reduce((a,b)=>a+b.grams,0);
   const pnl=totalCur-totalBuy;
   const pnlPct=totalBuy>0?(pnl/totalBuy*100):0;
-  const pnlColor=pnl>=0?'var(--green2)':'var(--red)';
-  const pnlSign=pnl>=0?'+':'';
+  const pnlColor=toneColor(pnl);
+  const pnlSign=toneSign(pnl);
 
   // Summary cards per metal type
   const metaSummary=['gold','silver','platinum'].map(m=>{
     if(!byType[m].grams) return '';
     const color=METAL_COLORS[m];
     const mpnl=byType[m].currentVal-byType[m].buyCost;
-    const mpnlSign=mpnl>=0?'+':'';
-    const mpnlColor=mpnl>=0?'var(--green2)':'var(--red)';
+    const mpnlSign=toneSign(mpnl);
+    const mpnlColor=toneColor(mpnl);
     return `<div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;">
       <div style="margin-bottom:3px;"><img src="section-icons/${m==='gold'?'Gold':m==='silver'?'Silver':'Platinum'}.png" style="width:28px;height:28px;object-fit:contain;"></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:${color};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">${names[m]}</div>
       <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${byType[m].grams.toFixed(2)} ${trx(UNIT_TXT.g)}</div>
-      <div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${color};margin-top:2px;">${sym}${fmtN(toDisplayCurr(byType[m].currentVal))}</div>
-      ${mpnl!==0?`<div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:9px;color:${mpnlColor};">${mpnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(mpnl)))}</div>`:''}
+      <div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:${color};margin-top:2px;">${fmtN(toDisplayCurr(byType[m].currentVal))} ${sym}</div>
+      ${mpnl!==0?`<div class="hide-amt" style="font-family:'DM Mono',monospace;font-size:9px;color:${mpnlColor};">${mpnlSign}${fmtN(toDisplayCurr(Math.abs(mpnl)))} ${sym}</div>`:''}
     </div>`;
   }).join('');
   // Items list with buy price and current value
@@ -10182,8 +10185,8 @@ function getMetalsCardHtml(s){
     const buyVal=grams*buyPrice;
     const curVal=grams*curPriceUah;
     const ipnl=curVal-buyVal;
-    const ipnlSign=ipnl>=0?'+':'';
-    const ipnlCol=ipnl>=0?'var(--green2)':'var(--red)';
+    const ipnlSign=toneSign(ipnl);
+    const ipnlCol=toneColor(ipnl);
     return `<div class="metal-item-row" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="metal-dot" style="background:${METAL_COLORS[it.type]};flex-shrink:0;"></div>
@@ -10191,9 +10194,9 @@ function getMetalsCardHtml(s){
         <button class="rm-btn" onclick="removeMetalItem('${s.id}',${j})">×</button>
       </div>
       <div style="display:flex;justify-content:space-between;padding:0 16px;font-family:'DM Mono',monospace;font-size:10px;">
-        <span class="hide-amt" style="color:var(--muted2)">${trx({uk:'Куплено',ru:'Куплено',en:'Bought',de:'Gekauft',zh:'买入'})}: ${sym}${fmtN(toDisplayCurr(buyVal))}</span>
-        <span class="hide-amt" style="color:var(--gold2)">${trx({uk:'Зараз',ru:'Сейчас',en:'Now',de:'Jetzt',zh:'现值'})}: ${sym}${fmtN(toDisplayCurr(curVal))}</span>
-        <span class="hide-amt" style="color:${ipnlCol}">${ipnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(ipnl)))}</span>
+        <span class="hide-amt" style="color:var(--muted2)">${trx({uk:'Куплено',ru:'Куплено',en:'Bought',de:'Gekauft',zh:'买入'})}: ${fmtN(toDisplayCurr(buyVal))} ${sym}</span>
+        <span class="hide-amt" style="color:var(--gold2)">${trx({uk:'Зараз',ru:'Сейчас',en:'Now',de:'Jetzt',zh:'现值'})}: ${fmtN(toDisplayCurr(curVal))} ${sym}</span>
+        <span class="hide-amt" style="color:${ipnlCol}">${ipnl<-0.004?'−':ipnlSign}${fmtN(toDisplayCurr(Math.abs(ipnl)))} ${sym}</span>
       </div>
     </div>`;
   }).join('');
@@ -10203,7 +10206,7 @@ function getMetalsCardHtml(s){
       <div class="card-icon">${sectionIconHtml({sectionType:'metals'},'💎')}</div>
       <div class="card-info" onclick="toggleCard('${s.id}')">
         <div class="card-name">${t('metalsBtn')||'Дорогоцінні метали'}</div>
-        <div class="card-value">${sym}${fmtN(toDisplayCurr(totalCur))}</div>
+        <div class="card-value">${fmtN(toDisplayCurr(totalCur))} ${sym}</div>
         <div class="card-pct" style="color:${pnlColor}">${pnlSign}${pnlPct.toFixed(1)}% · ${totalGrams.toFixed(1)} ${trx(UNIT_TXT.g)}</div>
       </div>
       ${getCardSparklineHtml('metals')}
@@ -10219,21 +10222,21 @@ function getMetalsCardHtml(s){
       <div class="result-box" style="margin-bottom:12px;">
         <div class="result-row">
           <span class="result-key">${trx({uk:'Куплено за',ru:'Куплено за',en:'Bought for',de:'Gekauft für',zh:'买入成本'})}</span>
-          <span class="result-val" style="color:var(--muted2)">${sym}${fmtN(toDisplayCurr(totalBuy))}</span>
+          <span class="result-val" style="color:var(--muted2)">${fmtN(toDisplayCurr(totalBuy))} ${sym}</span>
         </div>
         <div class="result-row">
           <span class="result-key">${t('metalTotalValue')}</span>
-          <span class="result-val gold">${sym}${fmtN(toDisplayCurr(totalCur))}</span>
+          <span class="result-val gold">${fmtN(toDisplayCurr(totalCur))} ${sym}</span>
         </div>
         <div class="result-row">
           <span class="result-key">P&L</span>
-          <span class="result-val" style="color:${pnlColor}">${pnlSign}${sym}${fmtN(toDisplayCurr(Math.abs(pnl)))} (${pnlSign}${pnlPct.toFixed(1)}%)</span>
+          <span class="result-val" style="color:${pnlColor}">${pnlSign}${fmtN(toDisplayCurr(Math.abs(pnl)))} ${sym} (${pnlSign}${pnlPct.toFixed(1)}%)</span>
         </div>
         <div class="result-row">
           <span class="result-key">${t('metalTotalGrams')}</span>
           <span class="result-val">${totalGrams.toFixed(2)} ${trx(UNIT_TXT.g)}</span>
         </div>
-        <div class="metal-price-src">${escHtml(metalPriceSourceText())}${['gold','silver','platinum'].filter(m=>byType[m].grams&&getMetalPriceUah(m)).map(m=>` · ${names[m]} <span class="hide-amt">${sym}${fmtN(toDisplayCurr(getMetalPriceUah(m)))}</span>/${trx(UNIT_TXT.g)}`).join('')}</div>
+        <div class="metal-price-src">${escHtml(metalPriceSourceText())}${['gold','silver','platinum'].filter(m=>byType[m].grams&&getMetalPriceUah(m)).map(m=>` · ${names[m]} <span class="hide-amt">${fmtN(toDisplayCurr(getMetalPriceUah(m)))} ${sym}</span>/${trx(UNIT_TXT.g)}`).join('')}</div>
       </div>
       <div style="margin-bottom:12px;">${itemRows}</div>`:''}
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">
@@ -10458,7 +10461,7 @@ function runCompound(){
   // капитализации, но человек увидел бы не то число, что у него в банке.
   const effective=principal>0&&years>0?(netInterest/principal)/years*100:0;
   const sym=getCurrSym();
-  const money=v=>sym+fmtN(toDisplayCurr(v));
+  const money=v=>fmtN(toDisplayCurr(v))+' '+sym;
   const calcLabel=(key,fallback)=>{
     const val=t(key);
     return val&&val!==key?val:fallback;
@@ -10959,8 +10962,8 @@ function renderLiabilities(){
       // Брутто — напрямую, а не из текста шапки: обратный пересчёт через
       // округлённый курс давал в EUR €1 593 вместо €1 875 (аудит п.16).
       const grossTotal=getCapitalParts().total;
-      document.getElementById('liabNetAmount').textContent=sym+fmtN(toDisplayCurr(Math.max(0,grossTotal-totalDebt)));
-      document.getElementById('liabTotalDebtAmount').textContent='-'+sym+fmtN(toDisplayCurr(totalDebt));
+      document.getElementById('liabNetAmount').textContent=fmtN(toDisplayCurr(Math.max(0,grossTotal-totalDebt)))+' '+sym;
+      document.getElementById('liabTotalDebtAmount').textContent='-'+fmtN(toDisplayCurr(totalDebt))+' '+sym;
     }
   }
 
@@ -10993,8 +10996,8 @@ function renderLiabilities(){
         <div class="liab-card-icon"><img class="section-card-icon-img" src="section-icons/section-credit.png?v=1" alt=""></div>
         <div class="liab-card-info">
           <div class="liab-card-name">${escHtml(l.name)}</div>
-          <div class="liab-card-amount">-${sym}${fmtN(toDisplayCurr(remaining))}</div>
-          <div class="liab-card-sub">${sym}${fmtN(toDisplayCurr(payment))}${liabPerMonthUnit()} · ${schedule.months} ${liabMonthUnit()} · ${schedule.rate}%</div>
+          <div class="liab-card-amount">-${fmtN(toDisplayCurr(remaining))} ${sym}</div>
+          <div class="liab-card-sub">${fmtN(toDisplayCurr(payment))} ${sym}${liabPerMonthUnit()} · ${schedule.months} ${liabMonthUnit()} · ${schedule.rate}%</div>
         </div>
         <div class="liab-card-toggle">▼</div>
       </div>
@@ -11002,8 +11005,8 @@ function renderLiabilities(){
         <!-- PROGRESS BAR -->
         <div class="liab-progress-wrap">
           <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;margin-bottom:4px;">
-            <span class="hide-amt" style="color:var(--green2)">✓ ${t('liabPaid')}: ${sym}${fmtN(toDisplayCurr(Math.max(0,schedule.paidPrincipal)))}</span>
-            <span class="hide-amt" style="color:var(--red)">⟳ ${t('liabLeft')}: ${sym}${fmtN(toDisplayCurr(remaining))}</span>
+            <span class="hide-amt" style="color:var(--green2)">✓ ${t('liabPaid')}: ${fmtN(toDisplayCurr(Math.max(0,schedule.paidPrincipal)))} ${sym}</span>
+            <span class="hide-amt" style="color:var(--red)">⟳ ${t('liabLeft')}: ${fmtN(toDisplayCurr(remaining))} ${sym}</span>
           </div>
           <div class="liab-progress-bar-bg">
             <div class="liab-progress-bar-fill" style="width:${progress.toFixed(1)}%"></div>
@@ -11019,28 +11022,28 @@ function renderLiabilities(){
         <div class="liab-stats-grid">
           <div class="liab-stat-box">
             <div class="liab-stat-label">${t('liabMonthlyPayment')}</div>
-            <div class="liab-stat-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(payment))}</div>
+            <div class="liab-stat-val" style="color:var(--red)">${fmtN(toDisplayCurr(payment))} ${sym}</div>
           </div>
           <div class="liab-stat-box">
             <div class="liab-stat-label">${t('liabOverpay')}</div>
-            <div class="liab-stat-val" style="color:var(--orange2)">${sym}${fmtN(toDisplayCurr(overpay))}</div>
+            <div class="liab-stat-val" style="color:var(--orange2)">${fmtN(toDisplayCurr(overpay))} ${sym}</div>
           </div>
           <div class="liab-stat-box">
             <div class="liab-stat-label">${t('liabBodyDebt')} / ${liabPaymentWord()}</div>
-            <div class="liab-stat-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(curPrincipal))}</div>
+            <div class="liab-stat-val" style="color:var(--green2)">${fmtN(toDisplayCurr(curPrincipal))} ${sym}</div>
           </div>
           <div class="liab-stat-box">
             <div class="liab-stat-label">${t('liabInterestPart')} / ${liabPaymentWord()}</div>
-            <div class="liab-stat-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(curInterest))}</div>
+            <div class="liab-stat-val" style="color:var(--red)">${fmtN(toDisplayCurr(curInterest))} ${sym}</div>
           </div>
         </div>
 
         <!-- FULL BREAKDOWN -->
         <div class="liab-payment-breakdown">
-          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabAmount')}</span><span class="liab-breakdown-val" style="color:var(--text)">${sym}${fmtN(toDisplayCurr(amount))}</span></div>
-          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabLeft')}</span><span class="liab-breakdown-val" style="color:var(--red)">${sym}${fmtN(toDisplayCurr(remaining))}</span></div>
-          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabTotalPaid')||'Всього виплат'}</span><span class="liab-breakdown-val">${sym}${fmtN(toDisplayCurr(totalPay))}</span></div>
-          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabOverpay')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">+${sym}${fmtN(toDisplayCurr(overpay))}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabAmount')}</span><span class="liab-breakdown-val" style="color:var(--text)">${fmtN(toDisplayCurr(amount))} ${sym}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabLeft')}</span><span class="liab-breakdown-val" style="color:var(--red)">${fmtN(toDisplayCurr(remaining))} ${sym}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabTotalPaid')||'Всього виплат'}</span><span class="liab-breakdown-val">${fmtN(toDisplayCurr(totalPay))} ${sym}</span></div>
+          <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabOverpay')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">+${fmtN(toDisplayCurr(overpay))} ${sym}</span></div>
           <div class="liab-breakdown-row"><span class="liab-breakdown-key">${t('liabEffRate')}</span><span class="liab-breakdown-val" style="color:var(--orange2)">${effRate.toFixed(2)}%</span></div>
         </div>
 
@@ -11049,12 +11052,12 @@ function renderLiabilities(){
           <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--blue2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">💳 ${t('liabPartialPayments')||'Часткові погашення'}</div>
           ${l.partialPayments.map((pp,pi)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;">
             <span style="color:var(--muted2)">${appShortDate(pp.date,true)}</span>
-            <span style="color:var(--blue2)">-${sym}${fmtN(toDisplayCurr(parseInputNumber(pp.amount)))}</span>
+            <span style="color:var(--blue2)">-${fmtN(toDisplayCurr(parseInputNumber(pp.amount)))} ${sym}</span>
             <button class="rm-btn" onclick="removePartialPay('${l.id}',${pi})">×</button>
           </div>`).join('')}
           <div style="font-family:'DM Mono',monospace;font-size:10px;padding-top:6px;display:flex;justify-content:space-between;">
             <span style="color:var(--muted)">${t('liabPartialTotal')||'Разом погашено'}</span>
-            <span style="color:var(--blue2);font-weight:600;">-${sym}${fmtN(toDisplayCurr(l.partialPayments.reduce((s,pp)=>s+parseInputNumber(pp.amount),0)))}</span>
+            <span style="color:var(--blue2);font-weight:600;">-${fmtN(toDisplayCurr(l.partialPayments.reduce((s,pp)=>s+parseInputNumber(pp.amount),0)))} ${sym}</span>
           </div>
         </div>`:''}
         <!-- EXTRA PAYMENT CALCULATOR -->
@@ -11117,8 +11120,8 @@ updateAll=function(){
     const debtEl=document.getElementById('liabTotalDebtAmount');
     const sym=getCurrSym();
     const grossUah=getCapitalParts().total;
-    if(netEl)netEl.textContent=sym+fmtN(toDisplayCurr(Math.max(0,grossUah-totalDebt)));
-    if(debtEl)debtEl.textContent='-'+sym+fmtN(toDisplayCurr(totalDebt));
+    if(netEl)netEl.textContent=fmtN(toDisplayCurr(Math.max(0,grossUah-totalDebt)))+' '+sym;
+    if(debtEl)debtEl.textContent='-'+fmtN(toDisplayCurr(totalDebt))+' '+sym;
   }
 };
 
@@ -11154,7 +11157,7 @@ function updateBizField(secId,field,val){
   const net=bizNetMonthly(customSections[idx]);
   const netEl=document.getElementById('biz_net_'+secId);
   if(netEl){
-    netEl.textContent=(net>=0?'+':'-')+getCurrSym()+fmtN(toDisplayCurr(Math.abs(net)))+bizTxt('mo');
+    netEl.textContent=(net>=0?'+':'-')+fmtN(toDisplayCurr(Math.abs(net)))+' '+getCurrSym()+bizTxt('mo');
     netEl.style.color=net>=0?'var(--green2)':'var(--red)';
   }
   // amount — месячная прибыль для показа; principal обнуляем, чтобы ни один
@@ -11173,7 +11176,7 @@ function openPartialPayModal(liabId,liabName,remaining){
   el.value=liabId||'';
   document.getElementById('partial_pay_title').textContent=t('partialPayTitle')||'Часткове погашення';
   document.getElementById('partial_pay_amount_label').textContent=t('partialPayAmount')||'Сума платежу (₴)';
-  document.getElementById('partial_pay_info').textContent=(liabName||'')+' · '+t('liabLeft')+': '+getCurrSym()+fmtN(toDisplayCurr(remaining||0));
+  document.getElementById('partial_pay_info').textContent=(liabName||'')+' · '+t('liabLeft')+': '+fmtN(toDisplayCurr(remaining||0))+' '+getCurrSym();
   document.getElementById('partial_pay_amount').value='';
   document.getElementById('partial_pay_date').value=getLocalDateKey();
   document.getElementById('partialPayModal').classList.add('open');
@@ -11217,7 +11220,7 @@ function updateFamilyField(secId,field,val){
   const f=customSections[idx].family;
   const total=(f.communal||0)+(f.food||0)+(f.entertain||0)+(f.med||0)+(f.kids||0)+(f.alimony||0)+(f.other||0);
   const totalEl=document.getElementById('family_total_'+secId);
-  if(totalEl)totalEl.textContent=getCurrSym()+fmtN(toDisplayCurr(total));
+  if(totalEl)totalEl.textContent=fmtN(toDisplayCurr(total))+' '+getCurrSym();
   customSections[idx].amount=total;
   updateAll();saveData();
 }
@@ -11851,11 +11854,11 @@ function renderChart(){
   }
 
   // Stats
-  setText('chartCurrentTotal', sym+fmtN(toDisplayCurr(currentTotal)));
-  setText('chartMin', sym+fmtN(toDisplayCurr(minVal)));
-  setText('chartMax', sym+fmtN(toDisplayCurr(maxVal)));
+  setText('chartCurrentTotal', fmtN(toDisplayCurr(currentTotal))+' '+sym);
+  setText('chartMin', fmtN(toDisplayCurr(minVal))+' '+sym);
+  setText('chartMax', fmtN(toDisplayCurr(maxVal))+' '+sym);
   const changeEl=document.getElementById('chartChange');
-  if(changeEl){changeEl.textContent=(change>=0?'+':'')+sym+fmtN(toDisplayCurr(Math.abs(change)));changeEl.style.color=change>=0?'var(--green2)':'var(--red)';}
+  if(changeEl){changeEl.textContent=(change>=0?'+':'')+fmtN(toDisplayCurr(Math.abs(change)))+' '+sym;changeEl.style.color=change>=0?'var(--green2)':'var(--red)';}
   const growthEl=document.getElementById('chartGrowth');
   if(growthEl){growthEl.textContent=(changePct>=0?'+':'')+changePct.toFixed(1)+'%';growthEl.style.color=changePct>=0?'var(--green2)':'var(--red)';}
   const dayEl=document.getElementById('chartDayChange');
@@ -11863,7 +11866,7 @@ function renderChart(){
     const open=Number(todayEntry?.openTotal)||Number(todayEntry?.total)||currentTotal;
     const dayChange=currentTotal-open;
     const dayPct=open>0?(dayChange/open*100):0;
-    dayEl.textContent=(dayChange>=0?'+':'')+sym+fmtN(toDisplayCurr(Math.abs(dayChange)))+' ('+(dayPct>=0?'+':'')+dayPct.toFixed(1)+'%)';
+    dayEl.textContent=(dayChange>=0?'+':'')+fmtN(toDisplayCurr(Math.abs(dayChange)))+' '+sym+' ('+(dayPct>=0?'+':'')+dayPct.toFixed(1)+'%)';
     dayEl.style.color=dayChange>=0?'var(--green2)':'var(--red)';
   }
 }
@@ -11930,7 +11933,7 @@ function exportPDF(){
   html+=`<h1>💰 ${rTxt('title')}</h1>
   <div class="sub">${rTxt('generated')} ${now}</div>
   <div class="summary-box">
-    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(totalUah))}</div><div class="summary-lbl">${rTxt('totalCapital')}</div></div>
+    <div class="summary-item"><div class="summary-val">${fmtN(toDisplayCurr(totalUah))} ${sym}</div><div class="summary-lbl">${rTxt('totalCapital')}</div></div>
     <div class="summary-item"><div class="summary-val">${deposits.length}</div><div class="summary-lbl">${rTxt('deposits')}</div></div>
     <div class="summary-item"><div class="summary-val">${visibleSecuritiesSections().reduce((s,sec)=>s+sec.items.length,0)}</div><div class="summary-lbl">${rTxt('stocks')}</div></div>
     <div class="summary-item"><div class="summary-val">${liabilities.length}</div><div class="summary-lbl">${rTxt('loans')}</div></div>
@@ -11943,7 +11946,7 @@ function exportPDF(){
     deposits.forEach(d=>{
       const p=getDepositPrincipalUah(d);
       const acc=getDepositMonthlyAccruedWithTopups(d);
-      html+=`<tr><td>${escHtml(d.name||rTxt('depDefault'))}</td><td>${sym}${fmtN(toDisplayCurr(p))}</td><td>${d.rate||0}%</td><td>${d.endDate||'—'}</td><td class="positive">+${sym}${fmtN(toDisplayCurr(acc))}</td></tr>`;
+      html+=`<tr><td>${escHtml(d.name||rTxt('depDefault'))}</td><td>${fmtN(toDisplayCurr(p))} ${sym}</td><td>${d.rate||0}%</td><td>${d.endDate||'—'}</td><td class="positive">+${fmtN(toDisplayCurr(acc))} ${sym}</td></tr>`;
     });
     html+=`</table></div>`;
   }
@@ -11955,7 +11958,7 @@ function exportPDF(){
     visibleSecuritiesSections().forEach(sec=>{
       sec.items.forEach(it=>{
         const val=(parseInputNumber(it.qty)||0)*(parseInputNumber(it.price)||0);
-        html+=`<tr><td>${escHtml(it.ticker||'—')}</td><td>${escHtml(it.liveName||it.name||'—')}</td><td>${it.qty}</td><td>${sym}${fmtN(toDisplayCurr(parseInputNumber(it.price)||0))}</td><td>${sym}${fmtN(toDisplayCurr(val))}</td></tr>`;
+        html+=`<tr><td>${escHtml(it.ticker||'—')}</td><td>${escHtml(it.liveName||it.name||'—')}</td><td>${it.qty}</td><td>${fmtN(toDisplayCurr(parseInputNumber(it.price)||0))} ${sym}</td><td>${fmtN(toDisplayCurr(val))} ${sym}</td></tr>`;
       });
     });
     html+=`</table></div>`;
@@ -11968,16 +11971,16 @@ function exportPDF(){
     liabilities.forEach(l=>{
       const rem=getLiabRemaining(l);
       const pay=calcAnnuity(l.amount,l.rate,l.months);
-      html+=`<tr><td>${escHtml(l.name)}</td><td>${sym}${fmtN(toDisplayCurr(l.amount))}</td><td class="negative">${sym}${fmtN(toDisplayCurr(rem))}</td><td>${sym}${fmtN(toDisplayCurr(pay))}</td><td>${l.rate}%</td></tr>`;
+      html+=`<tr><td>${escHtml(l.name)}</td><td>${fmtN(toDisplayCurr(l.amount))} ${sym}</td><td class="negative">${fmtN(toDisplayCurr(rem))} ${sym}</td><td>${fmtN(toDisplayCurr(pay))} ${sym}</td><td>${l.rate}%</td></tr>`;
     });
     html+=`</table></div>`;
   }
 
   const netCapital=totalUah-getLiabilitiesTotal();
   html+=`<div class="summary-box" style="margin-top:20px;">
-    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(totalUah))}</div><div class="summary-lbl">Брутто-капітал</div></div>
-    <div class="summary-item"><div class="summary-val negative">-${sym}${fmtN(toDisplayCurr(getLiabilitiesTotal()))}</div><div class="summary-lbl">Борги</div></div>
-    <div class="summary-item"><div class="summary-val">${sym}${fmtN(toDisplayCurr(netCapital))}</div><div class="summary-lbl">Нетто-капітал</div></div>
+    <div class="summary-item"><div class="summary-val">${fmtN(toDisplayCurr(totalUah))} ${sym}</div><div class="summary-lbl">Брутто-капітал</div></div>
+    <div class="summary-item"><div class="summary-val negative">-${fmtN(toDisplayCurr(getLiabilitiesTotal()))} ${sym}</div><div class="summary-lbl">Борги</div></div>
+    <div class="summary-item"><div class="summary-val">${fmtN(toDisplayCurr(netCapital))} ${sym}</div><div class="summary-lbl">Нетто-капітал</div></div>
   </div>`;
 
   html+=`</body></html>`;
@@ -13165,7 +13168,7 @@ function openCapitalHistory(){
     const sign=delta>=0?'+':'-';
     const locale=currentLang==='en'?'en-US':currentLang==='de'?'de-DE':currentLang==='zh'?'zh-CN':currentLang==='ru'?'ru-RU':'uk-UA';
     const date=new Date(h.date).toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'});
-    return '<div class="history-row"><div><div class="history-date">'+date+'</div><div class="history-delta" style="text-align:left;color:'+col+'">'+(prev?sign+sym+fmtN(toDisplayCurr(Math.abs(delta)))+' ('+sign+Math.abs(deltaPct).toFixed(1)+'%)':'—')+'</div></div><div class="history-total">'+sym+fmtN(toDisplayCurr(Number(h.total)))+'</div></div>';
+    return '<div class="history-row"><div><div class="history-date">'+date+'</div><div class="history-delta" style="text-align:left;color:'+col+'">'+(prev?sign+fmtN(toDisplayCurr(Math.abs(delta)))+' '+sym+' ('+sign+Math.abs(deltaPct).toFixed(1)+'%)':'—')+'</div></div><div class="history-total">'+fmtN(toDisplayCurr(Number(h.total)))+' '+sym+'</div></div>';
   }).join('');
   const ov=document.createElement('div');
   ov.className='history-overlay open';
@@ -13243,7 +13246,7 @@ function renderDiagnostics(){
     const v=stat.change||0;
     const sign=v>=0?'+':'-';
     const col=v>=0?'var(--green2)':'var(--red)';
-    return '<span style="color:'+col+'">'+sign+sym+fmtN(toDisplayCurr(Math.abs(v)))+' <span style="font-size:8px;color:var(--muted)">('+(stat.pct>=0?'+':'')+stat.pct.toFixed(1)+'%)</span></span>';
+    return '<span style="color:'+col+'">'+sign+fmtN(toDisplayCurr(Math.abs(v)))+' '+sym+' <span style="font-size:8px;color:var(--muted)">('+(stat.pct>=0?'+':'')+stat.pct.toFixed(1)+'%)</span></span>';
   };
   const formatSectionChip=(label,stat)=>{
     if(!stat)return '<div class="section-dyn-chip"><span>'+label+'</span><span style="color:var(--muted)">—</span></div>';
@@ -13265,7 +13268,7 @@ function renderDiagnostics(){
     return '<div class="section-dyn-card '+state+'">'+
       '<div class="section-dyn-head">'+
         '<div><div class="section-dyn-name"><span>'+diagIconHtml(key,item.icon)+'</span><span>'+label+'</span></div><div class="section-dyn-status">'+status+'</div></div>'+
-        '<div class="section-dyn-main"><div class="section-dyn-value" style="color:'+col+'">'+sign+sym+fmtN(toDisplayCurr(Math.abs(dayValue)))+'</div><div class="section-dyn-pct">'+pct+'</div></div>'+
+        '<div class="section-dyn-main"><div class="section-dyn-value" style="color:'+col+'">'+sign+fmtN(toDisplayCurr(Math.abs(dayValue)))+' '+sym+'</div><div class="section-dyn-pct">'+pct+'</div></div>'+
       '</div>'+
       '<div class="section-dyn-chips">'+
         formatSectionChip(sectionPerfTxt('d7'),d7)+
@@ -13293,21 +13296,21 @@ function renderDiagnostics(){
     const p=typeof stat==='object'?stat.pct:(pMaybe||0);
     const sign=v>=0?'+':'';
     const col=v>=0?'var(--green2)':'var(--red)';
-    return '<span style="color:'+col+'">'+sign+sym+fmtN(toDisplayCurr(Math.abs(v)))+' ('+sign+p.toFixed(1)+'%)</span>';
+    return '<span style="color:'+col+'">'+sign+fmtN(toDisplayCurr(Math.abs(v)))+' '+sym+' ('+sign+p.toFixed(1)+'%)</span>';
   };
 
   let html=`
     <div class="diag-stat-grid">
       <div class="diag-stat">
-        <div class="diag-stat-val" style="color:var(--gold2)">${sym}${fmtN(toDisplayCurr(total))}</div>
+        <div class="diag-stat-val" style="color:var(--gold2)">${fmtN(toDisplayCurr(total))} ${sym}</div>
         <div class="diag-stat-lbl">Брутто-капітал</div>
       </div>
       <div class="diag-stat">
-        <div class="diag-stat-val" style="color:${net>=0?'var(--green2)':'var(--red)'}">${sym}${fmtN(toDisplayCurr(net))}</div>
+        <div class="diag-stat-val" style="color:${net>=0?'var(--green2)':'var(--red)'}">${fmtN(toDisplayCurr(net))} ${sym}</div>
         <div class="diag-stat-lbl">Нетто-капітал</div>
       </div>
       <div class="diag-stat">
-        <div class="diag-stat-val" style="color:var(--red)">-${sym}${fmtN(toDisplayCurr(debt))}</div>
+        <div class="diag-stat-val" style="color:var(--red)">-${fmtN(toDisplayCurr(debt))} ${sym}</div>
         <div class="diag-stat-lbl">Борги</div>
       </div>
       <button class="diag-history-btn" onclick="openCapitalHistory()">
@@ -13316,19 +13319,19 @@ function renderDiagnostics(){
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px;">${capitalHistory.length} ${trx({uk:'записів',ru:'записей',en:'records',de:'Einträge',zh:'条记录'})}</div>
       </button>
       <div class="diag-stat">
-        <div class="diag-stat-val" style="color:var(--green2)">+${sym}${fmtN(toDisplayCurr(stockDivMonth))}<span style="font-size:9px;color:var(--muted);font-weight:400;">${diagMonthUnit()}</span></div>
+        <div class="diag-stat-val" style="color:var(--green2)">+${fmtN(toDisplayCurr(stockDivMonth))} ${sym}<span style="font-size:9px;color:var(--muted);font-weight:400;">${diagMonthUnit()}</span></div>
         <div class="diag-stat-lbl">Дивіденди акцій/місяць</div>
-        <div style="font-size:9px;color:${secPnl>=0?'var(--green2)':'var(--red)'};margin-top:4px;font-family:'DM Mono',monospace;">P&L: ${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(secPnl))}</div>
+        <div style="font-size:9px;color:${secPnl>=0?'var(--green2)':'var(--red)'};margin-top:4px;font-family:'DM Mono',monospace;">P&L: ${secPnl>=0?'+':''}${fmtN(toDisplayCurr(secPnl))} ${sym}</div>
       </div>
       <div class="diag-stat">
-        <div class="diag-stat-val" style="color:var(--blue2)">+${sym}${fmtN(toDisplayCurr(dailyDepIncome))}</div>
+        <div class="diag-stat-val" style="color:var(--blue2)">+${fmtN(toDisplayCurr(dailyDepIncome))} ${sym}</div>
         <div class="diag-stat-lbl">Дохід/день (деп. після податку)</div>
-        ${dailyDepIncomeGross!==dailyDepIncome?`<div style="font-size:8px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">${trx({uk:'до податку',ru:'до налога',en:'before tax',de:'vor Steuer',zh:'税前'})}: +${sym}${fmtN(toDisplayCurr(dailyDepIncomeGross))}</div>`:''}
+        ${dailyDepIncomeGross!==dailyDepIncome?`<div style="font-size:8px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;">${trx({uk:'до податку',ru:'до налога',en:'before tax',de:'vor Steuer',zh:'税前'})}: +${fmtN(toDisplayCurr(dailyDepIncomeGross))} ${sym}</div>`:''}
       </div>
       <div class="diag-stat diag-passive-banner">
-        <div class="diag-stat-val" style="color:var(--gold2);font-size:20px;">+${sym}${fmtN(toDisplayCurr(combinedMonth))}<span style="font-size:11px;color:var(--muted);font-weight:400;"> ${diagMonthWord()}</span></div>
+        <div class="diag-stat-val" style="color:var(--gold2);font-size:20px;">+${fmtN(toDisplayCurr(combinedMonth))} ${sym}<span style="font-size:11px;color:var(--muted);font-weight:400;"> ${diagMonthWord()}</span></div>
         <div class="diag-stat-lbl">Загальний пасивний дохід (деп. + дивіденди)</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;">${diagDepositShort()} +${sym}${fmtN(toDisplayCurr(depMonthIncome))} · ${diagDividendShort()} +${sym}${fmtN(toDisplayCurr(stockDivMonth))}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;">${diagDepositShort()} +${fmtN(toDisplayCurr(depMonthIncome))} ${sym} · ${diagDividendShort()} +${fmtN(toDisplayCurr(stockDivMonth))} ${sym}</div>
       </div>
     </div>
 
@@ -13350,7 +13353,7 @@ function renderDiagnostics(){
       ${assets.map(a=>`
         <div class="diag-row">
           <span class="diag-row-key">${a.icon} ${a.name}</span>
-          <span class="diag-row-val" style="color:${a.color}">${sym}${fmtN(toDisplayCurr(a.val))} <span style="font-size:9px;color:var(--muted)">${pct(a.val,total)}</span></span>
+          <span class="diag-row-val" style="color:${a.color}">${fmtN(toDisplayCurr(a.val))} ${sym} <span style="font-size:9px;color:var(--muted)">${pct(a.val,total)}</span></span>
         </div>`).join('')}
     </div>`;
 
@@ -13358,10 +13361,10 @@ function renderDiagnostics(){
   if(totalSecVal>0){
     html+=`<div class="diag-section">
       <div class="diag-section-title">${diagIconHtml('stocks','')} ${sectionPerfTxt('stocks')} — P&L</div>
-      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('portfolioValue')}</span><span class="diag-row-val" style="color:var(--green2)">${sym}${fmtN(toDisplayCurr(totalSecVal))}</span></div>
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('portfolioValue')}</span><span class="diag-row-val" style="color:var(--green2)">${fmtN(toDisplayCurr(totalSecVal))} ${sym}</span></div>
       ${totalSecBuyCost>0?`
-      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('buyValue')}</span><span class="diag-row-val">${sym}${fmtN(toDisplayCurr(totalSecBuyCost))}</span></div>
-      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('profitLoss')}</span><span class="diag-row-val" style="color:${secPnl>=0?'var(--green2)':'var(--red)'}">${secPnl>=0?'+':''}${sym}${fmtN(toDisplayCurr(Math.abs(secPnl)))} (${secPnl>=0?'+':''}${secPnlPct.toFixed(1)}%)</span></div>`:''}
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('buyValue')}</span><span class="diag-row-val">${fmtN(toDisplayCurr(totalSecBuyCost))} ${sym}</span></div>
+      <div class="diag-row"><span class="diag-row-key">${sectionPerfTxt('profitLoss')}</span><span class="diag-row-val" style="color:${secPnl>=0?'var(--green2)':'var(--red)'}">${secPnl>=0?'+':''}${fmtN(toDisplayCurr(Math.abs(secPnl)))} ${sym} (${secPnl>=0?'+':''}${secPnlPct.toFixed(1)}%)</span></div>`:''}
     </div>`;
   }
 
@@ -14027,7 +14030,7 @@ const _origGetCustomCardHtml=getCustomCardHtml;
 getCustomCardHtml=function(s,idx){
   if(s.sectionType==='startup'){
     const st=getStartupStats(s);
-    const pnlColor=st.pnl>=0?'var(--green2)':'var(--red)';
+    const pnlColor=toneColor(st.pnl);
     const sym=getCurrSym();
     const nativeSym=getStockCurrencySymbol(st.cur);
     const exitSym=getStockCurrencySymbol(st.exitCur);
@@ -14039,8 +14042,8 @@ getCustomCardHtml=function(s,idx){
         <div class="card-icon">${sectionIconHtml(s,'🚀')}</div>
         <div class="card-info" onclick="toggleCard('${s.id}')">
           <div class="card-name">${escapeHtml(startupTitle)}</div>
-          <div class="card-value" id="customDisplay_${s.id}">${sym}${fmtN(toDisplayCurr(st.total))}</div>
-          <div class="card-pct" id="customPct_${s.id}" style="color:${pnlColor}">${st.pnl>=0?'+':''}${st.pnlPct.toFixed(1)}%</div>
+          <div class="card-value" id="customDisplay_${s.id}">${fmtN(toDisplayCurr(st.total))} ${sym}</div>
+          <div class="card-pct" id="customPct_${s.id}" style="color:${pnlColor}">${toneSign(st.pnl)}${st.pnlPct.toFixed(1)}%</div>
         </div>
         ${getCardSparklineHtml('startups')}
         <div class="card-actions">
@@ -14116,7 +14119,7 @@ getCustomCardHtml=function(s,idx){
               ${STOCK_CASH_CURRENCIES.slice(0,5).map(cur=>`<option value="${cur}" ${st.exitCur===cur?'selected':''}>${getStockCurrencySymbol(cur)} ${cur}</option>`).join('')}
             </select>
           </div>
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${st.exitCashNative?('≈ '+sym+fmtN(toDisplayCurr(st.exitCash))):uiText('startupExitCashHint')}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;">${st.exitCashNative?('≈ '+fmtN(toDisplayCurr(st.exitCash))+' '+sym):uiText('startupExitCashHint')}</div>
         </div>
         <div class="field-group" style="margin-top:12px;">
           <div class="field-label">${uiText('startupNoteLabel')}</div>
@@ -14124,11 +14127,11 @@ getCustomCardHtml=function(s,idx){
             oninput="customSections[${idx}].startupNote=this.value;saveData()">
         </div>
         <div class="result-box" style="margin-top:12px;">
-          <div class="result-row"><span class="result-key"><img src="section-icons/ui-dividend-income.png?v=1" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupInvested')}</span><span class="result-val">${nativeSym}${fmtN(st.investedNative)} · ${sym}${fmtN(toDisplayCurr(st.invested))}</span></div>
-          <div class="result-row"><span class="result-key"><img src="section-icons/ui-percent.png?v=1" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupCurrentShare')}</span><span class="result-val" style="color:var(--teal2)">${st.equity}% = ${nativeSym}${fmtN(st.activeValueNative)} · ${sym}${fmtN(toDisplayCurr(st.currentValue))}</span></div>
-          ${st.exitCashNative?`<div class="result-row"><span class="result-key">${uiText('startupExitCash')}</span><span class="result-val green">${exitSym}${fmtN(st.exitCashNative)} · ${sym}${fmtN(toDisplayCurr(st.exitCash))}</span></div>`:''}
-          <div class="result-row"><span class="result-key">${uiText('startupTotalValue')}</span><span class="result-val blue">${sym}${fmtN(toDisplayCurr(st.total))}</span></div>
-          <div class="result-row"><span class="result-key">P&L</span><span class="result-val" style="color:${pnlColor}">${st.pnl>=0?'+':'-'}${sym}${fmtN(toDisplayCurr(Math.abs(st.pnl)))} (${st.pnl>=0?'+':''}${st.pnlPct.toFixed(1)}%)</span></div>
+          <div class="result-row"><span class="result-key"><img src="section-icons/ui-dividend-income.png?v=1" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupInvested')}</span><span class="result-val">${nativeSym}${fmtN(st.investedNative)} · ${fmtN(toDisplayCurr(st.invested))} ${sym}</span></div>
+          <div class="result-row"><span class="result-key"><img src="section-icons/ui-percent.png?v=1" style="width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:5px;">${uiText('startupCurrentShare')}</span><span class="result-val" style="color:var(--teal2)">${st.equity}% = ${nativeSym}${fmtN(st.activeValueNative)} · ${fmtN(toDisplayCurr(st.currentValue))} ${sym}</span></div>
+          ${st.exitCashNative?`<div class="result-row"><span class="result-key">${uiText('startupExitCash')}</span><span class="result-val green">${exitSym}${fmtN(st.exitCashNative)} · ${fmtN(toDisplayCurr(st.exitCash))} ${sym}</span></div>`:''}
+          <div class="result-row"><span class="result-key">${uiText('startupTotalValue')}</span><span class="result-val blue">${fmtN(toDisplayCurr(st.total))} ${sym}</span></div>
+          <div class="result-row"><span class="result-key">P&L</span><span class="result-val" style="color:${pnlColor}">${st.pnl>=0?'+':'-'}${fmtN(toDisplayCurr(Math.abs(st.pnl)))} ${sym} (${toneSign(st.pnl)}${st.pnlPct.toFixed(1)}%)</span></div>
         </div>
         <button class="add-btn" style="color:var(--red);border-color:#f8717130;margin-top:16px" onclick="removeCustomSection('${s.id}')">${t('removeSection')}</button>
       </div></div>
