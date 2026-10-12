@@ -2062,6 +2062,21 @@ body.modern-mockup.theme-light .total-currency{
   opacity:1!important;
 }
 
+/* Шапка: нижний край растворяется вместе с размытием, а не обрывается линией.
+   Маска захватывает только нижний отступ шапки — значки и сумма не бледнеют. */
+.header,body.modern-mockup .header{
+  -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 20px),transparent);
+  mask-image:linear-gradient(180deg,#000 calc(100% - 20px),transparent);
+  border-bottom:0!important;
+}
+/* Экраны от 430pt (iPhone Pro Max/Plus): панель уже поднята над полоской «домой»
+   через bottom, поэтому отступ не добавляем к высоте второй раз */
+@media (min-width:430px){
+  body.modern-mockup .bottom-nav{height:68px!important;padding:8px 10px 6px!important;}
+}
+@media (min-width:500px){
+  body.modern-mockup .bottom-nav{height:72px!important;padding:9px 12px 7px!important;}
+}
 </style>
 </head>
 <body class="modern-mockup">
@@ -3058,7 +3073,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.62';
+const APP_VERSION = 'v0.1.63';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
