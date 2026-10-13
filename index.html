@@ -2084,6 +2084,8 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
 .eye-btn{width:36px;height:36px;flex:0 0 36px;border-radius:10px;background:var(--bg2);border:1px solid var(--border2);}
 .eye-btn svg{width:24px;height:24px;}
 .eye-btn.on{border-color:#e8c97a55;}
+/* Глаз стоит рядом с шестерёнкой в правом верхнем углу (просьба Александра 14.10): у суммы он слишком бросался в глаза */
+.header-top-row .eye-btn{margin-left:0;align-self:center;}
 .eye-btn:active{opacity:.6;}
 /* Экраны от 430pt (iPhone Pro Max/Plus): панель уже поднята над полоской «домой»
    через bottom, поэтому отступ не добавляем к высоте второй раз */
@@ -2363,6 +2365,7 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
     <div class="header-label" data-i18n="totalCapital">Загальний капітал</div>
     <div style="display:flex;gap:6px;align-items:center;">
       <button class="diag-btn header-diag-btn" onclick="openDiagnostics()" title="Діагностика">📊</button>
+      <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="eyeGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#e2b24f"/><stop offset="1" stop-color="#a8761f"/></linearGradient></defs><path d="M1.8 12C4.3 7.6 7.9 5.3 12 5.3s7.7 2.3 10.2 6.7C19.7 16.4 16.1 18.7 12 18.7S4.3 16.4 1.8 12z" fill="none" stroke="url(#eyeGold)" stroke-width="2.1" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" fill="url(#eyeGold)"/><circle cx="13.4" cy="10.6" r="1.25" fill="#fff6d8"/></svg></button>
       <button class="gear-btn" onclick="openSettings()" title="Налаштування"><img class="settings-png-icon" src="section-icons/section-settings.png?v=1" alt=""></button>
     </div>
   </div>
@@ -2370,7 +2373,6 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-amount total-mask" aria-hidden="true">******</div>
     <div class="total-currency" id="totalCurrSym">₴</div>
-    <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="eyeGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#e2b24f"/><stop offset="1" stop-color="#a8761f"/></linearGradient></defs><path d="M1.8 12C4.3 7.6 7.9 5.3 12 5.3s7.7 2.3 10.2 6.7C19.7 16.4 16.1 18.7 12 18.7S4.3 16.4 1.8 12z" fill="none" stroke="url(#eyeGold)" stroke-width="2.1" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" fill="url(#eyeGold)"/><circle cx="13.4" cy="10.6" r="1.25" fill="#fff6d8"/></svg></button>
   </div>
   <!-- NEW DESIGN --><div class="nd-only nd-delta" id="ndDelta"></div>
   <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
@@ -3366,7 +3368,7 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.71';
+const APP_VERSION = 'v0.1.72';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
