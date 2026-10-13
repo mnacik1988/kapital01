@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-1-65-cloud';
+﻿const CACHE_NAME = 'investory-app-v0-1-66-header';
 // Ядро — без него приложение не откроется офлайн. Установка строгая: не
 // скачалось ядро — новый воркер не ставится, прежняя версия остаётся.
 const CORE = [

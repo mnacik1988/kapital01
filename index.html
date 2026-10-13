@@ -2066,13 +2066,25 @@ body.modern-mockup.theme-light .total-currency{
   opacity:1!important;
 }
 
-/* Шапка: нижний край растворяется вместе с размытием, а не обрывается линией.
-   Маска захватывает только нижний отступ шапки — значки и сумма не бледнеют. */
+/* Шапка непрозрачная и без размытия: содержимое уходит под неё по чёткой границе,
+   без полупрозрачной мутной полосы на стыке (просьба Александра 13.10) */
 .header,body.modern-mockup .header{
-  -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 20px),transparent);
-  mask-image:linear-gradient(180deg,#000 calc(100% - 20px),transparent);
-  border-bottom:0!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  -webkit-mask-image:none;mask-image:none;
+  background:radial-gradient(circle at 76% 8%,rgba(56,189,248,.30),transparent 44%),linear-gradient(180deg,#06192e,#061628)!important;
+  border-bottom:1px solid #ffffff0d!important;
+  box-shadow:0 10px 22px #00000059!important;
 }
+body.theme-light .header,body.modern-mockup.theme-light .header{
+  background:linear-gradient(180deg,#fbf2de,#f8f0e0)!important;
+  border-bottom:1px solid rgba(116,91,48,.12)!important;
+  box-shadow:0 8px 18px rgba(74,57,34,.10)!important;
+}
+/* Глаз — в одном стиле с шестерёнкой: тёмная плитка и золотой значок */
+.eye-btn{width:36px;height:36px;flex:0 0 36px;border-radius:10px;background:var(--bg2);border:1px solid var(--border2);}
+.eye-btn svg{width:24px;height:24px;}
+.eye-btn.on{border-color:#e8c97a55;}
+.eye-btn:active{opacity:.6;}
 /* Экраны от 430pt (iPhone Pro Max/Plus): панель уже поднята над полоской «домой»
    через bottom, поэтому отступ не добавляем к высоте второй раз */
 @media (min-width:430px){
@@ -2099,7 +2111,7 @@ body.modern-mockup.theme-light .total-currency{
     <div class="total-amount" id="totalAmount">0</div>
     <div class="total-amount total-mask" aria-hidden="true">******</div>
     <div class="total-currency" id="totalCurrSym">₴</div>
-    <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="eyeGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#e2b24f"/><stop offset="1" stop-color="#a8761f"/></linearGradient></defs><path d="M1.8 12C4.3 7.6 7.9 5.3 12 5.3s7.7 2.3 10.2 6.7C19.7 16.4 16.1 18.7 12 18.7S4.3 16.4 1.8 12z" fill="none" stroke="url(#eyeGold)" stroke-width="2.1" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" fill="url(#eyeGold)"/><circle cx="13.4" cy="10.6" r="1.25" fill="#fff6d8"/></svg></button>
   </div>
   <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
@@ -3079,7 +3091,7 @@ body.modern-mockup.theme-light .total-currency{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.65';
+const APP_VERSION = 'v0.1.66';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9043,8 +9055,8 @@ secContainerEl.after(metalsContainerEl);
 // запоминается на этом устройстве.
 const HIDE_AMOUNTS_LS='investory_hide_amounts';
 const EYE_ICONS={
-  open:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
-  closed:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12s3.4-6 9-6c1.8 0 3.4.6 4.7 1.4M21 12s-3.4 6-9 6c-1.8 0-3.4-.6-4.7-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20 20 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+  open:'<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="eyeGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#e2b24f"/><stop offset="1" stop-color="#a8761f"/></linearGradient></defs><path d="M1.8 12C4.3 7.6 7.9 5.3 12 5.3s7.7 2.3 10.2 6.7C19.7 16.4 16.1 18.7 12 18.7S4.3 16.4 1.8 12z" fill="none" stroke="url(#eyeGold)" stroke-width="2.1" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" fill="url(#eyeGold)"/><circle cx="13.4" cy="10.6" r="1.25" fill="#fff6d8"/></svg>',
+  closed:'<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="eyeGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#e2b24f"/><stop offset="1" stop-color="#a8761f"/></linearGradient></defs><path d="M2.5 10.5C5 14.2 8.2 16 12 16s7-1.8 9.5-5.5" fill="none" stroke="url(#eyeGold)" stroke-width="2.1" stroke-linecap="round"/><path d="M12 16v3M6.6 14.4l-1.8 2.4M17.4 14.4l1.8 2.4M3.6 12.1 1.8 13.6M20.4 12.1l1.8 1.5" stroke="url(#eyeGold)" stroke-width="1.9" stroke-linecap="round"/></svg>'
 };
 function amountsHidden(){try{return localStorage.getItem(HIDE_AMOUNTS_LS)==='1';}catch(e){return false;}}
 function applyHideAmounts(){
