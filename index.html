@@ -3366,7 +3366,7 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.70';
+const APP_VERSION = 'v0.1.71';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16532,7 +16532,7 @@ function ndDecorateSecurities(){
       const base=total-dayDelta;
       const p=base>0?dayDelta/base*100:0;
       const cls=dayDelta>0.004?'up':dayDelta<-0.004?'dn':'';
-      day.innerHTML='<span class="'+cls+' live-val">'+(dayDelta>0.004?'▲ +':dayDelta<-0.004?'▼ −':'')+fmtN(toDisplayCurr(Math.abs(dayDelta)))+' '+sym+' · '+(p>0?'+':'')+p.toFixed(1)+'%</span> '+escHtml(ndSecTxt('today'));
+      day.innerHTML='<span class="'+cls+' live-val">'+(dayDelta>0.004?'▲ +':dayDelta<-0.004?'▼ −':'')+fmtN(toDisplayCurr(Math.abs(dayDelta)))+' '+sym+' · '+ndFmtPct(p,Math.abs(p)>0&&Math.abs(p)<0.1?2:1)+'</span> '+escHtml(ndSecTxt('today'));
     }
     // три цифры
     const pnl=groups.reduce((s,g)=>s+(Number(g.pnl)||0),0);
@@ -16704,7 +16704,7 @@ function ndDecorateCrypto(){
   if(day){
     const ch=d?Number(d.change)||0:0,p=d?Number(d.pct)||0:0;
     const cls=ch>0.004?'up':ch<-0.004?'dn':'';
-    day.innerHTML='<span class="'+cls+' live-val">'+(ch>0.004?'▲ +':ch<-0.004?'▼ −':'')+fmtN(toDisplayCurr(Math.abs(ch)))+' '+sym+' · '+ndFmtPct(p)+'</span> '+escHtml(ndSecTxt('today'));
+    day.innerHTML='<span class="'+cls+' live-val">'+(ch>0.004?'▲ +':ch<-0.004?'▼ −':'')+fmtN(toDisplayCurr(Math.abs(ch)))+' '+sym+' · '+ndFmtPct(p,Math.abs(p)>0&&Math.abs(p)<0.1?2:1)+'</span> '+escHtml(ndSecTxt('today'));
   }
   // три цифры: прибыль, USDT, в долларах
   const st=getCryptoPortfolioStats();
@@ -16719,10 +16719,10 @@ function ndDecorateCrypto(){
   let tabs=inner.querySelector('.nd-sec-tabs');
   if(!tabs){
     tabs=document.createElement('div');tabs.className='nd-sec-tabs nd-only';box.after(tabs);
-    tabs.innerHTML=[['pos',ndCryptoTxt('coins')],['ex',ndCryptoTxt('ex')],['hist',ndSecTxt('hist')]].map(([k,l])=>'<button type="button" data-tab="'+k+'" onclick="ndSecSetTab(\'crypto\',\''+k+'\')">'+escHtml(l)+'</button>').join('');
+    tabs.innerHTML=[['ex',ndCryptoTxt('ex')],['pos',ndCryptoTxt('coins')],['hist',ndSecTxt('hist')]].map(([k,l])=>'<button type="button" data-tab="'+k+'" onclick="ndSecSetTab(\'crypto\',\''+k+'\')">'+escHtml(l)+'</button>').join('');
     tabs.insertAdjacentHTML('afterend','<div class="nd-sec-hint">'+escHtml(ndSecTxt('pick'))+'</div>');
   }
-  ndSecSetTab('crypto',ndSecTab.crypto||'pos');
+  ndSecSetTab('crypto',ndSecTab.crypto||'ex');
   let hist=inner.querySelector('.nd-sec-hist');
   if(!hist){hist=document.createElement('div');hist.className='nd-sec-hist nd-only';(inner.querySelector('.nd-box-add')||inner.lastElementChild).before(hist);}
   const list=(coins||[]).slice().reverse();
