@@ -2099,6 +2099,7 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
    Как удалить модуль целиком — список мест в начале JS-блока «NEW DESIGN BEGIN». */
 .nd-only{display:none;}
 body.nd .nd-only{display:block;}
+body:not(.nd) .nd-only{display:none!important;}
 body.modern-mockup.nd{background:radial-gradient(120% 50% at 80% -6%,#2a2112 0%,transparent 55%),linear-gradient(180deg,#0d0e12 0%,#08090b 100%)!important;background-attachment:fixed!important;}
 body.modern-mockup.nd::before{opacity:0!important;}
 /* шапка */
@@ -2186,6 +2187,107 @@ body.modern-mockup.nd .bottom-nav-btn:nth-child(5){order:5;}
 body.modern-mockup.nd .app{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;}
 /* динамика капитала в новом виде стоит после списка */
 body.modern-mockup.nd .chart-section{margin-top:16px!important;}
+/* — экран «Депозиты» — */
+body.modern-mockup.nd .card:not(.nd-open) .nd-dep-title,body.modern-mockup.nd .card:not(.nd-open) .nd-dep-live,body.modern-mockup.nd .card:not(.nd-open) .nd-dep-tabs{display:none!important;}
+body.modern-mockup.nd #card-deposit.nd-open .card-name,body.modern-mockup.nd #card-deposit.nd-open .card-pct{display:none!important;}
+.nd-dep-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8c8778;}
+.nd-dep-live{font-family:'DM Mono',monospace;font-size:12px;color:#7fd6a3;margin-top:4px;}
+body.modern-mockup.nd #card-deposit .divider,body.modern-mockup.nd #depositSummaryList,body.modern-mockup.nd #card-deposit .deposits-swipe-header{display:none!important;}
+body.nd .nd-dep-tabs{display:flex;gap:6px;margin:6px 0 14px;padding:4px;background:#121318;border-radius:14px;border:1px solid #ffffff0b;overflow-x:auto;scrollbar-width:none;}
+.nd-dep-tabs::-webkit-scrollbar{display:none;}
+.nd-dep-tabs button{flex:1 0 auto;min-width:0;padding:10px 12px;border-radius:10px;border:0;background:none;font:600 13px 'Manrope',sans-serif;color:#8c8778;white-space:nowrap;cursor:pointer;}
+.nd-dep-tabs button.on{background:#1d1b16;color:#f1ead9;box-shadow:inset 0 0 0 1px #d9b86633;}
+.nd-dep-tabs button.add{flex:0 0 40px;color:#d9b866;font-size:16px;}
+body.modern-mockup.nd #card-deposit .live-wrap{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:20px!important;padding:16px!important;box-shadow:none!important;}
+body.modern-mockup.nd #card-deposit .live-wrap::before,body.modern-mockup.nd #card-deposit .live-wrap::after{display:none!important;}
+body.modern-mockup.nd #card-deposit .live-label{margin-bottom:4px!important;align-items:center!important;}
+body.modern-mockup.nd #card-deposit .live-label .live-dot{display:none!important;}
+body.modern-mockup.nd #card-deposit .dep-name-input{font:700 16px 'Manrope',sans-serif!important;letter-spacing:0!important;text-transform:none!important;color:#f1ead9!important;width:100%!important;}
+.nd-rate{font-family:'DM Mono',monospace;font-size:12px;color:#e9cd85;background:#d9b86614;padding:5px 9px;border-radius:9px;white-space:nowrap;margin-left:8px;}
+body.modern-mockup.nd #card-deposit .dep-delete-btn{margin-left:8px!important;}
+.nd-dep-meta{font-family:'DM Mono',monospace;font-size:10px;color:#77736a;margin-bottom:12px;}
+body.modern-mockup.nd #card-deposit .live-num,body.modern-mockup.nd #card-deposit .live-sub{display:none!important;}
+body.modern-mockup.nd #card-deposit .live-bar-wrap{order:-1;height:5px!important;background:#ffffff0d!important;margin-top:4px!important;}
+body.modern-mockup.nd #card-deposit .live-bar{background:linear-gradient(90deg,#d9b866,#f3d88f)!important;}
+body.modern-mockup.nd #card-deposit .live-dates{font-family:'DM Mono',monospace!important;font-size:9.5px!important;color:#6f6a5e!important;margin-top:6px!important;}
+body.modern-mockup.nd #card-deposit [id^="liveMain_"]:not([style*="none"]){display:flex!important;flex-direction:column;}
+body.modern-mockup.nd #card-deposit .live-rows{order:1;display:grid!important;grid-template-columns:1fr 1fr;gap:1px!important;background:#ffffff0a;border-radius:14px;overflow:hidden;margin-top:14px!important;}
+body.modern-mockup.nd #card-deposit .live-row{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;background:#111216;padding:11px 12px!important;gap:5px;}
+body.modern-mockup.nd #card-deposit .live-row:nth-child(1),body.modern-mockup.nd #card-deposit .live-row:nth-child(2),body.modern-mockup.nd #card-deposit .live-row:nth-child(4),body.modern-mockup.nd #card-deposit .live-row:nth-child(7){display:none!important;}
+body.modern-mockup.nd #card-deposit .live-key{font-family:'DM Mono',monospace!important;font-size:9.5px!important;letter-spacing:.06em!important;text-transform:uppercase;color:#77736a!important;}
+body.modern-mockup.nd #card-deposit .live-key img,body.modern-mockup.nd #card-deposit .live-key .app-png-icon{display:none!important;}
+body.modern-mockup.nd #card-deposit .live-val{font:600 16px 'Manrope',sans-serif!important;}
+body.modern-mockup.nd #card-deposit .live-val.g{color:#7fd6a3!important;}
+body.modern-mockup.nd #card-deposit .live-val.o{color:#7fd6a3!important;}
+body.modern-mockup.nd #card-deposit [id^="livePerMonth_"]{color:#e9cd85!important;}
+body.modern-mockup.nd #card-deposit .nd-endrow .live-val{color:#f1ead9!important;}
+body.modern-mockup.nd #card-deposit .daily-section{order:2;margin-top:18px!important;}
+body.modern-mockup.nd #card-deposit .daily-toggle{display:none!important;}
+.nd-bars-head{display:flex;justify-content:space-between;align-items:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8c8778;margin-bottom:10px;cursor:pointer;}
+.nd-bars-head span:last-child{letter-spacing:.06em;}
+.nd-bars{display:flex;align-items:flex-end;gap:3px;height:70px;padding:14px 14px 0;background:#0d0e12;border:1px solid #ffffff0b;border-radius:16px 16px 0 0;}
+.nd-bars i{flex:1;background:#d9b86655;border-radius:2px 2px 0 0;min-height:2px;}
+.nd-bars i.now{background:#f3d88f;}
+.nd-bars-ax{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:#6f6a5e;padding:6px 14px 10px;background:#0d0e12;border:1px solid #ffffff0b;border-top:0;border-radius:0 0 16px 16px;}
+.nd-bars-empty{font-family:'DM Mono',monospace;font-size:10px;color:#6f6a5e;padding:12px;border:1px solid #ffffff0b;border-radius:16px;}
+body.modern-mockup.nd #card-deposit .daily-scroll{margin-top:10px;}
+.nd-dep-btns{display:flex;gap:10px;margin-top:16px;}
+.nd-dep-btns button{flex:1;padding:13px 0;border-radius:14px;font:700 13.5px 'Manrope',sans-serif;cursor:pointer;}
+.nd-dep-btns .b1{background:#14151a;border:1px solid #ffffff14;color:#cfc7b4;}
+.nd-dep-btns .b2{background:linear-gradient(145deg,#f3d88f,#b88a35);border:0;color:#1a1408;}
+body.modern-mockup.nd #card-deposit .dep-calc-toggle{display:none!important;}
+/* — экран «Акции» — */
+body.modern-mockup.nd .card-stocks.nd-open .card-pct{display:none!important;}
+body.modern-mockup.nd .card:not(.nd-open) .nd-sec-day{display:none!important;}
+.nd-sec-day{font-family:'DM Mono',monospace;font-size:12px;margin-top:4px;color:#8c8778;}
+.nd-sec-day .up{color:#7fd6a3;}.nd-sec-day .dn{color:#ef8a7a;}
+body.modern-mockup.nd .card-stocks .card-inner>.divider,body.modern-mockup.nd .card-stocks .result-box{display:none!important;}
+.nd-sec-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-radius:16px;background:#111216;border:1px solid #ffffff0d;margin-top:8px;}
+.nd-sec-stats>div{padding:11px 12px;border-left:1px solid #ffffff0a;min-width:0;}
+.nd-sec-stats>div:first-child{border-left:0;}
+.nd-sec-stats .k{font-family:'DM Mono',monospace;font-size:9px;color:#77736a;letter-spacing:.06em;text-transform:uppercase;}
+.nd-sec-stats .v{font:600 14.5px 'Manrope',sans-serif;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f1ead9;}
+.nd-sec-stats .g{color:#7fd6a3;}.nd-sec-stats .r{color:#ef8a7a;}.nd-sec-stats .gold{color:#e9cd85;}
+.nd-sec-tabs{display:flex;gap:6px;margin:14px 0 12px;padding:4px;background:#121318;border-radius:14px;border:1px solid #ffffff0b;}
+.nd-sec-tabs button{flex:1;padding:9px 0;border-radius:10px;border:0;background:none;font:600 12.5px 'Manrope',sans-serif;color:#8c8778;cursor:pointer;}
+.nd-sec-tabs button.on{background:#1d1b16;color:#f1ead9;box-shadow:inset 0 0 0 1px #d9b86633;}
+/* что видно на какой вкладке */
+body.modern-mockup.nd .card-stocks .nd-box-cash,body.modern-mockup.nd .card-stocks .nd-box-div,body.modern-mockup.nd .card-stocks .sec-summary-divs,body.modern-mockup.nd .card-stocks .nd-sec-hist{display:none!important;}
+body.modern-mockup.nd .card-stocks[data-ndtab="div"] .ticker-cards,body.modern-mockup.nd .card-stocks[data-ndtab="div"] .auto-refresh-bar,body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .ticker-cards,body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .auto-refresh-bar{display:none!important;}
+body.modern-mockup.nd .card-stocks[data-ndtab="div"] .sec-summary-divs,body.modern-mockup.nd .card-stocks[data-ndtab="div"] .nd-box-div{display:block!important;}
+body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .nd-sec-hist,body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .nd-box-cash{display:block!important;}
+body.modern-mockup.nd .card-stocks .nd-box-add{display:none!important;}
+body.modern-mockup.nd .card-stocks.nd-adding .nd-box-add{display:block!important;}
+body.modern-mockup.nd .card-stocks .nd-box-cash,body.modern-mockup.nd .card-stocks .nd-box-div,body.modern-mockup.nd .card-stocks .nd-box-add,body.modern-mockup.nd .card-stocks .sec-summary-divs{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;}
+/* позиции строками */
+body.modern-mockup.nd .card-stocks .ticker-cards{display:flex!important;flex-direction:column!important;gap:0!important;background:#111216;border:1px solid #ffffff0d;border-radius:20px;overflow:hidden;grid-template-columns:none!important;}
+body.modern-mockup.nd .card-stocks .ticker-card{display:grid!important;grid-template-columns:40px minmax(0,1fr) auto;column-gap:12px;row-gap:3px;align-items:center;padding:12px 14px!important;margin:0!important;border:0!important;border-top:1px solid #ffffff08!important;border-radius:0!important;background:none!important;box-shadow:none!important;min-height:0!important;}
+body.modern-mockup.nd .card-stocks .ticker-card:first-child{border-top:0!important;}
+body.modern-mockup.nd .card-stocks .ticker-card-head{display:contents!important;}
+body.modern-mockup.nd .card-stocks .ticker-card-sym{grid-column:1;grid-row:1/span 2;width:40px;height:40px;border-radius:12px;background:#24252b;color:#f1f1f1;display:flex!important;align-items:center;justify-content:center;font:800 10px 'Manrope',sans-serif!important;letter-spacing:.01em;overflow:hidden;white-space:nowrap;}
+body.modern-mockup.nd .card-stocks .ticker-card-name{grid-column:2;grid-row:1;font:700 14px 'Manrope',sans-serif!important;color:#ecebe6!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0!important;}
+body.modern-mockup.nd .card-stocks .ticker-card-qty{grid-column:2;grid-row:2;justify-self:start;font-family:'DM Mono',monospace!important;font-size:10px!important;color:#77736a!important;background:none!important;border:0!important;padding:0!important;width:auto!important;}
+body.modern-mockup.nd .card-stocks .ticker-card-price{grid-column:3;grid-row:1;text-align:right;font:600 14px 'Manrope',sans-serif!important;color:#f1ead9!important;margin:0!important;}
+body.modern-mockup.nd .card-stocks .ticker-card-pnl{grid-column:3;grid-row:2;text-align:right;font-family:'DM Mono',monospace!important;font-size:10px!important;margin:0!important;}
+body.modern-mockup.nd .card-stocks .ticker-card-div{display:none!important;}
+body.modern-mockup.nd .card-stocks .auto-refresh-bar{margin-top:10px!important;}
+.nd-sec-hist{background:#111216;border:1px solid #ffffff0d;border-radius:20px;overflow:hidden;margin-bottom:12px;}
+.nd-sec-hist .row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-top:1px solid #ffffff08;font-size:13px;color:#ecebe6;}
+.nd-sec-hist .row:first-child{border-top:0;}
+.nd-sec-hist .row small{display:block;font-family:'DM Mono',monospace;font-size:10px;color:#77736a;margin-top:2px;}
+.nd-sec-hist .q{font-family:'DM Mono',monospace;font-size:12px;}
+.nd-sec-hist .q.in{color:#7fd6a3;}.nd-sec-hist .q.out{color:#ef8a7a;}
+.nd-sec-hist .empty{padding:14px;font-family:'DM Mono',monospace;font-size:10px;color:#6f6a5e;}
+.nd-sec-hint{font-family:'DM Mono',monospace;font-size:10.5px;color:#e9cd85;text-align:center;margin:10px 0 0;display:none;}
+.card-stocks.nd-picking .nd-sec-hint{display:block;}
+.nd-sec-btns{display:flex;gap:10px;margin-top:14px;}
+.nd-sec-btns button{flex:1;padding:13px 0;border-radius:14px;font:700 13.5px 'Manrope',sans-serif;cursor:pointer;}
+.nd-sec-btns .b1{background:#14151a;border:1px solid #ffffff14;color:#cfc7b4;}
+.nd-sec-btns .b2{background:linear-gradient(145deg,#f3d88f,#b88a35);border:0;color:#1a1408;}
+body.nd .card .nd-sec-stats{display:grid;}
+body.nd .card .nd-sec-tabs,body.nd .card .nd-sec-btns{display:flex;}
+body.modern-mockup.nd .card:not(.nd-open) .nd-sec-stats,body.modern-mockup.nd .card:not(.nd-open) .nd-sec-tabs,body.modern-mockup.nd .card:not(.nd-open) .nd-sec-btns{display:none!important;}
+body:not(.nd) .nd-dep-btns,body:not(.nd) .nd-rate,body:not(.nd) .nd-dep-meta,body:not(.nd) .nd-endrow,body:not(.nd) .nd-bars-wrap,body:not(.nd) .nd-sec-hint{display:none!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -2307,9 +2409,11 @@ body.modern-mockup.nd .chart-section{margin-top:16px!important;}
       <div class="drag-handle">⠿</div>
       <div class="card-icon"><img class="section-card-icon-img" src="section-icons/section-deposit.png?v=1" alt=""></div>
       <div class="card-info" onclick="toggleCard('deposit')">
+        <!-- NEW DESIGN --><div class="nd-only nd-dep-title" id="ndDepTitle"></div>
         <div class="card-name" data-i18n="depositAll">Депозит (всього)</div>
         <div class="card-value" id="depositDisplay">0 ₴</div>
         <div class="card-pct" id="depositPct">0.0% від капіталу</div>
+        <!-- NEW DESIGN --><div class="nd-only nd-dep-live" id="ndDepLive"></div>
       </div>
       <div class="card-sparkline" id="spark_deposits" data-spark-key="deposits"></div>
       <div class="card-actions">
@@ -2318,6 +2422,7 @@ body.modern-mockup.nd .chart-section{margin-top:16px!important;}
       </div>
     </div>
     <div class="card-body"><div class="card-inner">
+      <!-- NEW DESIGN --><div class="nd-only nd-dep-tabs" id="ndDepTabs"></div>
       <div class="divider"></div>
       <div id="depositSummaryList"></div>
     </div></div>
@@ -3196,7 +3301,7 @@ body.modern-mockup.nd .chart-section{margin-top:16px!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.67';
+const APP_VERSION = 'v0.1.68';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -8101,18 +8206,18 @@ function cryptoDetailTxt(key){
     price:{uk:'Ціна',ru:'Цена',en:'Price',de:'Preis',zh:'价格'},
     avg:{uk:'Ø Середня',ru:'Ø Средняя',en:'Ø Average',de:'Ø Durchschnitt',zh:'Ø 平均'},
     change24:{uk:'24г зміна',ru:'24ч изменение',en:'24h change',de:'24h Änderung',zh:'24小时变化'},
-    trades:{uk:'Угоди',ru:'Сделки',en:'Trades',de:'Transaktionen',zh:'交易'},
-    buy:{uk:'Купівля',ru:'Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
-    sell:{uk:'Продаж',ru:'Продажа',en:'Sale',de:'Verkauf',zh:'卖出'},
-    sellTitle:{uk:'Продано',ru:'Продано',en:'Sold',de:'Verkauft',zh:'已卖出'},
+    trades:{uk:'Історія',ru:'История',en:'History',de:'Verlauf',zh:'记录'},
+    buy:{uk:'Додавання',ru:'Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
+    sell:{uk:'Списання',ru:'Списание',en:'Write-off',de:'Abbuchung',zh:'减少'},
+    sellTitle:{uk:'Списати',ru:'Списать',en:'Write off',de:'Abbuchen',zh:'减少'},
     qtyLabel:{uk:'Кількість',ru:'Количество',en:'Quantity',de:'Menge',zh:'数量'},
     priceUsd:{uk:'Ціна ($)',ru:'Цена ($)',en:'Price ($)',de:'Preis ($)',zh:'价格 ($)'},
-    confirm:{uk:'Підтвердити продаж',ru:'Подтвердить продажу',en:'Confirm sale',de:'Verkauf bestätigen',zh:'确认卖出'},
+    confirm:{uk:'Підтвердити списання',ru:'Подтвердить списание',en:'Confirm write-off',de:'Abbuchung bestätigen',zh:'确认减少'},
     cancel:{uk:'Скасувати',ru:'Отмена',en:'Cancel',de:'Abbrechen',zh:'取消'},
     enterQty:{uk:'Вкажіть кількість',ru:'Укажите количество',en:'Enter quantity',de:'Menge eingeben',zh:'输入数量'},
-    cannotSellMore:{uk:'Не можна продати більше ніж є',ru:'Нельзя продать больше, чем есть',en:'Cannot sell more than owned',de:'Mehr verkaufen als vorhanden ist nicht möglich',zh:'不能卖出超过持有数量'},
-    sellAsk:{uk:'Продати {qty} {coin} по ${price}?',ru:'Продать {qty} {coin} по ${price}?',en:'Sell {qty} {coin} at ${price}?',de:'{qty} {coin} zu ${price} verkaufen?',zh:'以 ${price} 卖出 {qty} {coin}？'},
-    sold:{uk:'Продано',ru:'Продано',en:'Sold',de:'Verkauft',zh:'已卖出'},
+    cannotSellMore:{uk:'Не можна списати більше ніж є',ru:'Нельзя списать больше, чем есть',en:'Cannot write off more than owned',de:'Mehr verkaufen als vorhanden ist nicht möglich',zh:'不能卖出超过持有数量'},
+    sellAsk:{uk:'Списати {qty} {coin} по ${price}?',ru:'Списать {qty} {coin} по ${price}?',en:'Write off {qty} {coin} at ${price}?',de:'{qty} {coin} zu ${price} verkaufen?',zh:'以 ${price} 卖出 {qty} {coin}？'},
+    sold:{uk:'Списано',ru:'Списано',en:'Written off',de:'Abgebucht',zh:'已减少'},
     added:{uk:'Додано до USDT балансу',ru:'Добавлено в баланс USDT',en:'Added to USDT balance',de:'Zum USDT-Guthaben hinzugefügt',zh:'已加入 USDT 余额'}
   };
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
@@ -8217,16 +8322,16 @@ function stockDetailTxt(key){
     price:{uk:'Ціна',ru:'Цена',en:'Price',de:'Preis',zh:'价格'},
     avg:{uk:'Ø Середня',ru:'Ø Средняя',en:'Ø Average',de:'Ø Durchschnitt',zh:'Ø 平均'},
     divMonth:{uk:'Дивід./міс',ru:'Дивид./мес',en:'Div./mo',de:'Div./Monat',zh:'股息/月'},
-    trades:{uk:'Угоди',ru:'Сделки',en:'Trades',de:'Transaktionen',zh:'交易'},
-    buy:{uk:'Купівля',ru:'Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
-    sell:{uk:'Продаж',ru:'Продажа',en:'Sale',de:'Verkauf',zh:'卖出'},
-    sellTitle:{uk:'Продано',ru:'Продано',en:'Sold',de:'Verkauft',zh:'已卖出'},
+    trades:{uk:'Історія',ru:'История',en:'History',de:'Verlauf',zh:'记录'},
+    buy:{uk:'Додавання',ru:'Добавление',en:'Add',de:'Hinzufügen',zh:'添加'},
+    sell:{uk:'Списання',ru:'Списание',en:'Write-off',de:'Abbuchung',zh:'减少'},
+    sellTitle:{uk:'Списати',ru:'Списать',en:'Write off',de:'Abbuchen',zh:'减少'},
     saleCurrency:{uk:'Валюта продажу',ru:'Валюта продажи',en:'Sale currency',de:'Verkaufswährung',zh:'卖出货币'},
-    confirmSale:{uk:'Скільки продано',ru:'Сколько продано',en:'Amount sold',de:'Verkaufte Menge',zh:'已卖出数量'},
+    confirmSale:{uk:'− Списати',ru:'− Списать',en:'− Write off',de:'− Abbuchen',zh:'− 减少'},
     cancel:{uk:'Скасувати',ru:'Отмена',en:'Cancel',de:'Abbrechen',zh:'取消'},
-    specifySellQty:{uk:'Вкажіть кількість для продажу',ru:'Укажите количество для продажи',en:'Enter quantity to sell',de:'Verkaufsmenge eingeben',zh:'输入卖出数量'},
-    cannotSellMore:{uk:'Не можна продати більше ніж є',ru:'Нельзя продать больше, чем есть',en:'Cannot sell more than owned',de:'Mehr verkaufen als vorhanden ist nicht möglich',zh:'不能卖出超过持有数量'},
-    sold:{uk:'Продано',ru:'Продано',en:'Sold',de:'Verkauft',zh:'已卖出'},
+    specifySellQty:{uk:'Вкажіть кількість для списання',ru:'Укажите количество для списания',en:'Enter quantity to write off',de:'Verkaufsmenge eingeben',zh:'输入卖出数量'},
+    cannotSellMore:{uk:'Не можна списати більше ніж є',ru:'Нельзя списать больше, чем есть',en:'Cannot write off more than owned',de:'Mehr verkaufen als vorhanden ist nicht möglich',zh:'不能卖出超过持有数量'},
+    sold:{uk:'Списано',ru:'Списано',en:'Written off',de:'Abgebucht',zh:'已减少'},
     addedCash:{uk:'Суму додано до кешу акцій',ru:'Сумма добавлена в деньги от продажи акций',en:'Amount added to stock sale cash',de:'Betrag zu Aktien-Verkaufserlösen hinzugefügt',zh:'金额已加入股票卖出资金'}
   };
   return (dict[key]&&dict[key][currentLang])||(dict[key]&&dict[key].uk)||key;
@@ -16033,7 +16138,8 @@ function schedulePngIconCleanup(){
 //  2) этот JS-блок до «NEW DESIGN END (код)»;
 //  3) разметку с пометкой NEW DESIGN: #ndDelta в шапке; #ndAlloc, #ndLive,
 //     #ndSecLabel перед .section-label; #ndScreenBar перед нижней панелью;
-//     кнопку #ndToggleBtn в #adminSection;
+//     кнопку #ndToggleBtn в #adminSection; в карточке депозитов #ndDepTitle,
+//     #ndDepLive (в card-info) и #ndDepTabs (в card-inner);
 //  4) строку вызова renderNdExtras() в конце _updateAllNow.
 // Включается переключателем у админа в Настройках, хранится только на этом
 // устройстве. Данные не трогает: меняет вид главного экрана, а разделы
@@ -16064,14 +16170,17 @@ function applyNewDesign(){
   if(on){
     ndRemember('wrap',wrap);ndRemember('chart',chart);
     // Живой счётчик и слайды вкладов переезжают внутрь экрана «Депозиты»
-    const depInner=document.querySelector('#card-deposit .card-inner');
-    if(wrap&&depInner&&wrap.parentNode!==depInner)depInner.prepend(wrap);
+    const tabs=$('ndDepTabs');
+    if(wrap&&tabs&&tabs.nextElementSibling!==wrap)tabs.after(wrap);
     const liab=$('liabilitiesSection');
     if(chart&&liab&&liab.nextElementSibling!==chart)liab.after(chart);
     ndWatchContainers();
   }else{
     ndCloseSection();
     ndRestore('wrap',wrap);ndRestore('chart',chart);
+    // пересобрать разделы начисто, чтобы в старом виде не осталось вставок нового
+    try{renderDeposits();}catch(e){}
+    try{renderSecuritiesCards();}catch(e){}
   }
   const st=$('ndToggleState');
   if(st)st.textContent=on?trx({uk:'увімк.',ru:'вкл.',en:'on',de:'an',zh:'开'}):trx({uk:'вимк.',ru:'выкл.',en:'off',de:'aus',zh:'关'});
@@ -16121,6 +16230,8 @@ function renderNdExtras(){
     if(s.endsWith(tail))el.textContent=s.slice(0,-tail.length);
   });
   setText('ndSecLabel',trx({uk:'Активи',ru:'Активы',en:'Assets',de:'Vermögen',zh:'资产'}));
+  try{ndDecorateDeposits();}catch(e){}
+  try{ndDecorateSecurities();}catch(e){}
   setText('ndBackLbl',trx({uk:'Капітал',ru:'Капитал',en:'Capital',de:'Kapital',zh:'资本'}));
   ndReapplyOpen();
 }
@@ -16172,6 +16283,218 @@ const _ndOrigToggleCard=toggleCard;
 toggleCard=function(name){
   if(document.body.classList.contains('nd'))return ndOpenSection(name);
   return _ndOrigToggleCard(name);
+};
+// — экран «Депозиты»: вкладки, ставка, «к концу срока», столбики по дням —
+// Живые цифры по-прежнему пишет тикер вклада (liveNet_/livePerDay_/…),
+// здесь только добавляем недостающие элементы и меняем раскладку стилями.
+const _ndEndCache={};
+function ndDepositEndValue(d){
+  try{
+    const start=getDepositAccrualStart(d);
+    const end=d.endDate?depLocalDate(d.endDate):getDepositContractEnd(d,start);
+    const key=JSON.stringify([d.principal,d.rate,d.tax,d.taxFree,d.freq,d.interestTo,d.startDate,d.endDate,d.months,d.openDay,d.topups||[],getLocalDateKey()]);
+    if(_ndEndCache[d.id]&&_ndEndCache[d.id].key===key)return _ndEndCache[d.id].v;
+    const s=simulateDeposit(d,{start,end,until:end});
+    const v=(Number(s.totalValue)||0)+(normalizeDepositMode(d.interestTo)==='separate'?(Number(s.separateNet)||0):0);
+    _ndEndCache[d.id]={key,v};
+    return v;
+  }catch(e){return 0;}
+}
+function ndDepositMeta(d){
+  const mode=normalizeDepositMode(d.interestTo)==='separate'
+    ?trx({uk:'виплата на рахунок',ru:'выплата на счёт',en:'paid out',de:'Auszahlung',zh:'派息'})
+    :trx({uk:'капіталізація',ru:'капитализация',en:'compounding',de:'Zinseszins',zh:'复利'});
+  const tax=parseInputNumber(d.tax)||0;
+  const day=getDepositOpenDay(d);
+  const dayTxt=trx({uk:day+'-го числа',ru:day+'-го числа',en:'on day '+day,de:'am '+day+'.',zh:'每月'+day+'日'});
+  return mode+' · '+trx({uk:'податок',ru:'налог',en:'tax',de:'Steuer',zh:'税'})+' '+tax+'% · '+dayTxt;
+}
+function ndRenderDepTabs(){
+  const box=$('ndDepTabs');
+  if(!box)return;
+  const sym=d=>getDepositCurrencySymbol(d);
+  box.innerHTML=deposits.map((d,i)=>{
+    const total=getDepositPrincipalNative(d)+getDepositTopupsNative(d)+getDepositMonthlyAccruedNativeWithTopups(d);
+    const name=d.name||(trx({uk:'Депозит',ru:'Депозит',en:'Deposit',de:'Einlage',zh:'存款'})+' '+(i+1));
+    return '<button type="button" class="'+(i===currentDepSlide?'on':'')+'" onclick="goToSlide('+i+')">'+escHtml(name)+' · <span class="live-val">'+fmtN(total)+' '+sym(d)+'</span></button>';
+  }).join('')+(deposits.length<3?'<button type="button" class="add" onclick="addDepositSlide()" aria-label="+">+</button>':'');
+}
+function ndDecorateDeposits(){
+  if(!document.body.classList.contains('nd'))return;
+  const slides=document.querySelectorAll('#depositsTrack .deposit-slide');
+  slides.forEach((slide,i)=>{
+    const d=deposits[i];
+    if(!d)return;
+    const label=slide.querySelector('.live-label');
+    if(label&&!label.querySelector('.nd-rate')){
+      const r=document.createElement('span');r.className='nd-rate';
+      const del=label.querySelector('.dep-delete-btn');
+      if(del)label.insertBefore(r,del);else label.appendChild(r);
+    }
+    const rate=label&&label.querySelector('.nd-rate');
+    if(rate)rate.textContent=(parseInputNumber(d.rate)||0)+'%';
+    let meta=slide.querySelector('.nd-dep-meta');
+    if(!meta&&label){meta=document.createElement('div');meta.className='nd-dep-meta';label.after(meta);}
+    if(meta)meta.textContent=ndDepositMeta(d);
+    const rows=slide.querySelector('.live-rows');
+    if(rows&&!rows.querySelector('.nd-endrow')){
+      rows.insertAdjacentHTML('beforeend','<div class="live-row nd-endrow"><span class="live-key">'+escHtml(trx({uk:'До кінця строку',ru:'К концу срока',en:'At maturity',de:'Bei Fälligkeit',zh:'到期时'}))+'</span><span class="live-val"></span></div>');
+    }
+    const endVal=rows&&rows.querySelector('.nd-endrow .live-val');
+    if(endVal)endVal.textContent='≈ '+fmtN(ndDepositEndValue(d))+' '+getDepositCurrencySymbol(d);
+    const daily=slide.querySelector('.daily-section');
+    if(daily&&!daily.querySelector('.nd-bars-wrap')){
+      daily.insertAdjacentHTML('afterbegin','<div class="nd-bars-wrap"><div class="nd-bars-head" onclick="toggleDailyLog(\''+d.id+'\')"><span>'+escHtml(trx({uk:'Дохід по днях',ru:'Доход по дням',en:'Daily income',de:'Tagesertrag',zh:'每日收益'}))+'</span><span>'+escHtml(trx({uk:'30 днів ›',ru:'30 дней ›',en:'30 days ›',de:'30 Tage ›',zh:'30天 ›'}))+'</span></div><div class="nd-bars-box"></div></div>');
+    }
+    ndRenderBars(d.id,slide);
+    if(!slide.querySelector('.nd-dep-btns')){
+      const tg=slide.querySelector('.dep-calc-toggle');
+      if(tg)tg.insertAdjacentHTML('beforebegin','<div class="nd-dep-btns"><button type="button" class="b1" onclick="toggleDepCalc(\''+d.id+'\')">'+escHtml(trx({uk:'Налаштування вкладу',ru:'Настройки вклада',en:'Deposit settings',de:'Einstellungen',zh:'存款设置'}))+'</button><button type="button" class="b2" onclick="openTopUpModal(\''+d.id+'\')">'+escHtml(trx({uk:'+ Поповнити',ru:'+ Пополнить',en:'+ Top up',de:'+ Einzahlen',zh:'+ 追加'}))+'</button></div>');
+    }
+  });
+  ndRenderDepTabs();
+  let inc={daily:0};
+  try{inc=getPortfolioDepositIncome();}catch(e){}
+  const sym=getCurrSym();
+  const n=deposits.length,n10=n%10,n100=n%100;
+  const few=n10>=2&&n10<=4&&(n100<10||n100>=20);
+  setText('ndDepTitle',trx({uk:'Депозити',ru:'Депозиты',en:'Deposits',de:'Einlagen',zh:'存款'})+' · '+n+' '+trx({
+    uk:n10===1&&n100!==11?'вклад':few?'вклади':'вкладів',
+    ru:n10===1&&n100!==11?'вклад':few?'вклада':'вкладов',
+    en:n===1?'deposit':'deposits',de:n===1?'Einlage':'Einlagen',zh:'笔'}));
+  const live=$('ndDepLive');
+  if(live)live.innerHTML='● <span class="live-val">+'+fmtD(toDisplayCurr(inc.daily))+' '+sym+'</span> '+escHtml(trx({uk:'сьогодні',ru:'сегодня',en:'today',de:'heute',zh:'今天'}))+' · <span class="live-val">'+(toDisplayCurr(inc.daily)/86400).toFixed(5)+' '+sym+'/'+trx({uk:'с',ru:'с',en:'s',de:'s',zh:'秒'})+'</span>';
+  if(typeof syncDepositSliderHeight==='function')syncDepositSliderHeight();
+}
+// Столбики берём из готового журнала по дням (его считает тот же движок, что и счётчик)
+function ndRenderBars(depId,slide){
+  const box=slide.querySelector('.nd-bars-box');
+  if(!box)return;
+  const rows=[...slide.querySelectorAll('#dailyLog_'+depId+' .daily-row')];
+  const vals=rows.map(r=>parseFloat(String(r.querySelector('.daily-income')?.textContent||'').replace(/[^\d.,-]/g,'').replace(',','.'))||0).reverse();
+  const sig=vals.join(',');
+  if(box.dataset.sig===sig&&box.childElementCount)return;
+  box.dataset.sig=sig;
+  if(!vals.length){box.innerHTML='<div class="nd-bars-empty">'+escHtml(t('monitoringTomorrow')||'—')+'</div>';return;}
+  const max=Math.max(...vals)||1;
+  const dates=rows.map(r=>r.querySelector('.daily-date')?.textContent.replace(/💰/g,'').trim()||'').reverse();
+  box.innerHTML='<div class="nd-bars">'+vals.map((v,i)=>'<i class="'+(i===vals.length-1?'now':'')+'" style="height:'+Math.max(4,v/max*100).toFixed(1)+'%"></i>').join('')+'</div>'+
+    '<div class="nd-bars-ax"><span>'+escHtml(dates[0]||'')+'</span><span>'+escHtml(dates[Math.floor(dates.length/2)]||'')+'</span><span>'+escHtml(trx({uk:'сьогодні',ru:'сегодня',en:'today',de:'heute',zh:'今天'}))+'</span></div>';
+}
+const _ndOrigRenderDeposits=renderDeposits;
+renderDeposits=function(){_ndOrigRenderDeposits();try{ndDecorateDeposits();}catch(e){}};
+const _ndOrigGoToSlide=goToSlide;
+goToSlide=function(idx){_ndOrigGoToSlide(idx);try{if(document.body.classList.contains('nd'))ndRenderDepTabs();}catch(e){}};
+// — экран «Акции»: три цифры, вкладки, позиции строками, «Списать / Добавить» —
+// Списание — это прежняя «продажа» в окне позиции: уменьшает количество и
+// записывает, сколько денег вернулось. Новый вид только даёт к ней дорогу.
+const ndSecTab={};
+function ndSecTxt(k){
+  return trx(({
+    profit:{uk:'Прибуток',ru:'Прибыль',en:'Profit',de:'Gewinn',zh:'收益'},
+    divs:{uk:'Дивіденди',ru:'Дивиденды',en:'Dividends',de:'Dividenden',zh:'股息'},
+    usd:{uk:'У доларах',ru:'В долларах',en:'In USD',de:'In USD',zh:'美元'},
+    pos:{uk:'Позиції',ru:'Позиции',en:'Positions',de:'Positionen',zh:'持仓'},
+    hist:{uk:'Історія',ru:'История',en:'History',de:'Verlauf',zh:'记录'},
+    perYr:{uk:'/р',ru:'/г',en:'/yr',de:'/J',zh:'/年'},
+    today:{uk:'сьогодні',ru:'сегодня',en:'today',de:'heute',zh:'今天'},
+    writeOff:{uk:'− Списати',ru:'− Списать',en:'− Write off',de:'− Abbuchen',zh:'− 减少'},
+    add:{uk:'+ Додати',ru:'+ Добавить',en:'+ Add',de:'+ Hinzufügen',zh:'+ 添加'},
+    pick:{uk:'Оберіть позицію, яку списати',ru:'Выберите позицию для списания',en:'Choose a position to write off',de:'Position zum Abbuchen wählen',zh:'选择要减少的持仓'},
+    empty:{uk:'Поки немає записів',ru:'Пока нет записей',en:'No records yet',de:'Noch keine Einträge',zh:'暂无记录'},
+    at:{uk:'по',ru:'по',en:'at',de:'zu',zh:'价'}
+  })[k]);
+}
+function ndSecSetTab(secId,tab){
+  ndSecTab[secId]=tab;
+  const card=$('card-'+secId);
+  if(card){card.dataset.ndtab=tab;card.querySelectorAll('.nd-sec-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));}
+}
+function ndSecAdd(secId){
+  const card=$('card-'+secId);
+  if(!card)return;
+  card.classList.remove('nd-picking');
+  card.classList.toggle('nd-adding');
+  ndSecSetTab(secId,'pos');
+  if(card.classList.contains('nd-adding'))setTimeout(()=>{const inp=$('secName_'+secId);if(inp){inp.scrollIntoView({block:'center',behavior:'smooth'});inp.focus();}},60);
+}
+function ndSecWriteOff(secId){
+  const sec=securitiesSections.find(s=>s.id===secId);
+  const card=$('card-'+secId);
+  if(!sec||!card)return;
+  const keys=Object.entries(getStockSectionStats(sec).groups||{}).filter(([k,g])=>g.totalQty>0).map(([k])=>k);
+  card.classList.remove('nd-adding');
+  ndSecSetTab(secId,'pos');
+  if(keys.length===1){openStockDetail(secId,keys[0]);return;}
+  card.classList.toggle('nd-picking');
+}
+function ndDecorateSecurities(){
+  if(!document.body.classList.contains('nd'))return;
+  const sym=getCurrSym();
+  document.querySelectorAll('.card.card-stocks').forEach(card=>{
+    const secId=(card.id||'').replace(/^card-/,'');
+    const sec=securitiesSections.find(s=>s.id===secId);
+    if(!sec)return;
+    const inner=card.querySelector('.card-inner');
+    if(!inner)return;
+    const stats=getStockSectionStats(sec);
+    const groups=Object.values(stats.groups||{});
+    // помечаем блоки без своих классов, чтобы раскладывать их по вкладкам
+    const tag=(id,cls)=>{const el=$(id+secId);const box=el&&el.closest('.card-inner > div');if(box)box.classList.add(cls);};
+    tag('secCashAmount_','nd-box-cash');tag('secIncomeAmount_','nd-box-div');tag('secName_','nd-box-add');
+    // изменение за сегодня — по дневному изменению цены каждой бумаги
+    const lastChange={};
+    sec.items.forEach(it=>{const k=it.ticker||'';if(k&&it.liveChange!=null)lastChange[k]=Number(it.liveChange)||0;});
+    let dayDelta=0;
+    groups.forEach(g=>{const c=lastChange[g.ticker||''];if(c!=null&&c>-100)dayDelta+=(Number(g.currentValue)||0)*c/(100+c);});
+    const total=Number(stats.total)||0;
+    const info=card.querySelector('.card-info');
+    let day=card.querySelector('.nd-sec-day');
+    if(!day&&info){day=document.createElement('div');day.className='nd-sec-day nd-only';info.appendChild(day);}
+    if(day){
+      const base=total-dayDelta;
+      const p=base>0?dayDelta/base*100:0;
+      const cls=dayDelta>0.004?'up':dayDelta<-0.004?'dn':'';
+      day.innerHTML='<span class="'+cls+' live-val">'+(dayDelta>0.004?'▲ +':dayDelta<-0.004?'▼ −':'')+fmtN(toDisplayCurr(Math.abs(dayDelta)))+' '+sym+' · '+(p>0?'+':'')+p.toFixed(1)+'%</span> '+escHtml(ndSecTxt('today'));
+    }
+    // три цифры
+    const pnl=groups.reduce((s,g)=>s+(Number(g.pnl)||0),0);
+    const usd=usdUahRate>0?total/usdUahRate:0;
+    let st=inner.querySelector('.nd-sec-stats');
+    if(!st){st=document.createElement('div');st.className='nd-sec-stats nd-only';inner.prepend(st);}
+    st.innerHTML='<div><div class="k">'+escHtml(ndSecTxt('profit'))+'</div><div class="v live-val '+(pnl>0.004?'g':pnl<-0.004?'r':'')+'">'+(pnl>0.004?'+':pnl<-0.004?'−':'')+fmtN(toDisplayCurr(Math.abs(pnl)))+' '+sym+'</div></div>'+
+      '<div><div class="k">'+escHtml(ndSecTxt('divs'))+'</div><div class="v live-val gold">~'+fmtN(toDisplayCurr(Number(stats.totalDiv)||0))+' '+sym+ndSecTxt('perYr')+'</div></div>'+
+      '<div><div class="k">'+escHtml(ndSecTxt('usd'))+'</div><div class="v live-val">$'+fmtN(usd)+'</div></div>';
+    // вкладки
+    let tabs=inner.querySelector('.nd-sec-tabs');
+    if(!tabs){
+      tabs=document.createElement('div');tabs.className='nd-sec-tabs nd-only';st.after(tabs);
+      tabs.innerHTML=['pos','divs','hist'].map(k=>'<button type="button" data-tab="'+(k==='divs'?'div':k)+'" onclick="ndSecSetTab(\''+secId+'\',\''+(k==='divs'?'div':k)+'\')">'+escHtml(ndSecTxt(k))+'</button>').join('')+'';
+      tabs.insertAdjacentHTML('afterend','<div class="nd-sec-hint">'+escHtml(ndSecTxt('pick'))+'</div>');
+    }
+    ndSecSetTab(secId,ndSecTab[secId]||'pos');
+    // история записей
+    let hist=inner.querySelector('.nd-sec-hist');
+    if(!hist){hist=document.createElement('div');hist.className='nd-sec-hist nd-only';(inner.querySelector('.nd-box-cash')||inner.lastElementChild).before(hist);}
+    const items=(sec.items||[]).slice().reverse();
+    hist.innerHTML=items.length?items.map(it=>{
+      const q=Number(it.qty)||0;
+      const name=it.liveName||it.name||it.ticker||'—';
+      return '<div class="row"><div>'+escHtml(it.ticker||name)+'<small>'+escHtml(name)+'</small></div><div class="q '+(q<0?'out':'in')+'">'+(q<0?'−':'+')+fmtMax2(Math.abs(q))+' '+escHtml(trx(UNIT_TXT.pcs))+' '+escHtml(ndSecTxt('at'))+' <span class="live-val">'+fmtN(toDisplayCurr(Number(it.price)||0))+' '+sym+'</span></div></div>';
+    }).join(''):'<div class="empty">'+escHtml(ndSecTxt('empty'))+'</div>';
+    // кнопки
+    if(!inner.querySelector('.nd-sec-btns')){
+      inner.insertAdjacentHTML('beforeend','<div class="nd-sec-btns nd-only"><button type="button" class="b1" onclick="ndSecWriteOff(\''+secId+'\')">'+escHtml(ndSecTxt('writeOff'))+'</button><button type="button" class="b2" onclick="ndSecAdd(\''+secId+'\')">'+escHtml(ndSecTxt('add'))+'</button></div>');
+    }
+  });
+}
+const _ndOrigRenderSecuritiesCards=renderSecuritiesCards;
+renderSecuritiesCards=function(){_ndOrigRenderSecuritiesCards();try{ndDecorateSecurities();}catch(e){}};
+const _ndOrigOpenStockDetail=openStockDetail;
+openStockDetail=function(secId,key){
+  const card=$('card-'+secId);
+  if(card)card.classList.remove('nd-picking');
+  return _ndOrigOpenStockDetail(secId,key);
 };
 try{applyNewDesign();}catch(e){}
 // ═══ NEW DESIGN END (код) ═══
