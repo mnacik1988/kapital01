@@ -2322,6 +2322,34 @@ body.modern-mockup.nd .card:not(.nd-open) .card-value{grid-column:3!important;gr
 body.modern-mockup.nd .card:not(.nd-open) .nd-day{grid-column:4!important;grid-row:1!important;font-size:11px!important;text-align:right;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
 body.modern-mockup.nd .card.nd-open .nd-day{display:none!important;}
 .nd-day.up{color:#7fd6a3;}.nd-day.dn{color:#ef8a7a;}.nd-day.mu{color:#77736a;}
+/* — подложка под парящей панелью: карточки не просвечивают снизу — */
+body.modern-mockup.nd .app::after{content:'';position:fixed;left:0;right:0;bottom:0;height:calc(46px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#08090b00 0%,#08090b 45%);z-index:389;pointer-events:none;}
+body.modern-mockup.nd.nd-section-open .app::after{display:none;}
+/* — скрытые суммы: звёздочки и в новом виде (его цвета не должны перебивать прозрачность) — */
+body.amounts-hidden.amounts-hidden.amounts-hidden.amounts-hidden.nd.nd :is(.card-value,.live-val,.ticker-card-price,.ticker-card-pnl,.ticker-card-qty,.result-val,.sd-val,.daily-income,.daily-total,.usdt-balance-main,.usdt-balance-equiv,.hide-amt,.live-num){color:transparent!important;-webkit-text-fill-color:transparent!important;}
+/* — экран «Крипто» по образцу «Акций» — */
+body.modern-mockup.nd .card-crypto.nd-open .card-pct{display:none!important;}
+body.modern-mockup.nd .card-crypto .card-inner>.divider,body.modern-mockup.nd .card-crypto .result-box{display:none!important;}
+body.modern-mockup.nd .card-crypto .nd-box-ex,body.modern-mockup.nd .card-crypto .nd-sec-hist{display:none!important;}
+body.modern-mockup.nd .card-crypto[data-ndtab="ex"] .nd-box-ex,body.modern-mockup.nd .card-crypto[data-ndtab="hist"] .nd-sec-hist{display:block!important;}
+body.modern-mockup.nd .card-crypto[data-ndtab="ex"] .nd-box-coins,body.modern-mockup.nd .card-crypto[data-ndtab="hist"] .nd-box-coins{display:none!important;}
+body.modern-mockup.nd .card-crypto .nd-box-add{display:none!important;}
+body.modern-mockup.nd .card-crypto.nd-adding .nd-box-add{display:block!important;}
+body.modern-mockup.nd .card-crypto .nd-box-add{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;}
+body.modern-mockup.nd .card-crypto .usdt-balance-card{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;box-shadow:none!important;margin-bottom:10px!important;}
+body.modern-mockup.nd .card-crypto .usdt-balance-card::before,body.modern-mockup.nd .card-crypto .usdt-balance-card::after{display:none!important;}
+body.modern-mockup.nd .card-crypto .ticker-cards{display:flex!important;flex-direction:column!important;gap:0!important;background:#111216;border:1px solid #ffffff0d;border-radius:20px;overflow:hidden;grid-template-columns:none!important;}
+body.modern-mockup.nd .card-crypto .ticker-card{display:grid!important;grid-template-columns:40px minmax(0,1fr) auto;column-gap:12px;row-gap:3px;align-items:center;padding:12px 14px!important;margin:0!important;border:0!important;border-top:1px solid #ffffff08!important;border-radius:0!important;background:none!important;box-shadow:none!important;min-height:0!important;}
+body.modern-mockup.nd .card-crypto .ticker-card:first-child{border-top:0!important;}
+body.modern-mockup.nd .card-crypto .ticker-card-head{display:contents!important;}
+body.modern-mockup.nd .card-crypto .ticker-card-sym{grid-column:1;grid-row:1/span 2;width:40px;height:40px;border-radius:50%;background:#24252b;color:#f3d88f;display:flex!important;align-items:center;justify-content:center;font:800 10px 'Manrope',sans-serif!important;overflow:hidden;white-space:nowrap;}
+body.modern-mockup.nd .card-crypto .ticker-card-name{grid-column:2;grid-row:1;font:700 14px 'Manrope',sans-serif!important;color:#ecebe6!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0!important;}
+body.modern-mockup.nd .card-crypto .ticker-card-qty{grid-column:2;grid-row:2;justify-self:start;font-family:'DM Mono',monospace!important;font-size:10px!important;color:#77736a!important;background:none!important;border:0!important;padding:0!important;width:auto!important;}
+body.modern-mockup.nd .card-crypto .ticker-card-price{grid-column:3;grid-row:1;text-align:right;font:600 14px 'Manrope',sans-serif!important;color:#f1ead9!important;margin:0!important;}
+body.modern-mockup.nd .card-crypto .ticker-card-pnl{grid-column:3;grid-row:2;text-align:right;font-family:'DM Mono',monospace!important;font-size:10px!important;margin:0!important;}
+body.modern-mockup.nd .card-crypto .ticker-card-div{display:none!important;}
+body.modern-mockup.nd .card-crypto .nd-sec-hint{display:none;}
+body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3338,7 +3366,7 @@ body.modern-mockup.nd .card.nd-open .nd-day{display:none!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.69';
+const APP_VERSION = 'v0.1.70';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16224,6 +16252,7 @@ function applyNewDesign(){
     // пересобрать разделы начисто, чтобы в старом виде не осталось вставок нового
     try{renderDeposits();}catch(e){}
     try{renderSecuritiesCards();}catch(e){}
+    try{ndCleanCrypto();}catch(e){}
   }
   const st=$('ndToggleState');
   if(st)st.textContent=on?trx({uk:'увімк.',ru:'вкл.',en:'on',de:'an',zh:'开'}):trx({uk:'вимк.',ru:'выкл.',en:'off',de:'aus',zh:'关'});
@@ -16275,6 +16304,7 @@ function renderNdExtras(){
   setText('ndSecLabel',trx({uk:'Активи',ru:'Активы',en:'Assets',de:'Vermögen',zh:'资产'}));
   try{ndDecorateDeposits();}catch(e){}
   try{ndDecorateSecurities();}catch(e){}
+  try{ndDecorateCrypto();}catch(e){}
   try{renderNdHero();}catch(e){}
   try{renderNdTable();}catch(e){}
   setText('ndBackLbl',trx({uk:'Капітал',ru:'Капитал',en:'Capital',de:'Kapital',zh:'资本'}));
@@ -16566,8 +16596,9 @@ function renderNdHero(){
   // точки графика — дневные снимки капитала за период + сегодняшний итог
   const from=addDaysKey(-days);
   const today=getLocalDateKey();
-  const pts=(capitalHistory||[]).filter(h=>h&&h.date>=from&&h.date<today&&Number(h.total)>0).map(h=>Number(h.total));
-  pts.push(total);
+  let pts;
+  if(days===1)pts=ndDayPoints(total);
+  else{pts=(capitalHistory||[]).filter(h=>h&&h.date>=from&&h.date<today&&Number(h.total)>0).map(h=>Number(h.total));pts.push(total);}
   let chart;
   if(pts.length<2){
     chart='<div class="nd-line-empty">'+escHtml(trx({uk:'Графік з’явиться за кілька днів',ru:'График появится через несколько дней',en:'Chart appears in a few days',de:'Diagramm erscheint in einigen Tagen',zh:'几天后显示图表'}))+'</div>';
@@ -16582,12 +16613,13 @@ function renderNdHero(){
   }
   const d1=total>0?getPeriodChangeStats(total,1):null;
   const d1ok=d1&&d1.base&&d1.base.date>=addDaysKey(-2);
-  const dP=total>0?getPeriodChangeStats(total,days):null;
+  let dP=total>0&&days>1?getPeriodChangeStats(total,days):null;
+  if(days===1&&pts.length>=2&&pts[0]>0)dP={change:total-pts[0],pct:(total-pts[0])/pts[0]*100};
   const cls=v=>!Number.isFinite(v)||Math.abs(v)<0.005?'':v>0?'g':'r';
-  const pLbl={7:trx({uk:'За 7 днів',ru:'За 7 дней',en:'7 days',de:'7 Tage',zh:'7天'}),30:trx({uk:'За 30 днів',ru:'За 30 дней',en:'30 days',de:'30 Tage',zh:'30天'}),365:trx({uk:'За рік',ru:'За год',en:'1 year',de:'1 Jahr',zh:'1年'})}[days];
+  const pLbl={1:trx({uk:'За 24 години',ru:'За 24 часа',en:'24 hours',de:'24 Std.',zh:'24小时'}),7:trx({uk:'За 7 днів',ru:'За 7 дней',en:'7 days',de:'7 Tage',zh:'7天'}),30:trx({uk:'За 30 днів',ru:'За 30 дней',en:'30 days',de:'30 Tage',zh:'30天'}),365:trx({uk:'За рік',ru:'За год',en:'1 year',de:'1 Jahr',zh:'1年'})}[days];
   const tab=(d,l)=>'<button type="button" class="'+(d===days?'on':'')+'" onclick="ndSetHeroPeriod('+d+')">'+l+'</button>';
   box.innerHTML='<div class="nd-hero-top"><div style="min-width:0"><div class="nd-k">'+escHtml(t('totalCapital'))+'</div><div class="nd-hero-amt live-val">'+fmtN(toDisplayCurr(total))+' <span>'+sym+'</span></div></div>'+
-    '<div class="nd-ptabs">'+tab(7,trx({uk:'7Д',ru:'7Д',en:'7D',de:'7T',zh:'7天'}))+tab(30,trx({uk:'30Д',ru:'30Д',en:'30D',de:'30T',zh:'30天'}))+tab(365,trx({uk:'1Р',ru:'1Г',en:'1Y',de:'1J',zh:'1年'}))+'</div></div>'+
+    '<div class="nd-ptabs">'+tab(1,trx({uk:'1Д',ru:'1Д',en:'1D',de:'1T',zh:'1天'}))+tab(7,trx({uk:'7Д',ru:'7Д',en:'7D',de:'7T',zh:'7天'}))+tab(30,trx({uk:'30Д',ru:'30Д',en:'30D',de:'30T',zh:'30天'}))+tab(365,trx({uk:'1Р',ru:'1Г',en:'1Y',de:'1J',zh:'1年'}))+'</div></div>'+
     chart+
     '<div class="nd-kpi">'+
       '<div><div class="nd-k">'+escHtml(trx({uk:'За добу',ru:'За сутки',en:'24 hours',de:'24 Std.',zh:'24小时'}))+'</div><div class="v '+(d1ok?cls(d1.pct):'')+'">'+(d1ok?ndFmtPct(d1.pct,2):'—')+'</div></div>'+
@@ -16630,6 +16662,104 @@ function renderNdTable(){
     el.textContent=ndFmtPct(p,digits);
     el.classList.toggle('up',p>0.004);el.classList.toggle('dn',p<-0.004);el.classList.toggle('mu',Math.abs(p)<=0.004);
   });
+}
+// — экран «Крипто» по образцу «Акций» —
+const ndCryptoTxt=k=>trx(({
+  coins:{uk:'Монети',ru:'Монеты',en:'Coins',de:'Coins',zh:'币'},
+  ex:{uk:'Біржі',ru:'Биржи',en:'Exchanges',de:'Börsen',zh:'交易所'},
+  usdt:{uk:'USDT',ru:'USDT',en:'USDT',de:'USDT',zh:'USDT'}
+})[k]);
+function ndCryptoAdd(){
+  const card=$('card-crypto');if(!card)return;
+  card.classList.remove('nd-picking');card.classList.toggle('nd-adding');
+  ndSecSetTab('crypto','pos');
+  if(card.classList.contains('nd-adding'))setTimeout(()=>{const inp=$('newCoinName');if(inp){inp.scrollIntoView({block:'center',behavior:'smooth'});inp.focus();}},60);
+}
+function ndCryptoWriteOff(){
+  const card=$('card-crypto');if(!card)return;
+  card.classList.remove('nd-adding');
+  ndSecSetTab('crypto','pos');
+  const keys=Object.entries(getCryptoPortfolioStats().groups||{}).filter(([k,g])=>(Number(g.totalQty)||0)>0).map(([k])=>k);
+  if(keys.length===1){openCryptoDetail(keys[0]);return;}
+  card.classList.toggle('nd-picking');
+}
+function ndDecorateCrypto(){
+  if(!document.body.classList.contains('nd'))return;
+  const card=$('card-crypto');
+  const inner=card&&card.querySelector('.card-inner');
+  if(!inner)return;
+  const sym=getCurrSym();
+  const rate=getCryptoRate();
+  const tag=(el,cls)=>{const box=el&&(el.closest('.card-inner > div')||el);if(box&&box.parentNode===inner)box.classList.add(cls);};
+  tag(inner.querySelector('.usdt-balance-card'),'nd-box-coins');
+  tag($('cryptoRows'),'nd-box-coins');
+  tag($('cryptoRefreshStatus'),'nd-box-coins');
+  tag($('exchangeBlock'),'nd-box-ex');
+  tag($('newCoinName'),'nd-box-add');
+  // изменение за сегодня — та же дневная дельта раздела, что в таблице на главной
+  let d=null;try{d=getSectionDayDelta(getSectionPerformanceSnapshot(),'crypto');}catch(e){}
+  const info=card.querySelector('.card-info');
+  let day=card.querySelector('.nd-sec-day');
+  if(!day&&info){day=document.createElement('div');day.className='nd-sec-day nd-only';info.appendChild(day);}
+  if(day){
+    const ch=d?Number(d.change)||0:0,p=d?Number(d.pct)||0:0;
+    const cls=ch>0.004?'up':ch<-0.004?'dn':'';
+    day.innerHTML='<span class="'+cls+' live-val">'+(ch>0.004?'▲ +':ch<-0.004?'▼ −':'')+fmtN(toDisplayCurr(Math.abs(ch)))+' '+sym+' · '+ndFmtPct(p)+'</span> '+escHtml(ndSecTxt('today'));
+  }
+  // три цифры: прибыль, USDT, в долларах
+  const st=getCryptoPortfolioStats();
+  const pnl=((Number(st.portfolioUsd)||0)-(Number(st.remainingCostUsd)||0))*rate;
+  const usdt=val('cryptoUsdt')||0;
+  const totalUsd=rate>0?getCryptoVal()/rate:0;
+  let box=inner.querySelector('.nd-sec-stats');
+  if(!box){box=document.createElement('div');box.className='nd-sec-stats nd-only';inner.prepend(box);}
+  box.innerHTML='<div><div class="k">'+escHtml(ndSecTxt('profit'))+'</div><div class="v live-val '+(pnl>0.004?'g':pnl<-0.004?'r':'')+'">'+(pnl>0.004?'+':pnl<-0.004?'−':'')+fmtN(toDisplayCurr(Math.abs(pnl)))+' '+sym+'</div></div>'+
+    '<div><div class="k">USDT</div><div class="v live-val gold">'+fmtN(usdt)+'</div></div>'+
+    '<div><div class="k">'+escHtml(ndSecTxt('usd'))+'</div><div class="v live-val">$'+fmtN(totalUsd)+'</div></div>';
+  let tabs=inner.querySelector('.nd-sec-tabs');
+  if(!tabs){
+    tabs=document.createElement('div');tabs.className='nd-sec-tabs nd-only';box.after(tabs);
+    tabs.innerHTML=[['pos',ndCryptoTxt('coins')],['ex',ndCryptoTxt('ex')],['hist',ndSecTxt('hist')]].map(([k,l])=>'<button type="button" data-tab="'+k+'" onclick="ndSecSetTab(\'crypto\',\''+k+'\')">'+escHtml(l)+'</button>').join('');
+    tabs.insertAdjacentHTML('afterend','<div class="nd-sec-hint">'+escHtml(ndSecTxt('pick'))+'</div>');
+  }
+  ndSecSetTab('crypto',ndSecTab.crypto||'pos');
+  let hist=inner.querySelector('.nd-sec-hist');
+  if(!hist){hist=document.createElement('div');hist.className='nd-sec-hist nd-only';(inner.querySelector('.nd-box-add')||inner.lastElementChild).before(hist);}
+  const list=(coins||[]).slice().reverse();
+  hist.innerHTML=list.length?list.map(c=>{
+    const q=parseInputNumber(c.qty)||0;
+    const name=String(c.name||'').toUpperCase();
+    return '<div class="row"><div>'+escHtml(name)+'</div><div class="q '+(q<0?'out':'in')+'">'+(q<0?'−':'+')+fmtMax2(Math.abs(q))+' '+escHtml(ndSecTxt('at'))+' <span class="live-val">$'+fmtMax2(Number(c.buyPrice)||Number(c.curPrice)||0)+'</span></div></div>';
+  }).join(''):'<div class="empty">'+escHtml(ndSecTxt('empty'))+'</div>';
+  if(!inner.querySelector('.nd-sec-btns')){
+    inner.insertAdjacentHTML('beforeend','<div class="nd-sec-btns nd-only"><button type="button" class="b1" onclick="ndCryptoWriteOff()">'+escHtml(ndSecTxt('writeOff'))+'</button><button type="button" class="b2" onclick="ndCryptoAdd()">'+escHtml(ndSecTxt('add'))+'</button></div>');
+  }
+}
+function ndCleanCrypto(){
+  const card=$('card-crypto');if(!card)return;
+  card.querySelectorAll('.nd-sec-stats,.nd-sec-tabs,.nd-sec-hint,.nd-sec-hist,.nd-sec-btns,.nd-sec-day').forEach(e=>e.remove());
+  card.querySelectorAll('.nd-box-coins,.nd-box-ex,.nd-box-add').forEach(e=>e.classList.remove('nd-box-coins','nd-box-ex','nd-box-add'));
+  card.classList.remove('nd-adding','nd-picking');card.removeAttribute('data-ndtab');
+}
+const _ndOrigOpenCryptoDetail=openCryptoDetail;
+openCryptoDetail=function(key){
+  const card=$('card-crypto');
+  if(card)card.classList.remove('nd-picking');
+  return _ndOrigOpenCryptoDetail(key);
+};
+const _ndOrigRenderCoins=renderCoins;
+renderCoins=function(){_ndOrigRenderCoins();try{ndDecorateCrypto();}catch(e){}};
+// — «1Д» на главной: почасовые снимки разделов + неизменная часть (вклады, наличные, счёт) —
+function ndDayPoints(total){
+  try{if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();}catch(e){}
+  const keys=['crypto','stocks','bonds','ovdp','metals','forex','usd','startups','custom'];
+  let snap=null;try{snap=getSectionPerformanceSnapshot();}catch(e){}
+  const sumOf=secs=>keys.reduce((s,k)=>s+(Number(secs&&secs[k]&&secs[k].value)||0),0);
+  const fixed=total-sumOf(snap&&snap.sections);
+  const from=getLocalHourKey(new Date(Date.now()-24*3600*1000));
+  const pts=(sectionHourlyHistory||[]).filter(h=>h&&h.hour&&h.hour>=from&&h.hour<getLocalHourKey()).map(h=>fixed+sumOf(h.sections)).filter(v=>Number.isFinite(v)&&v>0);
+  pts.push(total);
+  return pts;
 }
 try{applyNewDesign();}catch(e){}
 // ═══ NEW DESIGN END (код) ═══
