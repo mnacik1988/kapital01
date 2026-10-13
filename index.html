@@ -2093,6 +2093,98 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
 @media (min-width:500px){
   body.modern-mockup .bottom-nav{height:72px!important;padding:9px 12px 7px!important;}
 }
+/* ═══ НОВЫЙ ДИЗАЙН (тест, стиль 1 «Приватный банк») ═══
+   Включается только классом body.nd (переключатель у админа в Настройках).
+   Без класса ни одно правило ниже не срабатывает — старый вид не меняется. */
+.nd-only{display:none;}
+body.nd .nd-only{display:block;}
+body.modern-mockup.nd{background:radial-gradient(120% 50% at 80% -6%,#2a2112 0%,transparent 55%),linear-gradient(180deg,#0d0e12 0%,#08090b 100%)!important;background-attachment:fixed!important;}
+body.modern-mockup.nd::before{opacity:0!important;}
+/* шапка */
+body.modern-mockup.nd .header{background:linear-gradient(180deg,#0f0f13,#0c0d10)!important;box-shadow:0 10px 22px #0000006b!important;border-bottom:1px solid #ffffff0b!important;padding-bottom:16px!important;}
+body.modern-mockup.nd .header-label{color:#8c8778!important;letter-spacing:.22em!important;}
+body.modern-mockup.nd .header-diag-btn{display:none!important;}
+body.modern-mockup.nd .gear-btn,body.modern-mockup.nd .eye-btn{width:38px!important;height:38px!important;flex-basis:38px!important;border-radius:11px!important;background:#14151a!important;border:1px solid #ffffff12!important;}
+body.modern-mockup.nd .total-wrap{align-items:baseline!important;}
+body.modern-mockup.nd .total-amount{font-weight:300!important;background:none!important;-webkit-text-fill-color:#f6efe0!important;color:#f6efe0!important;letter-spacing:-.02em!important;font-size:clamp(40px,12.5vw,54px)!important;}
+body.modern-mockup.nd .total-currency{font-weight:300!important;color:#d9b866!important;-webkit-text-fill-color:#d9b866!important;background:none!important;}
+body.modern-mockup.nd .eye-btn{align-self:center!important;margin-left:12px!important;}
+body.modern-mockup.nd #totalChange,body.modern-mockup.nd #totalBreakdown{display:none!important;}
+body.modern-mockup.nd .total-subs{margin-top:2px!important;}
+.nd-delta{font-family:'DM Mono',monospace;font-size:12.5px;margin-top:6px;color:#8c8778;}
+.nd-delta .up{color:#7fd6a3;}.nd-delta .dn{color:#ef8a7a;}
+/* доли капитала */
+.nd-alloc{margin:18px 22px 0;}
+.nd-bar-line{display:flex;height:6px;border-radius:6px;overflow:hidden;gap:2px;}
+.nd-bar-line i{display:block;height:100%;min-width:3px;}
+.nd-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px 10px;margin-top:12px;font-family:'DM Mono',monospace;font-size:10px;color:#9a9588;}
+.nd-legend span{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nd-legend b{width:7px;height:7px;border-radius:2px;flex:0 0 7px;}
+/* живые депозиты */
+.nd-live{margin:18px 18px 0;padding:13px 14px;border-radius:16px;background:linear-gradient(90deg,#1a1710,#121216);border:1px solid #d9b86622;cursor:pointer;}
+body.nd .nd-live{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+body.nd .nd-live.nd-empty{display:none;}
+.nd-live .l{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#cfc7b4;white-space:nowrap;}
+.nd-live .dot{width:7px;height:7px;border-radius:50%;background:#7fd6a3;box-shadow:0 0 0 4px #7fd6a322;flex:0 0 7px;}
+.nd-live .v{font-family:'DM Mono',monospace;font-size:13.5px;color:#e9cd85;white-space:nowrap;}
+.nd-live .v small{color:#77736a;font-size:10.5px;}
+.nd-sec{margin:22px 22px 10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.22em;color:#8c8778;text-transform:uppercase;}
+body.modern-mockup.nd .section-label{display:none!important;}
+/* список активов: каждая карточка — строка */
+body.modern-mockup.nd .cards,body.modern-mockup.nd #securitiesContainer,body.modern-mockup.nd #metalsContainer,body.modern-mockup.nd #customCardsContainer{gap:8px!important;}
+body.modern-mockup.nd .cards,body.modern-mockup.nd #securitiesContainer,body.modern-mockup.nd #metalsContainer{padding:0 18px!important;}
+body.modern-mockup.nd #securitiesContainer,body.modern-mockup.nd #metalsContainer{margin-top:8px!important;}
+body.modern-mockup.nd #customCardsContainer{display:flex;flex-direction:column;}
+body.modern-mockup.nd .card:not(.nd-open){background:#111216!important;border:1px solid #ffffff0d!important;border-radius:18px!important;box-shadow:none!important;}
+body.modern-mockup.nd .card:not(.nd-open)::before,body.modern-mockup.nd .card:not(.nd-open)::after{display:none!important;}
+body.modern-mockup.nd .card:not(.nd-open) .card-header{padding:11px 14px!important;gap:12px!important;min-height:0!important;}
+body.modern-mockup.nd .card .drag-handle,body.modern-mockup.nd .card .card-sparkline,body.modern-mockup.nd .card .card-actions{display:none!important;}
+body.modern-mockup.nd .card:not(.nd-open) .card-body{max-height:0!important;}
+body.modern-mockup.nd .card:not(.nd-open) .card-icon{width:38px!important;height:38px!important;background:none!important;border:0!important;box-shadow:none!important;}
+body.modern-mockup.nd .card:not(.nd-open) .card-icon img{width:34px!important;height:34px!important;}
+body.modern-mockup.nd .card:not(.nd-open) .card-info{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:center;}
+body.modern-mockup.nd .card:not(.nd-open) .card-info>*{min-width:0;}
+body.modern-mockup.nd .card:not(.nd-open) .card-name{grid-column:1;grid-row:1/span 3;font-family:'Manrope',sans-serif!important;font-size:14.5px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important;color:#ecebe6!important;white-space:normal!important;line-height:1.25!important;}
+body.modern-mockup.nd .card:not(.nd-open) .card-value{grid-column:2;grid-row:1;text-align:right;font-family:'Manrope',sans-serif!important;font-size:14.5px!important;font-weight:600!important;color:#f1ead9!important;-webkit-text-fill-color:#f1ead9!important;background:none!important;margin:0!important;white-space:nowrap;}
+body.modern-mockup.nd .card:not(.nd-open) .card-pct{grid-column:2;grid-row:2;text-align:right;font-family:'DM Mono',monospace!important;font-size:10px!important;margin-top:3px!important;white-space:nowrap;}
+body.modern-mockup.nd .card:not(.nd-open) .card-info>:nth-child(n+4){grid-column:2;text-align:right;font-size:10px!important;}
+/* открытый раздел = отдельный экран поверх всего */
+body.modern-mockup.nd .card.nd-open{position:fixed!important;inset:0!important;z-index:300!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:radial-gradient(120% 50% at 80% -6%,#2a2112 0%,transparent 55%),linear-gradient(180deg,#0d0e12,#08090b)!important;padding:calc(58px + env(safe-area-inset-top)) 0 calc(36px + env(safe-area-inset-bottom))!important;}
+body.modern-mockup.nd .card.nd-open .card-header{padding:4px 22px 10px!important;gap:14px!important;}
+body.modern-mockup.nd .card.nd-open .card-icon{width:48px!important;height:48px!important;background:none!important;border:0!important;box-shadow:none!important;}
+body.modern-mockup.nd .card.nd-open .card-icon img{width:46px!important;height:46px!important;}
+body.modern-mockup.nd .card.nd-open .card-info{cursor:default!important;}
+body.modern-mockup.nd .card.nd-open .card-name{font-family:'DM Mono',monospace!important;font-size:10px!important;letter-spacing:.2em!important;text-transform:uppercase!important;color:#8c8778!important;font-weight:500!important;}
+body.modern-mockup.nd .card.nd-open .card-value{font-family:'Manrope',sans-serif!important;font-size:34px!important;font-weight:300!important;color:#f6efe0!important;-webkit-text-fill-color:#f6efe0!important;background:none!important;letter-spacing:-.02em!important;margin-top:4px!important;}
+body.modern-mockup.nd .card.nd-open .card-pct{font-family:'DM Mono',monospace!important;font-size:12px!important;margin-top:4px!important;}
+body.modern-mockup.nd .card.nd-open .card-body{max-height:none!important;overflow:visible!important;}
+body.modern-mockup.nd .card.nd-open .card-inner{padding-left:18px!important;padding-right:18px!important;}
+body.nd.nd-section-open{overflow:hidden!important;}
+body.modern-mockup.nd.nd-section-open .bottom-nav{display:none!important;}
+/* в экране «Депозиты» — слайды вкладов, а не общий счётчик портфеля */
+body.modern-mockup.nd #card-deposit #mainCounterAlt,body.modern-mockup.nd #card-deposit #mainCounterModeSelect{display:none!important;}
+body.modern-mockup.nd #card-deposit .deposits-slider{display:block!important;}
+body.modern-mockup.nd #card-deposit #depDots,body.modern-mockup.nd #card-deposit .deposits-nav{display:flex!important;}
+body.modern-mockup.nd #card-deposit .deposits-swipe-wrap{margin:6px 0 0!important;padding:0!important;}
+.nd-screen-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:310;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;background:linear-gradient(180deg,#0d0e12 70%,#0d0e1200);align-items:center;justify-content:space-between;}
+body.nd .nd-screen-bar{display:none;}
+body.nd.nd-section-open .nd-screen-bar{display:flex;}
+.nd-back{background:none;border:0;color:#d9b866;font:600 16px 'Manrope',sans-serif;padding:8px 4px;cursor:pointer;}
+.nd-more{width:38px;height:38px;border-radius:11px;background:#14151a;border:1px solid #ffffff12;color:#d9b866;font-size:18px;line-height:1;cursor:pointer;}
+/* нижняя панель: парящая, ИИ золотой по центру */
+body.modern-mockup.nd .bottom-nav{left:18px!important;right:18px!important;width:auto!important;transform:none!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;height:62px!important;padding:0 8px!important;border-radius:22px!important;background:#15161bf2!important;border:1px solid #ffffff12!important;box-shadow:0 18px 40px #000a!important;display:flex!important;align-items:center!important;justify-content:space-around!important;}
+body.modern-mockup.nd .bottom-nav::before,body.modern-mockup.nd .bottom-nav::after{display:none!important;}
+body.modern-mockup.nd .bottom-nav-btn{height:52px!important;width:52px!important;margin:0!important;flex:0 0 52px!important;background:none!important;border:0!important;box-shadow:none!important;display:flex!important;align-items:center!important;justify-content:center!important;}
+body.modern-mockup.nd .bottom-nav-btn .bn-label{display:none!important;}
+body.modern-mockup.nd .bottom-nav-btn .bn-icon,body.modern-mockup.nd .bottom-nav-btn .bottom-nav-icon{width:44px!important;height:44px!important;}
+body.modern-mockup.nd .bottom-nav-btn:nth-child(2){order:3;border-radius:17px!important;background:linear-gradient(145deg,#f3d88f,#b88a35)!important;box-shadow:0 8px 22px #d9b86644!important;}
+body.modern-mockup.nd .bottom-nav-btn:nth-child(2) .bottom-nav-icon{filter:brightness(.16) sepia(1) saturate(2);}
+body.modern-mockup.nd .bottom-nav-btn:nth-child(3){order:2;}
+body.modern-mockup.nd .bottom-nav-btn:nth-child(4){order:4;}
+body.modern-mockup.nd .bottom-nav-btn:nth-child(5){order:5;}
+body.modern-mockup.nd .app{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;}
+/* динамика капитала в новом виде стоит после списка */
+body.modern-mockup.nd .chart-section{margin-top:16px!important;}
 </style>
 </head>
 <body class="modern-mockup">
@@ -2113,6 +2205,7 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
     <div class="total-currency" id="totalCurrSym">₴</div>
     <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="eyeGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#e2b24f"/><stop offset="1" stop-color="#a8761f"/></linearGradient></defs><path d="M1.8 12C4.3 7.6 7.9 5.3 12 5.3s7.7 2.3 10.2 6.7C19.7 16.4 16.1 18.7 12 18.7S4.3 16.4 1.8 12z" fill="none" stroke="url(#eyeGold)" stroke-width="2.1" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" fill="url(#eyeGold)"/><circle cx="13.4" cy="10.6" r="1.25" fill="#fff6d8"/></svg></button>
   </div>
+  <div class="nd-only nd-delta" id="ndDelta"></div>
   <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
     <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
@@ -2121,6 +2214,10 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
     <div class="network-badge" id="networkStatusBadge"></div>
   </div>
 </div>
+
+<div class="nd-only nd-alloc" id="ndAlloc"></div>
+<div class="nd-only nd-live nd-empty" id="ndLive" onclick="toggleCard('deposit')"></div>
+<div class="nd-only nd-sec" id="ndSecLabel">Активи</div>
 
 <div class="section-label" data-i18n="sectionLabel">Активи · утримай та перетягни для сортування</div>
 
@@ -2643,6 +2740,8 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
 </button>
 
 <!-- BOTTOM NAV -->
+<div class="nd-screen-bar" id="ndScreenBar"><button class="nd-back" type="button" onclick="ndBack()">‹ <span id="ndBackLbl">Капітал</span></button><button class="nd-more" type="button" onclick="ndMore()" aria-label="More">⋯</button></div>
+
 <nav class="bottom-nav" aria-label="Швидка навігація">
   <button class="bottom-nav-btn" onclick="openSectionPicker()" title="Створити розділ">
     <span class="bn-icon"><img class="bottom-nav-icon" src="panel-icons/1.png?v=4" alt=""></span>
@@ -2925,6 +3024,9 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
         <button class="settings-link-btn" id="adminPanelBtn" onclick="openAdminPanel()">
           <span>🛠 Админ-панель</span><span>›</span>
         </button>
+        <button class="settings-link-btn" id="ndToggleBtn" onclick="toggleNewDesign()" style="margin-top:8px;">
+          <span>✨ Новый дизайн (тест)</span><span id="ndToggleState">выкл.</span>
+        </button>
       </div>
       <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
         <div class="settings-label" id="set_legal_label">Правові документи</div>
@@ -3091,7 +3193,7 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.66';
+const APP_VERSION = 'v0.1.67';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7854,6 +7956,7 @@ function _updateAllNow(){
     if(valEl)valEl.textContent=fmtN(toDisplayCurr(v))+' '+sym;
   });
 
+  if(document.body.classList.contains('nd')){try{renderNdExtras();}catch(e){}}
   saveData();
 }
 
@@ -15919,6 +16022,147 @@ function schedulePngIconCleanup(){
   }
 });
 
+
+// ═══ НОВЫЙ ДИЗАЙН (тест) ═══════════════════════════════════════
+// Включается переключателем у админа в Настройках, хранится только на этом
+// устройстве. Данные не трогает: меняет вид главного экрана, а разделы
+// открывает отдельным экраном — это та же карточка, растянутая поверх всего,
+// поэтому все кнопки и расчёты внутри работают как раньше.
+const ND_LS='investory_new_design';
+let ndOpenId=null;
+const _ndHome={};
+function ndEnabled(){try{return localStorage.getItem(ND_LS)==='1';}catch(e){return false;}}
+function toggleNewDesign(){
+  try{localStorage.setItem(ND_LS,ndEnabled()?'0':'1');}catch(e){}
+  applyNewDesign();
+}
+function ndRemember(key,node){
+  if(node&&!_ndHome[key])_ndHome[key]={parent:node.parentNode,next:node.nextSibling};
+}
+function ndRestore(key,node){
+  const h=_ndHome[key];
+  if(!h||!node)return;
+  if(h.next&&h.next.parentNode===h.parent)h.parent.insertBefore(node,h.next);
+  else h.parent.appendChild(node);
+}
+function applyNewDesign(){
+  const on=ndEnabled();
+  document.body.classList.toggle('nd',on);
+  const wrap=document.querySelector('.deposits-swipe-wrap');
+  const chart=$('chartSection');
+  if(on){
+    ndRemember('wrap',wrap);ndRemember('chart',chart);
+    // Живой счётчик и слайды вкладов переезжают внутрь экрана «Депозиты»
+    const depInner=document.querySelector('#card-deposit .card-inner');
+    if(wrap&&depInner&&wrap.parentNode!==depInner)depInner.prepend(wrap);
+    const liab=$('liabilitiesSection');
+    if(chart&&liab&&liab.nextElementSibling!==chart)liab.after(chart);
+    ndWatchContainers();
+  }else{
+    ndCloseSection();
+    ndRestore('wrap',wrap);ndRestore('chart',chart);
+  }
+  const st=$('ndToggleState');
+  if(st)st.textContent=on?trx({uk:'увімк.',ru:'вкл.',en:'on',de:'an',zh:'开'}):trx({uk:'вимк.',ru:'выкл.',en:'off',de:'aus',zh:'关'});
+  try{updateAll();}catch(e){}
+}
+const ND_CATS=[
+  {k:'crypto',c:'#a48bf5',n:{uk:'Крипто',ru:'Крипто',en:'Crypto',de:'Krypto',zh:'加密'}},
+  {k:'securities',c:'#6ccf9c',n:{uk:'Акції',ru:'Акции',en:'Stocks',de:'Aktien',zh:'股票'}},
+  {k:'dep',c:'#6aa8ff',n:{uk:'Депозити',ru:'Депозиты',en:'Deposits',de:'Einlagen',zh:'存款'}},
+  {k:'fx',c:'#e9a86c',n:{uk:'Валюта',ru:'Валюта',en:'Currency',de:'Devisen',zh:'外币'}},
+  {k:'cash',c:'#d9b866',n:{uk:'Готівка',ru:'Наличные',en:'Cash',de:'Bargeld',zh:'现金'}},
+  {k:'other',c:'#5ed2c6',n:{uk:'Рахунок',ru:'Счёт',en:'Account',de:'Konto',zh:'账户'}},
+  {k:'metals',c:'#c9c2b0',n:{uk:'Метали',ru:'Металлы',en:'Metals',de:'Metalle',zh:'金属'}},
+  {k:'custom',c:'#8c8778',n:{uk:'Інше',ru:'Другое',en:'Other',de:'Sonstiges',zh:'其他'}}
+];
+function renderNdExtras(){
+  const P=getCapitalParts();
+  const vals={crypto:P.crypto,securities:P.securities,dep:P.dep,fx:P.usd+P.forex,cash:P.cash,other:P.other,metals:P.metals,custom:P.custom};
+  const total=P.total;
+  const al=$('ndAlloc');
+  if(al){
+    const items=ND_CATS.map(c=>({...c,v:vals[c.k]||0})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+    al.style.visibility=total>0&&items.length?'':'hidden';
+    al.innerHTML=total>0?'<div class="nd-bar-line">'+items.map(x=>'<i style="width:'+(x.v/total*100).toFixed(2)+'%;background:'+x.c+'"></i>').join('')+'</div>'+
+      '<div class="nd-legend">'+items.map(x=>'<span><b style="background:'+x.c+'"></b>'+escHtml(trx(x.n))+' '+Math.round(x.v/total*100)+'%</span>').join('')+'</div>':'';
+  }
+  const lv=$('ndLive');
+  if(lv){
+    let inc={daily:0,month:0};
+    try{inc=getPortfolioDepositIncome();}catch(e){}
+    const sym=getCurrSym();
+    lv.classList.toggle('nd-empty',!(inc.daily>0));
+    lv.innerHTML='<div class="l"><span class="dot"></span>'+escHtml(trx({uk:'Депозити сьогодні',ru:'Депозиты сегодня',en:'Deposits today',de:'Einlagen heute',zh:'今日存款'}))+'</div>'+
+      '<div class="v live-val">+'+fmtD(toDisplayCurr(inc.daily))+' '+sym+' <small>· '+fmtN(toDisplayCurr(inc.month))+' '+sym+trx({uk:'/міс',ru:'/мес',en:'/mo',de:'/Mon.',zh:'/月'})+'</small></div>';
+  }
+  const dl=$('ndDelta'),ch=$('totalChange');
+  if(dl&&ch){
+    const amt=String(ch.title||'');
+    const txt=String(ch.textContent||'');
+    const cls=ch.classList.contains('badge-red')?'dn':ch.classList.contains('badge-green')&&/^[+]/.test(txt)?'up':'';
+    dl.innerHTML=/^[+−-]/.test(amt)?'<span class="'+cls+' live-val">'+escHtml(amt)+' · '+escHtml(txt.replace(/\s.*$/,''))+'</span> '+escHtml(txt.replace(/^\S+\s?/,'')):escHtml(txt);
+  }
+  // В строке списка хватает самого процента — подпись «від капіталу» видна в экране раздела
+  const tail=' '+t('pctOfCapital');
+  document.querySelectorAll('.card:not(.nd-open) .card-pct').forEach(el=>{
+    const s=el.textContent||'';
+    if(s.endsWith(tail))el.textContent=s.slice(0,-tail.length);
+  });
+  setText('ndSecLabel',trx({uk:'Активи',ru:'Активы',en:'Assets',de:'Vermögen',zh:'资产'}));
+  setText('ndBackLbl',trx({uk:'Капітал',ru:'Капитал',en:'Capital',de:'Kapital',zh:'资本'}));
+  ndReapplyOpen();
+}
+function ndReapplyOpen(){
+  if(!ndOpenId)return;
+  const el=$('card-'+ndOpenId);
+  if(!el||el.style.display==='none'){ndCloseSection();return;}
+  if(!el.classList.contains('nd-open'))el.classList.add('expanded','nd-open');
+}
+// Карточки акций, металлов и своих разделов перерисовываются целиком —
+// после перерисовки возвращаем открытый экран на место.
+let _ndObserver=null;
+function ndWatchContainers(){
+  if(_ndObserver||typeof MutationObserver==='undefined')return;
+  _ndObserver=new MutationObserver(()=>{if(ndOpenId)ndReapplyOpen();});
+  ['cardsContainer','customCardsContainer','securitiesContainer','metalsContainer'].forEach(id=>{const c=$(id);if(c)_ndObserver.observe(c,{childList:true});});
+}
+function ndOpenSection(name){
+  const el=$('card-'+name);
+  if(!el)return;
+  if(ndOpenId===name&&el.classList.contains('nd-open'))return;
+  if(ndOpenId)ndCloseSection(true);
+  ndOpenId=name;
+  el.classList.add('expanded','nd-open');
+  el.scrollTop=0;
+  document.body.classList.add('nd-section-open');
+  if(name==='deposit'&&typeof syncDepositSliderHeight==='function')setTimeout(()=>{try{syncDepositSliderHeight();}catch(e){}},30);
+  try{history.pushState({ndSection:name},'');}catch(e){}
+}
+function ndCloseSection(){
+  if(!ndOpenId){document.body.classList.remove('nd-section-open');return;}
+  const el=$('card-'+ndOpenId);
+  if(el)el.classList.remove('nd-open','expanded');
+  ndOpenId=null;
+  document.body.classList.remove('nd-section-open');
+}
+function ndBack(){
+  if(history.state&&history.state.ndSection)history.back();
+  else ndCloseSection();
+}
+function ndMore(){
+  if(!ndOpenId)return;
+  const el=$('card-'+ndOpenId);
+  const del=el&&el.querySelector('.card-del-btn');
+  if(del)del.click();
+}
+window.addEventListener('popstate',()=>{if(ndOpenId)ndCloseSection();});
+const _ndOrigToggleCard=toggleCard;
+toggleCard=function(name){
+  if(document.body.classList.contains('nd'))return ndOpenSection(name);
+  return _ndOrigToggleCard(name);
+};
+try{applyNewDesign();}catch(e){}
 </script>
 </body>
 </html>
