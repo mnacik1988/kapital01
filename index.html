@@ -2093,9 +2093,10 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
 @media (min-width:500px){
   body.modern-mockup .bottom-nav{height:72px!important;padding:9px 12px 7px!important;}
 }
-/* ═══ НОВЫЙ ДИЗАЙН (тест, стиль 1 «Приватный банк») ═══
+/* ═══ NEW DESIGN BEGIN — НОВЫЙ ДИЗАЙН (тест, стиль 1 «Приватный банк») ═══
    Включается только классом body.nd (переключатель у админа в Настройках).
-   Без класса ни одно правило ниже не срабатывает — старый вид не меняется. */
+   Без класса ни одно правило ниже не срабатывает — старый вид не меняется.
+   Как удалить модуль целиком — список мест в начале JS-блока «NEW DESIGN BEGIN». */
 .nd-only{display:none;}
 body.nd .nd-only{display:block;}
 body.modern-mockup.nd{background:radial-gradient(120% 50% at 80% -6%,#2a2112 0%,transparent 55%),linear-gradient(180deg,#0d0e12 0%,#08090b 100%)!important;background-attachment:fixed!important;}
@@ -2185,6 +2186,7 @@ body.modern-mockup.nd .bottom-nav-btn:nth-child(5){order:5;}
 body.modern-mockup.nd .app{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;}
 /* динамика капитала в новом виде стоит после списка */
 body.modern-mockup.nd .chart-section{margin-top:16px!important;}
+/* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
 <body class="modern-mockup">
@@ -2205,7 +2207,7 @@ body.modern-mockup.nd .chart-section{margin-top:16px!important;}
     <div class="total-currency" id="totalCurrSym">₴</div>
     <button class="eye-btn" id="amountsEyeBtn" type="button" onclick="toggleHideAmounts()" aria-label="Hide amounts"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="eyeGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#e2b24f"/><stop offset="1" stop-color="#a8761f"/></linearGradient></defs><path d="M1.8 12C4.3 7.6 7.9 5.3 12 5.3s7.7 2.3 10.2 6.7C19.7 16.4 16.1 18.7 12 18.7S4.3 16.4 1.8 12z" fill="none" stroke="url(#eyeGold)" stroke-width="2.1" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" fill="url(#eyeGold)"/><circle cx="13.4" cy="10.6" r="1.25" fill="#fff6d8"/></svg></button>
   </div>
-  <div class="nd-only nd-delta" id="ndDelta"></div>
+  <!-- NEW DESIGN --><div class="nd-only nd-delta" id="ndDelta"></div>
   <div class="total-subs" style="align-items:center;flex-wrap:wrap;gap:6px;">
     <div class="badge badge-green" id="totalChange" data-i18n="enterData">введіть дані</div>
     <div class="badge badge-purple" id="totalBreakdown">0 активів</div>
@@ -2215,9 +2217,9 @@ body.modern-mockup.nd .chart-section{margin-top:16px!important;}
   </div>
 </div>
 
-<div class="nd-only nd-alloc" id="ndAlloc"></div>
+<!-- NEW DESIGN BEGIN --><div class="nd-only nd-alloc" id="ndAlloc"></div>
 <div class="nd-only nd-live nd-empty" id="ndLive" onclick="toggleCard('deposit')"></div>
-<div class="nd-only nd-sec" id="ndSecLabel">Активи</div>
+<div class="nd-only nd-sec" id="ndSecLabel">Активи</div><!-- NEW DESIGN END -->
 
 <div class="section-label" data-i18n="sectionLabel">Активи · утримай та перетягни для сортування</div>
 
@@ -2740,7 +2742,7 @@ body.modern-mockup.nd .chart-section{margin-top:16px!important;}
 </button>
 
 <!-- BOTTOM NAV -->
-<div class="nd-screen-bar" id="ndScreenBar"><button class="nd-back" type="button" onclick="ndBack()">‹ <span id="ndBackLbl">Капітал</span></button><button class="nd-more" type="button" onclick="ndMore()" aria-label="More">⋯</button></div>
+<!-- NEW DESIGN --><div class="nd-screen-bar" id="ndScreenBar"><button class="nd-back" type="button" onclick="ndBack()">‹ <span id="ndBackLbl">Капітал</span></button><button class="nd-more" type="button" onclick="ndMore()" aria-label="More">⋯</button></div>
 
 <nav class="bottom-nav" aria-label="Швидка навігація">
   <button class="bottom-nav-btn" onclick="openSectionPicker()" title="Створити розділ">
@@ -3024,6 +3026,7 @@ body.modern-mockup.nd .chart-section{margin-top:16px!important;}
         <button class="settings-link-btn" id="adminPanelBtn" onclick="openAdminPanel()">
           <span>🛠 Админ-панель</span><span>›</span>
         </button>
+        <!-- NEW DESIGN -->
         <button class="settings-link-btn" id="ndToggleBtn" onclick="toggleNewDesign()" style="margin-top:8px;">
           <span>✨ Новый дизайн (тест)</span><span id="ndToggleState">выкл.</span>
         </button>
@@ -7956,7 +7959,7 @@ function _updateAllNow(){
     if(valEl)valEl.textContent=fmtN(toDisplayCurr(v))+' '+sym;
   });
 
-  if(document.body.classList.contains('nd')){try{renderNdExtras();}catch(e){}}
+  if(document.body.classList.contains('nd')){try{renderNdExtras();}catch(e){}} // NEW DESIGN
   saveData();
 }
 
@@ -16023,7 +16026,15 @@ function schedulePngIconCleanup(){
 });
 
 
-// ═══ НОВЫЙ ДИЗАЙН (тест) ═══════════════════════════════════════
+// ═══ NEW DESIGN BEGIN — НОВЫЙ ДИЗАЙН (тест) ═══════════════════════
+// КАК УДАЛИТЬ ЦЕЛИКОМ (данные не затрагиваются, хранится только флаг
+// localStorage 'investory_new_design'). Найти поиском «NEW DESIGN» и убрать:
+//  1) CSS-блок между «NEW DESIGN BEGIN» и «NEW DESIGN END (стили)»;
+//  2) этот JS-блок до «NEW DESIGN END (код)»;
+//  3) разметку с пометкой NEW DESIGN: #ndDelta в шапке; #ndAlloc, #ndLive,
+//     #ndSecLabel перед .section-label; #ndScreenBar перед нижней панелью;
+//     кнопку #ndToggleBtn в #adminSection;
+//  4) строку вызова renderNdExtras() в конце _updateAllNow.
 // Включается переключателем у админа в Настройках, хранится только на этом
 // устройстве. Данные не трогает: меняет вид главного экрана, а разделы
 // открывает отдельным экраном — это та же карточка, растянутая поверх всего,
@@ -16163,6 +16174,7 @@ toggleCard=function(name){
   return _ndOrigToggleCard(name);
 };
 try{applyNewDesign();}catch(e){}
+// ═══ NEW DESIGN END (код) ═══
 </script>
 </body>
 </html>
