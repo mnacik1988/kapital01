@@ -2153,7 +2153,7 @@ body.modern-mockup.nd .card:not(.nd-open) .card-value{grid-column:2;grid-row:1;t
 body.modern-mockup.nd .card:not(.nd-open) .card-pct{grid-column:2;grid-row:2;text-align:right;font-family:'DM Mono',monospace!important;font-size:10px!important;margin-top:3px!important;white-space:nowrap;}
 body.modern-mockup.nd .card:not(.nd-open) .card-info>:nth-child(n+4){grid-column:2;text-align:right;font-size:10px!important;}
 /* открытый раздел = отдельный экран поверх всего */
-body.modern-mockup.nd .card.nd-open{position:fixed!important;inset:0!important;z-index:300!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:radial-gradient(120% 50% at 80% -6%,#2a2112 0%,transparent 55%),linear-gradient(180deg,#0d0e12,#08090b)!important;padding:calc(58px + env(safe-area-inset-top)) 0 calc(36px + env(safe-area-inset-bottom))!important;}
+body.modern-mockup.nd .card.nd-open{position:fixed!important;inset:0!important;z-index:300!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:radial-gradient(120% 50% at 80% -6%,#2a2112 0%,transparent 55%),linear-gradient(180deg,#0d0e12,#08090b)!important;padding:calc(58px + env(safe-area-inset-top)) 0 calc(104px + env(safe-area-inset-bottom))!important;}
 body.modern-mockup.nd .card.nd-open .card-header{padding:4px 22px 10px!important;gap:14px!important;}
 body.modern-mockup.nd .card.nd-open .card-icon{width:48px!important;height:48px!important;background:none!important;border:0!important;box-shadow:none!important;}
 body.modern-mockup.nd .card.nd-open .card-icon img{width:46px!important;height:46px!important;}
@@ -2164,7 +2164,6 @@ body.modern-mockup.nd .card.nd-open .card-pct{font-family:'DM Mono',monospace!im
 body.modern-mockup.nd .card.nd-open .card-body{max-height:none!important;overflow:visible!important;}
 body.modern-mockup.nd .card.nd-open .card-inner{padding-left:18px!important;padding-right:18px!important;}
 body.nd.nd-section-open{overflow:hidden!important;}
-body.modern-mockup.nd.nd-section-open .bottom-nav{display:none!important;}
 /* в экране «Депозиты» — слайды вкладов, а не общий счётчик портфеля */
 body.modern-mockup.nd #card-deposit #mainCounterAlt,body.modern-mockup.nd #card-deposit #mainCounterModeSelect{display:none!important;}
 body.modern-mockup.nd #card-deposit .deposits-slider{display:block!important;}
@@ -2176,12 +2175,9 @@ body.nd.nd-section-open .nd-screen-bar{display:flex;}
 .nd-back{background:none;border:0;color:#d9b866;font:600 16px 'Manrope',sans-serif;padding:8px 4px;cursor:pointer;}
 .nd-more{width:38px;height:38px;border-radius:11px;background:#14151a;border:1px solid #ffffff12;color:#d9b866;font-size:18px;line-height:1;cursor:pointer;}
 /* нижняя панель: парящая, ИИ золотой по центру */
-body.modern-mockup.nd .bottom-nav{left:18px!important;right:18px!important;width:auto!important;transform:none!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;height:62px!important;padding:0 8px!important;border-radius:22px!important;background:#15161bf2!important;border:1px solid #ffffff12!important;box-shadow:0 18px 40px #000a!important;display:flex!important;align-items:center!important;justify-content:space-around!important;}
-body.modern-mockup.nd .bottom-nav::before,body.modern-mockup.nd .bottom-nav::after{display:none!important;}
-body.modern-mockup.nd .bottom-nav-btn{height:52px!important;width:52px!important;margin:0!important;flex:0 0 52px!important;background:none!important;border:0!important;box-shadow:none!important;display:flex!important;align-items:center!important;justify-content:center!important;}
-body.modern-mockup.nd .bottom-nav-btn .bn-label{display:none!important;}
-body.modern-mockup.nd .bottom-nav-btn .bn-icon,body.modern-mockup.nd .bottom-nav-btn .bottom-nav-icon{width:44px!important;height:44px!important;}
-body.modern-mockup.nd .bottom-nav-btn.center{border-radius:17px!important;background:linear-gradient(145deg,#f3d88f,#b88a35)!important;box-shadow:0 8px 22px #d9b86644!important;}
+/* нижняя панель: форма как в основном виде (на всю ширину, прижата к низу), цвета нового вида; видна и в разделах */
+body.modern-mockup.nd .bottom-nav{background:linear-gradient(180deg,#17181d,#0c0d10)!important;border-color:#ffffff12!important;box-shadow:0 -10px 30px #00000066!important;}
+body.modern-mockup.nd .bottom-nav-btn.center{border-radius:18px!important;background:linear-gradient(145deg,#f3d88f,#b88a35)!important;box-shadow:0 8px 22px #d9b86644!important;}
 body.modern-mockup.nd .bottom-nav-btn.center .bottom-nav-icon{filter:brightness(.16) sepia(1) saturate(2);}
 body.modern-mockup.nd .app{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;}
 /* динамика капитала в новом виде стоит после списка */
@@ -2324,9 +2320,6 @@ body.modern-mockup.nd .card:not(.nd-open) .card-value{grid-column:3!important;gr
 body.modern-mockup.nd .card:not(.nd-open) .nd-day{grid-column:4!important;grid-row:1!important;font-size:11px!important;text-align:right;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
 body.modern-mockup.nd .card.nd-open .nd-day{display:none!important;}
 .nd-day.up{color:#7fd6a3;}.nd-day.dn{color:#ef8a7a;}.nd-day.mu{color:#77736a;}
-/* — подложка под парящей панелью: карточки не просвечивают снизу — */
-body.modern-mockup.nd .app::after{content:'';position:fixed;left:0;right:0;bottom:0;height:calc(46px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#08090b00 0%,#08090b 45%);z-index:389;pointer-events:none;}
-body.modern-mockup.nd.nd-section-open .app::after{display:none;}
 /* — скрытые суммы: звёздочки и в новом виде (его цвета не должны перебивать прозрачность) — */
 body.amounts-hidden.amounts-hidden.amounts-hidden.amounts-hidden.nd.nd :is(.card-value,.live-val,.ticker-card-price,.ticker-card-pnl,.ticker-card-qty,.result-val,.sd-val,.daily-income,.daily-total,.usdt-balance-main,.usdt-balance-equiv,.hide-amt,.live-num){color:transparent!important;-webkit-text-fill-color:transparent!important;}
 /* — экран «Крипто» по образцу «Акций» — */
@@ -3384,7 +3377,7 @@ body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!imp
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.74';
+const APP_VERSION = 'v0.1.75';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
