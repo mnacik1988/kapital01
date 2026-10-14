@@ -2463,6 +2463,25 @@ body.modern-mockup.nd .liab-card.nd-open .liab-stat-box,body.modern-mockup.nd .l
 body.modern-mockup.nd .liab-card.nd-open .liab-extra-box .field-input,body.modern-mockup.nd .liab-card.nd-open .liab-extra-box input{background:#0d0e12!important;border:1px solid #ffffff12!important;border-radius:14px!important;color:#f1ead9!important;font:600 15px 'Manrope',sans-serif!important;}
 body.modern-mockup.nd .liab-card.nd-open button[onclick^="openPartialPayModal"]{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;border-radius:14px!important;color:#1a1408!important;font:700 14px 'Manrope',sans-serif!important;padding:13px!important;}
 body.modern-mockup.nd .liab-card.nd-open button[onclick^="removeLiab"]{display:none!important;}
+/* — окна добавления, позиции, кредита, пополнения, выбора раздела — */
+body.nd :is(.crypto-add-overlay,.stock-add-overlay,.stock-detail-overlay,.picker-overlay,.modal-overlay){background:#000000b8!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box){background:#17181e!important;border:1px solid #ffffff14!important;box-shadow:0 -18px 50px #000c!important;color:#ecebe6!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box)::before,body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box)::after{display:none!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) .field-label,body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) label{font-family:'DM Mono',monospace!important;font-size:9.5px!important;letter-spacing:.08em!important;text-transform:uppercase;color:#77736a!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) :is(.field-input,input[type="text"],input[type="number"],input[type="date"],select){background:#111216!important;border:1px solid #ffffff12!important;border-radius:14px!important;color:#f1ead9!important;font:600 15px 'Manrope',sans-serif!important;box-shadow:none!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) :is(.field-input,input,select):focus{border-color:#d9b86666!important;box-shadow:0 0 0 3px #d9b86618!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) .add-btn:not([style*="var(--red)"]){background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;border-radius:14px!important;color:#1a1408!important;font:700 14px 'Manrope',sans-serif!important;letter-spacing:0!important;text-transform:none!important;box-shadow:none!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) .add-btn[style*="var(--red)"]{background:#14151a!important;border:1px solid #ef8a7a44!important;border-radius:14px!important;color:#ef8a7a!important;font:700 14px 'Manrope',sans-serif!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) :is(.result-box,.stock-detail-stats,.sd-row){background:#111216!important;border-color:#ffffff0d!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) :is(.result-key,.stock-detail-stat-lbl,.sd-key){font-family:'DM Mono',monospace!important;color:#77736a!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) :is(.result-val,.stock-detail-stat-val,.sd-val){font-family:'Manrope',sans-serif!important;font-weight:600!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) :is(.calc-title,.picker-title,.modal-title,.stock-detail-title){font-family:'Manrope',sans-serif!important;font-weight:700!important;color:#f1ead9!important;letter-spacing:0!important;text-transform:none!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) .modal-confirm{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;border-radius:14px!important;color:#1a1408!important;font:700 14px 'Manrope',sans-serif!important;box-shadow:none!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) .modal-cancel{background:#14151a!important;border:1px solid #ffffff14!important;border-radius:14px!important;color:#cfc7b4!important;font:700 14px 'Manrope',sans-serif!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) :is(.crypto-add-close,.stock-add-close,.picker-close,.stock-detail-close){background:#14151a!important;border:1px solid #ffffff14!important;border-radius:11px!important;color:#cfc7b4!important;}
+body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) .stock-detail-stat{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:14px!important;box-shadow:none!important;}
+body.nd .picker-item{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:18px!important;box-shadow:none!important;}
+body.nd .picker-item:active{border-color:#d9b86655!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3479,7 +3498,7 @@ body.modern-mockup.nd .liab-card.nd-open button[onclick^="removeLiab"]{display:n
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.85';
+const APP_VERSION = 'v0.1.86';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
