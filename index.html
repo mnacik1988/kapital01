@@ -2173,7 +2173,7 @@ body.modern-mockup.nd #card-deposit #mainCounterAlt,body.modern-mockup.nd #card-
 body.modern-mockup.nd #card-deposit .deposits-slider{display:block!important;}
 body.modern-mockup.nd #card-deposit #depDots,body.modern-mockup.nd #card-deposit .deposits-nav{display:flex!important;}
 body.modern-mockup.nd #card-deposit .deposits-swipe-wrap{margin:6px 0 0!important;padding:0!important;}
-.nd-screen-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:310;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;background:linear-gradient(180deg,#0d0e12 70%,#0d0e1200);align-items:center;justify-content:space-between;}
+.nd-screen-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:310;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;background:#0d0e12;border-bottom:1px solid #ffffff0b;box-shadow:0 8px 18px #00000059;align-items:center;justify-content:space-between;}
 body.nd .nd-screen-bar{display:none;}
 body.nd.nd-section-open .nd-screen-bar{display:flex;}
 .nd-back{background:none;border:0;color:#d9b866;font:600 16px 'Manrope',sans-serif;padding:8px 4px;cursor:pointer;}
@@ -2342,8 +2342,9 @@ body.modern-mockup.nd .card-crypto .card-inner>.divider,body.modern-mockup.nd .c
 body.modern-mockup.nd .card-crypto .nd-box-ex,body.modern-mockup.nd .card-crypto .nd-sec-hist{display:none!important;}
 body.modern-mockup.nd .card-crypto[data-ndtab="ex"] .nd-box-ex,body.modern-mockup.nd .card-crypto[data-ndtab="hist"] .nd-sec-hist{display:block!important;}
 body.modern-mockup.nd .card-crypto[data-ndtab="ex"] .nd-box-coins,body.modern-mockup.nd .card-crypto[data-ndtab="hist"] .nd-box-coins{display:none!important;}
-body.modern-mockup.nd .card-crypto .nd-box-add{display:none!important;}
-body.modern-mockup.nd .card-crypto.nd-adding .nd-box-add{display:block!important;}
+/* поиск монеты с ценой онлайн виден всегда, кроме вкладки «История» */
+body.modern-mockup.nd .card-crypto[data-ndtab="hist"] .nd-box-add{display:none!important;}
+body.modern-mockup.nd .card-crypto .nd-box-add .calc-title{font-family:'DM Mono',monospace!important;font-size:10px!important;letter-spacing:.2em!important;text-transform:uppercase;color:#8c8778!important;}
 body.modern-mockup.nd .card-crypto .nd-box-add{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;}
 body.modern-mockup.nd .card-crypto .usdt-balance-card{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;box-shadow:none!important;margin-bottom:10px!important;}
 body.modern-mockup.nd .card-crypto .usdt-balance-card::before,body.modern-mockup.nd .card-crypto .usdt-balance-card::after{display:none!important;}
@@ -3391,7 +3392,7 @@ body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!imp
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.79';
+const APP_VERSION = 'v0.1.80';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16721,9 +16722,9 @@ const ndCryptoTxt=k=>trx(({
 })[k]);
 function ndCryptoAdd(){
   const card=$('card-crypto');if(!card)return;
-  card.classList.remove('nd-picking');card.classList.toggle('nd-adding');
-  ndSecSetTab('crypto','pos');
-  if(card.classList.contains('nd-adding'))setTimeout(()=>{const inp=$('newCoinName');if(inp){inp.scrollIntoView({block:'center',behavior:'smooth'});inp.focus();}},60);
+  card.classList.remove('nd-picking');
+  if(card.dataset.ndtab==='hist')ndSecSetTab('crypto','pos');
+  setTimeout(()=>{const inp=$('newCoinName');if(inp){inp.scrollIntoView({block:'center',behavior:'smooth'});inp.focus();}},60);
 }
 function ndCryptoWriteOff(){
   const card=$('card-crypto');if(!card)return;
