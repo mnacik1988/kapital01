@@ -2482,6 +2482,45 @@ body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-
 body.nd :is(.crypto-add-box,.stock-add-box,.stock-detail-box,.picker-box,.modal-box) .stock-detail-stat{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:14px!important;box-shadow:none!important;}
 body.nd .picker-item{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:18px!important;box-shadow:none!important;}
 body.nd .picker-item:active{border-color:#d9b86655!important;}
+/* — настройки, калькулятор, статистика, ИИ-чат — */
+body.nd :is(.settings-overlay,.calc-overlay,.diag-overlay,.ai-chat-overlay){background:#000000b8!important;}
+body.nd :is(.settings-box,.calc-box,.diag-box,.ai-chat-panel){background:#17181e!important;border:1px solid #ffffff14!important;box-shadow:0 -18px 50px #000c!important;}
+body.nd :is(.settings-close,.calc-head-close,.diag-close,.ai-chat-close){background:#14151a!important;border:1px solid #ffffff14!important;border-radius:11px!important;color:#cfc7b4!important;}
+/* настройки: выбор — тёмная кнопка с золотой рамкой */
+body.nd .settings-box .settings-label{font-family:'DM Mono',monospace!important;font-size:10px!important;letter-spacing:.2em!important;color:#8c8778!important;}
+body.nd :is(.settings-lang-btn,.settings-curr-btn,.settings-theme-btn,.test-build-btn){background:#111216!important;border:1px solid #ffffff12!important;border-radius:12px!important;color:#9a9588!important;font:600 13px 'Manrope',sans-serif!important;box-shadow:none!important;}
+body.nd :is(.settings-lang-btn,.settings-curr-btn,.settings-theme-btn,.test-build-btn).active{background:#1d1b16!important;border-color:#d9b86666!important;color:#f1ead9!important;}
+body.nd .settings-box button:is([onclick^="backupExport"],[onclick^="backupImport"],[onclick^="confirmSignOut"]){background:#14151a!important;border:1px solid #ffffff14!important;border-radius:14px!important;color:#cfc7b4!important;font:700 13px 'Manrope',sans-serif!important;}
+body.nd .settings-box button[onclick^="openDeleteAccountSheet"]{background:#14151a!important;border:1px solid #ef8a7a44!important;border-radius:14px!important;color:#ef8a7a!important;font:700 13px 'Manrope',sans-serif!important;}
+body.nd .settings-box .settings-link-btn{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:14px!important;color:#ecebe6!important;font:600 14px 'Manrope',sans-serif!important;}
+body.nd .settings-box .add-btn{background:#14151a!important;border:1px solid #ffffff14!important;border-radius:14px!important;color:#cfc7b4!important;font:700 13px 'Manrope',sans-serif!important;}
+/* калькулятор: операции и «=» золотые */
+body.nd .calc-tabs{background:#111216!important;border:1px solid #ffffff0b!important;border-radius:14px!important;padding:4px!important;}
+body.nd .calc-tab{background:none!important;border:0!important;border-radius:10px!important;color:#8c8778!important;font:600 12px 'Manrope',sans-serif!important;letter-spacing:0!important;text-transform:none!important;}
+body.nd .calc-tab.active{background:#1d1b16!important;box-shadow:inset 0 0 0 1px #d9b86633!important;color:#f1ead9!important;}
+body.nd .simple-calc-display{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;color:#f6efe0!important;font-family:'Manrope',sans-serif!important;font-weight:300!important;}
+body.nd .sc-btn{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:14px!important;color:#ecebe6!important;font:600 18px 'Manrope',sans-serif!important;box-shadow:none!important;}
+body.nd .sc-btn.op{background:#1d1b16!important;border-color:#d9b86633!important;color:#e9cd85!important;}
+body.nd .sc-btn.cl{background:#14151a!important;border-color:#ef8a7a33!important;color:#ef8a7a!important;}
+body.nd .sc-btn.eq{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;color:#1a1408!important;}
+body.nd .calc-box :is(.field-input,input,select){background:#111216!important;border:1px solid #ffffff12!important;border-radius:14px!important;color:#f1ead9!important;font:600 15px 'Manrope',sans-serif!important;}
+body.nd .calc-box .calc-field label,body.nd .calc-box .calc-field>div:first-child{font-family:'DM Mono',monospace!important;color:#77736a!important;}
+/* статистика: плитки как карточки раздела, цифры Manrope */
+body.nd :is(.diag-stat,.diag-section,.diag-history-btn,.section-dyn-card){background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;box-shadow:none!important;}
+body.nd .section-dyn-chip{background:#0d0e12!important;border:1px solid #ffffff0b!important;}
+body.nd :is(.diag-stat-val,.diag-row-val,.section-dyn-value){font-family:'Manrope',sans-serif!important;font-weight:600!important;letter-spacing:-.01em!important;}
+body.nd :is(.diag-stat-lbl,.diag-section-title,.diag-row-key){font-family:'DM Mono',monospace!important;color:#77736a!important;}
+body.nd .diag-title,body.nd .calc-head-title{font-family:'Manrope',sans-serif!important;font-weight:700!important;color:#f1ead9!important;}
+/* ИИ-чат: сообщения Manrope, подсказки и поле в тон */
+body.nd .ai-chat-header{border-bottom:1px solid #ffffff0b!important;}
+body.nd .ai-msg-bubble{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;color:#ecebe6!important;font:500 14px/1.5 'Manrope',sans-serif!important;}
+body.nd .ai-msg.user .ai-msg-bubble,body.nd .ai-msg-user .ai-msg-bubble{background:#1d1b16!important;border-color:#d9b86633!important;}
+body.nd .ai-suggestion-chip{background:#111216!important;border:1px solid #ffffff14!important;border-radius:14px!important;color:#cfc7b4!important;font:600 12.5px 'Manrope',sans-serif!important;}
+body.nd .ai-input-bar{background:#17181e!important;border-top:1px solid #ffffff0b!important;}
+body.nd .ai-input{background:#111216!important;border:1px solid #ffffff12!important;border-radius:14px!important;color:#f1ead9!important;font:500 15px 'Manrope',sans-serif!important;}
+body.nd .ai-send-btn{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;color:#1a1408!important;border:0!important;}
+body.nd .settings-box .app-version-card{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:14px!important;box-shadow:none!important;}
+body.nd .settings-box .app-version-card *{font-family:'DM Mono',monospace;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3498,7 +3537,7 @@ body.nd .picker-item:active{border-color:#d9b86655!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.86';
+const APP_VERSION = 'v0.1.87';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
