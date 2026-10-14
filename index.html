@@ -2379,6 +2379,40 @@ body.nd .custom-dialog-actions{gap:10px!important;}
 body.nd .custom-dialog-cancel,body.nd .custom-dialog-ok{padding:13px 0!important;border-radius:14px!important;font:700 14px 'Manrope',sans-serif!important;letter-spacing:0!important;}
 body.nd .custom-dialog-cancel{background:#14151a!important;border:1px solid #ffffff14!important;color:#cfc7b4!important;}
 body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;color:#1a1408!important;}
+/* — общий стиль форм и итогов внутри экранов разделов (наличные, счёт, валюта, металлы, облигации, свои разделы…) — */
+body.modern-mockup.nd .card.nd-open .card-inner>.divider{display:none!important;}
+body.modern-mockup.nd .card.nd-open .field-label{font-family:'DM Mono',monospace!important;font-size:9.5px!important;letter-spacing:.08em!important;text-transform:uppercase;color:#77736a!important;margin-bottom:6px!important;}
+body.modern-mockup.nd .card.nd-open .field-input{background:#111216!important;border:1px solid #ffffff12!important;border-radius:14px!important;color:#f1ead9!important;font:600 15px 'Manrope',sans-serif!important;padding:13px 14px!important;box-shadow:none!important;}
+body.modern-mockup.nd .card.nd-open select.field-input{padding:12px 10px!important;}
+body.modern-mockup.nd .card.nd-open .field-input:focus{border-color:#d9b86666!important;box-shadow:0 0 0 3px #d9b86618!important;}
+body.modern-mockup.nd .card.nd-open .field-input::placeholder{color:#55524b!important;}
+body.modern-mockup.nd .card.nd-open .field-group{margin-bottom:12px!important;}
+body.modern-mockup.nd .card.nd-open .calc-title{font-family:'DM Mono',monospace!important;font-size:10px!important;letter-spacing:.2em!important;text-transform:uppercase;color:#8c8778!important;}
+body.modern-mockup.nd .card.nd-open .add-btn{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;border-radius:14px!important;color:#1a1408!important;font:700 14px 'Manrope',sans-serif!important;padding:13px!important;box-shadow:none!important;letter-spacing:0!important;text-transform:none!important;}
+body.modern-mockup.nd .card.nd-open .result-box{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;padding:2px 14px!important;box-shadow:none!important;margin-top:12px!important;}
+body.modern-mockup.nd .card.nd-open .result-row{padding:11px 0!important;border-bottom:1px solid #ffffff08!important;}
+body.modern-mockup.nd .card.nd-open .result-row:last-child{border-bottom:0!important;}
+body.modern-mockup.nd .card.nd-open .result-key{font-family:'DM Mono',monospace!important;font-size:10px!important;letter-spacing:.06em!important;text-transform:uppercase;color:#77736a!important;}
+body.modern-mockup.nd .card.nd-open .result-val{font:600 14px 'Manrope',sans-serif!important;}
+body.modern-mockup.nd .card.nd-open .result-val.orange,body.modern-mockup.nd .card.nd-open .result-val.blue{color:#f1ead9!important;}
+/* — валютные накопления: строки вместо плиток — */
+body.modern-mockup.nd #card-forex .balance-list-cards{display:flex!important;flex-direction:column!important;gap:0!important;background:#111216;border:1px solid #ffffff0d;border-radius:20px;overflow:hidden;margin-bottom:14px;grid-template-columns:none!important;}
+body.modern-mockup.nd #card-forex .balance-list-card{display:grid!important;grid-template-columns:40px minmax(0,1fr) auto;column-gap:12px;row-gap:3px;align-items:center;padding:12px 14px!important;margin:0!important;border:0!important;border-top:1px solid #ffffff08!important;border-radius:0!important;background:none!important;box-shadow:none!important;min-height:0!important;}
+body.modern-mockup.nd #card-forex .balance-list-card:first-child{border-top:0!important;}
+body.modern-mockup.nd #card-forex .balance-list-head{display:contents!important;}
+body.modern-mockup.nd #card-forex .balance-list-flag{grid-column:1;grid-row:1/span 2;width:40px;height:40px;border-radius:50%;background:#1d1e24;display:flex!important;align-items:center;justify-content:center;font-size:20px!important;}
+body.modern-mockup.nd #card-forex .balance-list-code{grid-column:2;grid-row:1;font:700 14px 'Manrope',sans-serif!important;color:#ecebe6!important;letter-spacing:0!important;}
+body.modern-mockup.nd #card-forex .balance-list-rate{grid-column:2;grid-row:2;font-family:'DM Mono',monospace!important;font-size:10px!important;color:#77736a!important;margin:0!important;}
+body.modern-mockup.nd #card-forex .balance-list-amount{grid-column:3;grid-row:1;text-align:right;font:600 14px 'Manrope',sans-serif!important;color:#f1ead9!important;margin:0!important;}
+body.modern-mockup.nd #card-forex .balance-list-equiv{grid-column:3;grid-row:2;text-align:right;font-family:'DM Mono',monospace!important;font-size:10px!important;color:#9a9588!important;margin:0!important;}
+body.modern-mockup.nd #card-forex .balance-list-actions{grid-column:2/span 2;grid-row:3;display:flex!important;justify-content:flex-end;gap:6px;margin-top:8px!important;}
+body.modern-mockup.nd #card-forex .balance-list-btn{width:40px!important;height:32px!important;border-radius:10px!important;background:#14151a!important;border:1px solid #ffffff14!important;color:#cfc7b4!important;font:700 15px 'Manrope',sans-serif!important;}
+body.modern-mockup.nd #card-forex .balance-list-btn.delete{color:#ef8a7a!important;}
+body.modern-mockup.nd .card.nd-open .card-inner{padding-top:8px!important;}
+body.modern-mockup.nd #card-other .bank-add-row .add-btn:nth-child(2){background:#14151a!important;border:1px solid #ffffff14!important;color:#cfc7b4!important;}
+body.modern-mockup.nd #cashCurrency{width:96px!important;}
+body.modern-mockup.nd #card-forex .row3{display:grid!important;grid-template-columns:1.15fr 1fr .9fr!important;gap:8px!important;}
+body.modern-mockup.nd #card-forex .row3 .field-group{min-width:0;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3395,7 +3429,7 @@ body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!imp
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.82';
+const APP_VERSION = 'v0.1.83';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
