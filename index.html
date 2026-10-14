@@ -2425,6 +2425,44 @@ body.nd .pretty-select.open .pretty-select-btn{border-color:#d9b86666!important;
 body.nd .pretty-select-menu{background:#17181e!important;border:1px solid #ffffff14!important;border-radius:16px!important;box-shadow:0 18px 40px #000c!important;}
 body.nd .pretty-select-option{background:none!important;color:#ecebe6!important;font:600 14px 'Manrope',sans-serif!important;border-radius:11px!important;}
 body.nd .pretty-select-option.active{background:#1d1b16!important;box-shadow:inset 0 0 0 1px #d9b86633!important;color:#f1ead9!important;}
+/* — обязательства и кредиты: строки на главной, экран кредита — */
+body.modern-mockup.nd #liabButtonWrap{margin:14px 18px 0!important;padding:0!important;}
+body.modern-mockup.nd #liabButtonWrap .add-one-btn,body.modern-mockup.nd #liabilitiesSection>.add-one-btn{background:#111216!important;border:1px dashed #ef8a7a55!important;border-radius:16px!important;color:#ef8a7a!important;font:600 13.5px 'Manrope',sans-serif!important;padding:14px!important;box-shadow:none!important;}
+body.modern-mockup.nd #liabButtonWrap .add-one-btn .plus,body.modern-mockup.nd #liabilitiesSection>.add-one-btn .plus{color:#ef8a7a!important;}
+body.modern-mockup.nd #liabilitiesSection{margin:22px 18px 0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;}
+body.modern-mockup.nd #liabilitiesSection::before,body.modern-mockup.nd #liabilitiesSection::after{display:none!important;}
+body.modern-mockup.nd .liab-header{margin:0 4px 10px!important;padding:0!important;}
+body.modern-mockup.nd .liab-title{font-family:'DM Mono',monospace!important;font-size:10px!important;letter-spacing:.22em!important;color:#8c8778!important;}
+body.modern-mockup.nd .liab-toggle-net,body.modern-mockup.nd .liab-add-btn{background:#14151a!important;border:1px solid #ffffff14!important;border-radius:10px!important;color:#cfc7b4!important;font:600 11px 'Manrope',sans-serif!important;}
+body.modern-mockup.nd .liab-toggle-net.active{border-color:#d9b86655!important;color:#f1ead9!important;}
+body.modern-mockup.nd #liabCardsContainer{background:#111216;border:1px solid #ffffff0d;border-radius:20px;overflow:hidden;}
+body.modern-mockup.nd .liab-card:not(.nd-open){background:none!important;border:0!important;border-top:1px solid #ffffff08!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+body.modern-mockup.nd .liab-card:not(.nd-open):first-child{border-top:0!important;}
+body.modern-mockup.nd .liab-card:not(.nd-open) .liab-card-body,body.modern-mockup.nd .liab-card .liab-card-toggle{display:none!important;}
+body.modern-mockup.nd .liab-card:not(.nd-open) .liab-card-header{padding:12px 14px!important;cursor:pointer;}
+body.modern-mockup.nd .liab-card:not(.nd-open) .liab-card-icon img{width:30px!important;height:30px!important;}
+body.modern-mockup.nd .liab-card:not(.nd-open) .liab-card-info{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:center;}
+body.modern-mockup.nd .liab-card:not(.nd-open) .liab-card-name{grid-column:1;grid-row:1;font:600 14px 'Manrope',sans-serif!important;color:#ecebe6!important;letter-spacing:0!important;text-transform:none!important;}
+body.modern-mockup.nd .liab-card:not(.nd-open) .liab-card-sub{grid-column:1;grid-row:2;font-family:'DM Mono',monospace!important;font-size:10px!important;color:#77736a!important;margin-top:3px!important;}
+body.modern-mockup.nd .liab-card:not(.nd-open) .liab-card-amount{grid-column:2;grid-row:1/span 2;font:600 14px 'Manrope',sans-serif!important;color:#ef8a7a!important;}
+body.modern-mockup.nd .liab-net-banner{display:grid!important;grid-template-columns:1fr 1fr;gap:1px;background:#ffffff0a!important;border:1px solid #ffffff0d!important;border-radius:16px!important;overflow:hidden;padding:0!important;margin:10px 0 0!important;box-shadow:none!important;}
+body.modern-mockup.nd .liab-net-banner[style*="none"]{display:none!important;}
+body.modern-mockup.nd .liab-net-banner>div{background:#111216;padding:12px 14px;text-align:left!important;}
+body.modern-mockup.nd .liab-net-label{font-family:'DM Mono',monospace!important;font-size:9.5px!important;letter-spacing:.06em!important;color:#77736a!important;}
+body.modern-mockup.nd .liab-net-val{font:600 17px 'Manrope',sans-serif!important;margin-top:4px!important;}
+body.modern-mockup.nd #liabilitiesSection>.add-one-btn{margin-top:10px!important;width:100%;}
+/* экран кредита */
+body.modern-mockup.nd .liab-card.nd-open{position:fixed!important;inset:0!important;z-index:300!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:radial-gradient(120% 50% at 80% -6%,#2a1414 0%,transparent 55%),linear-gradient(180deg,#0d0e12,#08090b)!important;padding:calc(58px + env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom))!important;}
+body.modern-mockup.nd .liab-card.nd-open .liab-card-header{padding:4px 4px 14px!important;cursor:default;}
+body.modern-mockup.nd .liab-card.nd-open .liab-card-icon img{width:46px!important;height:46px!important;}
+body.modern-mockup.nd .liab-card.nd-open .liab-card-name{font-family:'DM Mono',monospace!important;font-size:10px!important;letter-spacing:.2em!important;text-transform:uppercase!important;color:#8c8778!important;}
+body.modern-mockup.nd .liab-card.nd-open .liab-card-amount{font:300 34px 'Manrope',sans-serif!important;color:#ef8a7a!important;letter-spacing:-.02em!important;margin-top:4px!important;}
+body.modern-mockup.nd .liab-card.nd-open .liab-card-sub{font-family:'DM Mono',monospace!important;font-size:11px!important;color:#9a9588!important;margin-top:4px!important;}
+body.modern-mockup.nd .liab-card.nd-open .liab-card-body{display:block!important;max-height:none!important;overflow:visible!important;padding:0!important;}
+body.modern-mockup.nd .liab-card.nd-open .liab-stat-box,body.modern-mockup.nd .liab-card.nd-open .liab-payment-breakdown,body.modern-mockup.nd .liab-card.nd-open .liab-extra-box{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;box-shadow:none!important;}
+body.modern-mockup.nd .liab-card.nd-open .liab-extra-box .field-input,body.modern-mockup.nd .liab-card.nd-open .liab-extra-box input{background:#0d0e12!important;border:1px solid #ffffff12!important;border-radius:14px!important;color:#f1ead9!important;font:600 15px 'Manrope',sans-serif!important;}
+body.modern-mockup.nd .liab-card.nd-open button[onclick^="openPartialPayModal"]{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;border-radius:14px!important;color:#1a1408!important;font:700 14px 'Manrope',sans-serif!important;padding:13px!important;}
+body.modern-mockup.nd .liab-card.nd-open button[onclick^="removeLiab"]{display:none!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3441,7 +3479,7 @@ body.nd .pretty-select-option.active{background:#1d1b16!important;box-shadow:ins
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.84';
+const APP_VERSION = 'v0.1.85';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -11035,7 +11073,7 @@ function translateDynamicUI(){
   const liabSectionTitle=document.getElementById('liab_section_title');
   if(liabSectionTitle)liabSectionTitle.innerHTML='<img class="app-png-icon" src="section-icons/section-credit.png?v=1" alt=""> '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
   const liabAddBtnTop=document.getElementById('liab_add_btn_top');
-  if(liabAddBtnTop)liabAddBtnTop.textContent='+ '+(t('liabName')||'Кредит');
+  if(liabAddBtnTop)liabAddBtnTop.textContent=trx({uk:'+ Кредит',ru:'+ Кредит',en:'+ Loan',de:'+ Kredit',zh:'+ 贷款'});
   const netToggle=document.getElementById('netCapitalToggle');
   if(netToggle){
     netToggle.title=t('liabNetCapital')||'Нетто-капітал';
@@ -11400,7 +11438,7 @@ function renderLiabilities(){
   const secTitle=document.getElementById('liab_section_title');
   if(secTitle)secTitle.innerHTML='<img class="app-png-icon" src="section-icons/section-credit.png?v=1" alt=""> '+(t('liabSection')||"ЗОБОВЯЗАННЯ").toUpperCase();
   const addBtn=document.getElementById('liab_add_btn_top');
-  if(addBtn)addBtn.textContent='+ '+(t('liabName')||'Кредит');
+  if(addBtn)addBtn.textContent=trx({uk:'+ Кредит',ru:'+ Кредит',en:'+ Loan',de:'+ Kredit',zh:'+ 贷款'}); // раньше брался t('liabName') — это подпись поля «Назва»
 
   container.innerHTML=liabilities.map(l=>{
     const schedule=calcLiabSchedule(l);
@@ -16320,6 +16358,14 @@ function applyNewDesign(){
     const eye=$('amountsEyeBtn'),gear=document.querySelector('.header-top-row .gear-btn');
     ndRemember('eye',eye);
     if(eye&&gear&&eye.nextElementSibling!==gear)gear.parentNode.insertBefore(eye,gear);
+    const lc=$('liabCardsContainer');
+    if(lc&&!lc._ndClick){lc._ndClick=true;lc.addEventListener('click',e=>{
+      if(!document.body.classList.contains('nd'))return;
+      const hdr=e.target.closest('.liab-card-header');const card=hdr&&hdr.closest('.liab-card');
+      if(!card||card.classList.contains('nd-open'))return;
+      e.stopPropagation();e.preventDefault();
+      ndOpenSection('liab:'+card.id.replace(/^liab_card_/,''));
+    },true);}
     const metals=$('metalsContainer');
     if(metals&&!$('ndTfoot'))metals.insertAdjacentHTML('afterend','<div class="nd-only nd-tfoot" id="ndTfoot"></div>');
     // Живой счётчик и слайды вкладов переезжают внутрь экрана «Депозиты»
@@ -16335,6 +16381,7 @@ function applyNewDesign(){
     try{renderDeposits();}catch(e){}
     try{renderSecuritiesCards();}catch(e){}
     try{ndCleanCrypto();}catch(e){}
+    try{renderLiabilities();}catch(e){}
   }
   const st=$('ndToggleState');
   if(st)st.textContent=on?trx({uk:'увімк.',ru:'вкл.',en:'on',de:'an',zh:'开'}):trx({uk:'вимк.',ru:'выкл.',en:'off',de:'aus',zh:'关'});
@@ -16392,9 +16439,11 @@ function renderNdExtras(){
   setText('ndBackLbl',trx({uk:'Назад',ru:'Назад',en:'Back',de:'Zurück',zh:'返回'}));
   ndReapplyOpen();
 }
+// Экран раздела или кредита: у кредита имя вида 'liab:<id>'
+function ndEl(name){return name&&name.indexOf('liab:')===0?$('liab_card_'+name.slice(5)):$('card-'+name);}
 function ndReapplyOpen(){
   if(!ndOpenId)return;
-  const el=$('card-'+ndOpenId);
+  const el=ndEl(ndOpenId);
   if(!el||el.style.display==='none'){ndCloseSection();return;}
   if(!el.classList.contains('nd-open'))el.classList.add('expanded','nd-open');
 }
@@ -16404,10 +16453,10 @@ let _ndObserver=null;
 function ndWatchContainers(){
   if(_ndObserver||typeof MutationObserver==='undefined')return;
   _ndObserver=new MutationObserver(()=>{if(ndOpenId)ndReapplyOpen();});
-  ['cardsContainer','customCardsContainer','securitiesContainer','metalsContainer'].forEach(id=>{const c=$(id);if(c)_ndObserver.observe(c,{childList:true});});
+  ['cardsContainer','customCardsContainer','securitiesContainer','metalsContainer','liabCardsContainer'].forEach(id=>{const c=$(id);if(c)_ndObserver.observe(c,{childList:true});});
 }
 function ndOpenSection(name){
-  const el=$('card-'+name);
+  const el=ndEl(name);
   if(!el)return;
   if(ndOpenId===name&&el.classList.contains('nd-open'))return;
   if(ndOpenId)ndCloseSection(true);
@@ -16422,7 +16471,7 @@ function ndOpenSection(name){
 function ndCloseSection(){
   ndMenuClose();
   if(!ndOpenId){document.body.classList.remove('nd-section-open');return;}
-  const el=$('card-'+ndOpenId);
+  const el=ndEl(ndOpenId);
   if(el)el.classList.remove('nd-open','expanded');
   ndOpenId=null;
   document.body.classList.remove('nd-section-open');
@@ -16439,12 +16488,17 @@ function ndMore(){
   if(!ndOpenId)return;
   if($('ndMenu')){ndMenuClose();return;}
   const id=ndOpenId;
-  const el=$('card-'+id);
+  const el=ndEl(id);
   const items=[];
-  if(id==='crypto')items.push({t:trx({uk:'Оновити з бірж',ru:'Обновить с бирж',en:'Refresh from exchanges',de:'Von Börsen aktualisieren',zh:'从交易所刷新'}),f:()=>{try{refreshCryptoPrices(true);}catch(e){}try{refreshExchanges();}catch(e){}}});
+  if(id.indexOf('liab:')===0){
+    const pay=el&&el.querySelector('button[onclick^="openPartialPayModal"]');
+    const rm=el&&el.querySelector('button[onclick^="removeLiab"]');
+    if(pay)items.push({t:trx({uk:'Частково погасити',ru:'Частично погасить',en:'Partial repayment',de:'Teilweise tilgen',zh:'部分还款'}),f:()=>pay.click()});
+    if(rm)items.push({t:trx({uk:'Видалити кредит',ru:'Удалить кредит',en:'Delete loan',de:'Kredit löschen',zh:'删除贷款'}),f:()=>rm.click(),danger:true});
+  }else if(id==='crypto')items.push({t:trx({uk:'Оновити з бірж',ru:'Обновить с бирж',en:'Refresh from exchanges',de:'Von Börsen aktualisieren',zh:'从交易所刷新'}),f:()=>{try{refreshCryptoPrices(true);}catch(e){}try{refreshExchanges();}catch(e){}}});
   else if(id==='deposit')items.push({t:trx({uk:'Додати вклад',ru:'Добавить вклад',en:'Add deposit',de:'Einlage hinzufügen',zh:'添加存款'}),f:()=>addDepositSlide()});
   else{const sec=(securitiesSections||[]).find(s=>s.id===id);if(sec)items.push({t:trx({uk:'Оновити ціни',ru:'Обновить цены',en:'Refresh prices',de:'Kurse aktualisieren',zh:'刷新价格'}),f:()=>refreshAllStockPrices(id)});}
-  const del=el&&el.querySelector('.card-del-btn');
+  const del=id.indexOf('liab:')===0?null:el&&el.querySelector('.card-del-btn');
   if(del)items.push({t:trx({uk:'Видалити розділ',ru:'Удалить раздел',en:'Delete section',de:'Bereich löschen',zh:'删除类别'}),f:()=>del.click(),danger:true});
   const m=document.createElement('div');
   m.id='ndMenu';m.className='nd-menu';
