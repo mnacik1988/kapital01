@@ -2352,6 +2352,12 @@ body.modern-mockup.nd .card-crypto .ticker-card-pnl{grid-column:3;grid-row:2;tex
 body.modern-mockup.nd .card-crypto .ticker-card-div{display:none!important;}
 body.modern-mockup.nd .card-crypto .nd-sec-hint{display:none;}
 body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
+/* — меню раздела «⋯» — */
+.nd-menu{position:fixed;top:calc(58px + env(safe-area-inset-top));right:16px;z-index:330;min-width:210px;padding:6px;background:#17181e;border:1px solid #ffffff14;border-radius:16px;box-shadow:0 18px 40px #000c;display:flex;flex-direction:column;}
+.nd-menu button{background:none;border:0;text-align:left;padding:12px 14px;border-radius:11px;font:600 14px 'Manrope',sans-serif;color:#ecebe6;cursor:pointer;}
+.nd-menu button:active{background:#ffffff0d;}
+.nd-menu button.danger{color:#ef8a7a;}
+.nd-menu button.danger:not(:first-child){border-top:1px solid #ffffff0d;border-radius:0 0 11px 11px;margin-top:2px;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -2914,7 +2920,7 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
 </button>
 
 <!-- BOTTOM NAV -->
-<!-- NEW DESIGN --><div class="nd-screen-bar" id="ndScreenBar"><button class="nd-back" type="button" onclick="ndBack()">‹ <span id="ndBackLbl">Капітал</span></button><button class="nd-more" type="button" onclick="ndMore()" aria-label="More">⋯</button></div>
+<!-- NEW DESIGN --><div class="nd-screen-bar" id="ndScreenBar"><button class="nd-back" type="button" onclick="ndBack()">‹ <span id="ndBackLbl">Назад</span></button><button class="nd-more" type="button" onclick="ndMore()" aria-label="More">⋯</button></div>
 
 <nav class="bottom-nav" aria-label="Швидка навігація">
   <button class="bottom-nav-btn" onclick="openSectionPicker()" title="Створити розділ">
@@ -3368,7 +3374,7 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.72';
+const APP_VERSION = 'v0.1.73';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16309,7 +16315,7 @@ function renderNdExtras(){
   try{ndDecorateCrypto();}catch(e){}
   try{renderNdHero();}catch(e){}
   try{renderNdTable();}catch(e){}
-  setText('ndBackLbl',trx({uk:'Капітал',ru:'Капитал',en:'Capital',de:'Kapital',zh:'资本'}));
+  setText('ndBackLbl',trx({uk:'Назад',ru:'Назад',en:'Back',de:'Zurück',zh:'返回'}));
   ndReapplyOpen();
 }
 function ndReapplyOpen(){
@@ -16340,6 +16346,7 @@ function ndOpenSection(name){
   try{history.pushState({ndSection:name},'');}catch(e){}
 }
 function ndCloseSection(){
+  ndMenuClose();
   if(!ndOpenId){document.body.classList.remove('nd-section-open');return;}
   const el=$('card-'+ndOpenId);
   if(el)el.classList.remove('nd-open','expanded');
@@ -16348,14 +16355,29 @@ function ndCloseSection(){
   if(document.body.classList.contains('nd')){try{renderNdExtras();}catch(e){}}
 }
 function ndBack(){
+  ndMenuClose();
   if(history.state&&history.state.ndSection)history.back();
   else ndCloseSection();
 }
+// «⋯» — меню раздела: действия раздела и последним, красным, «Удалить раздел»
+function ndMenuClose(){const m=$('ndMenu');if(m)m.remove();}
 function ndMore(){
   if(!ndOpenId)return;
-  const el=$('card-'+ndOpenId);
+  if($('ndMenu')){ndMenuClose();return;}
+  const id=ndOpenId;
+  const el=$('card-'+id);
+  const items=[];
+  if(id==='crypto')items.push({t:trx({uk:'Оновити з бірж',ru:'Обновить с бирж',en:'Refresh from exchanges',de:'Von Börsen aktualisieren',zh:'从交易所刷新'}),f:()=>{try{refreshCryptoPrices(true);}catch(e){}try{refreshExchanges();}catch(e){}}});
+  else if(id==='deposit')items.push({t:trx({uk:'Додати вклад',ru:'Добавить вклад',en:'Add deposit',de:'Einlage hinzufügen',zh:'添加存款'}),f:()=>addDepositSlide()});
+  else{const sec=(securitiesSections||[]).find(s=>s.id===id);if(sec)items.push({t:trx({uk:'Оновити ціни',ru:'Обновить цены',en:'Refresh prices',de:'Kurse aktualisieren',zh:'刷新价格'}),f:()=>refreshAllStockPrices(id)});}
   const del=el&&el.querySelector('.card-del-btn');
-  if(del)del.click();
+  if(del)items.push({t:trx({uk:'Видалити розділ',ru:'Удалить раздел',en:'Delete section',de:'Bereich löschen',zh:'删除类别'}),f:()=>del.click(),danger:true});
+  const m=document.createElement('div');
+  m.id='ndMenu';m.className='nd-menu';
+  m.innerHTML=items.map((it,i)=>'<button type="button" class="'+(it.danger?'danger':'')+'" data-i="'+i+'">'+escHtml(it.t)+'</button>').join('');
+  m.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ndMenuClose();const it=items[Number(b.dataset.i)];if(it)it.f();});
+  document.body.appendChild(m);
+  setTimeout(()=>document.addEventListener('click',function off(e){if(!e.target.closest('#ndMenu,.nd-more')){ndMenuClose();document.removeEventListener('click',off,true);}},true),0);
 }
 window.addEventListener('popstate',()=>{if(ndOpenId)ndCloseSection();});
 const _ndOrigToggleCard=toggleCard;
