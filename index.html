@@ -2242,7 +2242,8 @@ body.modern-mockup.nd .card-stocks .card-inner>.divider,body.modern-mockup.nd .c
 .nd-sec-stats>div:first-child{border-left:0;}
 .nd-sec-stats .k{font-family:'DM Mono',monospace;font-size:9px;color:#77736a;letter-spacing:.06em;text-transform:uppercase;}
 .nd-sec-stats .v{font:600 14.5px 'Manrope',sans-serif;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f1ead9;}
-.nd-sec-stats .g{color:#7fd6a3;}.nd-sec-stats .r{color:#ef8a7a;}.nd-sec-stats .gold{color:#e9cd85;}
+.nd-sec-stats .g{color:#7fd6a3;}.nd-sec-stats .r{color:#ef8a7a;}.nd-sec-stats .gold{color:#e9cd85;}.nd-sec-stats .mu{color:#77736a;}
+.nd-sec-hist .empty{line-height:1.5;}
 .nd-sec-tabs{display:flex;gap:6px;margin:14px 0 12px;padding:4px;background:#121318;border-radius:14px;border:1px solid #ffffff0b;}
 .nd-sec-tabs button{flex:1;padding:9px 0;border-radius:10px;border:0;background:none;font:600 12.5px 'Manrope',sans-serif;color:#8c8778;cursor:pointer;}
 .nd-sec-tabs button.on{background:#1d1b16;color:#f1ead9;box-shadow:inset 0 0 0 1px #d9b86633;}
@@ -3377,7 +3378,7 @@ body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!imp
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.75';
+const APP_VERSION = 'v0.1.76';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16740,7 +16741,8 @@ function ndDecorateCrypto(){
   const totalUsd=rate>0?getCryptoVal()/rate:0;
   let box=inner.querySelector('.nd-sec-stats');
   if(!box){box=document.createElement('div');box.className='nd-sec-stats nd-only';inner.prepend(box);}
-  box.innerHTML='<div><div class="k">'+escHtml(ndSecTxt('profit'))+'</div><div class="v live-val '+(pnl>0.004?'g':pnl<-0.004?'r':'')+'">'+(pnl>0.004?'+':pnl<-0.004?'−':'')+fmtN(toDisplayCurr(Math.abs(pnl)))+' '+sym+'</div></div>'+
+  const hasCost=(Number(st.remainingCostUsd)||0)>0;
+  box.innerHTML='<div><div class="k">'+escHtml(ndSecTxt('profit'))+'</div>'+(hasCost?'<div class="v live-val '+(pnl>0.004?'g':pnl<-0.004?'r':'')+'">'+(pnl>0.004?'+':pnl<-0.004?'−':'')+fmtN(toDisplayCurr(Math.abs(pnl)))+' '+sym+'</div>':'<div class="v mu">—</div>')+'</div>'+
     '<div><div class="k">USDT</div><div class="v live-val gold">'+fmtN(usdt)+'</div></div>'+
     '<div><div class="k">'+escHtml(ndSecTxt('usd'))+'</div><div class="v live-val">$'+fmtN(totalUsd)+'</div></div>';
   let tabs=inner.querySelector('.nd-sec-tabs');
@@ -16757,7 +16759,12 @@ function ndDecorateCrypto(){
     const q=parseInputNumber(c.qty)||0;
     const name=String(c.name||'').toUpperCase();
     return '<div class="row"><div>'+escHtml(name)+'</div><div class="q '+(q<0?'out':'in')+'">'+(q<0?'−':'+')+fmtMax2(Math.abs(q))+' '+escHtml(ndSecTxt('at'))+' <span class="live-val">$'+fmtMax2(Number(c.buyPrice)||Number(c.curPrice)||0)+'</span></div></div>';
-  }).join(''):'<div class="empty">'+escHtml(ndSecTxt('empty'))+'</div>';
+  }).join(''):'';
+  // С бирж приходят только остатки, без сделок и цен покупки — честно говорим, что здесь только ручные записи
+  let hasEx=false;try{hasEx=Object.keys(getExchangeCreds()||{}).length>0;}catch(e){}
+  const manualTxt=trx({uk:'Тут видно монети, додані вручну. Угоди з бірж поки не підтягуються.',ru:'Здесь видны монеты, добавленные вручную. Сделки с бирж пока не подтягиваются.',en:'Only coins added manually are shown here. Exchange trades are not imported yet.',de:'Hier erscheinen nur manuell hinzugefügte Coins. Börsen-Trades werden noch nicht importiert.',zh:'这里只显示手动添加的币。交易所的交易记录暂未导入。'});
+  if(!list.length)hist.innerHTML='<div class="empty">'+escHtml(manualTxt)+'</div>';
+  else if(hasEx)hist.insertAdjacentHTML('beforeend','<div class="empty">'+escHtml(trx({uk:'Угоди з бірж сюди не потрапляють.',ru:'Сделки с бирж сюда не попадают.',en:'Exchange trades are not listed here.',de:'Börsen-Trades erscheinen hier nicht.',zh:'交易所的交易不在此列出。'}))+'</div>');
   if(!inner.querySelector('.nd-sec-btns')){
     inner.insertAdjacentHTML('beforeend','<div class="nd-sec-btns nd-only"><button type="button" class="b1" onclick="ndCryptoWriteOff()">'+escHtml(ndSecTxt('writeOff'))+'</button><button type="button" class="b2" onclick="ndCryptoAdd()">'+escHtml(ndSecTxt('add'))+'</button></div>');
   }
