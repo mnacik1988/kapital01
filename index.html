@@ -115,6 +115,10 @@ body.is-dragging-card,body.is-dragging-card *{
   user-select:none!important;
   -webkit-touch-callout:none!important;
 }
+/* Как в нативных приложениях: долгое нажатие не выделяет текст интерфейса (просьба Александра 15.10).
+   Выделять можно только там, где это нужно: поля ввода и ответы ИИ (их копируют). */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+input,textarea,[contenteditable="true"],.ai-msg-bubble,.ai-msg-bubble *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;}
 .card-icon{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .section-card-icon-img{width:35px;height:35px;object-fit:contain;display:block;filter:drop-shadow(0 2px 5px #00000066);}
 .app-png-icon{width:1.55em;height:1.55em;object-fit:contain;display:inline-block;vertical-align:-0.32em;filter:drop-shadow(0 1px 3px #00000055);}
@@ -3387,7 +3391,7 @@ body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!imp
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.78';
+const APP_VERSION = 'v0.1.79';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
