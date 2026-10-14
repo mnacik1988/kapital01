@@ -2533,6 +2533,13 @@ body.nd .nd-diag-portfolio{margin:12px 0!important;}
 body.nd .nd-diag-portfolio .main-counter-card{background:var(--nd-surface)!important;border:1px solid var(--nd-l1)!important;border-radius:16px!important;box-shadow:none!important;}
 body.nd .nd-diag-portfolio .main-counter-card::before,body.nd .nd-diag-portfolio .main-counter-card::after{display:none!important;}
 body.nd .nd-diag-portfolio .main-counter-metric-value{font-family:'Manrope',sans-serif!important;}
+/* — мягче: тень шапки и центральная кнопка (замечание Александра 15.10) — */
+body.modern-mockup.nd .header{box-shadow:0 6px 18px #00000038!important;}
+body.modern-mockup.nd.theme-light .header{box-shadow:0 3px 12px #4a39220f!important;border-bottom-color:#1d1b170f!important;}
+body.modern-mockup.nd.theme-light .nd-screen-bar{box-shadow:0 3px 12px #4a39220f!important;}
+body.modern-mockup.nd .bottom-nav-btn.center{width:48px!important;height:48px!important;border-radius:15px!important;transform:translateY(-4px)!important;background:linear-gradient(145deg,#e8cf8e,#c39a48)!important;box-shadow:0 3px 10px #d9b86626!important;}
+body.modern-mockup.nd .bottom-nav-btn.center .bn-icon,body.modern-mockup.nd .bottom-nav-btn.center .bottom-nav-icon{width:40px!important;height:40px!important;}
+body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradient(145deg,#efdcae,#d4b06a)!important;box-shadow:0 2px 8px #b88a351f!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3549,7 +3556,7 @@ body.nd .nd-diag-portfolio .main-counter-metric-value{font-family:'Manrope',sans
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.89';
+const APP_VERSION = 'v0.1.90';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
