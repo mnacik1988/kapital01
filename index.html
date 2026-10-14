@@ -2259,8 +2259,7 @@ body.modern-mockup.nd .card-stocks .nd-box-cash,body.modern-mockup.nd .card-stoc
 body.modern-mockup.nd .card-stocks[data-ndtab="div"] .ticker-cards,body.modern-mockup.nd .card-stocks[data-ndtab="div"] .auto-refresh-bar,body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .ticker-cards,body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .auto-refresh-bar{display:none!important;}
 body.modern-mockup.nd .card-stocks[data-ndtab="div"] .sec-summary-divs,body.modern-mockup.nd .card-stocks[data-ndtab="div"] .nd-box-div{display:block!important;}
 body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .nd-sec-hist,body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .nd-box-cash{display:block!important;}
-body.modern-mockup.nd .card-stocks .nd-box-add{display:none!important;}
-body.modern-mockup.nd .card-stocks.nd-adding .nd-box-add{display:block!important;}
+body.modern-mockup.nd .card-stocks[data-ndtab="hist"] .nd-box-add,body.modern-mockup.nd .card-stocks[data-ndtab="div"] .nd-box-add{display:none!important;}
 body.modern-mockup.nd .card-stocks .nd-box-cash,body.modern-mockup.nd .card-stocks .nd-box-div,body.modern-mockup.nd .card-stocks .nd-box-add,body.modern-mockup.nd .card-stocks .sec-summary-divs{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;}
 /* позиции строками */
 body.modern-mockup.nd .card-stocks .ticker-cards{display:flex!important;flex-direction:column!important;gap:0!important;background:#111216;border:1px solid #ffffff0d;border-radius:20px;overflow:hidden;grid-template-columns:none!important;}
@@ -2521,6 +2520,10 @@ body.nd .ai-input{background:#111216!important;border:1px solid #ffffff12!import
 body.nd .ai-send-btn{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;color:#1a1408!important;border:0!important;}
 body.nd .settings-box .app-version-card{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:14px!important;box-shadow:none!important;}
 body.nd .settings-box .app-version-card *{font-family:'DM Mono',monospace;}
+body.nd .nd-diag-portfolio{margin:12px 0!important;}
+body.nd .nd-diag-portfolio .main-counter-card{background:#111216!important;border:1px solid #ffffff0d!important;border-radius:16px!important;box-shadow:none!important;}
+body.nd .nd-diag-portfolio .main-counter-card::before,body.nd .nd-diag-portfolio .main-counter-card::after{display:none!important;}
+body.nd .nd-diag-portfolio .main-counter-metric-value{font-family:'Manrope',sans-serif!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3537,7 +3540,7 @@ body.nd .settings-box .app-version-card *{font-family:'DM Mono',monospace;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.87';
+const APP_VERSION = 'v0.1.88';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16701,9 +16704,8 @@ function ndSecAdd(secId){
   const card=$('card-'+secId);
   if(!card)return;
   card.classList.remove('nd-picking');
-  card.classList.toggle('nd-adding');
-  ndSecSetTab(secId,'pos');
-  if(card.classList.contains('nd-adding'))setTimeout(()=>{const inp=$('secName_'+secId)||$('bondName_'+secId);if(inp){inp.scrollIntoView({block:'center',behavior:'smooth'});inp.focus();}},60);
+  if(card.dataset.ndtab!=='pos')ndSecSetTab(secId,'pos');
+  setTimeout(()=>{const inp=$('secName_'+secId)||$('bondName_'+secId);if(inp){inp.scrollIntoView({block:'center',behavior:'smooth'});inp.focus();}},60);
 }
 function ndSecWriteOff(secId){
   const sec=securitiesSections.find(s=>s.id===secId);
@@ -16985,6 +16987,21 @@ function ndDayPoints(total){
   pts.push(total);
   return pts;
 }
+// — «Загальний» (общая статистика портфеля) живёт в окне статистики —
+function ndDiagPortfolio(){
+  if(!document.body.classList.contains('nd'))return;
+  const box=document.querySelector('#diagOverlay .diag-box');
+  if(!box)return;
+  let el=$('ndDiagPortfolio');
+  if(!el||!box.contains(el)){
+    el=document.createElement('div');el.id='ndDiagPortfolio';el.className='nd-only nd-diag-portfolio';
+    const first=box.querySelector('.diag-section');
+    if(first)first.before(el);else box.appendChild(el);
+  }
+  el.innerHTML=getPortfolioMainCounterHtml();
+}
+const _ndOrigOpenDiagnostics=openDiagnostics;
+openDiagnostics=function(){_ndOrigOpenDiagnostics();try{ndDiagPortfolio();}catch(e){}};
 try{applyNewDesign();}catch(e){}
 // ═══ NEW DESIGN END (код) ═══
 </script>
