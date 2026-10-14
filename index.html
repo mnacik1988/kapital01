@@ -2358,6 +2358,16 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
 .nd-menu button:active{background:#ffffff0d;}
 .nd-menu button.danger{color:#ef8a7a;}
 .nd-menu button.danger:not(:first-child){border-top:1px solid #ffffff0d;border-radius:0 0 11px 11px;margin-top:2px;}
+/* — окна подтверждения и ввода (общие customConfirm / customPrompt) — */
+body.nd .custom-dialog-overlay{background:#000000b8!important;}
+body.nd .custom-dialog-box{background:#17181e!important;border:1px solid #ffffff14!important;border-radius:22px!important;padding:22px 20px 18px!important;box-shadow:0 24px 60px #000c!important;}
+body.nd .custom-dialog-title,body.nd .custom-dialog-message{font:600 15px/1.45 'Manrope',sans-serif!important;color:#ecebe6!important;letter-spacing:0!important;margin-bottom:18px!important;}
+body.nd .custom-dialog-input{background:#111216!important;border:1px solid #ffffff14!important;border-radius:14px!important;color:#f1ead9!important;font:600 15px 'Manrope',sans-serif!important;padding:13px 14px!important;}
+body.nd .custom-dialog-input:focus{border-color:#d9b86666!important;box-shadow:0 0 0 3px #d9b86618!important;}
+body.nd .custom-dialog-actions{gap:10px!important;}
+body.nd .custom-dialog-cancel,body.nd .custom-dialog-ok{padding:13px 0!important;border-radius:14px!important;font:700 14px 'Manrope',sans-serif!important;letter-spacing:0!important;}
+body.nd .custom-dialog-cancel{background:#14151a!important;border:1px solid #ffffff14!important;color:#cfc7b4!important;}
+body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;border:0!important;color:#1a1408!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3374,7 +3384,7 @@ body.modern-mockup.nd .card-crypto.nd-picking .nd-sec-hint{display:block;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.73';
+const APP_VERSION = 'v0.1.74';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
