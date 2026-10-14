@@ -3387,7 +3387,7 @@ body.nd .custom-dialog-ok{background:linear-gradient(145deg,#f3d88f,#b88a35)!imp
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.77';
+const APP_VERSION = 'v0.1.78';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -14403,6 +14403,13 @@ function setStartupExitCurrency(idx,value){
 }
 
 // Override getCustomCardHtml to handle startup type
+// Название стартапа обновляет и заголовок раздела сразу — раньше он менялся только после перезапуска
+function setStartupName(idx,id,value){
+  if(customSections[idx])customSections[idx].startupName=value;
+  const n=document.querySelector('#card-'+id+' .card-name');
+  if(n)n.textContent=value||uiText('startupProjectPh');
+  saveData();
+}
 const _origGetCustomCardHtml=getCustomCardHtml;
 getCustomCardHtml=function(s,idx){
   if(s.sectionType==='startup'){
@@ -14433,7 +14440,7 @@ getCustomCardHtml=function(s,idx){
         <div class="field-group">
           <div class="field-label">${uiText('startupNameLabel')}</div>
           <input class="field-input" type="text" id="startupName_${s.id}" value="${escapeHtml(s.startupName||'')}" placeholder="${uiText('startupProjectPh')}"
-            oninput="customSections[${idx}].startupName=this.value;saveData()">
+            oninput="setStartupName(${idx},'${s.id}',this.value)">
         </div>
         <div class="row2">
           <div class="field-group">
