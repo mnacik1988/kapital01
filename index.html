@@ -2255,6 +2255,10 @@ body.modern-mockup.nd #card-deposit .daily-toggle{display:none!important;}
 .nd-bars{display:flex;align-items:flex-end;gap:3px;height:70px;padding:14px 14px 0;background:var(--nd-bg);border:1px solid var(--nd-l1);border-radius:16px 16px 0 0;}
 .nd-bars i{flex:1;background:#d9b86655;border-radius:2px 2px 0 0;min-height:2px;}
 .nd-bars i.now{background:#f3d88f;}
+.nd-bars-ax b{font-weight:600;color:var(--nd-text2);}
+body.nd.theme-light .nd-bars,body.nd.theme-light .nd-bars-ax{background:var(--nd-surface)!important;}
+body.nd.theme-light .nd-bars i{background:#d9b866b3!important;}
+body.nd.theme-light .nd-bars i.now{background:#b88a35!important;}
 .nd-bars-ax{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:var(--nd-muted2);padding:6px 14px 10px;background:var(--nd-bg);border:1px solid var(--nd-l1);border-top:0;border-radius:0 0 16px 16px;}
 .nd-bars-empty{font-family:'DM Mono',monospace;font-size:10px;color:var(--nd-muted2);padding:12px;border:1px solid var(--nd-l1);border-radius:16px;}
 body.modern-mockup.nd #card-deposit .daily-scroll{margin-top:10px;}
@@ -3578,7 +3582,7 @@ body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradi
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.93';
+const APP_VERSION = 'v0.1.94';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16768,8 +16772,13 @@ function ndRenderBars(depId,slide){
   if(!vals.length){box.innerHTML='<div class="nd-bars-empty">'+escHtml(t('monitoringTomorrow')||'—')+'</div>';return;}
   const max=Math.max(...vals)||1;
   const dates=rows.map(r=>r.querySelector('.daily-date')?.textContent.replace(/💰/g,'').trim()||'').reverse();
-  box.innerHTML='<div class="nd-bars">'+vals.map((v,i)=>'<i class="'+(i===vals.length-1?'now':'')+'" style="height:'+Math.max(4,v/max*100).toFixed(1)+'%"></i>').join('')+'</div>'+
-    '<div class="nd-bars-ax"><span>'+escHtml(dates[0]||'')+'</span><span>'+escHtml(dates[Math.floor(dates.length/2)]||'')+'</span><span>'+escHtml(trx({uk:'сьогодні',ru:'сегодня',en:'today',de:'heute',zh:'今天'}))+'</span></div>';
+  // Шкала от нуля — честная; рост показываем цифрами под графиком: первый день и сегодня
+  const dep=(deposits||[]).find(d=>d.id===depId);
+  const sym=dep?getDepositCurrencySymbol(dep):'₴';
+  const amt=v=>'<b class="live-val">'+fmtD(v)+' '+sym+'</b>';
+  const today=trx({uk:'сьогодні',ru:'сегодня',en:'today',de:'heute',zh:'今天'});
+  box.innerHTML='<div class="nd-bars">'+vals.map((v,i)=>'<i class="'+(i===vals.length-1?'now':'')+'" title="'+escAttr((i===vals.length-1?today:dates[i])+' · '+fmtD(v)+' '+sym)+'" style="height:'+Math.max(4,v/max*100).toFixed(1)+'%"></i>').join('')+'</div>'+
+    '<div class="nd-bars-ax"><span>'+escHtml(dates[0]||'')+' · '+amt(vals[0])+'</span><span>'+escHtml(today)+' · '+amt(vals[vals.length-1])+'</span></div>';
 }
 const _ndOrigRenderDeposits=renderDeposits;
 renderDeposits=function(){_ndOrigRenderDeposits();try{ndDecorateDeposits();}catch(e){}};
