@@ -365,8 +365,9 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .dep-calc-toggle-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--muted2);text-transform:uppercase;}
 .dep-calc-toggle-icon{font-size:13px;color:var(--muted);transition:transform .25s;}
 .dep-calc-toggle.open .dep-calc-toggle-icon{transform:rotate(180deg);}
-.dep-calc-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.4,0,0.2,1);}
-.dep-calc-body.open{max-height:1200px;}
+.dep-calc-body{display:grid;grid-template-rows:minmax(0,0fr);overflow:hidden;transition:grid-template-rows .4s cubic-bezier(0.4,0,0.2,1);}
+.dep-calc-body>*{min-height:0;}
+.dep-calc-body.open{grid-template-rows:minmax(0,1fr);}
 
 /* SECURITIES TABLE */
 .sec-table{width:100%;border-collapse:collapse;margin-top:10px;}
@@ -2589,6 +2590,15 @@ body.nd .section-dyn-card.positive{border-color:#7fd6a33d!important;background:l
 body.nd .section-dyn-card.negative{border-color:#ef8a7a42!important;background:linear-gradient(135deg,#ef8a7a1c,var(--nd-surface) 70%)!important;}
 body.modern-mockup.nd.theme-light .section-dyn-card.positive{border-color:#2f7a5233!important;background:linear-gradient(135deg,#2f7a5214,var(--nd-surface) 70%)!important;}
 body.modern-mockup.nd.theme-light .section-dyn-card.negative{border-color:#b0473a33!important;background:linear-gradient(135deg,#b0473a14,var(--nd-surface) 70%)!important;}
+body.nd .nd-bars-head{cursor:default;}
+.nd-day-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px 6px 12px;border-radius:999px;border:1px solid var(--nd-l2);background:var(--nd-btn);color:var(--nd-text2);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s;}
+.nd-day-btn svg{color:#d9b866;transition:transform .25s;}
+.nd-day-btn:active{background:var(--nd-chip);}
+.nd-day-btn.on{border-color:#d9b86666;color:var(--nd-goldtx);}
+.nd-day-btn.on svg{transform:rotate(180deg);}
+body.modern-mockup.nd.theme-light .nd-day-btn{background:#ffffff;box-shadow:0 2px 6px #4a392212;}
+body.modern-mockup.nd.theme-light .nd-day-btn svg{color:#b88a35;}
+body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3605,7 +3615,7 @@ body.modern-mockup.nd.theme-light .section-dyn-card.negative{border-color:#b0473
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.96';
+const APP_VERSION = 'v0.1.97';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16761,9 +16771,11 @@ function ndDecorateDeposits(){
     if(endVal)endVal.textContent='≈ '+fmtN(ndDepositEndValue(d))+' '+getDepositCurrencySymbol(d);
     const daily=slide.querySelector('.daily-section');
     if(daily&&!daily.querySelector('.nd-bars-wrap')){
-      daily.insertAdjacentHTML('afterbegin','<div class="nd-bars-wrap"><div class="nd-bars-head" onclick="toggleDailyLog(\''+d.id+'\')"><span>'+escHtml(trx({uk:'Ріст вкладу',ru:'Рост вклада',en:'Deposit growth',de:'Einlagenverlauf',zh:'存款增长'}))+'</span><span>'+escHtml(trx({uk:'по днях ›',ru:'по дням ›',en:'by day ›',de:'pro Tag ›',zh:'按天 ›'}))+'</span></div><div class="nd-bars-box"></div></div>');
+      daily.insertAdjacentHTML('afterbegin','<div class="nd-bars-wrap"><div class="nd-bars-head"><span>'+escHtml(trx({uk:'Ріст вкладу',ru:'Рост вклада',en:'Deposit growth',de:'Einlagenverlauf',zh:'存款增长'}))+'</span><button type="button" class="nd-day-btn" onclick="toggleDailyLog(\''+d.id+'\');this.classList.toggle(\'on\',dailyLogOpen.has(\''+d.id+'\'))"><span>'+escHtml(trx({uk:'По днях',ru:'По дням',en:'By day',de:'Pro Tag',zh:'按天'}))+'</span><svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nd-bars-box"></div></div>');
     }
     ndRenderPath(d,slide);
+    const dayBtn=slide.querySelector('.nd-day-btn');
+    if(dayBtn)dayBtn.classList.toggle('on',dailyLogOpen.has(d.id));
     if(!slide.querySelector('.nd-dep-btns')){
       const tg=slide.querySelector('.dep-calc-toggle');
       if(tg)tg.insertAdjacentHTML('beforebegin','<div class="nd-dep-btns"><button type="button" class="b1" onclick="toggleDepCalc(\''+d.id+'\')">'+escHtml(trx({uk:'Налаштування вкладу',ru:'Настройки вклада',en:'Deposit settings',de:'Einstellungen',zh:'存款设置'}))+'</button><button type="button" class="b2" onclick="openTopUpModal(\''+d.id+'\')">'+escHtml(trx({uk:'+ Поповнити',ru:'+ Пополнить',en:'+ Top up',de:'+ Einzahlen',zh:'+ 追加'}))+'</button></div>');
