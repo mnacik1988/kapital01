@@ -2549,10 +2549,6 @@ body.nd .ai-input{background:var(--nd-surface)!important;border:1px solid var(--
 body.nd .ai-send-btn{background:linear-gradient(145deg,#f3d88f,#b88a35)!important;color:#1a1408!important;border:0!important;}
 body.nd .settings-box .app-version-card{background:var(--nd-surface)!important;border:1px solid var(--nd-l1)!important;border-radius:14px!important;box-shadow:none!important;}
 body.nd .settings-box .app-version-card *{font-family:'DM Mono',monospace;}
-body.nd .nd-diag-portfolio{margin:12px 0!important;}
-body.nd .nd-diag-portfolio .main-counter-card{background:var(--nd-surface)!important;border:1px solid var(--nd-l1)!important;border-radius:16px!important;box-shadow:none!important;}
-body.nd .nd-diag-portfolio .main-counter-card::before,body.nd .nd-diag-portfolio .main-counter-card::after{display:none!important;}
-body.nd .nd-diag-portfolio .main-counter-metric-value{font-family:'Manrope',sans-serif!important;}
 /* — мягче: тень шапки и центральная кнопка (замечание Александра 15.10) — */
 body.modern-mockup.nd .header{box-shadow:0 6px 18px #00000038!important;}
 body.modern-mockup.nd.theme-light .header{box-shadow:0 3px 12px #4a39220f!important;border-bottom-color:#1d1b170f!important;}
@@ -2589,6 +2585,10 @@ body.nd.theme-light .nd-path i.now{box-shadow:0 0 0 1.5px #b88a35;}
 body.nd.theme-light .nd-path i.now u{background:#b88a35;}
 body.nd.theme-light .nd-path i.future{background:#1d1b170f;}
 body.nd.theme-light .nd-path i.future u{background:#c99a3e44;}
+body.nd .section-dyn-card.positive{border-color:#7fd6a33d!important;background:linear-gradient(135deg,#7fd6a31c,var(--nd-surface) 70%)!important;}
+body.nd .section-dyn-card.negative{border-color:#ef8a7a42!important;background:linear-gradient(135deg,#ef8a7a1c,var(--nd-surface) 70%)!important;}
+body.modern-mockup.nd.theme-light .section-dyn-card.positive{border-color:#2f7a5233!important;background:linear-gradient(135deg,#2f7a5214,var(--nd-surface) 70%)!important;}
+body.modern-mockup.nd.theme-light .section-dyn-card.negative{border-color:#b0473a33!important;background:linear-gradient(135deg,#b0473a14,var(--nd-surface) 70%)!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3605,7 +3605,7 @@ body.nd.theme-light .nd-path i.future u{background:#c99a3e44;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.95';
+const APP_VERSION = 'v0.1.96';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17191,21 +17191,6 @@ function ndDayPoints(total){
   pts.push(total);
   return pts;
 }
-// — «Загальний» (общая статистика портфеля) живёт в окне статистики —
-function ndDiagPortfolio(){
-  if(!document.body.classList.contains('nd'))return;
-  const box=document.querySelector('#diagOverlay .diag-box');
-  if(!box)return;
-  let el=$('ndDiagPortfolio');
-  if(!el||!box.contains(el)){
-    el=document.createElement('div');el.id='ndDiagPortfolio';el.className='nd-only nd-diag-portfolio';
-    const first=box.querySelector('.diag-section');
-    if(first)first.before(el);else box.appendChild(el);
-  }
-  el.innerHTML=getPortfolioMainCounterHtml();
-}
-const _ndOrigOpenDiagnostics=openDiagnostics;
-openDiagnostics=function(){_ndOrigOpenDiagnostics();try{ndDiagPortfolio();}catch(e){}};
 try{applyNewDesign();}catch(e){}
 // ═══ NEW DESIGN END (код) ═══
 </script>
