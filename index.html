@@ -3578,7 +3578,7 @@ body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradi
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.92';
+const APP_VERSION = 'v0.1.93';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7540,13 +7540,13 @@ const CONNECT_GUIDES={
       en:['Open api.monobank.ua — easier on a computer, so you can scan the QR with your phone.','Tap “Get token” — a QR code appears.','Scan the QR in the monobank app and confirm.','Copy the token from the page and paste it here with “Paste”.'],
       de:['api.monobank.ua öffnen — am besten am Computer, um den QR mit dem Handy zu scannen.','„Token erhalten“ tippen — ein QR-Code erscheint.','QR in der monobank-App scannen und bestätigen.','Token von der Seite kopieren und hier mit „Einfügen“ einfügen.'],
       zh:['打开 api.monobank.ua——最好在电脑上打开，用手机扫描二维码。','点击“获取令牌”，会出现二维码。','在 monobank 应用中扫码并确认。','复制页面上的令牌，用“粘贴”按钮粘贴到这里。']},
-    note:{uk:'Токен лише для перегляду: переказати, оплатити чи вивести гроші ним неможливо.',ru:'Токен только для просмотра: перевести, оплатить или вывести деньги им невозможно.',en:'The token is view-only: it cannot transfer, pay or withdraw money.',de:'Der Token ist nur zum Ansehen: keine Überweisung, Zahlung oder Auszahlung möglich.',zh:'令牌仅用于查看：无法转账、付款或取款。'}}
+    safe:{uk:'Лише перегляд: переказати, оплатити чи вивести гроші цим токеном неможливо. Токен зберігається лише на цьому пристрої.',ru:'Только просмотр: перевести, оплатить или вывести деньги этим токеном невозможно. Токен хранится только на этом устройстве.',en:'View-only: this token cannot transfer, pay or withdraw money. It is stored only on this device.',de:'Nur Ansicht: keine Überweisung, Zahlung oder Auszahlung möglich. Der Token bleibt nur auf diesem Gerät.',zh:'仅查看：无法用此令牌转账、付款或取款。令牌只保存在本设备上。'}}
 };
 function connectGuideHtml(id){
   const g=CONNECT_GUIDES[id];
   if(!g)return '';
   const steps=trx(g.steps)||g.steps.en;
-  const safe=trx({uk:'Тільки читання: торгувати чи виводити гроші через цей доступ неможливо. Ключ зберігається лише на цьому пристрої.',ru:'Только чтение: торговать или выводить деньги через этот доступ невозможно. Ключ хранится только на этом устройстве.',en:'Read-only: this access cannot trade or withdraw money. The key is stored only on this device.',de:'Nur Lesen: kein Handel und keine Auszahlung möglich. Der Schlüssel bleibt nur auf diesem Gerät.',zh:'只读：无法交易或提现。密钥只保存在本设备上。'});
+  const safe=g.safe?trx(g.safe):trx({uk:'Тільки читання: торгувати чи виводити гроші через цей доступ неможливо. Ключ зберігається лише на цьому пристрої.',ru:'Только чтение: торговать или выводить деньги через этот доступ невозможно. Ключ хранится только на этом устройстве.',en:'Read-only: this access cannot trade or withdraw money. The key is stored only on this device.',de:'Nur Lesen: kein Handel und keine Auszahlung möglich. Der Schlüssel bleibt nur auf diesem Gerät.',zh:'只读：无法交易或提现。密钥只保存在本设备上。'});
   return '<div class="cg">'+
     '<div class="cg-title">'+escHtml(trx({uk:'Як підключити',ru:'Как подключить',en:'How to connect',de:'So verbinden',zh:'如何连接'}))+'</div>'+
     '<ol class="cg-steps">'+steps.map(t=>'<li>'+escHtml(t)+'</li>').join('')+'</ol>'+
