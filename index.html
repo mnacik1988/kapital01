@@ -2566,6 +2566,29 @@ body.modern-mockup.nd.theme-light .ex-card{box-shadow:0 1px 6px #4a39220d!import
 body.modern-mockup.nd.theme-light :is(.nd-sec-tabs button.on,.nd-dep-tabs button.on,.nd-ptabs button.on,.calc-tab.active){background:#ffffff!important;box-shadow:0 1px 5px #4a39221a,inset 0 0 0 1px #d9b86659!important;color:#141210!important;}
 body.modern-mockup.nd.theme-light :is(.settings-lang-btn,.settings-curr-btn,.settings-theme-btn,.test-build-btn).active{background:#ffffff!important;box-shadow:0 1px 5px #4a39221a!important;border-color:#d9b86680!important;color:#141210!important;}
 body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradient(145deg,#f8ecc9,#e6c98a)!important;box-shadow:0 2px 8px #b88a3514!important;}
+.nd-path{display:flex;align-items:flex-end;gap:3px;height:96px;padding:14px 14px 0;background:var(--nd-bg);border:1px solid var(--nd-l1);border-radius:16px 16px 0 0;}
+.nd-path i{flex:1;position:relative;display:flex;flex-direction:column;justify-content:flex-start;background:#8c877838;border-radius:3px 3px 0 0;min-height:3px;overflow:hidden;}
+.nd-path i u{display:block;width:100%;min-height:3px;background:#e6c46e;text-decoration:none;}
+.nd-path i.now{box-shadow:0 0 0 1.5px #f3d88f;}
+.nd-path i.now u{background:#f3d88f;}
+.nd-path i.future{background:#8c877822;}
+.nd-path i.future u{background:#d9b86666;}
+.nd-path-ax{position:relative;padding-bottom:24px!important;}
+.nd-path-ax .nd-path-now{position:absolute;top:21px;transform:translateX(-50%);color:var(--nd-goldtx);white-space:nowrap;}
+.nd-path-sum{display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-family:'DM Mono',monospace;font-size:10.5px;color:var(--nd-muted);}
+.nd-path-sum b{font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;color:var(--nd-text);}
+.nd-path-sum b.up{color:var(--nd-up);}
+.nd-path-leg{display:flex;gap:12px;margin-top:8px;font-family:'DM Mono',monospace;font-size:9.5px;color:var(--nd-muted2);}
+.nd-path-leg span{display:flex;align-items:center;gap:5px;}
+.nd-path-leg i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+.nd-path-leg .lb{background:#8c877866;}.nd-path-leg .lg{background:#d9b866;}.nd-path-leg .lf{background:#d9b86640;border:1px dashed #d9b86688;}
+body.nd.theme-light .nd-path{background:var(--nd-surface)!important;}
+body.nd.theme-light .nd-path i{background:#1d1b1724;}
+body.nd.theme-light .nd-path i u{background:#c99a3e;}
+body.nd.theme-light .nd-path i.now{box-shadow:0 0 0 1.5px #b88a35;}
+body.nd.theme-light .nd-path i.now u{background:#b88a35;}
+body.nd.theme-light .nd-path i.future{background:#1d1b170f;}
+body.nd.theme-light .nd-path i.future u{background:#c99a3e44;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3582,7 +3605,7 @@ body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradi
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.94';
+const APP_VERSION = 'v0.1.95';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -16738,9 +16761,9 @@ function ndDecorateDeposits(){
     if(endVal)endVal.textContent='≈ '+fmtN(ndDepositEndValue(d))+' '+getDepositCurrencySymbol(d);
     const daily=slide.querySelector('.daily-section');
     if(daily&&!daily.querySelector('.nd-bars-wrap')){
-      daily.insertAdjacentHTML('afterbegin','<div class="nd-bars-wrap"><div class="nd-bars-head" onclick="toggleDailyLog(\''+d.id+'\')"><span>'+escHtml(trx({uk:'Дохід по днях',ru:'Доход по дням',en:'Daily income',de:'Tagesertrag',zh:'每日收益'}))+'</span><span>'+escHtml(trx({uk:'30 днів ›',ru:'30 дней ›',en:'30 days ›',de:'30 Tage ›',zh:'30天 ›'}))+'</span></div><div class="nd-bars-box"></div></div>');
+      daily.insertAdjacentHTML('afterbegin','<div class="nd-bars-wrap"><div class="nd-bars-head" onclick="toggleDailyLog(\''+d.id+'\')"><span>'+escHtml(trx({uk:'Ріст вкладу',ru:'Рост вклада',en:'Deposit growth',de:'Einlagenverlauf',zh:'存款增长'}))+'</span><span>'+escHtml(trx({uk:'по днях ›',ru:'по дням ›',en:'by day ›',de:'pro Tag ›',zh:'按天 ›'}))+'</span></div><div class="nd-bars-box"></div></div>');
     }
-    ndRenderBars(d.id,slide);
+    ndRenderPath(d,slide);
     if(!slide.querySelector('.nd-dep-btns')){
       const tg=slide.querySelector('.dep-calc-toggle');
       if(tg)tg.insertAdjacentHTML('beforebegin','<div class="nd-dep-btns"><button type="button" class="b1" onclick="toggleDepCalc(\''+d.id+'\')">'+escHtml(trx({uk:'Налаштування вкладу',ru:'Настройки вклада',en:'Deposit settings',de:'Einstellungen',zh:'存款设置'}))+'</button><button type="button" class="b2" onclick="openTopUpModal(\''+d.id+'\')">'+escHtml(trx({uk:'+ Поповнити',ru:'+ Пополнить',en:'+ Top up',de:'+ Einzahlen',zh:'+ 追加'}))+'</button></div>');
@@ -16761,6 +16784,78 @@ function ndDecorateDeposits(){
   if(typeof syncDepositSliderHeight==='function')syncDepositSliderHeight();
 }
 // Столбики берём из готового журнала по дням (его считает тот же движок, что и счётчик)
+// «Рост вклада»: путь вклада от открытия до конца срока. Столбик = ваши деньги
+// (тело + пополнения) снизу и заработанные проценты сверху. Шкала от нуля — без
+// преувеличения. Шаг подстраивается под срок: до ~6 мес — недели, до ~2,5 лет —
+// месяцы, дольше — кварталы, чтобы столбиков было от ~8 до ~30.
+const _ndPathCache={};
+function ndDepositPath(d){
+  const start=d.startDate?depLocalDate(d.startDate):getDepositAccrualStart(d);
+  const end=d.endDate?depLocalDate(d.endDate):getDepositContractEnd(d,start);
+  const key=JSON.stringify([d.principal,d.rate,d.tax,d.taxFree,d.freq,d.interestTo,d.startDate,d.endDate,d.months,d.openDay,d.topups||[],d.interestModeHistory||[],getLocalDateKey()]);
+  if(_ndPathCache[d.id]&&_ndPathCache[d.id].key===key)return _ndPathCache[d.id].v;
+  const totalDays=Math.round((end-start)/86400000);
+  if(!(totalDays>0)||!(getDepositPrincipalNative(d)>0||getDepositTopupsNative(d)>0))return null;
+  const pts=[];
+  const mode=totalDays<=190?'week':totalDays<=930?'month':'quarter';
+  let t=new Date(start);
+  for(let guard=0;guard<80;guard++){
+    if(mode==='week')t=depAddDays(t,7);
+    else{const n=new Date(t);n.setMonth(n.getMonth()+(mode==='month'?1:3));t=n;}
+    if(t>=end){pts.push(new Date(end));break;}
+    pts.push(new Date(t));
+  }
+  const topupsTo=dt=>(d.topups||[]).filter(tp=>depLocalDate(tp.date)<=dt).reduce((a,tp)=>a+(parseInputNumber(tp.amount)||0),0);
+  const now=depLocalDate(new Date());
+  // Шкала — от открытия договора, а проценты — только с момента, когда вклад
+  // завели в приложении (как в карточке «Чистая прибыль»): прошлое не дорисовываем.
+  const acc=getDepositAccrualStart(d);
+  const bars=pts.map(dt=>{
+    const earned=dt>acc?Math.max(0,Number(simulateDeposit(d,{start:acc,end,until:dt}).totalNet)||0):0;
+    const base=getDepositPrincipalNative(d)+topupsTo(dt);
+    return {dt,base,earned};
+  });
+  const simNow=now>acc?simulateDeposit(d,{start:acc,end,until:now<end?now:end}):{totalNet:0};
+  const earnedNow=Math.max(0,Number(simNow.totalNet)||0);
+  const earnedEnd=bars.length?bars[bars.length-1].earned:earnedNow;
+  let cur=bars.findIndex(b=>b.dt>=now);
+  if(cur<0)cur=bars.length-1;
+  const v={start,end,mode,bars,cur,earnedNow,earnedEnd};
+  _ndPathCache[d.id]={key,v};
+  return v;
+}
+function ndRenderPath(d,slide){
+  const box=slide.querySelector('.nd-bars-box');
+  if(!box)return;
+  let v=null;
+  try{v=ndDepositPath(d);}catch(e){}
+  if(!v||!v.bars.length){box.innerHTML='<div class="nd-bars-empty">'+escHtml(trx({uk:'Вкажіть суму та строк вкладу — тут з’явиться його шлях',ru:'Укажите сумму и срок вклада — здесь появится его путь',en:'Enter the amount and term — the deposit path will appear here',de:'Betrag und Laufzeit angeben — hier erscheint der Verlauf',zh:'填写金额和期限后，这里会显示存款走势'}))+'</div>';return;}
+  const sig=JSON.stringify([v.bars.map(b=>Math.round(b.base+b.earned)),v.cur]);
+  if(box.dataset.sig===sig&&box.childElementCount)return;
+  box.dataset.sig=sig;
+  const sym=getDepositCurrencySymbol(d);
+  const max=Math.max(...v.bars.map(b=>b.base+b.earned))||1;
+  const fmtDt=dt=>dt.toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'2-digit'});
+  const cols=v.bars.map((b,i)=>{
+    const cls=i<v.cur?'past':i===v.cur?'now':'future';
+    const total=b.base+b.earned;
+    return '<i class="'+cls+'" title="'+escAttr(fmtDt(b.dt)+' · '+fmtN(total)+' '+sym+' (+'+fmtN(b.earned)+')')+'" style="height:'+Math.max(4,total/max*100).toFixed(1)+'%">'+
+      '<u style="height:'+(total>0?(b.earned/total*100):0).toFixed(2)+'%"></u></i>';
+  }).join('');
+  const T=k=>trx(({
+    earned:{uk:'Зароблено',ru:'Заработано',en:'Earned',de:'Verdient',zh:'已赚'},
+    ahead:{uk:'попереду',ru:'впереди',en:'ahead',de:'noch',zh:'预计还有'},
+    now:{uk:'зараз',ru:'сейчас',en:'now',de:'jetzt',zh:'现在'},
+    mine:{uk:'ваші гроші',ru:'ваши деньги',en:'your money',de:'Ihr Geld',zh:'本金'},
+    pct:{uk:'відсотки',ru:'проценты',en:'interest',de:'Zinsen',zh:'利息'},
+    prog:{uk:'прогноз',ru:'прогноз',en:'forecast',de:'Prognose',zh:'预测'}
+  })[k]);
+  const ahead=Math.max(0,v.earnedEnd-v.earnedNow);
+  box.innerHTML='<div class="nd-path">'+cols+'</div>'+
+    '<div class="nd-bars-ax nd-path-ax"><span>'+escHtml(fmtDt(v.start))+'</span><span class="nd-path-now" style="left:calc(14px + (100% - 28px) * '+((v.cur+0.5)/v.bars.length).toFixed(4)+')">▲ '+escHtml(T('now'))+'</span><span>'+escHtml(fmtDt(v.end))+'</span></div>'+
+    '<div class="nd-path-sum"><span>'+escHtml(T('earned'))+' <b class="live-val up">+'+fmtN(v.earnedNow)+' '+sym+'</b></span><span>'+escHtml(T('ahead'))+' <b class="live-val">≈ +'+fmtN(ahead)+' '+sym+'</b></span></div>'+
+    '<div class="nd-path-leg"><span><i class="lb"></i>'+escHtml(T('mine'))+'</span><span><i class="lg"></i>'+escHtml(T('pct'))+'</span><span><i class="lf"></i>'+escHtml(T('prog'))+'</span></div>';
+}
 function ndRenderBars(depId,slide){
   const box=slide.querySelector('.nd-bars-box');
   if(!box)return;
