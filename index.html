@@ -3615,7 +3615,7 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.97';
+const APP_VERSION = 'v0.1.98';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4213,7 +4213,7 @@ function t(key){const lang=LANGS[currentLang]||LANGS['uk'];return lang[key]||LAN
 const UI_TEXT={
   depOpenDay:{uk:'Число нарахування',ru:'Число начисления',en:'Interest day',de:'Zinstag',zh:'计息日'},
   depAmountNow:{uk:'Сума на депозиті зараз (₴)',ru:'Сумма на депозите сейчас (₴)',en:'Balance right now (₴)',de:'Aktueller Stand (₴)',zh:'当前余额 (₴)'},
-  depAmountHint:{uk:'Залишок на сьогодні. Відсотки почнемо рахувати з цього дня',ru:'Остаток на сегодня. Проценты начнём считать с этого дня',en:'Today\'s balance. Interest is counted from this day on',de:'Heutiger Stand. Zinsen werden ab diesem Tag berechnet',zh:'今日余额。利息自该日起计算'},
+  depAmountHint:{uk:'Сума, яку банк показує на вкладі. Відсотки з останньої виплати додамо самі',ru:'Сумма, которую банк показывает на вкладе. Проценты с последней выплаты досчитаем сами',en:'The balance your bank shows. Interest since the last payout is added automatically',de:'Der Stand laut Bank. Zinsen seit der letzten Auszahlung rechnen wir dazu',zh:'银行显示的余额。上次付息以来的利息会自动计入'},
   depPayFreq:{uk:'Як часто приходять відсотки',ru:'Как часто приходят проценты',en:'How often interest arrives',de:'Wie oft Zinsen kommen',zh:'利息到账频率'},
   depAmountFrom:{uk:'Відлік з',ru:'Отсчёт с',en:'Counting from',de:'Zählung ab',zh:'起算日'},
   stockSaleCash:{uk:'Кошти від продажів акцій',ru:'Деньги от продажи акций',en:'Stock sale cash',de:'Geld aus Aktienverkäufen',zh:'股票卖出资金'},
@@ -4728,23 +4728,32 @@ function getDepositMonitoringStart(dep){
 }
 // У депозита ДВА разных отсчёта, и путать их нельзя:
 //  · договор — от реального открытия до конца срока (шкала, «пройшло/залишилось»);
-//  · начисление — только с момента, когда депозит завели в приложении.
-// Пользователь может открыть счёт раньше, чем внесёт его сюда, и дорисовывать
-// ему проценты за тот период нельзя — ради этого точная дата открытия и заменена
-// на одно число (день месяца).
-// Поле суммы означает «сколько лежит на вкладе СЕЙЧАС», то есть всё начисленное
-// до этой минуты уже внутри названного числа. Значит при изменении суммы отсчёт
-// процентов надо начинать заново с сегодня — иначе приложение накрутит проценты
-// за период, который пользователь уже учёл сам.
+//  · начисление — с последней выплаты перед днём, когда депозит завели в
+//    приложении: всё, что выплачено раньше, уже внутри введённой суммы.
+// Поле суммы означает «сколько банк показывает на вкладе СЕЙЧАС» — тело вместе
+// с уже выплаченными процентами. При изменении суммы дата внесения переносится
+// на сегодня, а отсчёт процентов — на последнюю выплату до неё
+// (см. getDepositAccrualStart).
 function setDepositAmount(idx,depId,value){
   const dep=deposits[idx]||deposits.find(d=>d.id===depId);
   if(!dep)return;
   if(String(value)!==String(dep.principal??''))dep.registeredDate=depDateKey(new Date());
   dep.principal=value;
 }
+// Сумма на вкладе — это тело: проценты, набежавшие с последней выплаты, банк в
+// ней ещё не показывает и выплатит их целиком в ближайший день начисления.
+// Поэтому вклад, заведённый посреди периода, считаем не со дня внесения, а с
+// последней выплаты по графику договора (а в первом периоде — с открытия).
+// Иначе первая выплата в приложении выходила меньше банковской: открыт 20.04,
+// внесён 03.06 — банк 21.06 платит за месяц, а приложение считало 18 дней.
 function getDepositAccrualStart(dep){
-  if(dep?.registeredDate)return depLocalDate(dep.registeredDate);
-  return getDepositMonitoringStart(dep);
+  if(!dep?.registeredDate)return getDepositMonitoringStart(dep);
+  const reg=depLocalDate(dep.registeredDate);
+  if(!dep.startDate)return reg;
+  const contractStart=getDepositContractStart(dep);
+  if(reg<=contractStart)return reg;
+  const caps=getDepositCapDates(contractStart,reg,getDepositOpenDay(dep),dep);
+  return caps.length?caps[caps.length-1]:contractStart;
 }
 // Срок перестал быть полем ввода: две даты договора задают его однозначно.
 // Сохранённое число месяцев осталось запасным вариантом для депозитов,
@@ -5148,8 +5157,7 @@ function calcLive(depId){
   // вперёд на единицу, а сумма с «залишилось» переставала давать срок вклада.
   const dLeft=Math.max(0,Math.ceil((end-now)/(1000*60*60*24)));
   const dGone=Math.max(0,Math.floor((now-contractStart)/(1000*60*60*24)));
-  let regDate=start;
-  if(dep?.registeredDate)regDate=depLocalDate(dep.registeredDate);
+  const regDate=getDepositAccrualStart(dep);
   // Дата, с которой идёт начисление, была невидимой — и когда она оказывалась
   // неверной, увидеть это было неоткуда.
   setText('depAmountHint_'+depId,uiText('depAmountHint')+' · '+uiText('depAmountFrom')+' '+appShortDate(regDate,true));
@@ -13086,7 +13094,7 @@ function buildPortfolioContext(){
         if(dep.startDate&&dep.endDate)parts.push(`${dep.startDate} → ${dep.endDate}`);
         if(dep.openDay)parts.push(`нарахування ${dep.openDay}-го числа`);
         dRows.push(`  ${dep.name||'Депозит'}: ${parts.join(', ')}`);
-        dRows.push(`    нараховано з ${dep.registeredDate||'—'}: ${sim.totalNet.toFixed(2)} ${dSym} (${sim.dailyNet.toFixed(2)} ${dSym}/добу)`);
+        dRows.push(`    нараховано з ${depDateKey(getDepositAccrualStart(dep))}: ${sim.totalNet.toFixed(2)} ${dSym} (${sim.dailyNet.toFixed(2)} ${dSym}/добу)`);
       });
       if(dRows.length){lines.push(``);lines.push(`Депозити (умови):`);dRows.forEach(r=>lines.push(r));}
     }catch{}
