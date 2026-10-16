@@ -11,6 +11,8 @@
 <link rel="manifest" href="manifest.json">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <meta name="theme-color" content="#07192d">
+<!-- Своя тёмная/светлая тема: говорим браузеру, что перекрашивать страницу не нужно. -->
+<meta name="color-scheme" content="dark light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Капітал">
@@ -3615,7 +3617,7 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.99';
+const APP_VERSION = 'v0.2.00';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9796,6 +9798,10 @@ function applyAppTheme(theme=appTheme){
   document.body.classList.toggle('theme-dark',appTheme!=='light');
   document.documentElement.classList.toggle('theme-light-root',appTheme==='light');
   document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute('content',appTheme==='light'?'#f8f1e3':'#0a1024'));
+  // Встроенные элементы (календарь, полосы прокрутки) — в цвет темы приложения, а не системы.
+  document.documentElement.style.colorScheme=appTheme;
+  const csMeta=document.querySelector('meta[name="color-scheme"]');
+  if(csMeta)csMeta.setAttribute('content',appTheme==='light'?'light':'dark');
   const statusMeta=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
   if(statusMeta)statusMeta.setAttribute('content',appTheme==='light'?'default':'black-translucent');
   document.querySelectorAll('.settings-theme-btn').forEach(b=>{
