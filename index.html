@@ -3615,7 +3615,7 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.1.98';
+const APP_VERSION = 'v0.1.99';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4505,7 +4505,7 @@ function getDepositHtml(dep,idx){
           <div class="field-group">
             <div class="field-label">${lang.depStart}</div>
             <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" lang="${currentLang}" id="depStartDate_${dep.id}" value="${getDepositStartValue(dep)}"
-              oninput="deposits[${idx}].startDate=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()"></div>
+              oninput="deposits[${idx}].startDate=this.value;if(this.value){deposits[${idx}].openDay=depPayDayAfter(this.value);const od=document.getElementById('depOpenDay_${dep.id}');if(od)od.value=deposits[${idx}].openDay;}calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()"></div>
           </div>
           <div class="field-group">
             <div class="field-label">${lang.depEnd}</div>
@@ -4692,10 +4692,15 @@ function depAddDays(date,days){
 function normalizeDepositMode(mode){
   return mode==='separate'?'separate':'body';
 }
+// Выписка банка (вклад открыт 01.07): проценты за 02.07–01.08 капитализируются
+// 02.08 — на следующий день после числа открытия, и так каждый месяц.
+function depPayDayAfter(dateStr){
+  return String(depAddDays(depLocalDate(dateStr),1).getDate());
+}
 function getDepositOpenDay(dep){
   const raw=parseInt(String(dep?.openDay||'').replace(/\D+/g,''),10);
   if(Number.isFinite(raw)&&raw>=1&&raw<=31)return raw;
-  if(dep?.startDate)return depLocalDate(dep.startDate).getDate();
+  if(dep?.startDate)return parseInt(depPayDayAfter(dep.startDate),10);
   if(dep?.registeredDate)return depLocalDate(dep.registeredDate).getDate();
   return new Date().getDate();
 }
@@ -4769,7 +4774,7 @@ function getDepositTermMonths(dep){
 }
 function getDepositContractEnd(dep,start){
   if(dep?.endDate)return depLocalDate(dep.endDate);
-  return depAddMonthsSafe(start,getDepositTermMonths(dep),getDepositOpenDay(dep));
+  return depAddMonthsSafe(start,getDepositTermMonths(dep));
 }
 // Дату открытия теперь спрашиваем прямо. Восстановление «дата окончания минус
 // срок» осталось только для старых депозитов: оно промахивалось всякий раз,
@@ -4857,7 +4862,8 @@ function getDepositCapDates(start,end,startDay,dep){
   let m=anchor.getMonth();
   let cd=onDay(y,m);
   let guard=0;
-  while(cd<=start&&guard++<3000){m+=step;cd=onDay(y,m);}
+  const firstPossible=dep?depAddDays(anchor,1):null;
+  while((cd<=start||(firstPossible&&cd<=firstPossible))&&guard++<3000){m+=step;cd=onDay(y,m);}
   while(cd<=end&&guard++<3000){dates.push(new Date(cd));m+=step;cd=onDay(y,m);}
   return dates;
 }
@@ -4866,7 +4872,10 @@ function simulateDeposit(dep,opts={}){
   const start=depLocalDate(opts.start||getDepositMonitoringStart(dep));
   const end=depLocalDate(opts.end||getDepositContractEnd(dep,start));
   const until=depLocalDate(opts.until||new Date());
-  const stop=new Date(Math.min(end.getTime(),until.getTime()));
+  // По выписке: срок 01.07.2026–01.07.2028, проценты за 01.07.2028 начислены и
+  // капитализированы 02.07.2028. Поэтому «до конца срока» = день после окончания.
+  const endPay=depAddDays(end,1);
+  const stop=until>=end?endPay:until;
   const rAnn=numberOrFallback(opts.rate??dep?.rate,16)/100;
   const taxRate=parseInputNumber(opts.tax??dep?.tax)/100;
   let taxFreeLeft=parseInputNumber(opts.taxFree??dep?.taxFree);
@@ -4919,17 +4928,34 @@ function simulateDeposit(dep,opts={}){
   let contributed=P;
   let contribDays=0,spanDays=0;
 
+  // По выписке: 02.08 капитализировано 555,70, а процент за 02.08 начислен ещё
+  // на старое тело (1 день × 53108,97 + 29 дней × 53664,67 = 705,48 — как в банке).
+  let capLag=0;
+  const yearDays=y=>(y%4===0&&y%100!==0)||y%400===0?366:365;
+  // Доля года между датами с учётом високосных лет: 2028 банк делит на 366.
+  function yearFrac(from,to){
+    let f=0,a=new Date(from);
+    while(a<to){
+      const ny=new Date(a.getFullYear()+1,0,1);
+      const b=ny<to?ny:to;
+      f+=Math.round((b-a)/oneDay)/yearDays(a.getFullYear());
+      a=b;
+    }
+    return f;
+  }
   function addWeighted(toDate){
     const days=Math.round((toDate-periodStart)/oneDay);
     if(days>0){
-      weighted+=bodyBalance*days;
+      const firstDay=1/yearDays(periodStart.getFullYear());
+      weighted+=bodyBalance*yearFrac(periodStart,toDate)-capLag*firstDay;
+      capLag=0;
       contribDays+=contributed*days;
       spanDays+=days;
       periodStart=new Date(toDate);
     }
   }
   function settleCap(){
-    const gross=weighted*rAnn/365;
+    const gross=weighted*rAnn;
     if(gross){
       const taxBase=Math.max(0,gross-taxFreeLeft);
       const tax=taxBase*taxRate;
@@ -4944,6 +4970,7 @@ function simulateDeposit(dep,opts={}){
       if(currentMode==='body'){
         bodyBalance+=net;
         capitalizedNet+=net;
+        capLag+=net;
       }else{
         separateNet+=net;
       }
@@ -4971,7 +4998,7 @@ function simulateDeposit(dep,opts={}){
   // корзин отдельно, то есть мог сработать дважды за один период.
   let pendingGross=0,pendingTax=0,pendingNet=0,pendingBodyNet=0,pendingSeparateNet=0;
   {
-    const gross=weighted*rAnn/365;
+    const gross=weighted*rAnn;
     if(gross){
       const taxBase=Math.max(0,gross-taxFreeLeft);
       const tax=taxBase*taxRate;
@@ -4985,7 +5012,7 @@ function simulateDeposit(dep,opts={}){
   const shownGross=totalGross+pendingGross;
   const shownTax=totalTax+pendingTax;
   const shownNet=totalNet+pendingNet;
-  const dailyGross=bodyBalance*rAnn/365;
+  const dailyGross=bodyBalance*rAnn/yearDays(stop.getFullYear());
   // Пока необлагаемый минимум не исчерпан, налога нет и на дневной строке.
   // Раньше она удерживала его всегда, а итог — нет: «за добу» показывало
   // чистыми, а в тело падало грязное начисление.
@@ -5081,13 +5108,14 @@ function calcDeposit(depId){
   const start=getDepositContractStart(dep);
   // Calculator result is based on the selected term, not on extra calendar days
   // that may remain before the chosen closing date.
-  const end=depAddMonthsSafe(start,months,getDepositOpenDay(dep));
+  const end=depAddMonthsSafe(start,months);
   const sim=simulateDeposit(dep,{start,end,until:end});
   const taxBase=Math.max(0,sim.totalGross-parseInputNumber(dep.taxFree));
   // Делим на СРЕДНИЙ вложенный капитал, а не на стартовую сумму: иначе прибыль,
   // заработанная пополнениями, ложится на один только первый взнос и ставка
   // взлетает. Без пополнений средний капитал равен стартовой сумме, поэтому
-  // сверенные с банком 13,89% не меняются.
+  // сверенная с банком ставка не меняется (по выписке 2026–2028 выходит 13,90%:
+  // приложение банка показывает 13,89% — его прогноз не учитывает високосный 2028).
   const effBase=sim.avgContributed>0?sim.avgContributed:P;
   const eff=effBase&&months?((sim.totalNet/effBase)/(months/12)*100):0;
   setText('r-total_'+depId,   fmtN(Math.round(sim.totalValue))+' '+depSym);
@@ -9318,7 +9346,7 @@ function migrateDeposit(dep,index){
   out.topups=ensureArray(out.topups).map(tp=>({amount:parseInputNumber(tp?.amount),date:tp?.date||getLocalDateKey()}));
   out.interestTo=normalizeDepositMode(out.interestTo);
   out.interestModeHistory=getDepositModeHistory(out);
-  if(!out.openDay)out.openDay=out.startDate?String(depLocalDate(out.startDate).getDate()):'';
+  if(!out.openDay)out.openDay=out.startDate?depPayDayAfter(out.startDate):'';
   if(!out.startDate)out.startDate=migrateDepositStartDate(out);
   if(!out.registeredDate)out.registeredDate=getLocalDateKey();
   return out;
@@ -9559,7 +9587,7 @@ function loadData(){
     if(Array.isArray(d.deposits)&&d.deposits.length)deposits=d.deposits;
     // Ensure all deposits have registeredDate (for existing data without it)
     const todayStr=getLocalDateKey();
-    deposits.forEach(dep=>{if(!dep.openDay)dep.openDay=dep.startDate?String(depLocalDate(dep.startDate).getDate()):'';if(!dep.registeredDate)dep.registeredDate=todayStr;if(!dep.startDate)dep.startDate=migrateDepositStartDate(dep);});
+    deposits.forEach(dep=>{if(!dep.openDay)dep.openDay=dep.startDate?depPayDayAfter(dep.startDate):'';if(!dep.registeredDate)dep.registeredDate=todayStr;if(!dep.startDate)dep.startDate=migrateDepositStartDate(dep);});
     sv('cryptoUsdt',d.cryptoUsdt);sv('usdtUah',d.usdtUah);sv('usdtRateManual',d.usdtRateManual==='1'?'1':'');sv('cryptoCost',d.cryptoCost);
     sv('usdAmount',d.usdAmount);sv('usdUah',d.usdUah);sv('usdNote',d.usdNote);
     sv('cashAmount',d.cashAmount);sv('cashNote',d.cashNote);
