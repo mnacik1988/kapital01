@@ -3617,7 +3617,7 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.00';
+const APP_VERSION = 'v0.2.01';
 const APP_BUILD_DATE = '2026-07-01';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4507,7 +4507,7 @@ function getDepositHtml(dep,idx){
           <div class="field-group">
             <div class="field-label">${lang.depStart}</div>
             <div class="local-date-wrap" data-date-placeholder="${datePlaceholderText()}"><input class="field-input" type="date" lang="${currentLang}" id="depStartDate_${dep.id}" value="${getDepositStartValue(dep)}"
-              oninput="deposits[${idx}].startDate=this.value;if(this.value){deposits[${idx}].openDay=depPayDayAfter(this.value);const od=document.getElementById('depOpenDay_${dep.id}');if(od)od.value=deposits[${idx}].openDay;}calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()"></div>
+              oninput="const manualDay=depOpenDayIsManual(deposits[${idx}]);deposits[${idx}].startDate=this.value;if(this.value&&!manualDay){deposits[${idx}].openDay=depPayDayAfter(this.value);const od=document.getElementById('depOpenDay_${dep.id}');if(od)od.value=deposits[${idx}].openDay;}calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()"></div>
           </div>
           <div class="field-group">
             <div class="field-label">${lang.depEnd}</div>
@@ -4535,7 +4535,7 @@ function getDepositHtml(dep,idx){
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:4px;">
             ${dep.topups.map((tp,ti)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">
               <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);">${new Date(tp.date).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'})}</span>
-              <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600;">+${fmtN(parseInputNumber(tp.amount))} ${getDepositCurrencySymbol(dep)}</span>
+              <span style="font-family:'DM Mono',monospace;font-size:11px;color:${depTopupInBalance(dep,tp)?'var(--muted)':'var(--blue2)'};font-weight:600;">+${fmtN(parseInputNumber(tp.amount))} ${getDepositCurrencySymbol(dep)}${depTopupInBalance(dep,tp)?' · '+escHtml(trx({uk:'вже в залишку',ru:'уже в остатке',en:'in balance',de:'im Stand',zh:'已含在余额'})):''}</span>
               <button class="rm-btn" onclick="removeTopUp('${dep.id}',${ti})">×</button>
             </div>`).join('')}
             <div style="display:flex;justify-content:space-between;padding:6px 0 2px;font-family:'DM Mono',monospace;font-size:10px;margin-top:4px;">
@@ -4555,7 +4555,7 @@ function getDepositHtml(dep,idx){
             <div class="field-group">
               <div class="field-label">${uiText('depOpenDay')}</div>
               <input class="field-input" type="text" id="depOpenDay_${dep.id}" placeholder="1-31" value="${getDepositOpenDayValue(dep)}" inputmode="numeric"
-                oninput="deposits[${idx}].openDay=this.value;calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
+                oninput="deposits[${idx}].openDay=this.value;deposits[${idx}].openDayManual=!!this.value.trim();calcDeposit('${dep.id}');updateAll();startLiveTicker('${dep.id}');saveData()">
             </div>
             <div class="field-group">
               <div class="field-label">${uiText('depPayFreq')}</div>
@@ -4854,11 +4854,35 @@ function getDepositCapStepMonths(dep){
 // График начислений отсчитывается от начала ДОГОВОРА, а не от даты внесения в
 // приложение: депозит с квартальной выплатой, открытый 1 января, платит 1 апреля,
 // 1 июля и 1 октября — ровно как в выписке банка, когда бы его сюда ни завели.
+// Число выплаты, заданное человеком вручную, — отдельный случай: ему верим как есть.
+// Автоматические значения прежних версий (число открытия или «на следующий день»)
+// ручными не считаются.
+function depOpenDayIsManual(dep){
+  if(!dep)return false;
+  if(dep.openDayManual===true)return true;
+  if(dep.openDayManual===false)return false;
+  const raw=parseInt(String(dep.openDay||'').replace(/\D+/g,''),10);
+  if(!Number.isFinite(raw)||!dep.startDate)return false;
+  const s=depLocalDate(dep.startDate);
+  return raw!==s.getDate()&&raw!==depAddDays(s,1).getDate();
+}
 function getDepositCapDates(start,end,startDay,dep){
   const dates=[];
   const day=Math.min(31,Math.max(1,parseInt(startDay,10)||1));
   const step=getDepositCapStepMonths(dep);
   const anchor=dep?getDepositContractStart(dep):depLocalDate(start);
+  // Выплата — на следующий день после того же числа, что и открытие, КАЖДЫЙ период:
+  // дата открытия + n месяцев (с поправкой на короткий месяц) + 1 день. Фиксированное
+  // «число месяца» ломалось на вкладах, открытых в конце месяца: 28.02 → выплаты 1-го,
+  // первая через 32 дня, а с v0.1.98 это завышало проценты на месяц (аудит 18.10, п.5).
+  if(dep&&dep.startDate&&!depOpenDayIsManual(dep)){
+    for(let k=step,guard=0;guard<3000;k+=step,guard++){
+      const cd=depAddDays(depAddMonthsSafe(anchor,k),1);
+      if(cd>end)break;
+      if(cd>start)dates.push(cd);
+    }
+    return dates;
+  }
   const onDay=(y,m)=>{const last=new Date(y,m+1,0).getDate();return new Date(y,m,Math.min(day,last));};
   const y=anchor.getFullYear();
   let m=anchor.getMonth();
@@ -4886,7 +4910,7 @@ function simulateDeposit(dep,opts={}){
   // Вклад может начинаться с нуля и наполняться пополнениями — такой считается
   // действующим и в сводке доходов. Раньше проверка `!P` отсекала его целиком,
   // и все пополнения пропадали.
-  const topupTotal=(dep?.topups||[]).reduce((s,tp)=>s+(parseInputNumber(tp.amount)||0),0);
+  const topupTotal=depCountedTopups(dep).reduce((s,tp)=>s+(parseInputNumber(tp.amount)||0),0);
   if((!P&&!topupTotal)||stop<=start||end<=start){
     const dailyGross=(P||0)*rAnn/365;
     const dailyTax=Math.max(0,dailyGross)*taxRate;
@@ -4894,7 +4918,7 @@ function simulateDeposit(dep,opts={}){
     return {principal:P||0,bodyBalance:P||0,separateNet:0,pendingSeparateNet:0,stayingNet:0,pendingBodyNet:0,totalValue:P||0,totalGross:0,totalTax:0,totalNet:0,capitalizedNet:0,completedCaps:0,currentMode:normalizeDepositMode(dep?.interestTo),dailyGross,dailyNet,avgContributed:P||0,spanDays:0};
   }
   const events=[];
-  (dep?.topups||[]).forEach(tp=>{
+  depCountedTopups(dep).forEach(tp=>{
     const amount=parseInputNumber(tp.amount);
     if(!amount||!tp.date)return;
     events.push({date:depAddDays(tp.date,1),type:'topup',amount});
@@ -5052,8 +5076,19 @@ function getDepositCurrencyRate(d){
 function getDepositPrincipalNative(d){
   return parseInputNumber(d?.principal);
 }
+// Пополнения, сделанные ДО даты внесения остатка, уже входят в введённую сумму.
+// После ручного ввода остатка они раньше прибавлялись к телу второй раз и ещё
+// приносили проценты (аудит 18.10.2026, п.9). В истории они остаются.
+function depCountedTopups(d){
+  const all=d?.topups||[];
+  if(!d?.registeredDate)return all;
+  return all.filter(tp=>!tp.date||tp.date>=d.registeredDate);
+}
+function depTopupInBalance(d,tp){
+  return !!(d?.registeredDate&&tp?.date&&tp.date<d.registeredDate);
+}
 function getDepositTopupsNative(d){
-  return (d?.topups||[]).reduce((s,tp)=>s+parseInputNumber(tp.amount),0);
+  return depCountedTopups(d).reduce((s,tp)=>s+parseInputNumber(tp.amount),0);
 }
 function getDepositAmountUah(d,amountNative){
   return parseInputNumber(amountNative)*getDepositCurrencyRate(d);
@@ -5245,7 +5280,7 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
   // Внутри суток при неизменных настройках результат один и тот же — считаем раз.
   const sig=[depId,toStr(now),P,rAnn,tax,dep?.taxFree,dep?.freq,dep?.interestTo,
     dep?.endDate,dep?.months,dep?.openDay,toStr(start),depSym,currentLang,
-    JSON.stringify(dep?.topups||[]),JSON.stringify(dep?.interestModeHistory||[])].join('|');
+    JSON.stringify(dep?.topups||[]),dep?.registeredDate,JSON.stringify(dep?.interestModeHistory||[])].join('|');
   // Проверяем и содержимое: renderDeposits() пересоздаёт элемент пустым, и по
   // одной лишь совпавшей подписи журнал остался бы незаполненным.
   if(dailyLogCache[depId]===sig&&el.childElementCount)return;
@@ -9907,7 +9942,7 @@ function setDisplayCurrency(cur){
 const PRIVACY_I18N={
  "en": {
   "title": "Privacy Policy",
-  "updated": "Updated: October 12, 2026",
+  "updated": "Updated: October 18, 2026",
   "note": "Contact: mnacik1988@gmail.com · Online version: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -9920,7 +9955,7 @@ const PRIVACY_I18N={
    ],
    [
     "Your account on our server",
-    "When you sign in, we create an account record on our server: your Google account identifier, email address, dates of your first and latest visit, the number of AI requests, your access status (trial, subscription) and settings made by the administrator (for example, a personal limit or a block). It is needed to provide access, apply limits and prevent abuse. The record is kept while you use the app and is deleted when you delete your account (Settings → Delete account) or at your request."
+    "When you sign in, we create an account record on our server: your Google account identifier, email address, dates of your first and latest visit, the number of AI requests, your access status (trial, subscription), settings made by the administrator (for example, a personal limit or a block) and the platform and device model you sign in from (for example, “Android 14 · SM-S918B”). It is needed to provide access, apply limits and prevent abuse. The record is kept while you use the app and is deleted when you delete your account (Settings → Delete account) or at your request."
    ],
    [
     "Your portfolio data",
@@ -9928,11 +9963,11 @@ const PRIVACY_I18N={
    ],
    [
     "Cloud backup (optional)",
-    "If you turn on cloud backup, a copy of your portfolio data — the same content as a file export: deposits, coins, stocks, loans, notes, chart history and app settings — is uploaded to our server and linked to your Google account identifier, so you can restore it after changing or losing your phone. The copy is encrypted on our server. The encryption key is held by the service operator, who can technically decrypt the copy; we do not read it, sell it or share it, and use it only to restore your data for you. Exchange API keys, bank tokens and purchase information are never included — they stay only on your device. We keep up to 3 latest copies. The backup is off until you agree to it; you can turn it off and delete all copies at any time in Settings, and the copies are deleted automatically when you delete your account."
+    "If you turn on cloud backup, a copy of your portfolio data — the same content as a file export: deposits, coins, stocks, loans, notes, chart history and app settings — is uploaded to our server and linked to your Google account identifier, so you can restore it after changing or losing your phone. The copy is encrypted on our server. The encryption key is held by the service operator, who can technically decrypt the copy; we do not read it, sell it or share it, and use it only to restore your data for you. Exchange API keys, bank tokens and purchase information are never included — they stay only on your device. We keep up to 3 latest copies; each records the date, the app version and the type of device it was made on. The backup is off until you agree to it; you can turn it off and delete all copies at any time in Settings, and the copies are deleted automatically when you delete your account."
    ],
    [
     "Deleting your account and data",
-    "You can delete your account in the app: Settings → Delete account. This permanently removes from our server your account record, all cloud backups, your AI request counters and administrator-log entries that refer to you. Data stored on your device is erased only if you choose that option. You can also request deletion by email at mnacik1988@gmail.com or on the web page https://mnacik1988.github.io/kapital01/delete-account.html. Our infrastructure provider may keep technical database backups for a limited period (up to 30 days) before they are overwritten. Deleting your account does not cancel subscriptions bought through Google Play or the App Store — cancel those in the store."
+    "You can delete your account in the app: Settings → Delete account. This permanently removes from our server your account record, all cloud backups and administrator-log entries that refer to you. To prevent abuse (so that deleting and re-creating an account does not lift a block or reset limits), we keep only your Google account identifier, whether the account was blocked, and the dates of your first sign-in and of the deletion — no email or other data; the daily AI request counter is not reset either and is deleted automatically within 7 days. Data stored on your device is erased only if you choose that option. You can also request deletion by email at mnacik1988@gmail.com or on the web page https://mnacik1988.github.io/kapital01/delete-account.html. Our infrastructure provider may keep technical database backups for a limited period (up to 30 days) before they are overwritten. Deleting your account does not cancel subscriptions bought through Google Play or the App Store — cancel those in the store."
    ],
    [
     "Exchange connections",
@@ -9944,7 +9979,7 @@ const PRIVACY_I18N={
    ],
    [
     "AI assistant",
-    "The AI chat is optional. When you send a message, your message and a summary of your portfolio (totals by category, deposit terms and names, positions in stocks, bonds and crypto including coins from connected exchanges, exchange rates) are sent through our server to Anthropic, the provider of the Claude model, to generate a reply. We do not store the content of your conversations. To enforce limits we keep a daily request counter linked to your Google account identifier (deleted automatically after 2 days) and total token usage without any identifier (kept up to 90 days). If you do not use the AI chat, no portfolio data is sent."
+    "The AI chat is optional. When you send a message, your message and a summary of your portfolio (totals by category, deposit terms and names, positions in stocks, bonds and crypto including coins from connected exchanges, exchange rates) are sent through our server to Anthropic, the provider of the Claude model, to generate a reply. We do not store the content of your conversations. To enforce limits we keep a daily request counter linked to your Google account identifier (deleted automatically within 7 days) and total token usage without any identifier (kept up to 90 days). If you do not use the AI chat, no portfolio data is sent."
    ],
    [
     "Servers and hosting",
@@ -9990,7 +10025,7 @@ const PRIVACY_I18N={
  },
  "uk": {
   "title": "Політика конфіденційності",
-  "updated": "Оновлено: 12 жовтня 2026",
+  "updated": "Оновлено: 18 жовтня 2026",
   "note": "Контакт: mnacik1988@gmail.com · Онлайн-версія: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -10003,7 +10038,7 @@ const PRIVACY_I18N={
    ],
    [
     "Ваш обліковий запис на сервері",
-    "Коли ви входите, ми створюємо на своєму сервері картку облікового запису: ідентифікатор облікового запису Google, адресу пошти, дати першого й останнього входу, кількість запитів до AI, ваш статус доступу (пробний період, підписка) і налаштування, зроблені адміністратором (наприклад, особистий ліміт або блокування). Вона потрібна, щоб надавати доступ, застосовувати ліміти й запобігати зловживанням. Картка зберігається, доки ви користуєтеся застосунком, і видаляється, коли ви видаляєте обліковий запис (Налаштування → Видалити акаунт) або на ваш запит."
+    "Коли ви входите, ми створюємо на своєму сервері картку облікового запису: ідентифікатор облікового запису Google, адресу пошти, дати першого й останнього входу, кількість запитів до AI, ваш статус доступу (пробний період, підписка), налаштування, зроблені адміністратором (наприклад, особистий ліміт або блокування), а також платформу й модель пристрою, з якого ви заходите (наприклад, «Android 14 · SM-S918B»). Вона потрібна, щоб надавати доступ, застосовувати ліміти й запобігати зловживанням. Картка зберігається, доки ви користуєтеся застосунком, і видаляється, коли ви видаляєте обліковий запис (Налаштування → Видалити акаунт) або на ваш запит."
    ],
    [
     "Дані вашого портфеля",
@@ -10011,11 +10046,11 @@ const PRIVACY_I18N={
    ],
    [
     "Хмарна копія (за бажанням)",
-    "Якщо ви ввімкнете хмарну копію, копія даних вашого портфеля — той самий склад, що й у файловому експорті: депозити, монети, акції, кредити, нотатки, історія графіка та налаштування застосунку — завантажується на наш сервер і привʼязується до ідентифікатора вашого облікового запису Google, щоб ви могли відновити дані після зміни чи втрати телефона. Копія зберігається на сервері в зашифрованому вигляді. Ключ шифрування має оператор сервісу, який технічно може розшифрувати копію; ми її не читаємо, не продаємо й нікому не передаємо та використовуємо лише для відновлення ваших даних. Ключі API бірж, токени банків і дані про покупки в копію ніколи не потрапляють — вони залишаються лише на вашому пристрої. Ми зберігаємо до 3 останніх копій. Поки ви не погодитеся, копія вимкнена; вимкнути її та видалити всі копії можна будь-коли в Налаштуваннях, а під час видалення облікового запису копії видаляються автоматично."
+    "Якщо ви ввімкнете хмарну копію, копія даних вашого портфеля — той самий склад, що й у файловому експорті: депозити, монети, акції, кредити, нотатки, історія графіка та налаштування застосунку — завантажується на наш сервер і привʼязується до ідентифікатора вашого облікового запису Google, щоб ви могли відновити дані після зміни чи втрати телефона. Копія зберігається на сервері в зашифрованому вигляді. Ключ шифрування має оператор сервісу, який технічно може розшифрувати копію; ми її не читаємо, не продаємо й нікому не передаємо та використовуємо лише для відновлення ваших даних. Ключі API бірж, токени банків і дані про покупки в копію ніколи не потрапляють — вони залишаються лише на вашому пристрої. Ми зберігаємо до 3 останніх копій; для кожної записуються дата, версія застосунку й тип пристрою, з якого її зроблено. Поки ви не погодитеся, копія вимкнена; вимкнути її та видалити всі копії можна будь-коли в Налаштуваннях, а під час видалення облікового запису копії видаляються автоматично."
    ],
    [
     "Видалення облікового запису й даних",
-    "Ви можете видалити обліковий запис у застосунку: Налаштування → Видалити акаунт. Це остаточно видаляє з нашого сервера картку облікового запису, усі хмарні копії, лічильники запитів до AI і записи журналу адміністратора, що стосуються вас. Дані на вашому пристрої стираються лише якщо ви оберете цей варіант. Видалення також можна попросити листом на mnacik1988@gmail.com або на сторінці https://mnacik1988.github.io/kapital01/delete-account.html. Наш інфраструктурний провайдер може зберігати технічні резервні копії бази обмежений час (до 30 днів), доки вони не перезапишуться. Видалення облікового запису не скасовує підписки, оформлені через Google Play чи App Store, — скасуйте їх у магазині."
+    "Ви можете видалити обліковий запис у застосунку: Налаштування → Видалити акаунт. Це остаточно видаляє з нашого сервера картку облікового запису, усі хмарні копії та записи журналу адміністратора, що стосуються вас. Щоб запобігти зловживанням (видалення й повторне створення акаунта не має знімати блокування чи обнуляти ліміти), ми зберігаємо лише ідентифікатор облікового запису Google, ознаку блокування та дати першого входу й видалення — без пошти та інших даних; денний лічильник запитів до AI теж не обнуляється і видаляється автоматично протягом 7 днів. Дані на вашому пристрої стираються лише якщо ви оберете цей варіант. Видалення також можна попросити листом на mnacik1988@gmail.com або на сторінці https://mnacik1988.github.io/kapital01/delete-account.html. Наш інфраструктурний провайдер може зберігати технічні резервні копії бази обмежений час (до 30 днів), доки вони не перезапишуться. Видалення облікового запису не скасовує підписки, оформлені через Google Play чи App Store, — скасуйте їх у магазині."
    ],
    [
     "Підключення бірж",
@@ -10027,7 +10062,7 @@ const PRIVACY_I18N={
    ],
    [
     "AI-асистент",
-    "AI-чат необовʼязковий. Коли ви надсилаєте повідомлення, ваш текст і зведення портфеля (суми за категоріями, умови та назви депозитів, позиції в акціях, облігаціях і криптовалюті, зокрема монети з підключених бірж, курси валют) передаються через наш сервер компанії Anthropic — постачальнику моделі Claude — для формування відповіді. Зміст розмов ми не зберігаємо. Для лімітів ми зберігаємо денний лічильник запитів, привʼязаний до ідентифікатора облікового запису Google (видаляється автоматично через 2 дні), і загальну витрату токенів без будь-якого ідентифікатора (до 90 днів). Якщо ви не користуєтеся AI-чатом, дані портфеля нікуди не надсилаються."
+    "AI-чат необовʼязковий. Коли ви надсилаєте повідомлення, ваш текст і зведення портфеля (суми за категоріями, умови та назви депозитів, позиції в акціях, облігаціях і криптовалюті, зокрема монети з підключених бірж, курси валют) передаються через наш сервер компанії Anthropic — постачальнику моделі Claude — для формування відповіді. Зміст розмов ми не зберігаємо. Для лімітів ми зберігаємо денний лічильник запитів, привʼязаний до ідентифікатора облікового запису Google (видаляється автоматично протягом 7 днів), і загальну витрату токенів без будь-якого ідентифікатора (до 90 днів). Якщо ви не користуєтеся AI-чатом, дані портфеля нікуди не надсилаються."
    ],
    [
     "Сервери та хостинг",
@@ -10073,7 +10108,7 @@ const PRIVACY_I18N={
  },
  "ru": {
   "title": "Политика конфиденциальности",
-  "updated": "Обновлено: 12 октября 2026",
+  "updated": "Обновлено: 18 октября 2026",
   "note": "Контакт: mnacik1988@gmail.com · Онлайн-версия: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -10086,7 +10121,7 @@ const PRIVACY_I18N={
    ],
    [
     "Ваш аккаунт на сервере",
-    "Когда вы входите, мы создаём на своём сервере карточку аккаунта: идентификатор аккаунта Google, адрес почты, даты первого и последнего входа, количество запросов к AI, ваш статус доступа (пробный период, подписка) и настройки, сделанные администратором (например, личный лимит или блокировка). Она нужна, чтобы предоставлять доступ, применять лимиты и предотвращать злоупотребления. Карточка хранится, пока вы пользуетесь приложением, и удаляется, когда вы удаляете аккаунт (Настройки → Удалить аккаунт) или по вашему запросу."
+    "Когда вы входите, мы создаём на своём сервере карточку аккаунта: идентификатор аккаунта Google, адрес почты, даты первого и последнего входа, количество запросов к AI, ваш статус доступа (пробный период, подписка), настройки, сделанные администратором (например, личный лимит или блокировка), а также платформу и модель устройства, с которого вы заходите (например, «Android 14 · SM-S918B»). Она нужна, чтобы предоставлять доступ, применять лимиты и предотвращать злоупотребления. Карточка хранится, пока вы пользуетесь приложением, и удаляется, когда вы удаляете аккаунт (Настройки → Удалить аккаунт) или по вашему запросу."
    ],
    [
     "Данные вашего портфеля",
@@ -10094,11 +10129,11 @@ const PRIVACY_I18N={
    ],
    [
     "Облачная копия (по желанию)",
-    "Если вы включите облачную копию, копия данных вашего портфеля — тот же состав, что и в файловом экспорте: депозиты, монеты, акции, кредиты, заметки, история графика и настройки приложения — загружается на наш сервер и привязывается к идентификатору вашего аккаунта Google, чтобы вы могли восстановить данные после смены или потери телефона. Копия хранится на сервере в зашифрованном виде. Ключ шифрования есть у оператора сервиса, который технически может расшифровать копию; мы её не читаем, не продаём и никому не передаём и используем только для восстановления ваших данных. Ключи API бирж, токены банков и данные о покупках в копию никогда не попадают — они остаются только на вашем устройстве. Мы храним до 3 последних копий. Пока вы не согласитесь, копия выключена; выключить её и удалить все копии можно в любой момент в Настройках, а при удалении аккаунта копии удаляются автоматически."
+    "Если вы включите облачную копию, копия данных вашего портфеля — тот же состав, что и в файловом экспорте: депозиты, монеты, акции, кредиты, заметки, история графика и настройки приложения — загружается на наш сервер и привязывается к идентификатору вашего аккаунта Google, чтобы вы могли восстановить данные после смены или потери телефона. Копия хранится на сервере в зашифрованном виде. Ключ шифрования есть у оператора сервиса, который технически может расшифровать копию; мы её не читаем, не продаём и никому не передаём и используем только для восстановления ваших данных. Ключи API бирж, токены банков и данные о покупках в копию никогда не попадают — они остаются только на вашем устройстве. Мы храним до 3 последних копий; для каждой записываются дата, версия приложения и тип устройства, с которого она сделана. Пока вы не согласитесь, копия выключена; выключить её и удалить все копии можно в любой момент в Настройках, а при удалении аккаунта копии удаляются автоматически."
    ],
    [
     "Удаление аккаунта и данных",
-    "Вы можете удалить аккаунт в приложении: Настройки → Удалить аккаунт. Это безвозвратно удаляет с нашего сервера карточку аккаунта, все облачные копии, счётчики запросов к AI и записи журнала администратора, относящиеся к вам. Данные на вашем устройстве стираются, только если вы выберете этот вариант. Удаление можно также запросить письмом на mnacik1988@gmail.com или на странице https://mnacik1988.github.io/kapital01/delete-account.html. Наш инфраструктурный провайдер может хранить технические резервные копии базы ограниченное время (до 30 дней), пока они не будут перезаписаны. Удаление аккаунта не отменяет подписки, оформленные через Google Play или App Store, — отмените их в магазине."
+    "Вы можете удалить аккаунт в приложении: Настройки → Удалить аккаунт. Это безвозвратно удаляет с нашего сервера карточку аккаунта, все облачные копии и записи журнала администратора, относящиеся к вам. Чтобы предотвратить злоупотребления (удаление и повторное создание аккаунта не должно снимать блокировку или обнулять лимиты), мы храним только идентификатор аккаунта Google, признак блокировки и даты первого входа и удаления — без почты и других данных; дневной счётчик запросов к AI тоже не обнуляется и удаляется автоматически в течение 7 дней. Данные на вашем устройстве стираются, только если вы выберете этот вариант. Удаление можно также запросить письмом на mnacik1988@gmail.com или на странице https://mnacik1988.github.io/kapital01/delete-account.html. Наш инфраструктурный провайдер может хранить технические резервные копии базы ограниченное время (до 30 дней), пока они не будут перезаписаны. Удаление аккаунта не отменяет подписки, оформленные через Google Play или App Store, — отмените их в магазине."
    ],
    [
     "Подключение бирж",
@@ -10110,7 +10145,7 @@ const PRIVACY_I18N={
    ],
    [
     "AI-ассистент",
-    "AI-чат необязателен. Когда вы отправляете сообщение, ваш текст и сводка портфеля (суммы по категориям, условия и названия депозитов, позиции в акциях, облигациях и криптовалюте, включая монеты с подключённых бирж, курсы валют) передаются через наш сервер компании Anthropic — поставщику модели Claude — для формирования ответа. Содержание переписки мы не храним. Для лимитов мы храним дневной счётчик запросов, привязанный к идентификатору аккаунта Google (удаляется автоматически через 2 дня), и общий расход токенов без какого-либо идентификатора (до 90 дней). Если вы не пользуетесь AI-чатом, данные портфеля никуда не отправляются."
+    "AI-чат необязателен. Когда вы отправляете сообщение, ваш текст и сводка портфеля (суммы по категориям, условия и названия депозитов, позиции в акциях, облигациях и криптовалюте, включая монеты с подключённых бирж, курсы валют) передаются через наш сервер компании Anthropic — поставщику модели Claude — для формирования ответа. Содержание переписки мы не храним. Для лимитов мы храним дневной счётчик запросов, привязанный к идентификатору аккаунта Google (удаляется автоматически в течение 7 дней), и общий расход токенов без какого-либо идентификатора (до 90 дней). Если вы не пользуетесь AI-чатом, данные портфеля никуда не отправляются."
    ],
    [
     "Серверы и хостинг",
@@ -10156,7 +10191,7 @@ const PRIVACY_I18N={
  },
  "de": {
   "title": "Datenschutzrichtlinie",
-  "updated": "Aktualisiert: 12. Oktober 2026",
+  "updated": "Aktualisiert: 18. Oktober 2026",
   "note": "Kontakt: mnacik1988@gmail.com · Online-Version: https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -10169,7 +10204,7 @@ const PRIVACY_I18N={
    ],
    [
     "Ihr Konto auf unserem Server",
-    "Bei der Anmeldung legen wir auf unserem Server einen Kontodatensatz an: Ihre Google-Konto-ID, E-Mail-Adresse, Datum des ersten und letzten Besuchs, Anzahl der KI-Anfragen, Ihren Zugangsstatus (Testphase, Abonnement) und Einstellungen des Administrators (z. B. ein persönliches Limit oder eine Sperre). Er dient dazu, Zugang zu gewähren, Grenzen anzuwenden und Missbrauch zu verhindern. Der Datensatz bleibt bestehen, solange Sie die App nutzen, und wird gelöscht, wenn Sie Ihr Konto löschen (Einstellungen → Konto löschen) oder auf Ihren Wunsch."
+    "Bei der Anmeldung legen wir auf unserem Server einen Kontodatensatz an: Ihre Google-Konto-ID, E-Mail-Adresse, Datum des ersten und letzten Besuchs, Anzahl der KI-Anfragen, Ihren Zugangsstatus (Testphase, Abonnement), Einstellungen des Administrators (z. B. ein persönliches Limit oder eine Sperre) sowie Plattform und Gerätemodell, mit dem Sie sich anmelden (z. B. „Android 14 · SM-S918B“). Er dient dazu, Zugang zu gewähren, Grenzen anzuwenden und Missbrauch zu verhindern. Der Datensatz bleibt bestehen, solange Sie die App nutzen, und wird gelöscht, wenn Sie Ihr Konto löschen (Einstellungen → Konto löschen) oder auf Ihren Wunsch."
    ],
    [
     "Ihre Portfoliodaten",
@@ -10177,11 +10212,11 @@ const PRIVACY_I18N={
    ],
    [
     "Cloud-Sicherung (optional)",
-    "Wenn Sie die Cloud-Sicherung aktivieren, wird eine Kopie Ihrer Portfoliodaten — mit demselben Inhalt wie ein Dateiexport: Einlagen, Coins, Aktien, Kredite, Notizen, Diagrammverlauf und App-Einstellungen — auf unseren Server hochgeladen und mit Ihrer Google-Konto-ID verknüpft, damit Sie sie nach einem Telefonwechsel oder -verlust wiederherstellen können. Die Kopie wird auf unserem Server verschlüsselt gespeichert. Den Schlüssel besitzt der Betreiber des Dienstes, der die Kopie technisch entschlüsseln kann; wir lesen sie nicht, verkaufen sie nicht und geben sie nicht weiter, sondern nutzen sie nur, um Ihre Daten für Sie wiederherzustellen. API-Schlüssel von Börsen, Bank-Tokens und Kaufdaten sind nie enthalten — sie bleiben nur auf Ihrem Gerät. Wir speichern bis zu 3 neueste Kopien. Solange Sie nicht zugestimmt haben, ist die Sicherung aus; Sie können sie jederzeit in den Einstellungen ausschalten und alle Kopien löschen, und beim Löschen Ihres Kontos werden die Kopien automatisch gelöscht."
+    "Wenn Sie die Cloud-Sicherung aktivieren, wird eine Kopie Ihrer Portfoliodaten — mit demselben Inhalt wie ein Dateiexport: Einlagen, Coins, Aktien, Kredite, Notizen, Diagrammverlauf und App-Einstellungen — auf unseren Server hochgeladen und mit Ihrer Google-Konto-ID verknüpft, damit Sie sie nach einem Telefonwechsel oder -verlust wiederherstellen können. Die Kopie wird auf unserem Server verschlüsselt gespeichert. Den Schlüssel besitzt der Betreiber des Dienstes, der die Kopie technisch entschlüsseln kann; wir lesen sie nicht, verkaufen sie nicht und geben sie nicht weiter, sondern nutzen sie nur, um Ihre Daten für Sie wiederherzustellen. API-Schlüssel von Börsen, Bank-Tokens und Kaufdaten sind nie enthalten — sie bleiben nur auf Ihrem Gerät. Wir speichern bis zu 3 neueste Kopien; zu jeder werden Datum, App-Version und Gerätetyp gespeichert. Solange Sie nicht zugestimmt haben, ist die Sicherung aus; Sie können sie jederzeit in den Einstellungen ausschalten und alle Kopien löschen, und beim Löschen Ihres Kontos werden die Kopien automatisch gelöscht."
    ],
    [
     "Löschen von Konto und Daten",
-    "Sie können Ihr Konto in der App löschen: Einstellungen → Konto löschen. Dadurch werden Ihr Kontodatensatz, alle Cloud-Sicherungen, Ihre KI-Anfragezähler und Einträge des Administratorprotokolls, die sich auf Sie beziehen, endgültig von unserem Server entfernt. Daten auf Ihrem Gerät werden nur gelöscht, wenn Sie diese Option wählen. Die Löschung können Sie auch per E-Mail an mnacik1988@gmail.com oder über https://mnacik1988.github.io/kapital01/delete-account.html beantragen. Unser Infrastrukturanbieter kann technische Datenbank-Sicherungen für begrenzte Zeit (bis zu 30 Tage) aufbewahren, bis sie überschrieben werden. Das Löschen des Kontos kündigt keine über Google Play oder den App Store abgeschlossenen Abonnements — kündigen Sie diese im Store."
+    "Sie können Ihr Konto in der App löschen: Einstellungen → Konto löschen. Dadurch werden Ihr Kontodatensatz, alle Cloud-Sicherungen und Einträge des Administratorprotokolls, die sich auf Sie beziehen, endgültig von unserem Server entfernt. Um Missbrauch zu verhindern (Löschen und Neuanlegen soll keine Sperre aufheben und keine Limits zurücksetzen), behalten wir nur Ihre Google-Konto-ID, ob das Konto gesperrt war, sowie das Datum der ersten Anmeldung und der Löschung — ohne E-Mail oder andere Daten; auch der tägliche KI-Anfragezähler wird nicht zurückgesetzt und innerhalb von 7 Tagen automatisch gelöscht. Daten auf Ihrem Gerät werden nur gelöscht, wenn Sie diese Option wählen. Die Löschung können Sie auch per E-Mail an mnacik1988@gmail.com oder über https://mnacik1988.github.io/kapital01/delete-account.html beantragen. Unser Infrastrukturanbieter kann technische Datenbank-Sicherungen für begrenzte Zeit (bis zu 30 Tage) aufbewahren, bis sie überschrieben werden. Das Löschen des Kontos kündigt keine über Google Play oder den App Store abgeschlossenen Abonnements — kündigen Sie diese im Store."
    ],
    [
     "Börsenverbindungen",
@@ -10193,7 +10228,7 @@ const PRIVACY_I18N={
    ],
    [
     "KI-Assistent",
-    "Der KI-Chat ist optional. Wenn Sie eine Nachricht senden, werden Ihr Text und eine Zusammenfassung Ihres Portfolios (Summen nach Kategorien, Bedingungen und Namen von Einlagen, Positionen in Aktien, Anleihen und Krypto einschließlich Coins verbundener Börsen, Wechselkurse) über unseren Server an Anthropic, den Anbieter des Modells Claude, gesendet, um eine Antwort zu erzeugen. Den Inhalt Ihrer Unterhaltungen speichern wir nicht. Für Nutzungsgrenzen speichern wir einen täglichen Anfragezähler, verknüpft mit Ihrer Google-Konto-ID (automatisch nach 2 Tagen gelöscht), sowie den gesamten Token-Verbrauch ohne jede Kennung (bis zu 90 Tage). Wenn Sie den KI-Chat nicht nutzen, werden keine Portfoliodaten gesendet."
+    "Der KI-Chat ist optional. Wenn Sie eine Nachricht senden, werden Ihr Text und eine Zusammenfassung Ihres Portfolios (Summen nach Kategorien, Bedingungen und Namen von Einlagen, Positionen in Aktien, Anleihen und Krypto einschließlich Coins verbundener Börsen, Wechselkurse) über unseren Server an Anthropic, den Anbieter des Modells Claude, gesendet, um eine Antwort zu erzeugen. Den Inhalt Ihrer Unterhaltungen speichern wir nicht. Für Nutzungsgrenzen speichern wir einen täglichen Anfragezähler, verknüpft mit Ihrer Google-Konto-ID (automatisch innerhalb von 7 Tagen gelöscht), sowie den gesamten Token-Verbrauch ohne jede Kennung (bis zu 90 Tage). Wenn Sie den KI-Chat nicht nutzen, werden keine Portfoliodaten gesendet."
    ],
    [
     "Server und Hosting",
@@ -10239,7 +10274,7 @@ const PRIVACY_I18N={
  },
  "zh": {
   "title": "隐私政策",
-  "updated": "更新日期：2026年10月12日",
+  "updated": "更新日期：2026年10月18日",
   "note": "联系方式：mnacik1988@gmail.com · 在线版本：https://mnacik1988.github.io/kapital01/privacy-policy.html",
   "sections": [
    [
@@ -10252,7 +10287,7 @@ const PRIVACY_I18N={
    ],
    [
     "您在我们服务器上的账户",
-    "登录时，我们会在服务器上创建账户记录：您的 Google 账户标识、电子邮箱地址、首次和最近访问日期、AI 请求次数、访问状态（试用、订阅）以及管理员所做的设置（例如个人限额或封禁）。它用于提供访问权限、实施限制并防止滥用。在您使用应用期间保留，在您删除账户（设置 → 删除账号）或应您的要求时删除。"
+    "登录时，我们会在服务器上创建账户记录：您的 Google 账户标识、电子邮箱地址、首次和最近访问日期、AI 请求次数、访问状态（试用、订阅）、管理员所做的设置（例如个人限额或封禁），以及您登录所用的平台和设备型号（例如“Android 14 · SM-S918B”）。它用于提供访问权限、实施限制并防止滥用。在您使用应用期间保留，在您删除账户（设置 → 删除账号）或应您的要求时删除。"
    ],
    [
     "您的投资组合数据",
@@ -10260,11 +10295,11 @@ const PRIVACY_I18N={
    ],
    [
     "云端备份（可选）",
-    "如果您开启云端备份，您的投资组合数据副本（内容与文件导出相同：存款、币种、股票、贷款、备注、图表历史和应用设置）会上传到我们的服务器，并与您的 Google 账户标识绑定，以便您在更换或丢失手机后恢复。副本在服务器上加密存储。加密密钥由服务运营方持有，运营方在技术上可以解密副本；我们不会阅读、出售或共享副本，只用于为您恢复数据。交易所 API 密钥、银行令牌和购买信息绝不会包含在内——它们只保留在您的设备上。我们最多保留最近 3 份副本。在您同意之前备份处于关闭状态；您可随时在“设置”中关闭并删除所有副本，删除账户时副本会被自动删除。"
+    "如果您开启云端备份，您的投资组合数据副本（内容与文件导出相同：存款、币种、股票、贷款、备注、图表历史和应用设置）会上传到我们的服务器，并与您的 Google 账户标识绑定，以便您在更换或丢失手机后恢复。副本在服务器上加密存储。加密密钥由服务运营方持有，运营方在技术上可以解密副本；我们不会阅读、出售或共享副本，只用于为您恢复数据。交易所 API 密钥、银行令牌和购买信息绝不会包含在内——它们只保留在您的设备上。我们最多保留最近 3 份副本，每份记录保存日期、应用版本和设备类型。在您同意之前备份处于关闭状态；您可随时在“设置”中关闭并删除所有副本，删除账户时副本会被自动删除。"
    ],
    [
     "删除账户和数据",
-    "您可以在应用内删除账户：设置 → 删除账号。这会从我们的服务器永久删除您的账户记录、所有云端备份、AI 请求计数以及与您相关的管理员日志条目。仅当您选择该选项时，才会清除您设备上的数据。您也可以发送邮件至 mnacik1988@gmail.com，或通过 https://mnacik1988.github.io/kapital01/delete-account.html 申请删除。我们的基础设施提供商可能会在有限时间内（最长 30 天）保留数据库的技术备份，直至被覆盖。删除账户不会取消通过 Google Play 或 App Store 购买的订阅，请在商店中取消。"
+    "您可以在应用内删除账户：设置 → 删除账号。这会从我们的服务器永久删除您的账户记录、所有云端备份以及与您相关的管理员日志条目。为防止滥用（删除后重新创建账户不应解除封禁或重置限额），我们仅保留您的 Google 账户标识、是否被封禁以及首次登录和删除的日期，不保留邮箱或其他数据；每日 AI 请求计数同样不会被重置，并在 7 天内自动删除。仅当您选择该选项时，才会清除您设备上的数据。您也可以发送邮件至 mnacik1988@gmail.com，或通过 https://mnacik1988.github.io/kapital01/delete-account.html 申请删除。我们的基础设施提供商可能会在有限时间内（最长 30 天）保留数据库的技术备份，直至被覆盖。删除账户不会取消通过 Google Play 或 App Store 购买的订阅，请在商店中取消。"
    ],
    [
     "交易所连接",
@@ -10276,7 +10311,7 @@ const PRIVACY_I18N={
    ],
    [
     "AI 助手",
-    "AI 聊天为可选功能。当您发送消息时，您的消息和投资组合摘要（各类别合计、存款条件和名称、股票、债券和加密货币持仓（包括已连接交易所的币种）、汇率）会通过我们的服务器发送给 Claude 模型的提供商 Anthropic 以生成回复。我们不保存对话内容。为执行使用限制，我们保存与您的 Google 账户标识关联的每日请求计数（2 天后自动删除），以及不含任何标识的总 token 用量（最多保存 90 天）。如果您不使用 AI 聊天，则不会发送任何投资组合数据。"
+    "AI 聊天为可选功能。当您发送消息时，您的消息和投资组合摘要（各类别合计、存款条件和名称、股票、债券和加密货币持仓（包括已连接交易所的币种）、汇率）会通过我们的服务器发送给 Claude 模型的提供商 Anthropic 以生成回复。我们不保存对话内容。为执行使用限制，我们保存与您的 Google 账户标识关联的每日请求计数（7 天内自动删除），以及不含任何标识的总 token 用量（最多保存 90 天）。如果您不使用 AI 聊天，则不会发送任何投资组合数据。"
    ],
    [
     "服务器与托管",
@@ -11947,7 +11982,16 @@ function loadCapitalHistory(){
   capitalHistoryLoaded=true;
   normalizeCapitalHistory();
 }
+// Импорт, восстановление копии и стирание данных ставят _kapitalImportInProgress.
+// Отложенный снимок (таймер 1,5 с или pagehide) раньше этот флаг не проверял и
+// записывал старую историю из памяти поверх новой (аудит 18.10.2026, п.4).
+function historyWritesBlocked(){return !!window._kapitalImportInProgress;}
+function cancelPendingHistoryWrites(){
+  if(typeof _dailySnapTimer!=='undefined'&&_dailySnapTimer){clearTimeout(_dailySnapTimer);_dailySnapTimer=null;}
+  if(typeof _sectionHourlyRecordTimer!=='undefined'&&_sectionHourlyRecordTimer){clearTimeout(_sectionHourlyRecordTimer);_sectionHourlyRecordTimer=null;}
+}
 function saveCapitalHistory(){
+  if(historyWritesBlocked())return;
   // Keep max 365 entries
   if(capitalHistory.length>365) capitalHistory=capitalHistory.slice(-365);
   localStorage.setItem('cap_history',JSON.stringify(capitalHistory));
@@ -12141,11 +12185,13 @@ function normalizeSectionHourlyHistory(){
   sectionHourlyHistory=[...byHour.values()].sort((a,b)=>a.hour.localeCompare(b.hour)).slice(-720);
 }
 function saveSectionHourlyHistory(){
+  if(historyWritesBlocked())return;
   if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();
   normalizeSectionHourlyHistory();
   localStorage.setItem('section_hourly_history',JSON.stringify(sectionHourlyHistory));
 }
 function recordSectionHourlySnapshot(){
+  if(historyWritesBlocked())return;
   if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();
   const hour=getLocalHourKey();
   const perf=getSectionPerformanceSnapshot();
@@ -12411,6 +12457,7 @@ let _dailySnapTimer=null,_dailySnapTotal=0,_dailySnapFlushBound=false;
 function flushDailySnapshot(){
   if(!_dailySnapTimer)return;
   clearTimeout(_dailySnapTimer);_dailySnapTimer=null;
+  if(historyWritesBlocked())return;
   try{recordDailySnapshot(_dailySnapTotal);refreshCardSparklines();}catch(e){}
 }
 function scheduleDailySnapshot(total){
@@ -12420,6 +12467,7 @@ function scheduleDailySnapshot(total){
   _dailySnapTimer=setTimeout(flushDailySnapshot,1500);
 }
 function recordDailySnapshot(total){
+  if(historyWritesBlocked())return;
   if(!capitalHistoryLoaded)loadCapitalHistory();
   const today=getLocalDateKey();
   normalizeCapitalHistory();
@@ -15224,6 +15272,7 @@ function restoreBackupPayload(payload){
     createRollbackSnapshot();
     window._kapitalImportInProgress=true;
     if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
+    cancelPendingHistoryWrites();
     BACKUP_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
     Object.entries(payload.storage).forEach(([key,val])=>{
       if(BACKUP_STORAGE_KEYS.includes(key)&&typeof val==='string')localStorage.setItem(key,val);
@@ -15358,15 +15407,15 @@ var CLOUD_I18N={
   errRestore:{uk:'Не вдалося відновити: ',ru:'Не удалось восстановить: ',en:'Restore failed: ',de:'Wiederherstellung fehlgeschlagen: ',zh:'恢复失败：'},
   noCopies:{uk:'У хмарі немає копій.',ru:'В облаке нет копий.',en:'There are no backups in the cloud.',de:'In der Cloud gibt es keine Sicherungen.',zh:'云端没有备份。'},
   consentTitle:{uk:'Зберігати резервну копію в хмарі?',ru:'Хранить резервную копию в облаке?',en:'Keep a backup in the cloud?',de:'Sicherung in der Cloud speichern?',zh:'在云端保存备份？'},
-  consentBody:{uk:'Щоб не втратити дані при зміні чи втраті телефона, ми можемо зберігати копію вашого портфеля на нашому сервері в зашифрованому вигляді. Вона привʼязана до вашого акаунта Google — після входу на новому телефоні ви повернете всі дані. Ключі бірж і банків у копію не потрапляють: вони залишаються лише на вашому пристрої. Вимкнути та видалити копію можна будь-коли в Налаштуваннях.',
-    ru:'Чтобы не потерять данные при смене или потере телефона, мы можем хранить копию вашего портфеля на нашем сервере в зашифрованном виде. Она привязана к вашему аккаунту Google — после входа на новом телефоне вы вернёте все данные. Ключи бирж и банков в копию не попадают: они остаются только на вашем устройстве. Отключить и удалить копию можно в любой момент в Настройках.',
-    en:'So you do not lose your data if you change or lose your phone, we can keep an encrypted copy of your portfolio on our server. It is tied to your Google account — after signing in on a new phone you get everything back. Exchange and bank keys are never included: they stay only on your device. You can turn this off and delete the copy any time in Settings.',
-    de:'Damit Sie Ihre Daten bei einem Telefonwechsel oder -verlust nicht verlieren, können wir eine verschlüsselte Kopie Ihres Portfolios auf unserem Server speichern. Sie ist an Ihr Google-Konto gebunden – nach der Anmeldung auf einem neuen Telefon erhalten Sie alles zurück. Börsen- und Bankschlüssel sind nie enthalten: Sie bleiben nur auf Ihrem Gerät. Sie können dies jederzeit in den Einstellungen ausschalten und die Kopie löschen.',
-    zh:'为避免更换或丢失手机时丢失数据，我们可以在服务器上保存您投资组合的加密副本。副本与您的 Google 账号绑定——在新手机上登录后即可找回全部数据。交易所和银行的密钥不会包含在副本中，只保留在您的设备上。您可随时在“设置”中关闭并删除该副本。'},
+  consentBody:{uk:'Щоб не втратити дані при зміні чи втраті телефона, ми можемо зберігати копію вашого портфеля на нашому сервері в зашифрованому вигляді. Вона привʼязана до вашого акаунта Google — після входу на новому телефоні ви повернете всі дані. Ключ шифрування зберігається на нашому сервері, тож технічно ми можемо розшифрувати копію. Ключі бірж і банків у копію не потрапляють: вони залишаються лише на вашому пристрої. Вимкнути та видалити копію можна будь-коли в Налаштуваннях.',
+    ru:'Чтобы не потерять данные при смене или потере телефона, мы можем хранить копию вашего портфеля на нашем сервере в зашифрованном виде. Она привязана к вашему аккаунту Google — после входа на новом телефоне вы вернёте все данные. Ключ шифрования хранится на нашем сервере, поэтому технически мы можем расшифровать копию. Ключи бирж и банков в копию не попадают: они остаются только на вашем устройстве. Отключить и удалить копию можно в любой момент в Настройках.',
+    en:'So you do not lose your data if you change or lose your phone, we can keep an encrypted copy of your portfolio on our server. It is tied to your Google account — after signing in on a new phone you get everything back. The encryption key is kept on our server, so technically we are able to decrypt the copy. Exchange and bank keys are never included: they stay only on your device. You can turn this off and delete the copy any time in Settings.',
+    de:'Damit Sie Ihre Daten bei einem Telefonwechsel oder -verlust nicht verlieren, können wir eine verschlüsselte Kopie Ihres Portfolios auf unserem Server speichern. Sie ist an Ihr Google-Konto gebunden – nach der Anmeldung auf einem neuen Telefon erhalten Sie alles zurück. Der Schlüssel liegt auf unserem Server, technisch können wir die Kopie also entschlüsseln. Börsen- und Bankschlüssel sind nie enthalten: Sie bleiben nur auf Ihrem Gerät. Sie können dies jederzeit in den Einstellungen ausschalten und die Kopie löschen.',
+    zh:'为避免更换或丢失手机时丢失数据，我们可以在服务器上保存您投资组合的加密副本。副本与您的 Google 账号绑定——在新手机上登录后即可找回全部数据。加密密钥保存在我们的服务器上，因此从技术上讲我们能够解密该副本。交易所和银行的密钥不会包含在副本中，只保留在您的设备上。您可随时在“设置”中关闭并删除该副本。'},
   consentYes:{uk:'Увімкнути',ru:'Включить',en:'Turn on',de:'Aktivieren',zh:'开启'},
   consentNo:{uk:'Не зараз',ru:'Не сейчас',en:'Not now',de:'Nicht jetzt',zh:'暂不'},
   offerTitle:{uk:'Знайдено копію ваших даних',ru:'Найдена копия ваших данных',en:'We found a backup of your data',de:'Sicherung Ihrer Daten gefunden',zh:'找到您的数据备份'},
-  offerBody:{uk:'У хмарі є копія від {when}{dev}. Відновити її на цьому пристрої?',ru:'В облаке есть копия от {when}{dev}. Восстановить её на этом устройстве?',en:'There is a backup from {when}{dev}. Restore it on this device?',de:'Es gibt eine Sicherung vom {when}{dev}. Auf diesem Gerät wiederherstellen?',zh:'云端有一份 {when}{dev} 的备份。要在此设备上恢复吗？'},
+  offerBody:{uk:'У хмарі є копія від {when}{dev}. Відновити її на цьому пристрої? Те, що вже є тут (зокрема історію графіка й налаштування), буде замінено — це можна скасувати: «Відкотити останній імпорт».',ru:'В облаке есть копия от {when}{dev}. Восстановить её на этом устройстве? То, что уже есть здесь (в том числе история графика и настройки), будет заменено — это можно отменить: «Откатить последний импорт».',en:'There is a backup from {when}{dev}. Restore it on this device? Anything already here (including chart history and settings) will be replaced — you can undo it with “Undo last import”.',de:'Es gibt eine Sicherung vom {when}{dev}. Auf diesem Gerät wiederherstellen? Was hier bereits ist (auch Verlauf und Einstellungen), wird ersetzt – rückgängig mit „Letzten Import rückgängig machen“.',zh:'云端有一份 {when}{dev} 的备份。要在此设备上恢复吗？此处已有的内容（包括图表历史和设置）将被替换——可通过“撤销上次导入”还原。'},
   offerYes:{uk:'Відновити',ru:'Восстановить',en:'Restore',de:'Wiederherstellen',zh:'恢复'},
   offerNo:{uk:'Почати з нуля',ru:'Начать с нуля',en:'Start fresh',de:'Neu beginnen',zh:'重新开始'},
   offerHint:{uk:'Копія нікуди не зникне: відновити її можна пізніше в Налаштуваннях → Хмарна копія.',ru:'Копия никуда не денется: восстановить её можно позже в Настройках → Облачная копия.',en:'The backup is not going anywhere: you can restore it later in Settings → Cloud backup.',de:'Die Sicherung bleibt erhalten: Sie können sie später unter Einstellungen → Cloud-Sicherung wiederherstellen.',zh:'备份不会丢失：您之后可在“设置 → 云端备份”中恢复。'},
@@ -15433,6 +15482,12 @@ function cloudIsLocalEmpty(){
     if((d.securitiesSections||[]).some(x=>x&&((x.items||[]).length||pos(x.stockCashAmount)||pos(x.incomeAmount)||x.id!=='sec_stocks_default')))return false;
     if(['coins','forexItems','customSections','liabilities','metalsSections','manualBanks'].some(k=>Array.isArray(d[k])&&d[k].length>0))return false;
     if(['cryptoUsdt','usdAmount','cashAmount','otherAmount'].some(k=>pos(d[k])))return false;
+    // История графика и подключённые биржи / банк — тоже данные: у человека, чьи
+    // активы приходят только с подключений, автокопия молча не запускалась (аудит 18.10, п.13).
+    try{const h=JSON.parse(localStorage.getItem('cap_history')||'[]');if(Array.isArray(h)&&h.some(x=>x&&Number(x.total)>0))return false;}catch(e){}
+    for(const k of [EXCHANGE_KEYS_LS,BANK_KEYS_LS]){
+      try{const v=JSON.parse(localStorage.getItem(k)||'null');if(v&&typeof v==='object'&&Object.keys(v).length)return false;}catch(e){}
+    }
     return true;
   }catch(e){return true;}
 }
@@ -15530,10 +15585,13 @@ async function cloudUploadOnce(opts){
   CLOUD.busy=true;
   renderCloudBackupUI();
   try{
+    // Подпись снимаем ДО сжатия и отправки, в тот же момент, что и данные копии:
+    // правка, сделанная во время отправки, иначе помечалась как уже отправленная
+    // (аудит 18.10.2026, п.11).
+    const sig=cloudSignature();
     let pack=await cloudBuild(false);
     if(pack.bytes.length>CLOUD_MAX_BYTES)pack=await cloudBuild(true);
     if(pack.bytes.length>CLOUD_MAX_BYTES){CLOUD.msg='errTooLarge';return {error:'too_large'};}
-    const sig=cloudSignature();
     const base=opts.base!==undefined?opts.base:st.base;
     const q='?enc='+pack.enc+'&v='+encodeURIComponent(APP_VERSION)+'&base='+(base||0)+(opts.force?'&force=1':'');
     const r=await cloudApi('/backup/save'+q,{method:'POST',body:pack.bytes});
@@ -15580,13 +15638,27 @@ async function cloudRestore(meta){
   const payload=sanitizeBackupAccessState(normalizeBackupPayload(raw));
   if(!payload)throw new Error('unknown format');
   validateBackupPayload(payload);
+  // base — самая свежая копия на сервере, а не выбранная: иначе после восстановления
+  // не самой новой копии следующая автокопия получала ложный конфликт, и кнопка в нём
+  // молча откатывала выбор человека (аудит 18.10.2026, п.12).
+  let latestAt=Number(meta.savedAt)||0;
+  try{
+    const lr=await cloudApi('/backup/list');
+    if(lr&&lr.status===200){
+      const list=(await lr.json()).backups||[];
+      if(list[0]&&Number(list[0].savedAt)>latestAt)latestAt=Number(list[0].savedAt);
+    }
+  }catch(e){}
   // Лёгкая копия могла не нести историю графика — не стираем локальную.
   const keep={};
   CLOUD_HEAVY_DROP.forEach(k=>{if(!(payload.storage&&payload.storage[k])){const v=localStorage.getItem(k);if(v)keep[k]=v;}});
   if(!restoreBackupPayload(payload))throw new Error('restore failed');
-  Object.keys(keep).forEach(k=>localStorage.setItem(k,keep[k]));
+  // Дальше данные УЖЕ заменены: любая ошибка (например, переполнение хранилища) не
+  // должна показываться как «не удалось», а страница всё равно перезагружается —
+  // иначе сохранение оставалось заблокированным до перезапуска (аудит 18.10, п.14).
+  try{Object.keys(keep).forEach(k=>localStorage.setItem(k,keep[k]));}catch(e){console.warn('Restore: history keep failed',e);}
   // sig='restored': после перезагрузки запоминаем отпечаток, не отправляя ту же копию снова.
-  cloudPatch({enabled:true,decided:true,declined:false,base:meta.savedAt,sig:'restored',lastAt:Date.now()});
+  try{cloudPatch({enabled:true,decided:true,declined:false,base:latestAt,sig:'restored',lastAt:Date.now()});}catch(e){console.warn('Restore: cloud state failed',e);}
   setTimeout(()=>location.reload(),400);
 }
 function cloudRestoreById(meta,fromSheet){
@@ -15807,11 +15879,14 @@ async function doDeleteAccount(){
   try{localStorage.removeItem(CLOUD_KEY);}catch(e){}
   closeBankSheet();closeSettings();
   if(wipe){
-    window._kapitalImportInProgress=true;   // не даём saveData() переписать данные на выходе
+    window._kapitalImportInProgress=true;   // не даём saveData() и снимкам истории переписать данные на выходе
     if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;}
-    BACKUP_STORAGE_KEYS.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
-    try{localStorage.removeItem(STORAGE_ROLLBACK_KEY);}catch(e){}
+    cancelPendingHistoryWrites();
     signOutGoogle();
+    // Стираем ВСЁ хранилище приложения: раньше оставались история цен монет, настройки,
+    // ID устройства и др., а политика обещает стереть данные (аудит 18.10.2026, п.15).
+    try{localStorage.clear();}catch(e){}
+    try{sessionStorage.clear();}catch(e){}
     setTimeout(()=>location.reload(),300);
   }else{
     signOutGoogle();
@@ -16846,20 +16921,20 @@ const _ndPathCache={};
 function ndDepositPath(d){
   const start=d.startDate?depLocalDate(d.startDate):getDepositAccrualStart(d);
   const end=d.endDate?depLocalDate(d.endDate):getDepositContractEnd(d,start);
-  const key=JSON.stringify([d.principal,d.rate,d.tax,d.taxFree,d.freq,d.interestTo,d.startDate,d.endDate,d.months,d.openDay,d.topups||[],d.interestModeHistory||[],getLocalDateKey()]);
+  const key=JSON.stringify([d.principal,d.rate,d.tax,d.taxFree,d.freq,d.interestTo,d.startDate,d.endDate,d.months,d.openDay,d.openDayManual,d.registeredDate,d.topups||[],d.interestModeHistory||[],getLocalDateKey()]);
   if(_ndPathCache[d.id]&&_ndPathCache[d.id].key===key)return _ndPathCache[d.id].v;
   const totalDays=Math.round((end-start)/86400000);
   if(!(totalDays>0)||!(getDepositPrincipalNative(d)>0||getDepositTopupsNative(d)>0))return null;
   const pts=[];
   const mode=totalDays<=190?'week':totalDays<=930?'month':'quarter';
-  let t=new Date(start);
-  for(let guard=0;guard<80;guard++){
-    if(mode==='week')t=depAddDays(t,7);
-    else{const n=new Date(t);n.setMonth(n.getMonth()+(mode==='month'?1:3));t=n;}
+  // Каждая точка считается от даты открытия (depAddMonthsSafe), а не прибавлением
+  // к предыдущей: иначе вклад от 31.01 «съезжал» — 03.03, 03.04… (аудит 18.10, п.10).
+  for(let k=1;k<=80;k++){
+    const t=mode==='week'?depAddDays(start,7*k):depAddMonthsSafe(start,k*(mode==='month'?1:3));
     if(t>=end){pts.push(new Date(end));break;}
     pts.push(new Date(t));
   }
-  const topupsTo=dt=>(d.topups||[]).filter(tp=>depLocalDate(tp.date)<=dt).reduce((a,tp)=>a+(parseInputNumber(tp.amount)||0),0);
+  const topupsTo=dt=>depCountedTopups(d).filter(tp=>depLocalDate(tp.date)<=dt).reduce((a,tp)=>a+(parseInputNumber(tp.amount)||0),0);
   const now=depLocalDate(new Date());
   // Шкала — от открытия договора, а проценты — только с момента, когда вклад
   // завели в приложении (как в карточке «Чистая прибыль»): прошлое не дорисовываем.
