@@ -3617,7 +3617,7 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.03';
+const APP_VERSION = 'v0.2.04';
 const APP_BUILD_DATE = '2026-10-19';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7025,7 +7025,7 @@ function getCryptoPortfolioStats(){
       }
     }
     if(curPrice>0)g.curPrice=curPrice;
-    if(c.change24h!==undefined)g.change24h=cryptoNum(c.change24h);
+    if(c.change24h!==undefined){g.change24h=cryptoNum(c.change24h);g.hasChange24=true;}
   });
   let portfolioUsd=0;
   let remainingCostUsd=0;
@@ -12186,9 +12186,14 @@ function getSectionPerformanceSnapshot(totalOverride=null){
   const usdtUsd=val('cryptoUsdt');
   const cryptoValue=cryptoHidden?0:(cryptoStats.portfolioUsd+exchangeUsd+usdtUsd)*cryptoRate;
   const cryptoBasis=cryptoHidden?0:(cryptoStats.remainingCostUsd+exchangeUsd+usdtUsd)*cryptoRate;
-  const cryptoDetailSrc=Object.fromEntries(Object.entries(cryptoStats.groups||{}).map(([k,g])=>[k,{qty:Math.max(0,Number(g.totalQty)||0),unitValue:Number(g.curPrice)||0,scale:cryptoRate}]));
+  // dayPct — суточное изменение цены монеты от биржи, как у акций. Без него «сегодня»
+  // у крипты считалось от первого снимка приложения за день и зависело от того, когда
+  // приложение открыли: сразу после снимка — «+0 без изменений», через минуту — уже
+  // другое число (19.10.2026).
+  const coinDay=g=>g&&g.hasChange24&&Number.isFinite(Number(g.change24h))?Number(g.change24h):undefined;
+  const cryptoDetailSrc=Object.fromEntries(Object.entries(cryptoStats.groups||{}).map(([k,g])=>[k,{qty:Math.max(0,Number(g.totalQty)||0),unitValue:Number(g.curPrice)||0,scale:cryptoRate,dayPct:coinDay(g)}]));
   // Отдельный ключ «биржа:монета», чтобы не смешаться с введёнными вручную.
-  getExchangeHoldings().forEach(h=>{if(h.qty>0&&h.usd>0&&!h.noPrice)cryptoDetailSrc[h.exchange+':'+h.coin]={qty:h.qty,unitValue:h.usd/h.qty,scale:cryptoRate};});
+  getExchangeHoldings().forEach(h=>{if(h.qty>0&&h.usd>0&&!h.noPrice)cryptoDetailSrc[h.exchange+':'+h.coin]={qty:h.qty,unitValue:h.usd/h.qty,scale:cryptoRate,dayPct:Number.isFinite(Number(h.change24h))&&h.change24h!==null?Number(h.change24h):undefined};});
   const cryptoDetails=makePriceDetails(cryptoDetailSrc);
   const stockStats=visibleSecuritiesSections().filter(s=>s.type==='stocks').reduce((acc,sec)=>{
     const st=getStockSectionStats(sec);
@@ -14114,16 +14119,16 @@ function renderDiagnostics(){
     const d7=getSectionPeriodDelta(currentPerf,key,7);
     const d30=getSectionPeriodDelta(currentPerf,key,30);
     const dayValue=d1?.change||0;
-    const state=dayValue>0?'positive':dayValue<0?'negative':'flat';
-    const col=dayValue>=0?'var(--green2)':'var(--red)';
-    const status=dayValue>0?sectionPerfTxt('upPrice'):dayValue<0?sectionPerfTxt('downPrice'):sectionPerfTxt('flatPrice');
+    const state=!d1?'flat':dayValue>0?'positive':dayValue<0?'negative':'flat';
+    const col=!d1?'var(--muted)':dayValue>=0?'var(--green2)':'var(--red)';
+    const status=!d1?sectionPerfTxt('insufficient'):dayValue>0?sectionPerfTxt('upPrice'):dayValue<0?sectionPerfTxt('downPrice'):sectionPerfTxt('flatPrice');
     const sign=dayValue>=0?'+':'-';
     const label=sectionPerfTxt(key);
     const pct=d1?((d1.pct>=0?'+':'')+d1.pct.toFixed(1)+'%'):'—';
     return '<div class="section-dyn-card '+state+'">'+
       '<div class="section-dyn-head">'+
         '<div><div class="section-dyn-name"><span>'+diagIconHtml(key,item.icon)+'</span><span>'+label+'</span></div><div class="section-dyn-status">'+status+'</div></div>'+
-        '<div class="section-dyn-main"><div class="section-dyn-value" style="color:'+col+'">'+sign+fmtN(toDisplayCurr(Math.abs(dayValue)))+' '+sym+'</div><div class="section-dyn-pct">'+pct+'</div></div>'+
+        '<div class="section-dyn-main"><div class="section-dyn-value" style="color:'+col+'">'+(d1?sign+fmtN(toDisplayCurr(Math.abs(dayValue)))+' '+sym:'—')+'</div><div class="section-dyn-pct">'+pct+'</div></div>'+
       '</div>'+
       '<div class="section-dyn-chips">'+
         formatSectionChip(sectionPerfTxt('d7'),d7)+
