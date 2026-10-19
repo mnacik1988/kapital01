@@ -3617,7 +3617,7 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.01';
+const APP_VERSION = 'v0.2.02';
 const APP_BUILD_DATE = '2026-10-19';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9576,7 +9576,28 @@ function migrateStoragePayload(d){
 }
 function _saveDataNow(){
   if(window._kapitalImportInProgress)return;
-  try{
+  try{_saveDataWrite();}
+  catch(e){
+    if(!isQuotaError(e))return;
+    // Портфель важнее истории графика и копии для отката: освобождаем место и повторяем.
+    for(const step of STORAGE_FREE_STEPS){
+      let freed=false;try{freed=step();}catch(e2){}
+      if(!freed)continue;
+      try{_saveDataWrite();return;}catch(e3){if(!isQuotaError(e3))return;}
+    }
+    window._storageFullAt=Date.now();
+    console.error('localStorage full');
+    if(!window._storageFull){
+      window._storageFull=true;
+      setTimeout(()=>{alert(storageFullTxt());window._storageFull=false;},100);
+    }
+  }
+}
+function storageFullTxt(){
+  return trx({uk:'⚠️ Памʼять браузера на цьому пристрої заповнена — зміни можуть не зберегтися. Зробіть експорт у файл.',ru:'⚠️ Память браузера на этом устройстве заполнена — изменения могут не сохраниться. Сделайте экспорт в файл.',en:'⚠️ Browser storage on this device is full — changes may not be saved. Export your data to a file.',de:'⚠️ Der Browserspeicher auf diesem Gerät ist voll — Änderungen werden eventuell nicht gespeichert. Exportieren Sie Ihre Daten in eine Datei.',zh:'⚠️ 此设备的浏览器存储已满——更改可能无法保存。请导出数据到文件。'});
+}
+function _saveDataWrite(){
+  {
     const payload=buildStoragePayload();
     const next=JSON.stringify(payload);
     const prev=localStorage.getItem(STORAGE_KEY);
@@ -9591,14 +9612,6 @@ function _saveDataNow(){
     localStorage.setItem('kapital_last_app_version',APP_VERSION);
     updateStorageHealthUI();
     try{cloudOnSave();}catch(e2){}
-  }catch(e){
-    if(e.name==='QuotaExceededError'||e.code===22){
-      console.error('localStorage full');
-      if(!window._storageFull){
-        window._storageFull=true;
-        setTimeout(()=>{alert('⚠️ Пам\'ять заповнена. Дані можуть не зберегтися.');window._storageFull=false;},100);
-      }
-    }
   }
 }
 
@@ -9673,6 +9686,10 @@ function updateStorageHealthUI(){
     storageTxt('app')+': '+appVersion
   ];
   if(migratedText)parts.push(storageTxt('migrated')+': '+migratedText);
+  // Сколько занято в хранилище браузера: приложением и всем сайтом (вместе с соседями).
+  const use=storageUsageBytes();
+  parts.push(trx({uk:'у памʼяті',ru:'в памяти',en:'in storage',de:'im Speicher',zh:'存储占用'})+': '+formatStorageBytes(use.mine)+' / '+formatStorageBytes(use.all));
+  if(window._storageFullAt)parts.push('⚠️ '+trx({uk:'памʼять заповнена',ru:'память заполнена',en:'storage full',de:'Speicher voll',zh:'存储已满'}));
   el.textContent=parts.join(' · ');
   const rbBtn=document.getElementById('rollbackImportBtn');
   if(rbBtn){rbBtn.style.display=rollback?'':'none';rbBtn.textContent=rollbackTxt('btn');}
@@ -11968,10 +11985,70 @@ function loadCapitalHistory(){
   capitalHistoryLoaded=true;
   normalizeCapitalHistory();
 }
+// ── Переполнение хранилища ─────────────────────────────────────────────
+// У браузера на iPhone около 5 МБ на адрес, и mnacik1988.github.io делят InveStory,
+// Mynado и NeedBuy. Когда место кончалось, запись истории графика бросала ошибку,
+// и вместе с ней падали экспорт, окно диагностики и облачная копия (19.10.2026).
+// Теперь запись не роняет приложение: сначала освобождаем место тем, что легче всего
+// потерять, и пробуем снова.
+function isQuotaError(e){
+  return !!e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED'||e.code===22||e.code===1014||/quota/i.test(String(e.message||'')));
+}
+// Шаги по очереди: 1) почасовая история — до 7 дней (нужна для линий за сутки и
+// неделю); 2) у дней старше 60 — только итоги, без деталей по разделам; 3) копия
+// для «Откатить последний импорт».
+const STORAGE_FREE_STEPS=[
+  ()=>{
+    if(typeof sectionHourlyHistory==='undefined'||!Array.isArray(sectionHourlyHistory)||sectionHourlyHistory.length<=168)return false;
+    sectionHourlyHistory=sectionHourlyHistory.slice(-168);
+    try{localStorage.setItem('section_hourly_history',JSON.stringify(sectionHourlyHistory));}catch(e){localStorage.removeItem('section_hourly_history');}
+    return true;
+  },
+  ()=>{
+    if(typeof capitalHistory==='undefined'||!Array.isArray(capitalHistory))return false;
+    const cutoff=getLocalDateKey(new Date(Date.now()-60*86400000));
+    let changed=false;
+    capitalHistory.forEach(h=>{if(h&&h.date<cutoff&&(h.sections||h.openSections)){delete h.sections;delete h.openSections;changed=true;}});
+    if(!changed)return false;
+    try{localStorage.setItem('cap_history',JSON.stringify(capitalHistory));}catch(e){}
+    return true;
+  },
+  ()=>{
+    if(localStorage.getItem(STORAGE_ROLLBACK_KEY)===null)return false;
+    localStorage.removeItem(STORAGE_ROLLBACK_KEY);
+    return true;
+  }
+];
+// value — строка или функция, которая её строит (после освобождения место
+// могло уйти из самих данных, например при обрезке почасовой истории).
+function lsSetWithRoom(key,value){
+  const val=()=>typeof value==='function'?value():value;
+  try{localStorage.setItem(key,val());return true;}catch(e){if(!isQuotaError(e))throw e;}
+  for(const step of STORAGE_FREE_STEPS){
+    let freed=false;
+    try{freed=step();}catch(e){}
+    if(!freed)continue;
+    try{localStorage.setItem(key,val());return true;}catch(e){if(!isQuotaError(e))return false;}
+  }
+  window._storageFullAt=Date.now();
+  return false;
+}
+function storageUsageBytes(){
+  let mine=0,all=0;
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);const v=localStorage.getItem(k)||'';
+      const b=(k.length+v.length)*2;   // браузер хранит строки в UTF-16
+      all+=b;
+      if(/^(kapital|investory|cap_history|section_hourly_history|live_rates_cache|display_currency|app_theme|main_counter|chartExpanded|onboarded|trial_)/.test(k))mine+=b;
+    }
+  }catch(e){}
+  return {mine,all};
+}
 function saveCapitalHistory(){
   // Keep max 365 entries
   if(capitalHistory.length>365) capitalHistory=capitalHistory.slice(-365);
-  localStorage.setItem('cap_history',JSON.stringify(capitalHistory));
+  lsSetWithRoom('cap_history',()=>JSON.stringify(capitalHistory));
 }
 function getLocalDateKey(date=new Date()){
   const d=new Date(date);
@@ -12164,7 +12241,7 @@ function normalizeSectionHourlyHistory(){
 function saveSectionHourlyHistory(){
   if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();
   normalizeSectionHourlyHistory();
-  localStorage.setItem('section_hourly_history',JSON.stringify(sectionHourlyHistory));
+  lsSetWithRoom('section_hourly_history',()=>JSON.stringify(sectionHourlyHistory));
 }
 function recordSectionHourlySnapshot(){
   if(!sectionHourlyHistoryLoaded)loadSectionHourlyHistory();
@@ -13917,7 +13994,7 @@ function renderDiagnostics(){
   const net=total-debt;
 
   // Period stats use the nearest saved point on or before the target date.
-  recordDailySnapshot(total);
+  try{recordDailySnapshot(total);}catch(e){console.warn('daily snapshot failed',e);}
   const today=getLocalDateKey();
   // «Сьогодні» — только против свежей записи (не старше двух дней), как в шапке:
   // иначе после недели без открытия неделя выдавалась за сутки (аудит п.19).
@@ -15375,6 +15452,8 @@ var CLOUD_I18N={
   errAuth:{uk:'Потрібно увійти знову.',ru:'Нужно войти снова.',en:'Please sign in again.',de:'Bitte melden Sie sich erneut an.',zh:'请重新登录。'},
   errTooLarge:{uk:'Копія завелика для хмари. Скористайтеся експортом у файл.',ru:'Копия слишком большая для облака. Воспользуйтесь экспортом в файл.',en:'The backup is too large for the cloud. Use file export instead.',de:'Die Sicherung ist zu groß für die Cloud. Nutzen Sie den Dateiexport.',zh:'备份过大，无法保存到云端。请使用文件导出。'},
   errLimit:{uk:'Сьогодні вичерпано ліміт збережень. Спробуйте завтра.',ru:'Сегодня исчерпан лимит сохранений. Попробуйте завтра.',en:'Today’s backup limit is reached. Try again tomorrow.',de:'Das Tageslimit für Sicherungen ist erreicht. Versuchen Sie es morgen erneut.',zh:'今日备份次数已达上限，请明天再试。'},
+  errStorage:{uk:'Памʼять браузера на цьому пристрої заповнена — копію не вдалося підготувати.',ru:'Память браузера на этом устройстве заполнена — копию не удалось подготовить.',en:'Browser storage on this device is full — the backup could not be prepared.',de:'Der Browserspeicher auf diesem Gerät ist voll — die Sicherung konnte nicht erstellt werden.',zh:'此设备的浏览器存储已满，无法准备备份。'},
+  errLocal:{uk:'Не вдалося підготувати копію на пристрої.',ru:'Не удалось подготовить копию на устройстве.',en:'Could not prepare the backup on this device.',de:'Die Sicherung konnte auf dem Gerät nicht erstellt werden.',zh:'无法在设备上准备备份。'},
   errUnavail:{uk:'Хмарна копія тимчасово недоступна.',ru:'Облачная копия временно недоступна.',en:'Cloud backup is temporarily unavailable.',de:'Die Cloud-Sicherung ist vorübergehend nicht verfügbar.',zh:'云端备份暂时不可用。'},
   errRestore:{uk:'Не вдалося відновити: ',ru:'Не удалось восстановить: ',en:'Restore failed: ',de:'Wiederherstellung fehlgeschlagen: ',zh:'恢复失败：'},
   noCopies:{uk:'У хмарі немає копій.',ru:'В облаке нет копий.',en:'There are no backups in the cloud.',de:'In der Cloud gibt es keine Sicherungen.',zh:'云端没有备份。'},
@@ -15550,6 +15629,7 @@ async function cloudUploadOnce(opts){
   if(cloudIsLocalEmpty())return {skipped:'empty'};
   CLOUD.busy=true;
   renderCloudBackupUI();
+  let stage='build';
   try{
     let pack=await cloudBuild(false);
     if(pack.bytes.length>CLOUD_MAX_BYTES)pack=await cloudBuild(true);
@@ -15557,6 +15637,7 @@ async function cloudUploadOnce(opts){
     const sig=cloudSignature();
     const base=opts.base!==undefined?opts.base:st.base;
     const q='?enc='+pack.enc+'&v='+encodeURIComponent(APP_VERSION)+'&base='+(base||0)+(opts.force?'&force=1':'');
+    stage='net';
     const r=await cloudApi('/backup/save'+q,{method:'POST',body:pack.bytes});
     if(!r){CLOUD.msg='errAuth';return {error:'auth'};}
     let d={};try{d=await r.json();}catch(e){}
@@ -15575,8 +15656,11 @@ async function cloudUploadOnce(opts){
     CLOUD.msg=r.status===401?'errAuth':r.status===413?'errTooLarge':r.status===429?'errLimit':r.status===503?'errUnavail':'errNet';
     return {error:r.status};
   }catch(e){
-    CLOUD.msg='errNet';
-    return {error:'net'};
+    // Раньше любая ошибка показывалась как «нет связи с сервером», хотя копия
+    // падала ещё на устройстве — например, от переполненного хранилища.
+    CLOUD.msg=stage==='net'?'errNet':isQuotaError(e)?'errStorage':'errLocal';
+    if(CLOUD.msg==='errLocal')CLOUD.msgDetail=String(e&&e.message||e).slice(0,120);
+    return {error:stage==='net'?'net':'local'};
   }finally{
     CLOUD.busy=false;
     renderCloudBackupUI();
