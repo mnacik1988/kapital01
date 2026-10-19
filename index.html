@@ -3617,8 +3617,8 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.01';
-const APP_BUILD_DATE = '2026-07-01';
+const APP_VERSION = 'v0.2.02';
+const APP_BUILD_DATE = '2026-10-19';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -4758,7 +4758,9 @@ function getDepositAccrualStart(dep){
   const reg=depLocalDate(dep.registeredDate);
   if(!dep.startDate)return reg;
   const contractStart=getDepositContractStart(dep);
-  if(reg<=contractStart)return reg;
+  // Вклад завели заранее, до открытия счёта: проценты — только с открытия.
+  // Раньше они шли со дня внесения, и итог к концу срока завышался на эту фору.
+  if(reg<=contractStart)return contractStart;
   const caps=getDepositCapDates(contractStart,reg,getDepositOpenDay(dep),dep);
   return caps.length?caps[caps.length-1]:contractStart;
 }
@@ -4912,7 +4914,8 @@ function simulateDeposit(dep,opts={}){
   // и все пополнения пропадали.
   const topupTotal=depCountedTopups(dep).reduce((s,tp)=>s+(parseInputNumber(tp.amount)||0),0);
   if((!P&&!topupTotal)||stop<=start||end<=start){
-    const dailyGross=(P||0)*rAnn/365;
+    // Вклад ещё не открыт — дохода за день нет (раньше счётчик тикал до открытия).
+    const dailyGross=until<start?0:(P||0)*rAnn/365;
     const dailyTax=Math.max(0,dailyGross)*taxRate;
     const dailyNet=dailyGross-dailyTax;
     return {principal:P||0,bodyBalance:P||0,separateNet:0,pendingSeparateNet:0,stayingNet:0,pendingBodyNet:0,totalValue:P||0,totalGross:0,totalTax:0,totalNet:0,capitalizedNet:0,completedCaps:0,currentMode:normalizeDepositMode(dep?.interestTo),dailyGross,dailyNet,avgContributed:P||0,spanDays:0};
@@ -5038,7 +5041,10 @@ function simulateDeposit(dep,opts={}){
   const shownGross=totalGross+pendingGross;
   const shownTax=totalTax+pendingTax;
   const shownNet=totalNet+pendingNet;
-  const dailyGross=bodyBalance*rAnn/yearDays(stop.getFullYear());
+  // После последнего дня срока вклад ничего не приносит: раньше закончившийся
+  // вклад продолжал показывать «в день», «в секунду», «прогноз/месяц» и добавлял
+  // их в пассивный доход на главном экране.
+  const dailyGross=until>end?0:bodyBalance*rAnn/yearDays(stop.getFullYear());
   // Пока необлагаемый минимум не исчерпан, налога нет и на дневной строке.
   // Раньше она удерживала его всегда, а итог — нет: «за добу» показывало
   // чистыми, а в тело падало грязное начисление.
@@ -5182,7 +5188,7 @@ function calcLive(depId){
     if(s)s.style.display='block'; if(m)m.style.display='none'; return;
   }
   const start=getDepositAccrualStart(dep),end=depLocalDate(eStr),now=new Date();
-  if(now<start||end<=start){
+  if(end<=start){
     const s=$('liveSetup_'+depId), m=$('liveMain_'+depId);
     if(s)s.style.display='block'; if(m)m.style.display='none'; return;
   }
@@ -9301,6 +9307,16 @@ function saveOrder(){
   saveDataNow();
 }
 
+const BUILTIN_CARD_ORDER=['deposit','crypto','usd','forex','cash','other'];
+function defaultCardRank(id){
+  const b=BUILTIN_CARD_ORDER.indexOf(id);
+  if(b>=0)return b;
+  const find=(list,base)=>{const i=(list||[]).findIndex(x=>x&&x.id===id);return i>=0?base+i:-1;};
+  for(const [list,base] of [[customSections,100],[metalsSections,2000],[securitiesSections,3000]]){
+    const r=find(list,base);if(r>=0)return r;
+  }
+  return 9000;
+}
 function restoreOrder(){
   cleanupRemovedCards();
   const root=getUnifiedRoot();
@@ -9310,7 +9326,12 @@ function restoreOrder(){
   const map=new Map(cards.map(card=>[card.dataset.card,card]));
   const ids=(Array.isArray(cardOrder)&&cardOrder.length?cardOrder:[])
     .filter(id=>map.has(id));
-  cards.forEach(card=>{if(!ids.includes(card.dataset.card))ids.push(card.dataset.card);});
+  // Карточки без сохранённого места — в постоянном порядке по типу. Раньше брался
+  // текущий порядок в DOM, и раздел, перерисованный последним (например, металлы
+  // после смены языка), уезжал в конец списка.
+  const rest=cards.map(card=>card.dataset.card).filter(id=>!ids.includes(id));
+  rest.sort((a,b)=>defaultCardRank(a)-defaultCardRank(b));
+  ids.push(...rest);
   ids.forEach(id=>{
     const el=map.get(id);
     if(el)root.appendChild(el);
