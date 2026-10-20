@@ -2126,7 +2126,7 @@ body.nd .cg-note,body.nd .cg-title{color:var(--nd-muted)!important;}
 body.nd{--nd-bg:#0d0e12;--nd-bg2:#08090b;--nd-head:#0f0f13;--nd-surface:#111216;--nd-panel:#17181e;--nd-btn:#14151a;--nd-seg:#121318;--nd-active:#1d1b16;--nd-chip:#24252b;--nd-glow:#2a2112;--nd-glow-red:#2a1414;--nd-text-hi:#f6efe0;--nd-text:#f1ead9;--nd-text2:#cfc7b4;--nd-muted:#8c8778;--nd-muted2:#77736a;--nd-l0:#ffffff08;--nd-l1:#ffffff0d;--nd-l2:#ffffff14;--nd-up:#7fd6a3;--nd-dn:#ef8a7a;--nd-goldtx:#e9cd85;}
 body.nd.theme-light{--nd-bg:#f4efe6;--nd-bg2:#ebe4d7;--nd-head:#f8f3ea;--nd-surface:#ffffff;--nd-panel:#fbf8f2;--nd-btn:#f2ece2;--nd-seg:#ece5d8;--nd-active:#fff6e2;--nd-chip:#efe8db;--nd-glow:#ead8ae;--nd-glow-red:#f1d6cf;--nd-text-hi:#141210;--nd-text:#1d1b17;--nd-text2:#4b4538;--nd-muted:#8a8273;--nd-muted2:#a39b8b;--nd-l0:#1d1b170f;--nd-l1:#1d1b1717;--nd-l2:#1d1b1724;--nd-up:#2f7a52;--nd-dn:#b0473a;--nd-goldtx:#8f6223;}
 body.nd.theme-light .header,body.nd.theme-light .bottom-nav{box-shadow:0 8px 20px #4a392214!important;}
-body.nd.theme-light .bottom-nav{box-shadow:0 -8px 24px #4a39221a!important;}
+body.nd.theme-light .bottom-nav{box-shadow:0 -3px 12px #4a39220b!important;}
 body.nd.theme-light .nd-screen-bar{box-shadow:0 6px 16px #4a39221a!important;}
 body.nd.theme-light :is(.custom-dialog-overlay,.crypto-add-overlay,.stock-add-overlay,.stock-detail-overlay,.picker-overlay,.modal-overlay,.settings-overlay,.calc-overlay,.diag-overlay,.ai-chat-overlay){background:#1d1b1766!important;}
 body.nd.theme-light .bottom-nav-btn:not(.center) .bottom-nav-icon{filter:saturate(1.1) brightness(.8);}
@@ -2563,8 +2563,8 @@ body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradi
 body.modern-mockup.nd .ex-card{background:var(--nd-surface)!important;border:1px solid var(--nd-l1)!important;box-shadow:none!important;}
 body.modern-mockup.nd.theme-light .ex-card{box-shadow:0 1px 6px #4a39220d!important;}
 body.modern-mockup.nd.theme-light :is(.nd-sec-tabs button.on,.nd-dep-tabs button.on,.nd-ptabs button.on,.calc-tab.active){background:#ffffff!important;box-shadow:0 1px 5px #4a39221a,inset 0 0 0 1px #d9b86659!important;color:#141210!important;}
-body.modern-mockup.nd.theme-light :is(.settings-lang-btn,.settings-curr-btn,.settings-theme-btn,.test-build-btn).active{background:#ffffff!important;box-shadow:0 1px 5px #4a39221a!important;border-color:#d9b86680!important;color:#141210!important;}
-body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradient(145deg,#f8ecc9,#e6c98a)!important;box-shadow:0 2px 8px #b88a3514!important;}
+body.modern-mockup.nd.theme-light :is(.settings-lang-btn,.settings-curr-btn,.settings-theme-btn,.test-build-btn).active{background:linear-gradient(145deg,#fdf1d4,#f2dca6)!important;box-shadow:0 2px 8px #b88a3526!important;border:1.5px solid #c99a3e!important;color:#3d2a08!important;}
+body.modern-mockup.nd.theme-light .bottom-nav-btn.center{background:linear-gradient(145deg,#fdf7e8,#f2e2b8)!important;box-shadow:0 1px 6px #b88a3512!important;border:1px solid #e6d3a3!important;}
 .nd-path{display:flex;align-items:flex-end;gap:3px;height:96px;padding:14px 14px 0;background:var(--nd-bg);border:1px solid var(--nd-l1);border-radius:16px 16px 0 0;}
 .nd-path i{flex:1;position:relative;display:flex;flex-direction:column;justify-content:flex-start;background:#8c877838;border-radius:3px 3px 0 0;min-height:3px;overflow:hidden;}
 .nd-path i u{display:block;width:100%;min-height:3px;background:#e6c46e;text-decoration:none;}
@@ -2601,6 +2601,13 @@ body.nd .nd-bars-head{cursor:default;}
 body.modern-mockup.nd.theme-light .nd-day-btn{background:#ffffff;box-shadow:0 2px 6px #4a392212;}
 body.modern-mockup.nd.theme-light .nd-day-btn svg{color:#b88a35;}
 body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
+.nd-ico{display:none;}
+body.nd .nd-ico{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:7px;vertical-align:-4px;flex:none;}
+body.nd .settings-group-title .nd-ico{width:20px;height:20px;margin-right:8px;vertical-align:-5px;}
+body.nd .nd-ico svg{width:100%;height:100%;fill:none;stroke:url(#ndGoldGrad);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+#ndGoldGrad .g1{stop-color:#f6dc8c;}#ndGoldGrad .g2{stop-color:#c48a2c;}
+body.theme-light #ndGoldGrad .g1{stop-color:#d8a64a;}body.theme-light #ndGoldGrad .g2{stop-color:#9a6519;}
+body.modern-mockup.nd.theme-light .bottom-nav{box-shadow:0 -3px 12px #4a39220d!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3617,8 +3624,8 @@ body.modern-mockup.nd.theme-light .nd-day-btn.on{border-color:#b88a3566;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.04';
-const APP_BUILD_DATE = '2026-10-19';
+const APP_VERSION = 'v0.2.05';
+const APP_BUILD_DATE = '2026-10-20';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -3966,6 +3973,10 @@ const EXTRA_I18N={
   'Відображення суми':{uk:'Відображення суми',ru:'Отображение суммы',en:'Display currency',de:'Anzeigewährung',zh:'显示货币'},
   '🛠 Розробник':{uk:'🛠 Розробник',ru:'🛠 Разработчик',en:'🛠 Developer',de:'🛠 Entwickler',zh:'🛠 开发者'},
   'Статус:':{uk:'Статус:',ru:'Статус:',en:'Status:',de:'Status:',zh:'状态：'},
+  // Те же фразы без эмодзи: в новом виде эмодзи заменены иконками, перевод должен находить и их.
+  'РЕЗЕРВНЕ КОПІЮВАННЯ':{uk:'РЕЗЕРВНЕ КОПІЮВАННЯ',ru:'РЕЗЕРВНОЕ КОПИРОВАНИЕ',en:'BACKUP',de:'SICHERUNG',zh:'备份'},
+  'Експорт даних':{uk:'Експорт даних',ru:'Экспорт данных',en:'Export data',de:'Daten exportieren',zh:'导出数据'},
+  'Імпорт даних':{uk:'Імпорт даних',ru:'Импорт данных',en:'Import data',de:'Daten importieren',zh:'导入数据'},
   '💾 РЕЗЕРВНЕ КОПІЮВАННЯ':{uk:'💾 РЕЗЕРВНЕ КОПІЮВАННЯ',ru:'💾 РЕЗЕРВНОЕ КОПИРОВАНИЕ',en:'💾 BACKUP',de:'💾 SICHERUNG',zh:'💾 备份'},
   '📤 Експорт даних':{uk:'📤 Експорт даних',ru:'📤 Экспорт данных',en:'📤 Export data',de:'📤 Daten exportieren',zh:'📤 导出数据'},
   '📥 Імпорт даних':{uk:'📥 Імпорт даних',ru:'📥 Импорт данных',en:'📥 Import data',de:'📥 Daten importieren',zh:'📥 导入数据'},
@@ -16776,6 +16787,7 @@ function ndRestore(key,node){
 function applyNewDesign(){
   const on=ndEnabled();
   document.body.classList.toggle('nd',on);
+  try{if(on)ndDecorateSettingsIcons();else ndRestoreSettingsIcons();}catch(e){}
   const wrap=document.querySelector('.deposits-swipe-wrap');
   const chart=$('chartSection');
   if(on){
@@ -17429,6 +17441,53 @@ function ndDayPoints(total){
   const pts=(sectionHourlyHistory||[]).filter(h=>h&&h.hour&&h.hour>=from&&h.hour<getLocalHourKey()).map(h=>fixed+sumOf(h.sections)).filter(v=>Number.isFinite(v)&&v>0);
   pts.push(total);
   return pts;
+}
+// — Иконки резервного копирования и облака: эмодзи → золотые линии в стиле иконок разделов —
+const ND_ICONS={
+  backup:'<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3"/><rect x="8" y="13" width="8" height="6" rx="1"/>',
+  export:'<path d="M12 15V4"/><path d="M8 8l4-4 4 4"/><path d="M5 14v5h14v-5"/>',
+  import:'<path d="M12 4v11"/><path d="M8 11l4 4 4-4"/><path d="M5 14v5h14v-5"/>',
+  undo:'<path d="M8 5L4 9l4 4"/><path d="M4 9h10a5 5 0 0 1 0 10H8"/>',
+  cloud:'<path d="M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 9.6 4.2 4.2 0 0 0 7 18z"/>',
+  cloudUp:'<path d="M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 9.6 4.2 4.2 0 0 0 7 18z"/><path d="M12 16v-5"/><path d="M9.8 13L12 10.8 14.2 13"/>',
+  restore:'<path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/>'
+};
+function ndIcoHtml(name){return '<span class="nd-ico" aria-hidden="true"><svg viewBox="0 0 24 24">'+ND_ICONS[name]+'</svg></span>';}
+function ndEnsureGoldGrad(){
+  if($('ndGoldGradSvg'))return;
+  document.body.insertAdjacentHTML('beforeend','<svg id="ndGoldGradSvg" width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true"><defs><linearGradient id="ndGoldGrad" gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21"><stop class="g1" offset="0"/><stop class="g2" offset="1"/></linearGradient></defs></svg>');
+}
+// Ведущий эмодзи заменяем иконкой; исходный текст храним, чтобы вернуть в старом виде.
+function ndSwapIcon(el,name){
+  if(!el)return;
+  const txt=el.textContent||'';
+  if(el.dataset.ndIco===name&&el.querySelector('.nd-ico'))return;
+  const clean=txt.replace(/^\s*(?:💾|📤|📥|☁️|☁|↶|↻)\uFE0F?\s*/,'');
+  el.dataset.ndIco=name;el.dataset.ndOrig=txt;
+  el.innerHTML=ndIcoHtml(name)+escHtml(clean);
+}
+function ndDecorateSettingsIcons(){
+  if(!document.body.classList.contains('nd'))return;
+  ndEnsureGoldGrad();
+  const exp=document.querySelector('button[onclick="backupExport()"]');
+  const sec=exp&&exp.closest('.settings-section');
+  ndSwapIcon(sec&&sec.querySelector('.settings-group-title'),'backup');
+  ndSwapIcon(exp,'export');
+  ndSwapIcon(document.querySelector('button[onclick="backupImport()"]'),'import');
+  const rb=$('rollbackImportBtn');if(rb&&rb.textContent.trim())ndSwapIcon(rb,'undo');
+  const box=$('cloudBackupBox');
+  if(box){
+    ndSwapIcon(box.querySelector('.settings-group-title'),'cloud');
+    ndSwapIcon(box.querySelector('button[onclick="cloudSaveNow()"]'),'cloudUp');
+    ndSwapIcon(box.querySelector('button[onclick="cloudOpenRestorePicker()"]'),'restore');
+  }
+}
+function ndRestoreSettingsIcons(){
+  document.querySelectorAll('[data-nd-ico]').forEach(el=>{if(el.dataset.ndOrig!==undefined)el.textContent=el.dataset.ndOrig;delete el.dataset.ndIco;delete el.dataset.ndOrig;});
+}
+for(const fname of ['openSettings','renderCloudBackupUI','updateStorageHealthUI','applyTranslations']){
+  const orig=window[fname];
+  if(typeof orig==='function')window[fname]=function(...a){const r=orig.apply(this,a);try{ndDecorateSettingsIcons();}catch(e){}return r;};
 }
 try{applyNewDesign();}catch(e){}
 // ═══ NEW DESIGN END (код) ═══
