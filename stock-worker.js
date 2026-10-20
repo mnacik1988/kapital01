@@ -136,6 +136,10 @@ async function verifyGoogleIdToken(token, env) {
     if (!valid) return null;
   } catch { return null; }
 
+  // Отзыв (удаление аккаунта, «выгнать» из админки) раньше действовал только на
+  // нашу сессию: ещё живой токен Google (около часа) проходил на /backup, /ai, /me
+  // и обменивался на новую 90-дневную сессию (аудит 18.10.2026, п.6).
+  if (await isTokenRevoked(env, payload.sub, payload.iat)) return null;
   return payload.sub;
 }
 
@@ -194,19 +198,25 @@ async function verifySessionToken(token, env) {
   // и отозванная сессия снова работала. Теперь одна повторная попытка, затем
   // временный отказ 503: человек видит «попробуйте позже», а не выход из
   // аккаунта, и отозванный токен не проходит (аудит 01.10.2026, K09).
+  if (await isTokenRevoked(env, payload.sub, payload.iat)) return null;
+  return payload.sub;
+}
+
+// Общая проверка отзыва для нашей сессии и для токена Google.
+async function isTokenRevoked(env, sub, iat) {
+  if (!env.AI_LIMITS) return false;
   let revokedBefore;
   for (let attempt = 0; ; attempt++) {
     try {
-      revokedBefore = await env.AI_LIMITS.get('revoke:' + payload.sub, { cacheTtl: 300 });
+      revokedBefore = await env.AI_LIMITS.get('revoke:' + sub, { cacheTtl: 300 });
       break;
     } catch {
       if (attempt >= 1) throw new AuthUnavailableError();
     }
   }
-  if (revokedBefore && typeof payload.iat === 'number'
-      && payload.iat < parseInt(revokedBefore, 10)) return null;
-
-  return payload.sub;
+  if (!revokedBefore) return false;
+  // Токен без iat при действующем отзыве не принимаем.
+  return !(typeof iat === 'number' && iat >= parseInt(revokedBefore, 10));
 }
 
 // Понимает и наш токен (HS256), и сырой Google (RS256) — старый клиент,
@@ -438,11 +448,13 @@ async function counterRelease(env, key) {
   } catch { /* откат не удался — счётчик останется завышенным, это безопасная сторона */ }
 }
 
-// Старые дни не нужны: держим неделю для /stats.
+// Старые дни не нужны: держим неделю для /stats. Политика обещает удаление
+// дневных счётчиков в течение 7 дней — строка дня D уходит начиная с D+7.
+// Запускается из /ai, /backup/save и /me (аудит 18.10.2026, п.2 и п.8).
 async function counterCleanup(env, day) {
   if (!env.DB) return;
   try {
-    const cutoff = new Date(Date.parse(day + 'T00:00:00Z') - 7 * DAY_SEC * 1000).toISOString().slice(0, 10);
+    const cutoff = new Date(Date.parse(day + 'T00:00:00Z') - 6 * DAY_SEC * 1000).toISOString().slice(0, 10);
     await env.DB.prepare('DELETE FROM ai_counters WHERE day < ?').bind(cutoff).run();
   } catch {}
 }
@@ -751,7 +763,13 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS backups (
       id INTEGER PRIMARY KEY AUTOINCREMENT, sub TEXT NOT NULL, saved_at INTEGER NOT NULL,
       device TEXT, platform TEXT, app_version TEXT, enc TEXT NOT NULL, size INTEGER NOT NULL, data TEXT NOT NULL)`),
-    env.DB.prepare('CREATE INDEX IF NOT EXISTS backups_sub ON backups(sub, id)')
+    env.DB.prepare('CREATE INDEX IF NOT EXISTS backups_sub ON backups(sub, id)'),
+    // Удалённые аккаунты (с 18.10.2026): только то, что нужно для защиты от
+    // злоупотреблений, — без почты и прочих данных. Иначе удаление аккаунта
+    // снимало блокировку, а цикл «удалить — войти» начинал всё с нуля (аудит п.1).
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS deleted_accounts (
+      sub TEXT PRIMARY KEY, banned INTEGER NOT NULL DEFAULT 0,
+      first_seen INTEGER, deleted_at INTEGER NOT NULL)`)
   ]);
   // Откуда заходит человек (Android / веб) и с какого устройства — 05.10.2026:
   // в админке появились незнакомые аккаунты, и без этого не отличить робота
@@ -801,11 +819,16 @@ async function getUserRecord(env, sub, { touch = false, email = null } = {}) {
   await ensureSchema(env);
   const now = Date.now();
   if (touch) {
-    await env.DB.prepare(`INSERT INTO users (sub, email, first_seen, last_seen) VALUES (?1, ?2, ?3, ?3)
+    await env.DB.prepare(`INSERT INTO users (sub, email, first_seen, last_seen, banned) VALUES (?1, ?2,
+      COALESCE((SELECT first_seen FROM deleted_accounts WHERE sub = ?1), ?3), ?3,
+      COALESCE((SELECT banned FROM deleted_accounts WHERE sub = ?1), 0))
       ON CONFLICT(sub) DO UPDATE SET last_seen = ?3, email = COALESCE(users.email, ?2)`)
       .bind(sub, cleanEmail(email), now).run();
   } else {
-    await env.DB.prepare('INSERT OR IGNORE INTO users (sub, email, first_seen, last_seen) VALUES (?1, ?2, ?3, ?3)')
+    await env.DB.prepare(`INSERT INTO users (sub, email, first_seen, last_seen, banned) VALUES (?1, ?2,
+      COALESCE((SELECT first_seen FROM deleted_accounts WHERE sub = ?1), ?3), ?3,
+      COALESCE((SELECT banned FROM deleted_accounts WHERE sub = ?1), 0))
+      ON CONFLICT(sub) DO NOTHING`)
       .bind(sub, cleanEmail(email), now).run();
   }
   return env.DB.prepare('SELECT * FROM users WHERE sub = ?').bind(sub).first();
@@ -844,7 +867,9 @@ async function rememberVerifiedEmail(env, sub, idToken) {
     if (!email) return;
     await ensureSchema(env);
     const now = Date.now();
-    await env.DB.prepare(`INSERT INTO users (sub, email, first_seen, last_seen) VALUES (?1, ?2, ?3, ?3)
+    await env.DB.prepare(`INSERT INTO users (sub, email, first_seen, last_seen, banned) VALUES (?1, ?2,
+      COALESCE((SELECT first_seen FROM deleted_accounts WHERE sub = ?1), ?3), ?3,
+      COALESCE((SELECT banned FROM deleted_accounts WHERE sub = ?1), 0))
       ON CONFLICT(sub) DO UPDATE SET email = ?2, last_seen = ?3`).bind(sub, email, now).run();
   } catch { /* карточка не должна мешать входу */ }
 }
@@ -893,6 +918,7 @@ async function handleMe(request, origin, env) {
     }
   }
   const now = Date.now();
+  if (Math.random() < 0.05) await counterCleanup(env, todayKey());
   const used = await counterRead(env, 'user:g' + sub + ':' + todayKey());
   const limit = aiLimitFor(sub, rec, cfg);
   return json({
@@ -942,16 +968,26 @@ async function getBackupKey(env) {
   return backupKeyCache;
 }
 
+// Номер ключа в начале шифртекста: «k1.iv.шифртекст». Если когда-нибудь понадобится
+// сменить BACKUP_KEY, новый станет k2, а копии k1 останутся читаемыми старым ключом.
+// Копии без префикса (до 18.10.2026) — это k1 (аудит 18.10.2026, п.7).
+const BACKUP_KEY_VERSION = 'k1';
+
 async function sealBackup(env, sub, bytes) {
   const key = await getBackupKey(env);
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ct = new Uint8Array(await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv, additionalData: new TextEncoder().encode(sub) }, key, bytes));
-  return bytesToB64url(iv) + '.' + bytesToB64url(ct);
+  return BACKUP_KEY_VERSION + '.' + bytesToB64url(iv) + '.' + bytesToB64url(ct);
 }
 
 async function openBackup(env, sub, sealed) {
-  const [ivPart, ctPart] = String(sealed).split('.');
+  const parts = String(sealed).split('.');
+  if (parts.length === 3) {
+    if (parts[0] !== BACKUP_KEY_VERSION) throw new Error('Unknown backup key version');
+    parts.shift();
+  }
+  const [ivPart, ctPart] = parts;
   const key = await getBackupKey(env);
   const plain = await crypto.subtle.decrypt(
     { name: 'AES-GCM', iv: b64urlToBytes(ivPart), additionalData: new TextEncoder().encode(sub) },
@@ -1004,7 +1040,11 @@ async function handleBackup(request, url, origin, env) {
     if (bytes.length < 2) return json({ error: 'Empty copy' }, 400, origin);
     if (bytes.length > BACKUP_MAX_BYTES) return json({ error: 'too_large', maxBytes: BACKUP_MAX_BYTES }, 413, origin);
 
-    const reserved = await counterReserve(env, 'bk:' + sub, todayKey(), BACKUP_DAILY_SAVES);
+    // Ключ с датой: без неё счётчик рос неделями, и автокопия активного человека
+    // вставала на daily_limit на несколько дней (аудит 18.10.2026, п.2).
+    const bkDay = todayKey();
+    const bkKey = 'bk:' + sub + ':' + bkDay;
+    const reserved = await counterReserve(env, bkKey, bkDay, BACKUP_DAILY_SAVES);
     if (reserved === null) return json({ error: 'Temporarily unavailable' }, 503, origin);
     if (reserved === false) return json({ error: 'daily_limit' }, 429, origin);
 
@@ -1025,7 +1065,7 @@ async function handleBackup(request, url, origin, env) {
       WHERE ?9 = 1 OR COALESCE((SELECT MAX(saved_at) FROM backups WHERE sub = ?1), 0) = ?10`)
       .bind(sub, savedAt, ci.device, ci.platform, appVersion, enc, bytes.length, sealed, force ? 1 : 0, base).run();
     if (!res.meta || !res.meta.changes) {
-      await counterRelease(env, 'bk:' + sub);
+      await counterRelease(env, bkKey);
       const cur = await env.DB.prepare(
         'SELECT id, saved_at, device, platform, app_version, enc, size FROM backups WHERE sub = ? ORDER BY id DESC LIMIT 1').bind(sub).first();
       return json({ error: 'conflict', latest: cur ? backupMeta(cur) : null }, 409, origin, 0);
@@ -1033,6 +1073,9 @@ async function handleBackup(request, url, origin, env) {
     await env.DB.prepare(
       'DELETE FROM backups WHERE sub = ?1 AND id NOT IN (SELECT id FROM backups WHERE sub = ?1 ORDER BY id DESC LIMIT ?2)')
       .bind(sub, BACKUP_KEEP).run();
+    // Очистка старых счётчиков не только из обработчика ИИ: иначе при редком ИИ
+    // строки жили бы дольше недели.
+    if (Math.random() < 0.05) await counterCleanup(env, bkDay);
     return json({ ok: true, savedAt }, 200, origin, 0);
   }
 
@@ -1045,15 +1088,23 @@ async function handleBackup(request, url, origin, env) {
 }
 
 // Удаление аккаунта самим человеком — требование Google Play и App Store.
-// Стирает всё, что сервер о нём хранит: карточку, облачные копии, счётчики ИИ;
-// сессии гасит отзывом. Журнал админа не трогаем — в нём только действия владельца.
-// Владельца не удаляем (как и в админке): иначе потерять доступ к панели.
+// Стирает карточку (почту, заметки, лимиты, устройство), облачные копии и записи
+// журнала о человеке; сессии гасит отзывом. Владельца не удаляем (как и в админке).
+// Остаётся только строка в deleted_accounts: sub, блокировка, дата первого входа и
+// дата удаления — чтобы удаление не снимало бан. Сегодняшние счётчики ИИ тоже не
+// трогаем: в них нет личных данных, и они сами стираются через неделю, а иначе
+// цикл «3 запроса → удалить → войти» выбирал общий потолок ИИ (аудит 18.10, п.1).
 async function deleteAccountData(env, sub, { revoke = true, purgeLog = true } = {}) {
   await ensureSchema(env);
+  const now = Date.now();
   await env.DB.batch([
+    env.DB.prepare(`INSERT INTO deleted_accounts (sub, banned, first_seen, deleted_at)
+      SELECT sub, banned, first_seen, ?2 FROM users WHERE sub = ?1
+      ON CONFLICT(sub) DO UPDATE SET banned = excluded.banned,
+        first_seen = COALESCE(MIN(deleted_accounts.first_seen, excluded.first_seen), deleted_accounts.first_seen, excluded.first_seen),
+        deleted_at = excluded.deleted_at`).bind(sub, now),
     env.DB.prepare('DELETE FROM backups WHERE sub = ?').bind(sub),
-    env.DB.prepare('DELETE FROM ai_counters WHERE k LIKE ?').bind('user:g' + sub + ':%'),
-    env.DB.prepare('DELETE FROM ai_counters WHERE k = ?').bind('bk:' + sub),
+    env.DB.prepare('DELETE FROM ai_counters WHERE k LIKE ?').bind('bk:' + sub + ':%'),
     env.DB.prepare('DELETE FROM users WHERE sub = ?').bind(sub)
   ]);
   // Записи журнала админа, где человек назван целью (с его почтой в деталях), — тоже
@@ -1254,7 +1305,8 @@ async function handleAdmin(request, url, origin, env) {
     if (!/^\d{5,40}$/.test(sub)) return json({ error: 'Invalid user' }, 400, origin);
     if (sub === ADMIN_SUB) return json({ error: 'Cannot delete the owner' }, 400, origin);
     const gone = await env.DB.prepare('SELECT email FROM users WHERE sub = ?').bind(sub).first();
-    await deleteAccountData(env, sub, { revoke: false, purgeLog: false });   // карточка + облачные копии + счётчики (сессии не гасим — как раньше)
+    // Карточка и облачные копии; сессии гасим, блокировка сохраняется в deleted_accounts (аудит 18.10, п.1).
+    await deleteAccountData(env, sub, { revoke: true, purgeLog: false });
     await adminLog(env, request, 'user_delete', sub, { email: gone ? gone.email : null });
     return json({ ok: true }, 200, origin, 0);
   }
@@ -1451,18 +1503,35 @@ async function handleAI(request, origin, env) {
     }
   };
 
+  // Учёт расхода — по КАЖДОЙ попытке: раньше записывалась только последняя, и
+  // оплаченная попытка Haiku перед повтором на Sonnet в статистику не попадала.
+  // Попытка считается оплаченной, если Anthropic вернул usage (аудит 18.10, п.3).
+  let billed = false;
+  const account = async (attempt) => {
+    if (attempt.ok && attempt.data?.usage) {
+      billed = true;
+      await recordUsage(env, attempt.data.usage, attempt.model);
+    }
+  };
   let r = await callClaude(AI_MODEL_PRIMARY);
+  await account(r);
   // 401 — неверный ключ, у запасной модели он тот же: повтор бессмыслен
-  if ((!r.ok || !r.content) && r.status !== 401) r = await callClaude(AI_MODEL_FALLBACK);
+  if ((!r.ok || !r.content) && r.status !== 401) {
+    r = await callClaude(AI_MODEL_FALLBACK);
+    await account(r);
+  }
   const data = r.data;
+  // Резерв снимаем, только если Anthropic ничего не списал (сеть, 429/5xx, нет
+  // usage). Оплаченный пустой ответ засчитывается в лимит: иначе вопрос, на который
+  // модели не отвечают текстом, можно было повторять без ограничения.
   if (!r.ok) {
-    await releaseReservation();
+    if (!billed) await releaseReservation();
     return json({ error: data?.error?.message || ('Claude error ' + r.status) }, 200, origin, 0);
   }
   const content = r.content;
   if (!content) {
     // Пустой ответ — отдаём причину, чтобы не гадать (обычно stop_reason: max_tokens)
-    await releaseReservation();
+    if (!billed) await releaseReservation();
     return json({
       error: 'Порожня відповідь від моделі',
       stop_reason: data?.stop_reason || null,
@@ -1471,9 +1540,7 @@ async function handleAI(request, origin, env) {
     }, 200, origin, 0);
   }
 
-  // Резерв уже сделан выше — здесь только учёт токенов. Ошибки Anthropic лимит
-  // не съедают: на всех путях отказа резерв снимается (см. releaseReservation).
-  await recordUsage(env, data?.usage, r.model);
+  // Резерв сделан выше, расход уже записан по каждой попытке (account).
   const userUsed = (await counterRead(env, uKey)) || 1;
   if (Math.random() < 0.05) await counterCleanup(env, day);
   if (env.DB) {
