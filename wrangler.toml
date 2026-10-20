@@ -53,3 +53,9 @@ simple = { limit = 120, period = 60 }
 name = "RL_DATA"
 namespace_id = "4106"
 simple = { limit = 60, period = 60 }
+
+# Логотипы монет и акций — отдельно, чтобы картинки не съедали лимит цен и курсов.
+[[ratelimits]]
+name = "RL_LOGO"
+namespace_id = "4107"
+simple = { limit = 120, period = 60 }

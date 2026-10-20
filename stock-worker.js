@@ -277,6 +277,9 @@ export default {
 
 async function handleRequest(request, env, ctx) {
   {
+    // Логотипы монет и акций грузит тег <img>, а он не присылает Origin — поэтому
+    // этот адрес проверяется отдельно (Referer, свой лимит частоты), до общей проверки.
+    if (new URL(request.url).pathname === '/logo') return handleLogo(request, env);
     const origin = request.headers.get('Origin') || '';
     if (!isAllowedOrigin(origin)) return json({ error: 'Origin not allowed' }, 403, origin);
 
@@ -377,7 +380,115 @@ function isAllowedOrigin(origin) {
 // API на workers.dev молча ничего не делал — по документации Cloudflare Cache
 // API там не работает, и все лимиты в минуту пропускали всё (аудит 03.10, п.1, п.5).
 // Cache API остаётся запасным путём на случай, если привязки нет (локальные тесты).
-const RL_BINDINGS = { auth: 'RL_AUTH', ai: 'RL_AI', exrelay: 'RL_EXRELAY', me: 'RL_ME', admin: 'RL_ADMIN', data: 'RL_DATA' };
+const RL_BINDINGS = { auth: 'RL_AUTH', ai: 'RL_AI', exrelay: 'RL_EXRELAY', me: 'RL_ME', admin: 'RL_ADMIN', data: 'RL_DATA', logo: 'RL_LOGO' };
+// ── Логотипы монет и акций (с 20.10.2026) ─────────────────────────────
+// Картинка берётся у внешнего источника ОДИН раз и лежит в KV 30 дней (кеш Cloudflare
+// на *.workers.dev не работает). «Не найдено» запоминается на 7 дней, временные сбои
+// источника — не запоминаются. Сторонним сервисам уходит только тикер, без данных
+// пользователя. Свой лимит частоты, чтобы картинки не съедали лимит цен и курсов.
+const LOGO_TTL = 30 * DAY_SEC;
+const LOGO_MISS_TTL = 7 * DAY_SEC;
+const LOGO_MAX_BYTES = 200 * 1024;
+const LOGO_IP_PER_MIN = 120;
+
+function logoResponse(bytes, ct) {
+  return new Response(bytes, { status: 200, headers: {
+    'Content-Type': ct || 'image/png',
+    'Cache-Control': 'public, max-age=' + LOGO_TTL + ', immutable',
+    'X-Content-Type-Options': 'nosniff',
+    'Access-Control-Allow-Origin': '*',
+    // SVG, открытый напрямую, не сможет выполнить скрипт на нашем адресе.
+    'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'"
+  } });
+}
+function logoMiss(status = 404, maxAge = DAY_SEC) {
+  return new Response('', { status, headers: {
+    'Cache-Control': maxAge ? 'public, max-age=' + maxAge : 'no-store',
+    'Access-Control-Allow-Origin': '*'
+  } });
+}
+// null — картинки нет (запомним «нет»); исключение — временный сбой (не запоминаем).
+async function fetchLogoImage(url) {
+  const res = await fetch(url, { cf: { cacheEverything: true, cacheTtl: DAY_SEC } });
+  if (res.status === 404 || res.status === 403 || res.status === 400) return null;
+  if (!res.ok) throw new Error('logo source HTTP ' + res.status);
+  const ct = String(res.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
+  if (!/^image\/(png|jpeg|webp|gif|svg\+xml)$/.test(ct)) return null;
+  const bytes = await res.arrayBuffer();
+  if (!bytes.byteLength || bytes.byteLength > LOGO_MAX_BYTES) return null;
+  return { bytes, ct };
+}
+async function fetchCoinLogo(sym) {
+  // Набор цветных иконок ~400 известных монет — с CDN, без лимитов.
+  const pack = await fetchLogoImage('https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/' + encodeURIComponent(sym.toLowerCase()) + '.svg');
+  if (pack) return pack;
+  // Редкие монеты — картинка CoinGecko (самая крупная монета с таким тикером).
+  const res = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(sym), {
+    headers: { Accept: 'application/json', 'User-Agent': 'InveStory-Worker/2.0' }, cf: { cacheEverything: true, cacheTtl: DAY_SEC } });
+  if (!res.ok) throw new Error('coingecko HTTP ' + res.status);
+  const found = await res.json();
+  const matches = (found?.coins || []).filter(c => String(c.symbol || '').toUpperCase() === sym);
+  matches.sort((a, b) => (a.market_cap_rank || 1e9) - (b.market_cap_rank || 1e9));
+  const img = matches[0] && (matches[0].large || matches[0].thumb);
+  if (!img) return null;
+  let host = '';
+  try { host = new URL(img).hostname; } catch { return null; }
+  if (!/(^|\.)coingecko\.com$/.test(host)) return null;
+  return fetchLogoImage(img);
+}
+async function fetchStockLogo(sym, env) {
+  if (!env.FINNHUB_KEY) return null;
+  const res = await fetch('https://finnhub.io/api/v1/stock/profile2?symbol=' + encodeURIComponent(sym) + '&token=' + encodeURIComponent(env.FINNHUB_KEY), {
+    headers: { Accept: 'application/json', 'User-Agent': 'InveStory-Worker/2.0' }, cf: { cacheEverything: true, cacheTtl: DAY_SEC } });
+  if (!res.ok) throw new Error('finnhub HTTP ' + res.status);
+  const prof = await res.json().catch(() => ({}));
+  const img = prof && prof.logo;
+  if (!img) return null;
+  let host = '';
+  try { host = new URL(img).hostname; } catch { return null; }
+  if (!/(^|\.)finnhub\.io$/.test(host)) return null;
+  return fetchLogoImage(img);
+}
+async function handleLogo(request, env) {
+  if (request.method !== 'GET') return logoMiss(405, 0);
+  const url = new URL(request.url);
+  // Если браузер сообщил, с какой страницы запрос, — только с нашей.
+  const ref = request.headers.get('Referer') || '';
+  if (ref) {
+    let o = '';
+    try { o = new URL(ref).origin; } catch {}
+    if (!isAllowedOrigin(o)) return logoMiss(403, 0);
+  }
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (await isRateLimited('logo', ip, LOGO_IP_PER_MIN, 60, env)) return logoMiss(429, 0);
+  const type = url.searchParams.get('t');
+  const sym = String(url.searchParams.get('s') || '').trim().toUpperCase();
+  if (!((type === 'coin' && COIN_RE.test(sym)) || (type === 'stock' && TICKER_RE.test(sym)))) return logoMiss(400, 0);
+  const key = 'logo:' + type + ':' + sym;
+  if (env.AI_LIMITS) {
+    try {
+      const hit = await env.AI_LIMITS.getWithMetadata(key, 'arrayBuffer');
+      if (hit && hit.value !== null) {
+        if (hit.metadata && hit.metadata.miss) return logoMiss();
+        return logoResponse(hit.value, hit.metadata && hit.metadata.ct);
+      }
+    } catch {}
+  }
+  let img;
+  try {
+    img = type === 'coin' ? await fetchCoinLogo(sym) : await fetchStockLogo(sym, env);
+  } catch {
+    return logoMiss(503, 0);   // временный сбой источника — попробуем в следующий раз
+  }
+  if (env.AI_LIMITS) {
+    try {
+      if (img) await env.AI_LIMITS.put(key, img.bytes, { expirationTtl: LOGO_TTL, metadata: { ct: img.ct } });
+      else await env.AI_LIMITS.put(key, '', { expirationTtl: LOGO_MISS_TTL, metadata: { miss: 1 } });
+    } catch { /* квота записи KV — просто не запомним */ }
+  }
+  return img ? logoResponse(img.bytes, img.ct) : logoMiss();
+}
+
 async function isRateLimited(kind, ip, limit, windowSec, env) {
   const rl = env && env[RL_BINDINGS[kind]];
   if (rl && typeof rl.limit === 'function') {
