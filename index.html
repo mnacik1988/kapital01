@@ -3646,7 +3646,7 @@ body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.09';
+const APP_VERSION = 'v0.2.10';
 const APP_BUILD_DATE = '2026-10-21';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -13364,9 +13364,14 @@ function buildPortfolioContext(){
         if(dep.startDate&&dep.endDate)parts.push(`${dep.startDate} → ${dep.endDate}`);
         if(dep.openDay)parts.push(`нарахування ${dep.openDay}-го числа`);
         dRows.push(`  ${dep.name||'Депозит'}: ${parts.join(', ')}`);
-        dRows.push(`    нараховано з ${depDateKey(getDepositAccrualStart(dep))}: ${sim.totalNet.toFixed(2)} ${dSym} (${sim.dailyNet.toFixed(2)} ${dSym}/добу)`);
+        // Усі суми застосунку — ЧИСТІ, податок уже утримано. Раніше тут була одна
+        // цифра без пояснення, і ІІ віднімав податок вдруге.
+        dRows.push(`    зараз на вкладі: ${sim.totalValue.toFixed(2)} ${dSym}`);
+        dRows.push(`    нараховано з ${depDateKey(getDepositAccrualStart(dep))}: чистими ${sim.totalNet.toFixed(2)} ${dSym} (до податку ${sim.totalGross.toFixed(2)}, податок ${sim.totalTax.toFixed(2)} вже утримано)`);
+        dRows.push(`    у поточному періоді (з останньої виплати відсотків): чистими ${sim.pendingNet.toFixed(2)} ${dSym} (до податку ${sim.pendingGross.toFixed(2)})`);
+        dRows.push(`    за добу: чистими ${sim.dailyNet.toFixed(2)} ${dSym} (до податку ${sim.dailyGross.toFixed(2)})`);
       });
-      if(dRows.length){lines.push(``);lines.push(`Депозити (умови):`);dRows.forEach(r=>lines.push(r));}
+      if(dRows.length){lines.push(``);lines.push(`Депозити (умови; усі суми вже ЧИСТІ — після податку, вдруге податок не віднімати):`);dRows.forEach(r=>lines.push(r));}
     }catch{}
 
     // Акції та облігації — поштучно, з цінами й валютою
