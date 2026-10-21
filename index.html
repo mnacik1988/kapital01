@@ -2241,6 +2241,12 @@ body.modern-mockup.nd #card-deposit .dep-name-input{font:700 16px 'Manrope',sans
 .nd-rate{font-family:'DM Mono',monospace;font-size:12px;color:var(--nd-goldtx);background:#d9b86614;padding:5px 9px;border-radius:9px;white-space:nowrap;margin-left:8px;}
 body.modern-mockup.nd #card-deposit .dep-delete-btn{margin-left:8px!important;}
 .nd-dep-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--nd-muted2);margin-bottom:12px;}
+.nd-dep-bank{order:1;font-size:12px;color:var(--nd-muted2);margin-top:12px;}
+body.modern-mockup.nd #card-deposit .nd-dep-bank:not(:empty)+.live-rows{margin-top:10px!important;}
+.nd-dep-bank:empty{display:none;}
+.nd-dep-bank b{font-weight:600;color:var(--nd-text);}
+.nd-dep-bank b.up{color:var(--nd-up);}
+body:not(.nd) .nd-dep-bank{display:none!important;}
 body.modern-mockup.nd #card-deposit .live-num,body.modern-mockup.nd #card-deposit .live-sub{display:none!important;}
 body.modern-mockup.nd #card-deposit .live-bar-wrap{order:-1;height:5px!important;background:var(--nd-l1)!important;margin-top:4px!important;}
 body.modern-mockup.nd #card-deposit .live-bar{background:linear-gradient(90deg,#d9b866,#f3d88f)!important;}
@@ -3646,7 +3652,7 @@ body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.10';
+const APP_VERSION = 'v0.2.11';
 const APP_BUILD_DATE = '2026-10-21';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17054,6 +17060,15 @@ function ndDepositMeta(d){
   const dayTxt=trx({uk:day+'-го числа',ru:day+'-го числа',en:'on day '+day,de:'am '+day+'.',zh:'每月'+day+'日'});
   return mode+' · '+trx({uk:'податок',ru:'налог',en:'tax',de:'Steuer',zh:'税'})+' '+tax+'% · '+dayTxt;
 }
+function ndDepositBankLine(d){
+  if(!(getDepositPrincipalNative(d)>0))return '';
+  let s;
+  try{s=simulateDeposit(d,{start:getDepositAccrualStart(d),end:getDepositContractEnd(d,getDepositContractStart(d)),until:new Date()});}catch(e){return '';}
+  const sym=getDepositCurrencySymbol(d);
+  const pending=Number(s.pendingNet)||0;
+  return escHtml(trx({uk:'в банку',ru:'в банке',en:'in the bank',de:'bei der Bank',zh:'银行余额'}))+' <b>'+fmtD(Number(s.bodyBalance)||0)+' '+sym+'</b>'+
+    (pending>=0.5?' · '+escHtml(trx({uk:'набігло',ru:'набежало',en:'accrued',de:'aufgelaufen',zh:'已累计'}))+' <b class="up">+'+fmtN(pending)+' '+sym+'</b>':'');
+}
 function ndRenderDepTabs(){
   const box=$('ndDepTabs');
   if(!box)return;
@@ -17082,6 +17097,11 @@ function ndDecorateDeposits(){
     if(!meta&&label){meta=document.createElement('div');meta.className='nd-dep-meta';label.after(meta);}
     if(meta)meta.textContent=ndDepositMeta(d);
     const rows=slide.querySelector('.live-rows');
+    // Строка для сверки с банком: тело вклада, как «Основа» в банке, и сколько
+    // процентов уже набежало с последней выплаты (банк добавит их в день выплаты).
+    let bank=slide.querySelector('.nd-dep-bank');
+    if(!bank&&rows){bank=document.createElement('div');bank.className='nd-dep-bank';rows.before(bank);}
+    if(bank)bank.innerHTML=ndDepositBankLine(d);
     if(rows&&!rows.querySelector('.nd-endrow')){
       rows.insertAdjacentHTML('beforeend','<div class="live-row nd-endrow"><span class="live-key">'+escHtml(trx({uk:'До кінця строку',ru:'К концу срока',en:'At maturity',de:'Bei Fälligkeit',zh:'到期时'}))+'</span><span class="live-val"></span></div>');
     }
