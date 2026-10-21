@@ -943,6 +943,7 @@ body.theme-light .diag-passive-banner .diag-stat-lbl{color:#667085;}
 .ticker-card:active{border-color:var(--green);box-shadow:0 0 0 1px #4ecb8d55;}
 .ticker-card-head{display:flex;justify-content:space-between;align-items:center;}
 .ticker-card-sym{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--green2);}
+.ticker-card-coin{display:none;}
 .ticker-card-sym .asset-logo{width:16px;height:16px;margin-right:6px;vertical-align:-3px;object-fit:contain;border-radius:50%;}
 .ticker-card-sym .asset-logo.stock{background:#fff;border-radius:4px;padding:1px;box-sizing:border-box;}
 .ticker-card-qty{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);font-weight:700;background:var(--bg);padding:2px 6px;border-radius:8px;box-shadow:inset 0 0 0 1px #ffffff10;}
@@ -2616,6 +2617,19 @@ body.modern-mockup.nd .ticker-card-sym{position:relative!important;}
 body.modern-mockup.nd .ticker-card-sym .asset-logo{position:absolute;inset:6px;width:calc(100% - 12px);height:calc(100% - 12px);margin:0;vertical-align:0;}
 body.modern-mockup.nd .ticker-card-sym .asset-logo.stock{inset:7px;width:calc(100% - 14px);height:calc(100% - 14px);border-radius:7px;padding:2px;}
 body.modern-mockup.nd .ticker-card-sym.has-logo{color:transparent!important;}
+body.modern-mockup.nd :is(.card-crypto,.card-stocks) .ticker-card{grid-template-columns:44px minmax(0,1fr) auto!important;}
+body.modern-mockup.nd :is(.card-crypto,.card-stocks) .ticker-card-sym{width:44px!important;height:44px!important;}
+body.modern-mockup.nd :is(.card-crypto,.card-stocks) .ticker-card-name,body.modern-mockup.nd :is(.card-crypto,.card-stocks) .ticker-card-price{font-size:17px!important;}
+body.modern-mockup.nd :is(.card-crypto,.card-stocks) .ticker-card-name span{font-size:11px!important;}
+body.modern-mockup.nd :is(.card-crypto,.card-stocks) .ticker-card-qty,body.modern-mockup.nd :is(.card-crypto,.card-stocks) .ticker-card-pnl{font-size:12px!important;}
+body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-sym{grid-row:1/span 3!important;}
+body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-coin{display:block;grid-column:2;grid-row:1;font:800 13px 'Manrope',sans-serif;color:#f3d88f;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-coin span{font-weight:600;color:var(--nd-muted2);letter-spacing:0;margin-left:4px;}
+body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-name{grid-row:2!important;}
+body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-qty{grid-row:3!important;}
+body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-price{grid-row:1/span 2!important;align-self:end;}
+body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-pnl{grid-row:3!important;}
+body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card-coin{color:#a57a1c;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3632,7 +3646,7 @@ body.modern-mockup.nd .ticker-card-sym.has-logo{color:transparent!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.08';
+const APP_VERSION = 'v0.2.09';
 const APP_BUILD_DATE = '2026-10-21';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -5632,6 +5646,31 @@ loadLiveRatesCache();
 // ── API CONFIG ─────────────────────────────────────────────────
 // Public proxy endpoint only. Provider secrets must stay inside the Worker.
 const WORKER_URL = 'https://plain-bread-df6d.mnacik1988.workers.dev';
+// Полные названия популярных монет. Биржи отдают только тикер, поэтому для
+// остальных монет показываем один тикер.
+const COIN_NAMES={BTC:'Bitcoin',ETH:'Ethereum',BNB:'BNB',SOL:'Solana',XRP:'XRP',ADA:'Cardano',DOT:'Polkadot',
+  DOGE:'Dogecoin',AVAX:'Avalanche',MATIC:'Polygon',POL:'Polygon',LINK:'Chainlink',UNI:'Uniswap',ATOM:'Cosmos',
+  LTC:'Litecoin',NEAR:'NEAR Protocol',FTM:'Fantom',S:'Sonic',ALGO:'Algorand',APT:'Aptos',ARB:'Arbitrum',OP:'Optimism',
+  SUI:'Sui',TON:'Toncoin',TRX:'TRON',SHIB:'Shiba Inu',PEPE:'Pepe',WIF:'dogwifhat',USDT:'Tether',USDC:'USD Coin',
+  DAI:'Dai',MNT:'Mantle',AAVE:'Aave',CRV:'Curve',SAND:'The Sandbox',MANA:'Decentraland',AXS:'Axie Infinity',
+  GALA:'Gala',ENJ:'Enjin',CHZ:'Chiliz',THETA:'Theta',VET:'VeChain',FIL:'Filecoin',ICP:'Internet Computer',
+  HBAR:'Hedera',EOS:'EOS',XLM:'Stellar',XMR:'Monero',CAKE:'PancakeSwap',COMP:'Compound',MKR:'Maker',SNX:'Synthetix',
+  GRT:'The Graph','1INCH':'1inch',SUSHI:'SushiSwap',YFI:'yearn.finance',BAT:'Basic Attention',RUNE:'THORChain',
+  INJ:'Injective',SEI:'Sei',TIA:'Celestia',JUP:'Jupiter',BONK:'Bonk',RENDER:'Render',FET:'Artificial Superintelligence',
+  WLD:'Worldcoin',PYTH:'Pyth Network',JTO:'Jito',ONDO:'Ondo',ENA:'Ethena',TAO:'Bittensor',KAS:'Kaspa',STX:'Stacks',
+  IMX:'Immutable',LDO:'Lido DAO',ETC:'Ethereum Classic',BCH:'Bitcoin Cash',XTZ:'Tezos',EGLD:'MultiversX',
+  FLOW:'Flow',KAVA:'Kava',ROSE:'Oasis',ZIL:'Zilliqa',ZEC:'Zcash',DASH:'Dash',NEO:'Neo',IOTA:'IOTA',QNT:'Quant',
+  STRK:'Starknet',ZK:'ZKsync',W:'Wormhole',ENS:'ENS',PENDLE:'Pendle',GMX:'GMX',DYDX:'dYdX',BLUR:'Blur',
+  APE:'ApeCoin',FLOKI:'Floki',NOT:'Notcoin',TRUMP:'Official Trump',HYPE:'Hyperliquid',BGB:'Bitget Token',
+  OKB:'OKB',LEO:'UNUS SED LEO',CRO:'Cronos',XDC:'XDC Network',HNT:'Helium',AR:'Arweave',MINA:'Mina',
+  WAVES:'Waves',ONE:'Harmony',CELO:'Celo',GLMR:'Moonbeam',ASTR:'Astar',MOVE:'Movement',VIRTUAL:'Virtuals',
+  POPCAT:'Popcat',PENGU:'Pudgy Penguins',USDE:'Ethena USDe',FDUSD:'First Digital USD',WBTC:'Wrapped Bitcoin',
+  STETH:'Lido Staked ETH',PAXG:'PAX Gold',XAUT:'Tether Gold'};
+function coinNameRowHtml(sym){
+  const s=String(sym||'').trim().toUpperCase();
+  const n=COIN_NAMES[s];
+  return '<div class="ticker-card-coin">'+escHtml(s)+(n&&n.toUpperCase()!==s?' <span>'+escHtml(n)+'</span>':'')+'</div>';
+}
 // Логотип монеты или акции — через наш сервер (он запоминает картинку на 30 дней,
 // сторонним сервисам уходит только тикер). Не загрузилась — тег убирает себя сам,
 // и остаются буквы тикера, как раньше.
@@ -7608,7 +7647,8 @@ function exCoinCard(r,rate,sym,exId){
   const valueTxt=r.noPrice?'—':fmtN(toDisplayCurr((Number(r.usd)||0)*rate))+' '+sym;
   const usd=Number(r.usd)||0;
   const usdTxt=r.noPrice?'':(usd<0?'−$':'$')+(Math.abs(usd)<10?fmtD(Math.abs(usd),2):fmtN(Math.round(Math.abs(usd))));
-  return '<div class="ticker-card" style="border-top:2px solid var(--purple)" onclick="openExchangeCoinDetail(\''+exId+'\',\''+String(r.coin).replace(/[^A-Za-z0-9._-]/g,'')+'\')">'+
+  return '<div class="ticker-card tc-coin" style="border-top:2px solid var(--purple)" onclick="openExchangeCoinDetail(\''+exId+'\',\''+String(r.coin).replace(/[^A-Za-z0-9._-]/g,'')+'\')">'+
+    coinNameRowHtml(r.coin)+
     '<div class="ticker-card-head"><span class="ticker-card-sym" style="color:var(--purple2)">'+assetLogoHtml('coin',r.coin)+escHtml(r.coin)+'</span>'+
     '<span class="ticker-card-qty">'+escHtml(exFmtQty(r.qty))+'</span></div>'+
     '<div class="ticker-card-name">'+escHtml(priceTxt)+(hasCh?' <span style="font-size:9px;color:'+(ch>=0?'var(--green2)':'var(--red)')+'">'+(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(1)+'%</span>':'')+'</div>'+
@@ -8668,7 +8708,8 @@ function renderCoins(){
     const ch=g.change24h;
     totalVal+=value;totalCost+=cost;
     
-    html+=`<div class="ticker-card" style="border-top:2px solid var(--purple)" onclick="openCryptoDetail('${safeCoinSymbol(key)}')">
+    html+=`<div class="ticker-card tc-coin" style="border-top:2px solid var(--purple)" onclick="openCryptoDetail('${safeCoinSymbol(key)}')">
+      ${coinNameRowHtml(key)}
       <div class="ticker-card-head">
         <span class="ticker-card-sym" style="color:var(--purple2)">${assetLogoHtml('coin',key)}${escHtml(key)}</span>
         <span class="ticker-card-qty">${g.totalQty}</span>
