@@ -3652,8 +3652,8 @@ body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.11';
-const APP_BUILD_DATE = '2026-10-21';
+const APP_VERSION = 'v0.2.12';
+const APP_BUILD_DATE = '2026-10-22';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -13462,6 +13462,68 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('resize',_aiAdjustForKeyboard);
   window.visualViewport.addEventListener('scroll',_aiAdjustForKeyboard);
 }
+
+// iPhone не прокручивает к полю ввода внутри «плавающих» окон (экраны разделов
+// нового дизайна, калькулятор, нижние шторки): клавиатура выезжает поверх, и не
+// видно, что печатаешь. Пока клавиатура открыта: шторку у нижнего края
+// поднимаем над ней, полноэкранному окну даём снизу запас под её высоту — и
+// прокручиваем так, чтобы поле стояло в видимой части. ИИ-чат делает это сам.
+const _kbFit={el:null,box:null,mode:'',old:{}};
+function _kbScroller(el){
+  // overflow-x:hidden делает и overflowY «auto», поэтому берём только то, что
+  // действительно прокручивается по вертикали, или само плавающее окно.
+  for(let p=el.parentElement;p&&p!==document.body&&p!==document.documentElement;p=p.parentElement){
+    const cs=getComputedStyle(p);
+    if(!/(auto|scroll)/.test(cs.overflowY))continue;
+    const par=p.parentElement;
+    if(p.scrollHeight>p.clientHeight+1||cs.position==='fixed'||(par&&getComputedStyle(par).position==='fixed'))return p;
+  }
+  return null;
+}
+function _kbRestore(){
+  const b=_kbFit.box;
+  if(b){b.style.marginBottom=_kbFit.old.mb||'';b.style.maxHeight=_kbFit.old.mh||'';b.style.paddingBottom=_kbFit.old.pb||'';}
+  _kbFit.box=null;_kbFit.mode='';_kbFit.old={};
+}
+function _kbAdjust(){
+  const vv=window.visualViewport,el=_kbFit.el;
+  if(!vv||!el||document.activeElement!==el){_kbRestore();return;}
+  const kb=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+  if(kb<80){_kbRestore();return;}
+  const box=_kbScroller(el);
+  if(box&&_kbFit.box!==box){
+    _kbRestore();
+    _kbFit.box=box;
+    _kbFit.old={mb:box.style.marginBottom,mh:box.style.maxHeight,pb:box.style.paddingBottom};
+    const par=box.parentElement,pcs=par?getComputedStyle(par):null;
+    _kbFit.mode=pcs&&pcs.position==='fixed'&&pcs.alignItems==='flex-end'?'sheet':'pad';
+  }
+  if(box&&_kbFit.mode==='sheet'){
+    box.style.setProperty('margin-bottom',kb+'px','important');
+    box.style.setProperty('max-height',Math.max(200,vv.height-16)+'px','important');
+  }else if(box){
+    box.style.paddingBottom='';
+    const base=parseFloat(getComputedStyle(box).paddingBottom)||0;
+    box.style.setProperty('padding-bottom',(base+kb)+'px','important');
+  }
+  const r=el.getBoundingClientRect();
+  const top=vv.offsetTop,bottom=vv.offsetTop+vv.height;
+  if(r.bottom>bottom-16||r.top<top+70){
+    const d=r.top-(top+(vv.height-r.height)*0.4);
+    if(box)box.scrollTop+=d;else window.scrollBy(0,d);
+  }
+}
+document.addEventListener('focusin',e=>{
+  const t=e.target;
+  if(!t||!t.matches||!t.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]),textarea'))return;
+  if(t.closest('#aiChatOverlay'))return;
+  _kbFit.el=t;
+  setTimeout(_kbAdjust,300);setTimeout(_kbAdjust,650);
+});
+document.addEventListener('focusout',()=>{
+  setTimeout(()=>{if(!_kbFit.el||document.activeElement!==_kbFit.el){_kbFit.el=null;_kbRestore();}},120);
+});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if(_kbFit.el)_kbAdjust();});
 
 // Safari на iOS до сих пор шлёт собственные события щипка мимо touch-action,
 // поэтому глушим их отдельно. Двойной тап там же масштабирует страницу, если
