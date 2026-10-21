@@ -58,6 +58,7 @@ body.theme-light{
 /* pan-x pan-y разрешает обычную прокрутку, но убирает щипок и двойной тап —
    приложение перестаёт зумиться. overscroll-behavior гасит резиновый отскок
    за границы страницы и вытягивание «обновить» сверху. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html,body{height:100%;width:100%;overflow-x:hidden;background:var(--app-bg-gradient);touch-action:pan-x pan-y;overscroll-behavior:none;}
 body{font-family:'Manrope',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;background:var(--app-bg-gradient);background-attachment:fixed;}
 /* Базовый цвет страницы = низ градиента. iOS (особенно iOS 26 с домашнего экрана) отдаёт
@@ -3631,8 +3632,8 @@ body.modern-mockup.nd .ticker-card-sym.has-logo{color:transparent!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.07';
-const APP_BUILD_DATE = '2026-10-20';
+const APP_VERSION = 'v0.2.08';
+const APP_BUILD_DATE = '2026-10-21';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
