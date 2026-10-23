@@ -2650,6 +2650,16 @@ body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card
   .privacy-overlay,.picker-overlay,.diag-overlay,.history-overlay,.crypto-add-overlay,
   .stock-add-overlay,.stock-detail-overlay,.custom-dialog-overlay,.disclaimer-overlay,
   body.modern-mockup.nd .card.nd-open,body.modern-mockup.nd .liab-card.nd-open{bottom:calc(100% - 100vh)!important;}
+  /* Последние 48pt (зону, которую iOS не отдаёт приложению) плавающие слои не закрашивают: iPhone
+     заливает её цветом фона html. Делаем его цветом нижней панели — панель визуально доходит до края. */
+  html{background-color:#080a10!important;}
+  html.theme-light-root{background-color:#eef2f8!important;}
+  html:has(body.modern-mockup.nd){background-color:#0f0f13!important;}
+  html.theme-light-root:has(body.modern-mockup.nd){background-color:#f8f3ea!important;}
+}
+/* На телефоне панель во всю ширину, как в Mynado: так она сливается с полосой под ней. */
+@media (max-width:520px){
+  body.modern-mockup .bottom-nav{width:100vw!important;border-left:0!important;border-right:0!important;}
 }
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
@@ -3668,7 +3678,7 @@ body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.16';
+const APP_VERSION = 'v0.2.17';
 const APP_BUILD_DATE = '2026-10-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
