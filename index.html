@@ -67,7 +67,8 @@ html,body{background-color:#05080f;}
 html.theme-light-root,body.theme-light{background-color:#eee9e0;}
 /* iOS PWA: allow text selection in inputs */
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:0;}
-body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:env(safe-area-inset-bottom);background:inherit;pointer-events:none;z-index:389;}
+/* Здесь была полоса body::after (высотой env(safe-area-inset-bottom), z-index 389) — она лежала ПОВЕРХ
+   всего .app (у .app свой z-index:1) и закрывала нижние 34pt панели, настроек и шторок. Убрана 23.10.2026. */
 .app{position:relative;z-index:1;min-height:100vh;padding-bottom:calc(72px + env(safe-area-inset-bottom));}
 
 /* LANG SWITCHER */
@@ -3671,7 +3672,7 @@ html.ios-vgap.theme-light-root:has(body.modern-mockup.nd){background-color:#f8f3
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.18';
+const APP_VERSION = 'v0.2.19';
 const APP_BUILD_DATE = '2026-10-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
