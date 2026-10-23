@@ -14,7 +14,7 @@
 <!-- Своя тёмная/светлая тема: говорим браузеру, что перекрашивать страницу не нужно. -->
 <meta name="color-scheme" content="dark light">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Капітал">
 <meta name="application-name" content="Капітал">
 <meta name="description" content="Фінансовий трекер: депозити, акції, крипто">
@@ -3659,7 +3659,7 @@ body.modern-mockup.nd .bottom-nav::after{background:var(--nd-head)!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.13';
+const APP_VERSION = 'v0.2.14';
 const APP_BUILD_DATE = '2026-10-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9973,8 +9973,10 @@ function applyAppTheme(theme=appTheme){
   document.documentElement.style.colorScheme=appTheme;
   const csMeta=document.querySelector('meta[name="color-scheme"]');
   if(csMeta)csMeta.setAttribute('content',appTheme==='light'?'light':'dark');
-  const statusMeta=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-  if(statusMeta)statusMeta.setAttribute('content',appTheme==='light'?'default':'black-translucent');
+  // Стиль строки состояния iPhone НЕ переключаем на ходу (как и в Mynado): iOS читает его при
+  // запуске, а смену во время работы обрабатывал криво — приложение рисовалось под часами, а
+  // высоту экрана считал без часов и полоски «домой», и все плавающие слои (нижняя панель,
+  // настройки, шторки) кончались на ~78pt выше низа. Цвет зоны часов задаёт theme-color выше.
   document.querySelectorAll('.settings-theme-btn').forEach(b=>{
     b.classList.toggle('active',b.id==='theme-'+appTheme);
   });
