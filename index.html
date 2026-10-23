@@ -479,12 +479,6 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .bottom-nav-btn.loading .bn-icon{animation:none;}
 @keyframes navSpin{to{transform:rotate(360deg);}}
 body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear-gradient(180deg,#fffffffa,#eef1f8 88%);}
-/* На iPhone в режиме приложения «низ экрана» для fixed-панели оказывается выше полоски «домой»,
-   и под панелью был виден фон страницы — панель выглядела обрезанной. Продлеваем её цвет и боковые
-   рамки вниз до самого края; кнопки остаются на месте. */
-.bottom-nav::after{content:'';position:absolute;left:-1px;right:-1px;top:100%;height:160px;pointer-events:none;
-  background:var(--bg);border:inherit;border-top:0;border-bottom:0;border-radius:0;}
-body.theme-light .bottom-nav::after{background:#eef1f8;}
 .calc-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
 .calc-overlay.open{display:flex;}
 /* AI CHAT */
@@ -2105,13 +2099,15 @@ body.theme-light .header,body.modern-mockup.theme-light .header{
 /* Глаз стоит рядом с шестерёнкой в правом верхнем углу (просьба Александра 14.10): у суммы он слишком бросался в глаза */
 .header-top-row .eye-btn{margin-left:0;align-self:center;}
 .eye-btn:active{opacity:.6;}
-/* Экраны от 430pt (iPhone Pro Max/Plus): панель уже поднята над полоской «домой»
-   через bottom, поэтому отступ не добавляем к высоте второй раз */
+/* Нижняя панель стоит на самом краю экрана, как в Mynado: раньше её поднимали над полоской «домой»
+   (bottom:env(...)), и под ней оставалась пустая полоса — выглядело обрезанным. Теперь отступ под
+   полоску — внутри панели, кнопки остаются на прежней высоте. */
+body.modern-mockup .bottom-nav{bottom:0!important;height:calc(66px + env(safe-area-inset-bottom))!important;padding-bottom:calc(6px + env(safe-area-inset-bottom))!important;}
 @media (min-width:430px){
-  body.modern-mockup .bottom-nav{height:68px!important;padding:8px 10px 6px!important;}
+  body.modern-mockup .bottom-nav{height:calc(68px + env(safe-area-inset-bottom))!important;padding:8px 10px calc(6px + env(safe-area-inset-bottom))!important;}
 }
 @media (min-width:500px){
-  body.modern-mockup .bottom-nav{height:72px!important;padding:9px 12px 7px!important;}
+  body.modern-mockup .bottom-nav{height:calc(72px + env(safe-area-inset-bottom))!important;padding:9px 12px calc(7px + env(safe-area-inset-bottom))!important;}
 }
 /* Подсказка подключения биржи/банка */
 .cg{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin:4px 0 12px;}
@@ -2642,7 +2638,19 @@ body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-qty{grid-ro
 body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-price{grid-row:1/span 2!important;align-self:end;}
 body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-pnl{grid-row:3!important;}
 body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card-coin{color:#a57a1c;}
-body.modern-mockup.nd .bottom-nav::after{background:var(--nd-head)!important;}
+/* iPhone, ярлык добавлен с прозрачной строкой состояния: приложение рисуется с самого верха, под
+   часами, а высоту экрана iOS отдаёт без зоны часов (замер 23.10.2026: экран 896, inner 848, 100vh 896).
+   Всё position:fixed кончалось на 48pt выше низа — панель, настройки, шторки. 100vh при этом равен
+   полной высоте, поэтому низ считаем от него: bottom = 100% − 100vh (здесь −48px). Где ошибки нет,
+   100vh = 100% и сдвиг нулевой. Только для режима приложения: в браузере 100vh больше видимой
+   области, и панель ушла бы под панель Safari. */
+@media (display-mode: standalone){
+  .bottom-nav,body.modern-mockup .bottom-nav,body::after,
+  .modal-overlay,.auth-gate,.paywall-overlay,.calc-overlay,.ai-chat-overlay,.settings-overlay,
+  .privacy-overlay,.picker-overlay,.diag-overlay,.history-overlay,.crypto-add-overlay,
+  .stock-add-overlay,.stock-detail-overlay,.custom-dialog-overlay,.disclaimer-overlay,
+  body.modern-mockup.nd .card.nd-open,body.modern-mockup.nd .liab-card.nd-open{bottom:calc(100% - 100vh)!important;}
+}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3660,7 +3668,7 @@ body.modern-mockup.nd .bottom-nav::after{background:var(--nd-head)!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.15';
+const APP_VERSION = 'v0.2.16';
 const APP_BUILD_DATE = '2026-10-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -13486,7 +13494,8 @@ function _aiAdjustForKeyboard(){
   if(!vv)return;
   const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
   if(keyboard>60){
-    panel.style.marginBottom=keyboard+'px';
+    // Отступ — от настоящего низа окна до верха клавиатуры: на iPhone окно может быть ниже innerHeight.
+    panel.style.marginBottom=Math.max(keyboard,overlay.getBoundingClientRect().bottom-vv.offsetTop-vv.height)+'px';
     panel.style.height=Math.min(window.innerHeight*0.82,vv.height*0.96)+'px';
   }else{
     panel.style.marginBottom='';
@@ -13535,13 +13544,16 @@ function _kbAdjust(){
     const par=box.parentElement,pcs=par?getComputedStyle(par):null;
     _kbFit.mode=pcs&&pcs.position==='fixed'&&pcs.alignItems==='flex-end'?'sheet':'pad';
   }
+  // Сколько окна закрыто клавиатурой — считаем от его настоящего низа: на iPhone с ярлыком
+  // под «прозрачную» строку состояния окно уходит ниже innerHeight (см. стили display-mode).
+  const vb=vv.offsetTop+vv.height;
   if(box&&_kbFit.mode==='sheet'){
-    box.style.setProperty('margin-bottom',kb+'px','important');
+    box.style.setProperty('margin-bottom',Math.max(kb,box.parentElement.getBoundingClientRect().bottom-vb)+'px','important');
     box.style.setProperty('max-height',Math.max(200,vv.height-16)+'px','important');
   }else if(box){
     box.style.paddingBottom='';
     const base=parseFloat(getComputedStyle(box).paddingBottom)||0;
-    box.style.setProperty('padding-bottom',(base+kb)+'px','important');
+    box.style.setProperty('padding-bottom',(base+Math.max(kb,box.getBoundingClientRect().bottom-vb))+'px','important');
   }
   const r=el.getBoundingClientRect();
   const top=vv.offsetTop,bottom=vv.offsetTop+vv.height;
