@@ -479,6 +479,12 @@ body.theme-light .live-wrap::before{background:radial-gradient(ellipse at top le
 .bottom-nav-btn.loading .bn-icon{animation:none;}
 @keyframes navSpin{to{transform:rotate(360deg);}}
 body.theme-light .bottom-nav{box-shadow:0 -10px 28px #27304a28;background:linear-gradient(180deg,#fffffffa,#eef1f8 88%);}
+/* На iPhone в режиме приложения «низ экрана» для fixed-панели оказывается выше полоски «домой»,
+   и под панелью был виден фон страницы — панель выглядела обрезанной. Продлеваем её цвет и боковые
+   рамки вниз до самого края; кнопки остаются на месте. */
+.bottom-nav::after{content:'';position:absolute;left:-1px;right:-1px;top:100%;height:160px;pointer-events:none;
+  background:var(--bg);border:inherit;border-top:0;border-bottom:0;border-radius:0;}
+body.theme-light .bottom-nav::after{background:#eef1f8;}
 .calc-overlay{position:fixed;inset:0;background:#000000bb;z-index:510;display:none;align-items:flex-end;}
 .calc-overlay.open{display:flex;}
 /* AI CHAT */
@@ -2636,6 +2642,7 @@ body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-qty{grid-ro
 body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-price{grid-row:1/span 2!important;align-self:end;}
 body.modern-mockup.nd .card-crypto .ticker-card.tc-coin .ticker-card-pnl{grid-row:3!important;}
 body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card-coin{color:#a57a1c;}
+body.modern-mockup.nd .bottom-nav::after{background:var(--nd-head)!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3652,8 +3659,8 @@ body.modern-mockup.nd.theme-light .card-crypto .ticker-card.tc-coin .ticker-card
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.12';
-const APP_BUILD_DATE = '2026-10-21';
+const APP_VERSION = 'v0.2.13';
+const APP_BUILD_DATE = '2026-10-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
