@@ -3461,6 +3461,7 @@ body.modern-mockup.nd .bottom-nav::after{background:var(--nd-head)!important;}
         <button onclick="backupImport()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #5b9cf640;background:#5b9cf610;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue2);cursor:pointer;">📥 Імпорт даних</button>
       </div>
       <div id="storageHealthInfo" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;text-align:center;"></div>
+      <div id="viewportDiag" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:6px;text-align:left;white-space:pre-wrap;word-break:break-all;"></div>
 <button type="button" id="rollbackImportBtn" class="add-btn" style="display:none;margin-top:8px;width:100%;" onclick="rollbackImport()"></button>
       <input class="backup-file-input" type="file" id="backupFileInput" accept=".json,application/json" onchange="handleBackupFile(this)">
       <div id="cloudBackupBox" style="margin-top:16px;"></div>
@@ -3659,7 +3660,7 @@ body.modern-mockup.nd .bottom-nav::after{background:var(--nd-head)!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.14';
+const APP_VERSION = 'v0.2.15';
 const APP_BUILD_DATE = '2026-10-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -9987,8 +9988,35 @@ function setAppTheme(theme){
   saveData();
 }
 applyAppTheme(appTheme);
+// ВРЕМЕННО (23.10.2026): замеры экрана для разбора «обрезанной» нижней панели на iPhone —
+// где кончается слой position:fixed, какие высоты дают 100vh/svh/lvh/dvh и что нарисовано внизу.
+function viewportDiagText(){
+  try{
+    const probe=css=>{const d=document.createElement('div');d.style.cssText='position:fixed;left:0;width:1px;pointer-events:none;visibility:hidden;'+css;document.body.appendChild(d);const r=d.getBoundingClientRect();const c=getComputedStyle(d);const cs={paddingTop:c.paddingTop,paddingBottom:c.paddingBottom};d.remove();return {r,cs};};
+    const h=u=>Math.round(probe('top:0;height:100'+u).r.height);
+    const fx=probe('top:0;bottom:0').r;
+    const sa=probe('top:0;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)').cs;
+    const nav=document.querySelector('.bottom-nav')?.getBoundingClientRect();
+    const box=document.querySelector('.settings-box')?.getBoundingClientRect();
+    const vv=window.visualViewport;
+    const name=el=>el?(el.id?'#'+el.id:el.tagName.toLowerCase()+(el.classList[0]?'.'+el.classList[0]:'')):'—';
+    const at=y=>(document.elementsFromPoint(innerWidth/2,y)||[]).slice(0,3).map(name).join(' > ')||'пусто';
+    return [
+      'standalone '+navigator.standalone+' / dm '+matchMedia('(display-mode: standalone)').matches,
+      'screen '+screen.width+'×'+screen.height+' · inner '+innerWidth+'×'+innerHeight+' · client '+document.documentElement.clientHeight,
+      'vv '+(vv?Math.round(vv.width)+'×'+Math.round(vv.height)+' off '+Math.round(vv.offsetTop)+' scale '+vv.scale.toFixed(2):'—'),
+      'vh '+h('vh')+' · svh '+h('svh')+' · lvh '+h('lvh')+' · dvh '+h('dvh'),
+      'safe top '+sa.paddingTop+' · bottom '+sa.paddingBottom,
+      'fixed 0..'+Math.round(fx.bottom)+' · nav '+(nav?Math.round(nav.top)+'..'+Math.round(nav.bottom):'—')+' · окно до '+(box?Math.round(box.bottom):'—'),
+      'scrollY '+Math.round(scrollY)+' · doc '+document.documentElement.scrollHeight,
+      'внизу: '+at(innerHeight-3),
+      'у края экрана: '+at(screen.height-10)
+    ].join('\n');
+  }catch(e){return 'diag error: '+e.message;}
+}
 function openSettings(){
   const lang=currentLang||'uk';
+  setTimeout(()=>{const d=$('viewportDiag');if(d)d.textContent=viewportDiagText();},450);
   applySettingsLabels(lang);
   updateTestBuildUI();
   updateAppVersionUI();
