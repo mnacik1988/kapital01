@@ -2222,7 +2222,10 @@ body.modern-mockup.nd .bottom-nav-btn.center{width:52px!important;height:52px!im
 body.modern-mockup.nd .bottom-nav-btn.center .bn-icon,body.modern-mockup.nd .bottom-nav-btn.center .bottom-nav-icon{width:44px!important;height:44px!important;}
 body.modern-mockup.nd .bottom-nav-btn.center .bn-label{display:none!important;}
 body.modern-mockup.nd .bottom-nav-btn.center .bottom-nav-icon{filter:brightness(.16) sepia(1) saturate(2);}
-body.modern-mockup.nd .app{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;}
+body.modern-mockup.nd .app{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important;}
+/* Строка «КАПИТАЛ · версия» внизу страницы всегда оказывалась под нижней панелью — её не было видно,
+   а лишние 53pt пустоты при прокрутке до конца оставались. Версия есть в Настройках. */
+body.modern-mockup .footer{display:none!important;}
 /* динамика капитала в новом виде стоит после списка */
 body.modern-mockup.nd .chart-section{margin-top:16px!important;}
 /* — экран «Депозиты» — */
@@ -2650,7 +2653,7 @@ html.ios-vgap body.modern-mockup .bottom-nav{height:66px!important;padding-botto
 /* запас снизу под панель — без env: у панели здесь нет отступа под полоску; и без лишних 48pt от 100vh */
 html.ios-vgap .app{min-height:100%!important;}
 html.ios-vgap body.modern-mockup .app{padding-bottom:92px!important;}
-html.ios-vgap body.modern-mockup.nd .app{padding-bottom:96px!important;}
+html.ios-vgap body.modern-mockup.nd .app{padding-bottom:88px!important;}
 html.ios-vgap{background-color:#080a10!important;}
 html.ios-vgap.theme-light-root{background-color:#eef2f8!important;}
 html.ios-vgap:has(body.modern-mockup.nd){background-color:#0f0f13!important;}
@@ -3675,7 +3678,7 @@ html.ios-vgap.theme-light-root:has(body.modern-mockup.nd){background-color:#f8f3
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.20';
+const APP_VERSION = 'v0.2.21';
 const APP_BUILD_DATE = '2026-10-23';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
