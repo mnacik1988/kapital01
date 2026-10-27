@@ -2666,6 +2666,14 @@ html.ios-vgap.theme-light-root:has(body.modern-mockup.nd){background-color:#f8f3
    центрировалась через transform. Центруем без transform, у центральной кнопки подъём — через top. */
 .bottom-nav{left:0!important;right:0!important;margin-left:auto!important;margin-right:auto!important;transform:none!important;}
 body.modern-mockup.nd .bottom-nav-btn.center{transform:none!important;position:relative!important;top:-4px!important;}
+/* Ни одного CSS-фильтра в панели: на iPhone картинки с filter рисуются отдельным слоем, и он съезжал
+   влево-вниз и обрезался. Тонированные варианты заранее сохранены картинками (panel-icons/*-nd*.png). */
+.bottom-nav .bn-icon,.bottom-nav .bottom-nav-icon{filter:none!important;}
+body.modern-mockup.nd .bottom-nav-btn.center .bottom-nav-icon{content:url("panel-icons/3-nd.png?v=1");}
+body.nd.theme-light .bottom-nav-btn:nth-child(1) .bottom-nav-icon{content:url("panel-icons/1-ndl.png?v=1");}
+body.nd.theme-light .bottom-nav-btn:nth-child(2) .bottom-nav-icon{content:url("panel-icons/ai-ndl.png?v=1");}
+body.nd.theme-light .bottom-nav-btn:nth-child(4) .bottom-nav-icon{content:url("panel-icons/4-ndl.png?v=1");}
+body.nd.theme-light .bottom-nav-btn:nth-child(5) .bottom-nav-icon{content:url("panel-icons/5-ndl.png?v=1");}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3683,7 +3691,7 @@ body.modern-mockup.nd .bottom-nav-btn.center{transform:none!important;position:r
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.24';
+const APP_VERSION = 'v0.2.25';
 const APP_BUILD_DATE = '2026-10-27';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';

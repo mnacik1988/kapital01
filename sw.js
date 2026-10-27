@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'investory-app-v0-2-24-navfix';
+﻿const CACHE_NAME = 'investory-app-v0-2-25-nofilter';
 // Ядро — без него приложение не откроется офлайн. Установка строгая: не
 // скачалось ядро — новый воркер не ставится, прежняя версия остаётся.
 const CORE = [
@@ -20,6 +20,11 @@ const APP_SHELL = [
   './panel-icons/4.png?v=4',
   './panel-icons/5.png?v=4',
   './section-icons/AI.png?v=1',
+  './panel-icons/3-nd.png?v=1',
+  './panel-icons/1-ndl.png?v=1',
+  './panel-icons/ai-ndl.png?v=1',
+  './panel-icons/4-ndl.png?v=1',
+  './panel-icons/5-ndl.png?v=1',
   './section-icons/section-crypto.png?v=1',
   './section-icons/section-stocks.png?v=1',
   './section-icons/section-account.png?v=1',
