@@ -2674,6 +2674,26 @@ body.nd.theme-light .bottom-nav-btn:nth-child(1) .bottom-nav-icon{content:url("p
 body.nd.theme-light .bottom-nav-btn:nth-child(2) .bottom-nav-icon{content:url("panel-icons/ai-ndl.png?v=1");}
 body.nd.theme-light .bottom-nav-btn:nth-child(4) .bottom-nav-icon{content:url("panel-icons/4-ndl.png?v=1");}
 body.nd.theme-light .bottom-nav-btn:nth-child(5) .bottom-nav-icon{content:url("panel-icons/5-ndl.png?v=1");}
+/* 29.10: светлая тема без золотого свечения сверху (выглядело как размытие под шапкой);
+   нижняя панель без backdrop-filter (на iPhone эффекты-слои в fixed-панели сбоят). */
+body.nd.theme-light{--nd-glow:transparent;--nd-glow-red:transparent;}
+.bottom-nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+/* ставка теперь в строке под названием — отдельная плашка не нужна */
+body.nd .nd-rate{display:none!important;}
+/* «По дням» — заметная кнопка */
+.nd-day-btn{border:1.5px solid #d9b866!important;color:var(--nd-goldtx)!important;font-weight:700;}
+body.modern-mockup.nd.theme-light .nd-day-btn{border-color:#c4962f!important;}
+/* история пополнений прямо в карточке вклада */
+.nd-topups{order:2;margin-top:16px;border:1px solid var(--nd-l1);border-radius:16px;padding:12px 14px;background:var(--nd-bg);}
+.nd-topups-head{display:flex;justify-content:space-between;align-items:baseline;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--nd-muted);margin-bottom:6px;}
+.nd-topups-head b{letter-spacing:0;font-size:12px;color:var(--nd-goldtx);}
+.nd-topup{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--nd-l1);font-size:13px;color:var(--nd-text);}
+.nd-topup:first-of-type{border-top:0;}
+.nd-topup .d{flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--nd-muted2);}
+.nd-topup .a{font-weight:700;color:var(--nd-text-hi);}
+.nd-topup .x{border:0;background:transparent;color:var(--nd-muted);font-size:17px;line-height:1;padding:2px 4px;cursor:pointer;}
+.nd-topup .x.arm{font-size:11px;font-weight:700;color:#fff;background:#d85a4a;border-radius:8px;padding:5px 8px;}
+body:not(.nd) .nd-topups{display:none!important;}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3690,8 +3710,8 @@ body.nd.theme-light .bottom-nav-btn:nth-child(5) .bottom-nav-icon{content:url("p
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.26';
-const APP_BUILD_DATE = '2026-10-27';
+const APP_VERSION = 'v0.2.27';
+const APP_BUILD_DATE = '2026-10-29';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -17188,7 +17208,7 @@ function ndDepositMeta(d){
   const tax=parseInputNumber(d.tax)||0;
   const day=getDepositOpenDay(d);
   const dayTxt=trx({uk:day+'-го числа',ru:day+'-го числа',en:'on day '+day,de:'am '+day+'.',zh:'每月'+day+'日'});
-  return mode+' · '+trx({uk:'податок',ru:'налог',en:'tax',de:'Steuer',zh:'税'})+' '+tax+'% · '+dayTxt;
+  return (parseInputNumber(d.rate)||0)+'% · '+mode+' · '+trx({uk:'податок',ru:'налог',en:'tax',de:'Steuer',zh:'税'})+' '+tax+'% · '+dayTxt;
 }
 function ndDepositBankLine(d){
   if(!(getDepositPrincipalNative(d)>0))return '';
@@ -17199,6 +17219,17 @@ function ndDepositBankLine(d){
   // hide-amt — суммы прячутся «глазом» вместе с остальными
   return escHtml(trx({uk:'в банку',ru:'в банке',en:'in the bank',de:'bei der Bank',zh:'银行余额'}))+' <b class="hide-amt">'+fmtD(Number(s.bodyBalance)||0)+' '+sym+'</b>'+
     (pending>=0.5?' · '+escHtml(trx({uk:'набігло',ru:'набежало',en:'accrued',de:'aufgelaufen',zh:'已累计'}))+' <b class="up hide-amt">+'+fmtN(pending)+' '+sym+'</b>':'');
+}
+// Удаление пополнения в два нажатия: × → «Удалить?» → удаляем (confirm() в WebView не работает)
+function ndDelTopup(depId,ti){
+  const btn=window.event&&window.event.currentTarget;
+  if(btn&&!btn.classList.contains('arm')){
+    btn.classList.add('arm');
+    btn.textContent=trx({uk:'Видалити?',ru:'Удалить?',en:'Delete?',de:'Löschen?',zh:'删除?'});
+    setTimeout(()=>{if(btn.isConnected){btn.classList.remove('arm');btn.textContent='×';}},3000);
+    return;
+  }
+  removeTopUp(depId,ti);
 }
 function ndRenderDepTabs(){
   const box=$('ndDepTabs');
@@ -17245,6 +17276,16 @@ function ndDecorateDeposits(){
     ndRenderPath(d,slide);
     const dayBtn=slide.querySelector('.nd-day-btn');
     if(dayBtn)dayBtn.classList.toggle('on',dailyLogOpen.has(d.id));
+    // История пополнений — раньше пряталась в «Настройках вклада»
+    let tops=slide.querySelector('.nd-topups');
+    const tl=d.topups||[];
+    if(!tl.length){if(tops)tops.remove();}
+    else{
+      if(!tops){tops=document.createElement('div');tops.className='nd-topups';const db=slide.querySelector('.daily-section');if(db)db.after(tops);else slide.appendChild(tops);}
+      const sym=getDepositCurrencySymbol(d);
+      tops.innerHTML='<div class="nd-topups-head"><span>'+escHtml(trx({uk:'Поповнення',ru:'Пополнения',en:'Top-ups',de:'Einzahlungen',zh:'追加'}))+' · '+tl.length+'</span><b class="hide-amt">+'+fmtN(tl.reduce((a,tp)=>a+(parseInputNumber(tp.amount)||0),0))+' '+sym+'</b></div>'+
+        tl.map((tp,ti)=>'<div class="nd-topup"><span class="d">'+escHtml(new Date(tp.date).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'}))+'</span><span class="a hide-amt">+'+fmtN(parseInputNumber(tp.amount))+' '+sym+'</span><button type="button" class="x" aria-label="×" onclick="ndDelTopup(\''+d.id+'\','+ti+')">×</button></div>').join('');
+    }
     if(!slide.querySelector('.nd-dep-btns')){
       const tg=slide.querySelector('.dep-calc-toggle');
       if(tg)tg.insertAdjacentHTML('beforebegin','<div class="nd-dep-btns"><button type="button" class="b1" onclick="toggleDepCalc(\''+d.id+'\')">'+escHtml(trx({uk:'Налаштування вкладу',ru:'Настройки вклада',en:'Deposit settings',de:'Einstellungen',zh:'存款设置'}))+'</button><button type="button" class="b2" onclick="openTopUpModal(\''+d.id+'\')">'+escHtml(trx({uk:'+ Поповнити',ru:'+ Пополнить',en:'+ Top up',de:'+ Einzahlen',zh:'+ 追加'}))+'</button></div>');
