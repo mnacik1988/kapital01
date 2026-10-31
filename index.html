@@ -3710,7 +3710,7 @@ body:not(.nd) .nd-topups{display:none!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.30';
+const APP_VERSION = 'v0.2.31';
 const APP_BUILD_DATE = '2026-10-31';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -3797,6 +3797,8 @@ let manualBanks = [];
 // сумме: { "monobank:<id>": {include:false} }. В данных портфеля — значит, в бэкапе.
 let bankCardPrefs = {};
 function openPaywall(reason,mode){
+  // На iPhone покупки — только через App Store; пока подписка там не заведена, экран оплаты не показываем
+  if(typeof isIosApp==='function'&&isIosApp())return;
   refreshAccessState();
   updatePaywallAccessText(reason);
   paywallReason=reason||'';
@@ -13100,7 +13102,9 @@ function setGoogleToken(jwt){
     const p=JSON.parse(decodeURIComponent(escape(atob(
       jwt.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))));
     ls.set(AK.jwt,jwt);ls.set(AK.jwtExp,String(p.exp||0));
-    ls.set(AK.email,p.email||'');ls.set(AK.sub,p.sub||'');
+    // Вход с Apple — отдельный аккаунт apple:<sub>, как его видит сервер (с Google не путается)
+    const sub=p.sub?(p.iss==='https://appleid.apple.com'?'apple:'+p.sub:p.sub):'';
+    ls.set(AK.email,p.email||'');ls.set(AK.sub,sub);
   }catch{}
 }
 async function exchangeForSessionToken(idToken){
@@ -13192,6 +13196,7 @@ function signOutGoogle(){
   try{const a=document.getElementById('adminSection');if(a)a.style.display='none';closeAdminPanel();}catch{}
   try{exchangeUi.busy={};exchangeUi.errors={};exchangeUi.formOpen=false;renderExchanges();}catch{}
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();}catch{}
+  try{if(window.InveStoryNative&&window.InveStoryNative.signOutNative)window.InveStoryNative.signOutNative();}catch{}
   aiLimitInfo=null;
   // Облачная копия: сбрасываем таймеры и показанное. Сама копия на сервере остаётся.
   try{if(CLOUD){if(CLOUD.timer){clearTimeout(CLOUD.timer);CLOUD.timer=null;}CLOUD.list=null;CLOUD.msg='';CLOUD.started=-1;CLOUD.consentAsked=false;CLOUD.conflictShown=false;renderCloudBackupUI();}}catch(e){}
@@ -13215,6 +13220,32 @@ function hideAuthGate(){
 }
 // В Android-обёртке окно входа показывает система: Google не даёт своей кнопке
 // работать внутри WebView. Признак приходит из нативной части.
+// Приложение для iPhone (Capacitor, 31.10.2026). Google запрещает свой веб-вход внутри встроенного окна,
+// поэтому вход идёт через нативный Google Sign-In и «Вход с Apple» (плагин SocialLogin; Apple требует
+// вход Apple рядом с Google — правило App Store 4.8). Собираем такой же мост, как у Android-обёртки:
+// дальше приложение само рисует свою кнопку входа. В браузере и на Android window.Capacitor нет.
+const GOOGLE_IOS_CLIENT_ID='802898443875-4j7a7rckvcphvmckcger678d7ke8o6lb.apps.googleusercontent.com';
+function isIosApp(){const C=window.Capacitor;return !!(C&&C.isNativePlatform&&C.isNativePlatform()&&C.getPlatform&&C.getPlatform()==='ios');}
+(function(){
+  if(!isIosApp()||window.InveStoryNative)return;
+  const C=window.Capacitor;
+  const SL=(C.Plugins&&C.Plugins.SocialLogin)||(C.registerPlugin&&C.registerPlugin('SocialLogin'));
+  if(!SL)return;
+  let ready=null;
+  const init=()=>ready||(ready=SL.initialize({google:{iOSClientId:GOOGLE_IOS_CLIENT_ID,iOSServerClientId:GOOGLE_CLIENT_ID,mode:'online'},apple:{clientId:'app.ovanta.ios'}}));
+  const login=(provider,scopes)=>init().then(()=>SL.login({provider,options:{scopes}})).then(r=>{
+    const t=r&&r.result&&r.result.idToken;
+    if(t)window.onAndroidGoogleCredential(t);else window.onAndroidSignInFailed();
+  }).catch(()=>{ready=null;window.onAndroidSignInFailed();});
+  window.InveStoryNative={
+    hasNativeSignIn:()=>true,
+    signIn:()=>login('google',['email','profile']),
+    signInApple:()=>login('apple',['email','name']),
+    getDeviceId:()=>'',
+    // Google SDK помнит прошлый аккаунт — без сброса сменить его при следующем входе нельзя
+    signOutNative:()=>init().then(()=>SL.logout({provider:'google'})).catch(()=>{})
+  };
+})();
 function hasNativeSignIn(){
   try{return !!(window.InveStoryNative&&window.InveStoryNative.hasNativeSignIn
     &&window.InveStoryNative.hasNativeSignIn());}catch{return false;}
@@ -13239,6 +13270,16 @@ function renderNativeSignInButton(){
     try{window.InveStoryNative.signIn();}catch{b.disabled=false;}
   };
   slot.appendChild(b);
+  if(window.InveStoryNative&&window.InveStoryNative.signInApple){
+    slot.style.flexDirection='column';slot.style.alignItems='center';
+    const a=document.createElement('button');
+    a.id='nativeAppleBtn';
+    a.style.cssText=b.style.cssText+'margin-top:10px;background:#fff;color:#000;border-color:#fff;';
+    a.innerHTML='<svg width="15" height="18" viewBox="0 0 17 20" aria-hidden="true"><path fill="#000" d="M14.1 10.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM11.6 3c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3-1.5z"/></svg>'+
+      '<span>'+escHtml(trx({uk:'Увійти з Apple',ru:'Войти с Apple',en:'Sign in with Apple',de:'Mit Apple anmelden',zh:'通过 Apple 登录'}))+'</span>';
+    a.onclick=()=>{a.disabled=true;b.disabled=true;try{window.InveStoryNative.signInApple();}catch{a.disabled=false;b.disabled=false;}};
+    slot.appendChild(a);
+  }
 }
 // Систему закрыли, аккаунта нет, что-то пошло не так — веб обязан узнать, иначе
 // кнопка так и останется нажатой, а человек решит, что приложение зависло.
@@ -13249,6 +13290,8 @@ window.onAndroidSignInFailed=function(){
   if(window._adminReauthPending){window._adminReauthPending=false;adminLoginFailed('Вход отменён');return;}
   const b=document.getElementById('nativeSignInBtn');
   if(b)b.disabled=false;
+  const a=document.getElementById('nativeAppleBtn');
+  if(a)a.disabled=false;
   const desc=document.getElementById('authGateDesc');
   if(desc)desc.textContent=authGateText().cancelled;
 };
