@@ -2674,9 +2674,9 @@ body.nd.theme-light .bottom-nav-btn:nth-child(1) .bottom-nav-icon{content:url("p
 body.nd.theme-light .bottom-nav-btn:nth-child(2) .bottom-nav-icon{content:url("panel-icons/ai-ndl.png?v=1");}
 body.nd.theme-light .bottom-nav-btn:nth-child(4) .bottom-nav-icon{content:url("panel-icons/4-ndl.png?v=1");}
 body.nd.theme-light .bottom-nav-btn:nth-child(5) .bottom-nav-icon{content:url("panel-icons/5-ndl.png?v=1");}
-/* 29.10: светлая тема без золотого свечения сверху (выглядело как размытие под шапкой);
+/* 29.10/31.10: обе темы без свечения сверху (выглядело как размытие под шапкой);
    нижняя панель без backdrop-filter (на iPhone эффекты-слои в fixed-панели сбоят). */
-body.nd.theme-light{--nd-glow:transparent;--nd-glow-red:transparent;}
+body.nd,body.nd.theme-light{--nd-glow:transparent;--nd-glow-red:transparent;}
 .bottom-nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
 /* ставка теперь в строке под названием — отдельная плашка не нужна */
 body.nd .nd-rate{display:none!important;}
@@ -3710,8 +3710,8 @@ body:not(.nd) .nd-topups{display:none!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.27';
-const APP_BUILD_DATE = '2026-10-29';
+const APP_VERSION = 'v0.2.28';
+const APP_BUILD_DATE = '2026-10-31';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -17655,7 +17655,9 @@ function ndDecorateCrypto(){
   // три цифры: прибыль, USDT, в долларах
   const st=getCryptoPortfolioStats();
   const pnl=((Number(st.portfolioUsd)||0)-(Number(st.remainingCostUsd)||0))*rate;
-  const usdt=val('cryptoUsdt')||0;
+  // USDT — ручной баланс плюс USDT на всех подключённых биржах
+  let usdt=val('cryptoUsdt')||0;
+  try{getExchangeHoldings().forEach(h=>{if(h.coin==='USDT')usdt+=Number(h.qty)||0;});}catch(e){}
   const totalUsd=rate>0?getCryptoVal()/rate:0;
   let box=inner.querySelector('.nd-sec-stats');
   if(!box){box=document.createElement('div');box.className='nd-sec-stats nd-only';inner.prepend(box);}
