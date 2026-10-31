@@ -3710,7 +3710,7 @@ body:not(.nd) .nd-topups{display:none!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.29';
+const APP_VERSION = 'v0.2.30';
 const APP_BUILD_DATE = '2026-10-31';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17488,8 +17488,10 @@ function ndDecorateSecurities(){
       (isBond?'<div><div class="k">'+escHtml(trx({uk:'Накопичено',ru:'Накоплено',en:'Accrued',de:'Aufgelaufen',zh:'应计'}))+'</div><div class="v live-val g">+'+fmtN(toDisplayCurr(Number(stats.accruedTotal)||0))+' '+sym+'</div></div>':'<div><div class="k">'+escHtml(ndSecTxt('usd'))+'</div><div class="v live-val">$'+fmtN(usd)+'</div></div>');
     // вкладки
     let tabs=inner.querySelector('.nd-sec-tabs');
+    // подписи строятся один раз — при смене языка пересоздаём
+    if(tabs&&tabs.dataset.lang!==currentLang){const h=tabs.nextElementSibling;if(h&&h.classList.contains('nd-sec-hint'))h.remove();tabs.remove();tabs=null;}
     if(!tabs){
-      tabs=document.createElement('div');tabs.className='nd-sec-tabs nd-only';st.after(tabs);
+      tabs=document.createElement('div');tabs.className='nd-sec-tabs nd-only';st.after(tabs);tabs.dataset.lang=currentLang;
       tabs.innerHTML=['pos','divs','hist'].map(k=>'<button type="button" data-tab="'+(k==='divs'?'div':k)+'" onclick="ndSecSetTab(\''+secId+'\',\''+(k==='divs'?'div':k)+'\')">'+escHtml(k==='divs'&&isBond?trx({uk:'Купони',ru:'Купоны',en:'Coupons',de:'Kupons',zh:'票息'}):ndSecTxt(k))+'</button>').join('')+'';
       tabs.insertAdjacentHTML('afterend','<div class="nd-sec-hint">'+escHtml(ndSecTxt('pick'))+'</div>');
     }
@@ -17504,8 +17506,9 @@ function ndDecorateSecurities(){
       return '<div class="row"><div>'+escHtml(it.ticker||name)+'<small>'+escHtml(name)+'</small></div><div class="q '+(q<0?'out':'in')+'">'+(q<0?'−':'+')+fmtMax2(Math.abs(q))+' '+escHtml(trx(UNIT_TXT.pcs))+' '+escHtml(ndSecTxt('at'))+' <span class="live-val">'+fmtN(toDisplayCurr(Number(it.price)||Number(it.buyPrice)||0))+' '+sym+'</span></div></div>';
     }).join(''):'<div class="empty">'+escHtml(ndSecTxt('empty'))+'</div>';
     // кнопки
-    if(!inner.querySelector('.nd-sec-btns')){
-      inner.insertAdjacentHTML('beforeend','<div class="nd-sec-btns nd-only">'+(isBond?'':'<button type="button" class="b1" onclick="ndSecWriteOff(\''+secId+'\')">'+escHtml(ndSecTxt('writeOff'))+'</button>')+'<button type="button" class="b2" onclick="ndSecAdd(\''+secId+'\')">'+escHtml(ndSecTxt('add'))+'</button></div>');
+    {const b=inner.querySelector('.nd-sec-btns');if(b&&b.dataset.lang!==currentLang)b.remove();}
+  if(!inner.querySelector('.nd-sec-btns')){
+      inner.insertAdjacentHTML('beforeend','<div class="nd-sec-btns nd-only" data-lang="'+currentLang+'">'+(isBond?'':'<button type="button" class="b1" onclick="ndSecWriteOff(\''+secId+'\')">'+escHtml(ndSecTxt('writeOff'))+'</button>')+'<button type="button" class="b2" onclick="ndSecAdd(\''+secId+'\')">'+escHtml(ndSecTxt('add'))+'</button></div>');
     }
   });
 }
@@ -17666,8 +17669,10 @@ function ndDecorateCrypto(){
     '<div><div class="k">USDT</div><div class="v live-val gold">'+fmtN(usdt)+'</div></div>'+
     '<div><div class="k">'+escHtml(ndSecTxt('usd'))+'</div><div class="v live-val">$'+fmtN(totalUsd)+'</div></div>';
   let tabs=inner.querySelector('.nd-sec-tabs');
+  // подписи строятся один раз — при смене языка пересоздаём
+  if(tabs&&tabs.dataset.lang!==currentLang){const h=tabs.nextElementSibling;if(h&&h.classList.contains('nd-sec-hint'))h.remove();tabs.remove();tabs=null;}
   if(!tabs){
-    tabs=document.createElement('div');tabs.className='nd-sec-tabs nd-only';box.after(tabs);
+    tabs=document.createElement('div');tabs.className='nd-sec-tabs nd-only';box.after(tabs);tabs.dataset.lang=currentLang;
     tabs.innerHTML=[['ex',ndCryptoTxt('ex')],['pos',ndCryptoTxt('coins')],['hist',ndSecTxt('hist')]].map(([k,l])=>'<button type="button" data-tab="'+k+'" onclick="ndSecSetTab(\'crypto\',\''+k+'\')">'+escHtml(l)+'</button>').join('');
     tabs.insertAdjacentHTML('afterend','<div class="nd-sec-hint">'+escHtml(ndSecTxt('pick'))+'</div>');
   }
@@ -17685,8 +17690,9 @@ function ndDecorateCrypto(){
   const manualTxt=trx({uk:'Тут видно монети, додані вручну. Угоди з бірж поки не підтягуються.',ru:'Здесь видны монеты, добавленные вручную. Сделки с бирж пока не подтягиваются.',en:'Only coins added manually are shown here. Exchange trades are not imported yet.',de:'Hier erscheinen nur manuell hinzugefügte Coins. Börsen-Trades werden noch nicht importiert.',zh:'这里只显示手动添加的币。交易所的交易记录暂未导入。'});
   if(!list.length)hist.innerHTML='<div class="empty">'+escHtml(manualTxt)+'</div>';
   else if(hasEx)hist.insertAdjacentHTML('beforeend','<div class="empty">'+escHtml(trx({uk:'Угоди з бірж сюди не потрапляють.',ru:'Сделки с бирж сюда не попадают.',en:'Exchange trades are not listed here.',de:'Börsen-Trades erscheinen hier nicht.',zh:'交易所的交易不在此列出。'}))+'</div>');
+  {const b=inner.querySelector('.nd-sec-btns');if(b&&b.dataset.lang!==currentLang)b.remove();}
   if(!inner.querySelector('.nd-sec-btns')){
-    inner.insertAdjacentHTML('beforeend','<div class="nd-sec-btns nd-only"><button type="button" class="b1" onclick="ndCryptoWriteOff()">'+escHtml(ndSecTxt('writeOff'))+'</button><button type="button" class="b2" onclick="ndCryptoAdd()">'+escHtml(ndSecTxt('add'))+'</button></div>');
+    inner.insertAdjacentHTML('beforeend','<div class="nd-sec-btns nd-only" data-lang="'+currentLang+'"><button type="button" class="b1" onclick="ndCryptoWriteOff()">'+escHtml(ndSecTxt('writeOff'))+'</button><button type="button" class="b2" onclick="ndCryptoAdd()">'+escHtml(ndSecTxt('add'))+'</button></div>');
   }
 }
 function ndCleanCrypto(){
