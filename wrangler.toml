@@ -8,7 +8,10 @@ enabled = true
 # Не секрет: client_id и так виден в коде любой страницы, которая просит вход.
 # Секретом остаётся только SESSION_SECRET — он ставится через wrangler secret.
 [vars]
-GOOGLE_CLIENT_ID = "802898443875-ipii5n1uh9u2i4n9iu87r5ks51pjk6tl.apps.googleusercontent.com"
+# Веб-клиент + iOS-клиент «Ovanta iOS» (31.10.2026) — через запятую.
+GOOGLE_CLIENT_ID = "802898443875-ipii5n1uh9u2i4n9iu87r5ks51pjk6tl.apps.googleusercontent.com,802898443875-4j7a7rckvcphvmckcger678d7ke8o6lb.apps.googleusercontent.com"
+# «Вход с Apple»: aud токена = Bundle ID iPhone-приложения.
+APPLE_CLIENT_ID = "app.ovanta.ios"
 
 # Счётчики лимитов ИИ: global:ДАТА и user:<id>:ДАТА
 [[kv_namespaces]]

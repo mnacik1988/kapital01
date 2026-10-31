@@ -2,7 +2,9 @@
 // Origin 'null' was removed after migrating off file:///android_asset/ loading.
 const ALLOWED_ORIGINS = new Set([
   'https://mnacik1988.github.io',
-  'https://appassets.androidplatform.net'
+  'https://appassets.androidplatform.net',
+  // iPhone-приложение (Capacitor, схема iosScheme: capacitor) — с 31.10.2026
+  'capacitor://localhost'
 ]);
 
 const TICKER_RE = /^[A-Z0-9.\-]{1,15}$/;
@@ -143,6 +145,54 @@ async function verifyGoogleIdToken(token, env) {
   return payload.sub;
 }
 
+// «Вход с Apple» (iPhone-приложение, правило App Store 4.8). Токен подписан ключами
+// appleid.apple.com, aud — Bundle ID приложения. Пользователь у нас — 'apple:<sub>',
+// чтобы никогда не совпасть с идентификатором Google: другой способ входа — другой аккаунт.
+const APPLE_JWKS_URL = 'https://appleid.apple.com/auth/keys';
+let appleJwksCache = null, appleJwksCacheTime = 0;
+async function getAppleJwks() {
+  const now = Date.now();
+  if (appleJwksCache && now - appleJwksCacheTime < 3600000) return appleJwksCache;
+  const resp = await fetch(APPLE_JWKS_URL);
+  const data = await resp.json();
+  appleJwksCache = data.keys;
+  appleJwksCacheTime = now;
+  return appleJwksCache;
+}
+
+async function verifyAppleIdToken(token, env) {
+  if (!token) return null;
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  let header, payload;
+  try {
+    header = JSON.parse(new TextDecoder().decode(b64urlToBytes(parts[0])));
+    payload = JSON.parse(new TextDecoder().decode(b64urlToBytes(parts[1])));
+  } catch { return null; }
+  const now = Math.floor(Date.now() / 1000);
+  if (typeof payload.exp !== 'number' || payload.exp < now) return null;
+  const allowed = String(env.APPLE_CLIENT_ID || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (!allowed.length || !allowed.includes(payload.aud)) return null;
+  if (payload.iss !== 'https://appleid.apple.com' || !payload.sub) return null;
+  let jwks;
+  try { jwks = await getAppleJwks(); } catch { return null; }
+  const jwk = jwks.find(k => k.kid === header.kid);
+  if (!jwk) return null;
+  try {
+    const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key,
+      b64urlToBytes(parts[2]), new TextEncoder().encode(parts[0] + '.' + parts[1]));
+    if (!valid) return null;
+  } catch { return null; }
+  const sub = 'apple:' + payload.sub;
+  if (await isTokenRevoked(env, sub, payload.iat)) return null;
+  return sub;
+}
+
+function tokenIssuer(token) {
+  try { return JSON.parse(new TextDecoder().decode(b64urlToBytes(String(token).split('.')[1]))).iss || ''; } catch { return ''; }
+}
+
 // Токен Google живёт ~1 час, а тихое обновление через One Tap ненадёжно:
 // у Google есть период охлаждения после закрытых окон, а в обёртке всплывающее
 // окно негде показать. Поэтому сразу после входа выдаём СВОЙ токен на 90 дней —
@@ -227,7 +277,8 @@ async function verifyAuthToken(token, env) {
   if (parts.length !== 3) return null;
   let header;
   try { header = JSON.parse(new TextDecoder().decode(b64urlToBytes(parts[0]))); } catch { return null; }
-  return header.alg === 'HS256' ? verifySessionToken(token, env) : verifyGoogleIdToken(token, env);
+  if (header.alg === 'HS256') return verifySessionToken(token, env);
+  return tokenIssuer(token) === 'https://appleid.apple.com' ? verifyAppleIdToken(token, env) : verifyGoogleIdToken(token, env);
 }
 
 function bearerToken(request) {
@@ -974,7 +1025,7 @@ async function rememberVerifiedEmail(env, sub, idToken) {
   if (!env.DB) return;
   try {
     const payload = JSON.parse(new TextDecoder().decode(b64urlToBytes(String(idToken).split('.')[1])));
-    const email = payload.email_verified === false ? null : cleanEmail(payload.email);
+    const email = (payload.email_verified === false || payload.email_verified === 'false') ? null : cleanEmail(payload.email);
     if (!email) return;
     await ensureSchema(env);
     const now = Date.now();
