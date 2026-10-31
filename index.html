@@ -21,7 +21,7 @@
 <link rel="apple-touch-icon" sizes="384x384" href="icons/icon-384.png">
 <link rel="icon" type="image/png" sizes="384x384" href="icons/icon-384.png">
 <link rel="icon" type="image/png" sizes="152x152" href="icons/icon-152.png">
-<title>InveStory</title>
+<title>Ovanta</title>
 <!-- Syne и Inter заменены на Manrope (тот же шрифт, что в Mynado) — заголовки и
      текст теперь общие у двух приложений. DM Mono остался: он моноширинный,
      на нём держится выравнивание сумм по разрядам в живом счётчике и журнале —
@@ -3668,7 +3668,7 @@ body:not(.nd) .nd-topups{display:none!important;}
   </div>
 </div>
 
-<div class="footer"><span data-i18n="footer">InveStory</span><span id="footerVersion"> · v0.0.44-test</span></div>
+<div class="footer"><span data-i18n="footer">Ovanta</span><span id="footerVersion"> · v0.0.44-test</span></div>
 
 <!-- DIAGNOSTICS POPUP -->
 
@@ -3698,7 +3698,7 @@ body:not(.nd) .nd-topups{display:none!important;}
      (z-index:600) сидит уровнем выше и перекрывал кнопку входа. -->
 <div class="auth-gate" id="authGate">
   <img class="auth-gate-logo" src="icons/icon-384.png" alt="">
-  <div class="auth-gate-title">InveStory</div>
+  <div class="auth-gate-title">Ovanta</div>
   <div class="auth-gate-desc" id="authGateDesc">Увійдіть, щоб користуватися застосунком</div>
   <div id="googleBtnSlot"></div>
   <div class="auth-gate-note" id="authGateNote">Ми отримуємо лише ім'я, пошту та ідентифікатор облікового запису. Дані портфеля зберігаються на пристрої; хмарну копію можна ввімкнути за бажанням.</div>
@@ -3710,7 +3710,7 @@ body:not(.nd) .nd-topups{display:none!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.28';
+const APP_VERSION = 'v0.2.29';
 const APP_BUILD_DATE = '2026-10-31';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4024,7 +4024,7 @@ const EXTRA_I18N={
 'на місяць':{uk:'на місяць',ru:'в месяц',en:'per month',de:'pro Monat',zh:'每月'},
   'на рік · економія 20%':{uk:'на рік · економія 20%',ru:'в год · экономия 30%',en:'per year · save 30%',de:'pro Jahr · 30% sparen',zh:'每年 · 节省 30%'},
   'Після 30 днів можна обрати зручний тариф':{uk:'Після 30 днів можна обрати зручний тариф',ru:'После 30 дней можно выбрать удобный тариф',en:'After 30 days, choose the plan that suits you',de:'Nach 30 Tagen wählen Sie den passenden Tarif',zh:'30 天后可选择适合您的方案'},
-'Капітал':{uk:'InveStory',ru:'InveStory',en:'InveStory',de:'InveStory',zh:'InveStory'},
+'Капітал':{uk:'Ovanta',ru:'Ovanta',en:'Ovanta',de:'Ovanta',zh:'Ovanta'},
   '📉 ДИНАМІКА КАПІТАЛУ':{uk:'📉 ДИНАМІКА КАПІТАЛУ',ru:'📉 ДИНАМИКА КАПИТАЛА',en:'📉 CAPITAL DYNAMICS',de:'📉 KAPITALENTWICKLUNG',zh:'📉 资本动态'},
   'Мін':{uk:'Мін',ru:'Мин',en:'Min',de:'Min.',zh:'最低'},
   'Макс':{uk:'Макс',ru:'Макс',en:'Max',de:'Max.',zh:'最高'},
@@ -7229,11 +7229,11 @@ function exTxt(k){
           en:'Bybit disables keys without an IP whitelist after 3 months — then issue a new one.',
           de:'Bybit deaktiviert Schlüssel ohne IP-Bindung nach 3 Monaten — dann einen neuen erstellen.',
           zh:'Bybit：未绑定 IP 的密钥 3 个月后失效，届时需重新创建。'},
-    hint_binance:{uk:'Binance: у ключі залиште лише «Enable Reading». Ключ із правом виведення не приймається. Запит до Binance йде через сервер InveStory — секрет туди не передається, лише публічний ключ.',
-          ru:'Binance: в ключе оставьте только «Enable Reading». Ключ с правом вывода не принимается. Запрос к Binance идёт через сервер InveStory — секрет туда не передаётся, только публичный ключ.',
-          en:'Binance: leave only “Enable Reading” on the key. Keys that allow withdrawals are rejected. Requests to Binance go through the InveStory server — only the public key is sent, never the secret.',
-          de:'Binance: Nur „Enable Reading“ aktiviert lassen. Schlüssel mit Auszahlungsrecht werden abgelehnt. Anfragen an Binance laufen über den InveStory-Server — nur der öffentliche Schlüssel, nie das Secret.',
-          zh:'Binance：密钥只保留“Enable Reading”。允许提现的密钥将被拒绝。发往 Binance 的请求经由 InveStory 服务器，只传公钥，从不传 Secret。'},
+    hint_binance:{uk:'Binance: у ключі залиште лише «Enable Reading». Ключ із правом виведення не приймається. Запит до Binance йде через сервер Ovanta — секрет туди не передається, лише публічний ключ.',
+          ru:'Binance: в ключе оставьте только «Enable Reading». Ключ с правом вывода не принимается. Запрос к Binance идёт через сервер Ovanta — секрет туда не передаётся, только публичный ключ.',
+          en:'Binance: leave only “Enable Reading” on the key. Keys that allow withdrawals are rejected. Requests to Binance go through the Ovanta server — only the public key is sent, never the secret.',
+          de:'Binance: Nur „Enable Reading“ aktiviert lassen. Schlüssel mit Auszahlungsrecht werden abgelehnt. Anfragen an Binance laufen über den Ovanta-Server — nur der öffentliche Schlüssel, nie das Secret.',
+          zh:'Binance：密钥只保留“Enable Reading”。允许提现的密钥将被拒绝。发往 Binance 的请求经由 Ovanta 服务器，只传公钥，从不传 Secret。'},
     connected:{uk:'підключено',ru:'подключено',en:'connected',de:'verbunden',zh:'已连接'},
     partial_binance:{uk:'частину активів (ф’ючерси, маржа, боти) враховано в сумі, але без розбивки по монетах',ru:'часть активов (фьючерсы, маржа, боты) учтена в сумме, но без разбивки по монетам',en:'some assets (futures, margin, bots) are in the total but not broken down by coin',de:'ein Teil (Futures, Margin, Bots) ist in der Summe, aber nicht nach Coins aufgeschlüsselt',zh:'部分资产（合约、杠杆、机器人）已计入总额，但未按币种拆分'},
     partial_binance_miss:{uk:'не вдалося прочитати частину рахунків — сума може бути неповною',ru:'не удалось прочитать часть счетов — сумма может быть неполной',en:'some accounts could not be read — the total may be incomplete',de:'einige Konten konnten nicht gelesen werden — Summe evtl. unvollständig',zh:'部分账户读取失败——总额可能不完整'},
@@ -7781,21 +7781,21 @@ const CONNECT_GUIDES={
   bybit:{url:'https://www.bybit.com/app/user/api-management',
     open:{uk:'Відкрити Bybit',ru:'Открыть Bybit',en:'Open Bybit',de:'Bybit öffnen',zh:'打开 Bybit'},
     steps:{
-      uk:['Відкрийте застосунок Bybit → іконка профілю (ліворуч угорі) → «API».','«Створити новий ключ» → «Згенеровані системою».','Назва — InveStory. Дозволи: лише «Тільки читання» (Read-Only). Торгівлю й виведення не вмикайте.','Підтвердіть кодом і скопіюйте API Key та API Secret.','Поверніться сюди й вставте обидва ключі кнопками «Вставити».'],
-      ru:['Откройте приложение Bybit → иконка профиля (слева вверху) → «API».','«Создать новый ключ» → «Сгенерированные системой».','Название — InveStory. Права: только «Только чтение» (Read-Only). Торговлю и вывод не включайте.','Подтвердите кодом и скопируйте API Key и API Secret.','Вернитесь сюда и вставьте оба ключа кнопками «Вставить».'],
-      en:['Open the Bybit app → profile icon (top left) → “API”.','“Create new key” → “System-generated”.','Name it InveStory. Permissions: “Read-Only” only. Do not enable trading or withdrawals.','Confirm with the code and copy the API Key and API Secret.','Come back here and paste both with the “Paste” buttons.'],
-      de:['Bybit-App öffnen → Profilsymbol (oben links) → „API“.','„Neuen Schlüssel erstellen“ → „Systemgeneriert“.','Name: InveStory. Rechte: nur „Read-Only“. Handel und Auszahlung nicht aktivieren.','Mit Code bestätigen, API Key und API Secret kopieren.','Hierher zurückkehren und beide mit „Einfügen“ einfügen.'],
-      zh:['打开 Bybit 应用 → 左上角头像 → “API”。','“创建新密钥” → “系统生成”。','名称填 InveStory。权限只选“只读”(Read-Only)，不要开启交易和提现。','用验证码确认，复制 API Key 和 API Secret。','回到这里，用“粘贴”按钮粘贴两个密钥。']},
+      uk:['Відкрийте застосунок Bybit → іконка профілю (ліворуч угорі) → «API».','«Створити новий ключ» → «Згенеровані системою».','Назва — Ovanta. Дозволи: лише «Тільки читання» (Read-Only). Торгівлю й виведення не вмикайте.','Підтвердіть кодом і скопіюйте API Key та API Secret.','Поверніться сюди й вставте обидва ключі кнопками «Вставити».'],
+      ru:['Откройте приложение Bybit → иконка профиля (слева вверху) → «API».','«Создать новый ключ» → «Сгенерированные системой».','Название — Ovanta. Права: только «Только чтение» (Read-Only). Торговлю и вывод не включайте.','Подтвердите кодом и скопируйте API Key и API Secret.','Вернитесь сюда и вставьте оба ключа кнопками «Вставить».'],
+      en:['Open the Bybit app → profile icon (top left) → “API”.','“Create new key” → “System-generated”.','Name it Ovanta. Permissions: “Read-Only” only. Do not enable trading or withdrawals.','Confirm with the code and copy the API Key and API Secret.','Come back here and paste both with the “Paste” buttons.'],
+      de:['Bybit-App öffnen → Profilsymbol (oben links) → „API“.','„Neuen Schlüssel erstellen“ → „Systemgeneriert“.','Name: Ovanta. Rechte: nur „Read-Only“. Handel und Auszahlung nicht aktivieren.','Mit Code bestätigen, API Key und API Secret kopieren.','Hierher zurückkehren und beide mit „Einfügen“ einfügen.'],
+      zh:['打开 Bybit 应用 → 左上角头像 → “API”。','“创建新密钥” → “系统生成”。','名称填 Ovanta。权限只选“只读”(Read-Only)，不要开启交易和提现。','用验证码确认，复制 API Key 和 API Secret。','回到这里，用“粘贴”按钮粘贴两个密钥。']},
     note:{uk:'Ключ без прив’язки до IP Bybit вимикає через 3 місяці — тоді створіть новий.',ru:'Ключ без привязки к IP Bybit отключает через 3 месяца — тогда создайте новый.',en:'Bybit disables keys without an IP binding after 3 months — then create a new one.',de:'Bybit deaktiviert Schlüssel ohne IP-Bindung nach 3 Monaten — dann neu erstellen.',zh:'未绑定 IP 的密钥 3 个月后会被 Bybit 停用，届时请重新创建。'}},
   binance:{url:'https://www.binance.com/my/settings/api-management',
     open:{uk:'Відкрити Binance',ru:'Открыть Binance',en:'Open Binance',de:'Binance öffnen',zh:'打开 Binance'},
     steps:{
-      uk:['Відкрийте застосунок Binance → іконка профілю (ліворуч угорі) → «Управління API» (буває в розділі «Безпека»).','«Створити API» → «Згенерований системою», назва — InveStory.','Підтвердіть кодом (2FA або пошта).','У дозволах залиште лише «Enable Reading» — він увімкнений за замовчуванням.','Скопіюйте API Key і Secret Key (секрет показують лише один раз) і вставте сюди.'],
-      ru:['Откройте приложение Binance → иконка профиля (слева вверху) → «Управление API» (бывает в разделе «Безопасность»).','«Создать API» → «Сгенерированный системой», название — InveStory.','Подтвердите кодом (2FA или почта).','В правах оставьте только «Enable Reading» — оно включено по умолчанию.','Скопируйте API Key и Secret Key (секрет показывают только один раз) и вставьте сюда.'],
-      en:['Open the Binance app → profile icon (top left) → “API Management” (sometimes under “Security”).','“Create API” → “System generated”, name it InveStory.','Confirm with the code (2FA or email).','Keep only “Enable Reading” — it is on by default.','Copy the API Key and Secret Key (the secret is shown only once) and paste them here.'],
-      de:['Binance-App öffnen → Profilsymbol (oben links) → „API-Verwaltung“ (teils unter „Sicherheit“).','„API erstellen“ → „Systemgeneriert“, Name: InveStory.','Mit Code bestätigen (2FA oder E-Mail).','Nur „Enable Reading“ lassen — standardmäßig aktiv.','API Key und Secret Key kopieren (Secret wird nur einmal angezeigt) und hier einfügen.'],
-      zh:['打开币安应用 → 左上角头像 → “API 管理”(有时在“安全”中)。','“创建 API” → “系统生成”，名称填 InveStory。','用验证码确认(2FA 或邮箱)。','权限只保留 “Enable Reading”(默认已开启)。','复制 API Key 和 Secret Key(密钥只显示一次)，粘贴到这里。']},
-    note:{uk:'Запит до Binance йде через сервер InveStory — секрет туди не передається, лише публічний ключ.',ru:'Запрос к Binance идёт через сервер InveStory — секрет туда не передаётся, только публичный ключ.',en:'Binance requests go through the InveStory server — only the public key, never the secret.',de:'Binance-Anfragen laufen über den InveStory-Server — nur der öffentliche Schlüssel, nie das Secret.',zh:'币安请求经 InveStory 服务器转发，只传公钥，不传密钥。'}},
+      uk:['Відкрийте застосунок Binance → іконка профілю (ліворуч угорі) → «Управління API» (буває в розділі «Безпека»).','«Створити API» → «Згенерований системою», назва — Ovanta.','Підтвердіть кодом (2FA або пошта).','У дозволах залиште лише «Enable Reading» — він увімкнений за замовчуванням.','Скопіюйте API Key і Secret Key (секрет показують лише один раз) і вставте сюди.'],
+      ru:['Откройте приложение Binance → иконка профиля (слева вверху) → «Управление API» (бывает в разделе «Безопасность»).','«Создать API» → «Сгенерированный системой», название — Ovanta.','Подтвердите кодом (2FA или почта).','В правах оставьте только «Enable Reading» — оно включено по умолчанию.','Скопируйте API Key и Secret Key (секрет показывают только один раз) и вставьте сюда.'],
+      en:['Open the Binance app → profile icon (top left) → “API Management” (sometimes under “Security”).','“Create API” → “System generated”, name it Ovanta.','Confirm with the code (2FA or email).','Keep only “Enable Reading” — it is on by default.','Copy the API Key and Secret Key (the secret is shown only once) and paste them here.'],
+      de:['Binance-App öffnen → Profilsymbol (oben links) → „API-Verwaltung“ (teils unter „Sicherheit“).','„API erstellen“ → „Systemgeneriert“, Name: Ovanta.','Mit Code bestätigen (2FA oder E-Mail).','Nur „Enable Reading“ lassen — standardmäßig aktiv.','API Key und Secret Key kopieren (Secret wird nur einmal angezeigt) und hier einfügen.'],
+      zh:['打开币安应用 → 左上角头像 → “API 管理”(有时在“安全”中)。','“创建 API” → “系统生成”，名称填 Ovanta。','用验证码确认(2FA 或邮箱)。','权限只保留 “Enable Reading”(默认已开启)。','复制 API Key 和 Secret Key(密钥只显示一次)，粘贴到这里。']},
+    note:{uk:'Запит до Binance йде через сервер Ovanta — секрет туди не передається, лише публічний ключ.',ru:'Запрос к Binance идёт через сервер Ovanta — секрет туда не передаётся, только публичный ключ.',en:'Binance requests go through the Ovanta server — only the public key, never the secret.',de:'Binance-Anfragen laufen über den Ovanta-Server — nur der öffentliche Schlüssel, nie das Secret.',zh:'币安请求经 Ovanta 服务器转发，只传公钥，不传密钥。'}},
   monobank:{url:'https://api.monobank.ua/',
     open:{uk:'Відкрити api.monobank.ua',ru:'Открыть api.monobank.ua',en:'Open api.monobank.ua',de:'api.monobank.ua öffnen',zh:'打开 api.monobank.ua'},
     steps:{
@@ -10159,7 +10159,7 @@ const PRIVACY_I18N={
   "sections": [
    [
     "Who we are",
-    "InveStory is a personal finance tracker created by an independent developer (\"we\"). Contact: mnacik1988@gmail.com."
+    "Ovanta is a personal finance tracker created by an independent developer (\"we\"). Contact: mnacik1988@gmail.com."
    ],
    [
     "Sign-in with Google",
@@ -10227,7 +10227,7 @@ const PRIVACY_I18N={
    ],
    [
     "Important",
-    "InveStory is not a financial advisor. Calculations, rates and forecasts are informational and may differ from actual bank or market values."
+    "Ovanta is not a financial advisor. Calculations, rates and forecasts are informational and may differ from actual bank or market values."
    ],
    [
     "Changes",
@@ -10242,7 +10242,7 @@ const PRIVACY_I18N={
   "sections": [
    [
     "Хто ми",
-    "InveStory — застосунок для обліку особистих фінансів, створений незалежним розробником («ми»). Контакт: mnacik1988@gmail.com."
+    "Ovanta — застосунок для обліку особистих фінансів, створений незалежним розробником («ми»). Контакт: mnacik1988@gmail.com."
    ],
    [
     "Вхід через Google",
@@ -10310,7 +10310,7 @@ const PRIVACY_I18N={
    ],
    [
     "Важливо",
-    "InveStory не є фінансовим радником. Розрахунки, курси та прогнози мають інформаційний характер і можуть відрізнятися від фактичних банківських або ринкових значень."
+    "Ovanta не є фінансовим радником. Розрахунки, курси та прогнози мають інформаційний характер і можуть відрізнятися від фактичних банківських або ринкових значень."
    ],
    [
     "Зміни",
@@ -10325,7 +10325,7 @@ const PRIVACY_I18N={
   "sections": [
    [
     "Кто мы",
-    "InveStory — приложение для учёта личных финансов, созданное независимым разработчиком («мы»). Контакт: mnacik1988@gmail.com."
+    "Ovanta — приложение для учёта личных финансов, созданное независимым разработчиком («мы»). Контакт: mnacik1988@gmail.com."
    ],
    [
     "Вход через Google",
@@ -10393,7 +10393,7 @@ const PRIVACY_I18N={
    ],
    [
     "Важно",
-    "InveStory не является финансовым советником. Расчёты, курсы и прогнозы носят информационный характер и могут отличаться от фактических банковских или рыночных значений."
+    "Ovanta не является финансовым советником. Расчёты, курсы и прогнозы носят информационный характер и могут отличаться от фактических банковских или рыночных значений."
    ],
    [
     "Изменения",
@@ -10408,7 +10408,7 @@ const PRIVACY_I18N={
   "sections": [
    [
     "Wer wir sind",
-    "InveStory ist eine App zur Verwaltung persönlicher Finanzen, entwickelt von einem unabhängigen Entwickler („wir“). Kontakt: mnacik1988@gmail.com."
+    "Ovanta ist eine App zur Verwaltung persönlicher Finanzen, entwickelt von einem unabhängigen Entwickler („wir“). Kontakt: mnacik1988@gmail.com."
    ],
    [
     "Anmeldung mit Google",
@@ -10476,7 +10476,7 @@ const PRIVACY_I18N={
    ],
    [
     "Wichtig",
-    "InveStory ist kein Finanzberater. Berechnungen, Kurse und Prognosen dienen nur zur Information und können von tatsächlichen Bank- oder Marktwerten abweichen."
+    "Ovanta ist kein Finanzberater. Berechnungen, Kurse und Prognosen dienen nur zur Information und können von tatsächlichen Bank- oder Marktwerten abweichen."
    ],
    [
     "Änderungen",
@@ -10491,7 +10491,7 @@ const PRIVACY_I18N={
   "sections": [
    [
     "我们是谁",
-    "InveStory 是一款个人财务记录应用，由独立开发者（“我们”）开发。联系方式：mnacik1988@gmail.com。"
+    "Ovanta 是一款个人财务记录应用，由独立开发者（“我们”）开发。联系方式：mnacik1988@gmail.com。"
    ],
    [
     "使用 Google 登录",
@@ -10559,7 +10559,7 @@ const PRIVACY_I18N={
    ],
    [
     "重要说明",
-    "InveStory 不是财务顾问。计算、汇率和预测仅供参考，可能与实际银行或市场数据不同。"
+    "Ovanta 不是财务顾问。计算、汇率和预测仅供参考，可能与实际银行或市场数据不同。"
    ],
    [
     "变更",
@@ -10597,7 +10597,7 @@ const LEGAL_I18N={
   "sections": [
    [
     "Інформаційний характер",
-    "InveStory призначений для особистого обліку активів, боргів, доходів і орієнтовних розрахунків. Застосунок не є банком, брокером, податковим консультантом або фінансовим радником."
+    "Ovanta призначений для особистого обліку активів, боргів, доходів і орієнтовних розрахунків. Застосунок не є банком, брокером, податковим консультантом або фінансовим радником."
    ],
    [
     "Не фінансова порада",
@@ -10640,7 +10640,7 @@ const LEGAL_I18N={
   "sections": [
    [
     "Информационный характер",
-    "InveStory предназначен для личного учёта активов, долгов, доходов и ориентировочных расчётов. Приложение не является банком, брокером, налоговым консультантом или финансовым советником."
+    "Ovanta предназначен для личного учёта активов, долгов, доходов и ориентировочных расчётов. Приложение не является банком, брокером, налоговым консультантом или финансовым советником."
    ],
    [
     "Не финансовая рекомендация",
@@ -10683,7 +10683,7 @@ const LEGAL_I18N={
   "sections": [
    [
     "Informational purpose",
-    "InveStory is intended for personal tracking of assets, debts, income and approximate calculations. The app is not a bank, broker, tax advisor or financial advisor."
+    "Ovanta is intended for personal tracking of assets, debts, income and approximate calculations. The app is not a bank, broker, tax advisor or financial advisor."
    ],
    [
     "Not financial advice",
@@ -10726,7 +10726,7 @@ const LEGAL_I18N={
   "sections": [
    [
     "Informationszweck",
-    "InveStory dient der persönlichen Erfassung von Vermögenswerten, Schulden, Einkommen und ungefähren Berechnungen. Die App ist keine Bank, kein Broker, kein Steuerberater und kein Finanzberater."
+    "Ovanta dient der persönlichen Erfassung von Vermögenswerten, Schulden, Einkommen und ungefähren Berechnungen. Die App ist keine Bank, kein Broker, kein Steuerberater und kein Finanzberater."
    ],
    [
     "Keine Finanzberatung",
@@ -10769,7 +10769,7 @@ const LEGAL_I18N={
   "sections": [
    [
     "信息用途",
-    "InveStory 用于个人记录资产、债务、收入和近似计算。本应用不是银行、券商、税务顾问或财务顾问。"
+    "Ovanta 用于个人记录资产、债务、收入和近似计算。本应用不是银行、券商、税务顾问或财务顾问。"
    ],
    [
     "非财务建议",
@@ -10832,7 +10832,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Експорт, імпорт та офлайн',items:['Експортувати backup і переконатися, що файл відкривається як JSON.','Імпортувати backup на чисті дані і перевірити всі розділи.','Увімкнути офлайн-режим і перевірити використання cached/manual курсів.','Перевірити rollback snapshot перед імпортом.']},
     {title:'Інтерфейс та мобільна верстка',items:['Перевірити темну і світлу тему на вузькому екрані.','Перевірити, що великі суми не обрізаються.','Перевірити модальні вікна, свайп депозитів і нижні кнопки.','Перевірити переклади кнопок і порожніх станів у всіх мовах.']},
     {title:'Paywall та юридичні екрани',items:['Перевірити 30 днів безкоштовно, ціни $2.99/міс і $24.99/рік.','Перевірити Privacy Policy та Terms & Disclaimer у застосунку.','Переконатися, що немає текстів про старі ліміти.','Перевірити, що фінансовий disclaimer показаний зрозуміло.']},
-    {title:'Публікація',items:['Перевірити іконку, назву InveStory, splash screen і версію.','Перевірити Android/iOS build на реальному пристрої.','Підготувати скріншоти, опис, privacy URL і support URL.','Перед релізом зробити фінальний backup тестових даних.']}
+    {title:'Публікація',items:['Перевірити іконку, назву Ovanta, splash screen і версію.','Перевірити Android/iOS build на реальному пристрої.','Підготувати скріншоти, опис, privacy URL і support URL.','Перед релізом зробити фінальний backup тестових даних.']}
   ]},
   ru:{title:'Тестовый чек-лист',updated:'Перед релизом в App Store / Play Market',progress:'Готово',reset:'Сбросить чек-лист',sections:[
     {title:'Данные и миграции',items:['Обновить приложение со старыми данными и проверить, что активы не исчезли.','Проверить схему v4, дату миграции и pre-migration backup в хранилище.','Создать депозит, кредит, валюту, металл и акцию, перезагрузить приложение.','Проверить сброс trial без потери основных данных.']},
@@ -10840,7 +10840,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Экспорт, импорт и офлайн',items:['Экспортировать backup и убедиться, что файл открывается как JSON.','Импортировать backup на чистые данные и проверить все разделы.','Включить офлайн-режим и проверить cached/manual курсы.','Проверить rollback snapshot перед импортом.']},
     {title:'Интерфейс и мобильная вёрстка',items:['Проверить тёмную и светлую тему на узком экране.','Проверить, что большие суммы не обрезаются.','Проверить модальные окна, свайп депозитов и нижние кнопки.','Проверить переводы кнопок и пустых состояний на всех языках.']},
     {title:'Paywall и юридические экраны',items:['Проверить 30 дней бесплатно, цены $2.99/мес и $24.99/год.','Проверить Privacy Policy и Terms & Disclaimer в приложении.','Убедиться, что нет текстов про старые лимиты.','Проверить, что финансовый disclaimer показан понятно.']},
-    {title:'Публикация',items:['Проверить иконку, название InveStory, splash screen и версию.','Проверить Android/iOS build на реальном устройстве.','Подготовить скриншоты, описание, privacy URL и support URL.','Перед релизом сделать финальный backup тестовых данных.']}
+    {title:'Публикация',items:['Проверить иконку, название Ovanta, splash screen и версию.','Проверить Android/iOS build на реальном устройстве.','Подготовить скриншоты, описание, privacy URL и support URL.','Перед релизом сделать финальный backup тестовых данных.']}
   ]},
   en:{title:'Test Checklist',updated:'Before App Store / Play Market release',progress:'Done',reset:'Reset checklist',sections:[
     {title:'Data and migrations',items:['Update the app with old data and confirm assets are still present.','Check schema v4, migration date, and pre-migration backup in storage.','Create a deposit, loan, currency, metal, and stock, then reload the app.','Check trial reset without losing core data.']},
@@ -10848,7 +10848,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Export, import, and offline',items:['Export a backup and confirm the file opens as JSON.','Import a backup into clean data and verify every section.','Enable offline mode and check cached/manual rates.','Check rollback snapshot before import.']},
     {title:'UI and mobile layout',items:['Check dark and light themes on a narrow screen.','Check that large amounts are not clipped.','Check modals, deposit swipes, and bottom buttons.','Check button and empty-state translations in every language.']},
     {title:'Paywall and legal screens',items:['Check 30 days free, $2.99/month and $24.99/year prices.','Check Privacy Policy and Terms & Disclaimer inside the app.','Confirm there are no old limit texts.','Check that the financial disclaimer is clear.']},
-    {title:'Publishing',items:['Check icon, InveStory name, splash screen, and version.','Check Android/iOS build on a real device.','Prepare screenshots, description, privacy URL, and support URL.','Make a final backup of test data before release.']}
+    {title:'Publishing',items:['Check icon, Ovanta name, splash screen, and version.','Check Android/iOS build on a real device.','Prepare screenshots, description, privacy URL, and support URL.','Make a final backup of test data before release.']}
   ]},
   de:{title:'Test-Checkliste',updated:'Vor dem Release im App Store / Play Market',progress:'Erledigt',reset:'Checkliste zurücksetzen',sections:[
     {title:'Daten und Migrationen',items:['App mit alten Daten aktualisieren und prüfen, dass Vermögenswerte erhalten bleiben.','Schema v4, Migrationsdatum und Pre-Migration-Backup im Speicher prüfen.','Einlage, Kredit, Währung, Metall und Aktie erstellen, danach App neu laden.','Trial-Reset ohne Verlust der Kerndaten prüfen.']},
@@ -10856,7 +10856,7 @@ const TEST_CHECKLIST_I18N={
     {title:'Export, Import und Offline',items:['Backup exportieren und prüfen, dass die Datei als JSON geöffnet wird.','Backup in leere Daten importieren und alle Bereiche prüfen.','Offline-Modus aktivieren und cached/manual Kurse prüfen.','Rollback-Snapshot vor dem Import prüfen.']},
     {title:'UI und mobiles Layout',items:['Dunkles und helles Design auf schmalem Bildschirm prüfen.','Prüfen, dass große Summen nicht abgeschnitten werden.','Modale Fenster, Einlagen-Swipe und untere Buttons prüfen.','Übersetzungen von Buttons und leeren Zuständen in allen Sprachen prüfen.']},
     {title:'Paywall und Rechtliches',items:['30 Tage kostenlos, Preise $2.99/Monat und $24.99/Jahr prüfen.','Privacy Policy und Terms & Disclaimer in der App prüfen.','Sicherstellen, dass keine alten Limit-Texte vorhanden sind.','Prüfen, dass der Finanz-Disclaimer klar ist.']},
-    {title:'Veröffentlichung',items:['Icon, Name InveStory, Splash Screen und Version prüfen.','Android/iOS Build auf echtem Gerät prüfen.','Screenshots, Beschreibung, Privacy URL und Support URL vorbereiten.','Vor Release ein finales Backup der Testdaten erstellen.']}
+    {title:'Veröffentlichung',items:['Icon, Name Ovanta, Splash Screen und Version prüfen.','Android/iOS Build auf echtem Gerät prüfen.','Screenshots, Beschreibung, Privacy URL und Support URL vorbereiten.','Vor Release ein finales Backup der Testdaten erstellen.']}
   ]},
   zh:{title:'测试清单',updated:'发布到 App Store / Play Market 前',progress:'已完成',reset:'重置清单',sections:[
     {title:'数据和迁移',items:['使用旧数据更新应用，并确认资产没有丢失。','检查 schema v4、迁移日期和 pre-migration backup。','创建存款、贷款、货币、金属和股票，然后重新加载应用。','检查重置 trial 时不会丢失核心数据。']},
@@ -10864,7 +10864,7 @@ const TEST_CHECKLIST_I18N={
     {title:'导出、导入和离线',items:['导出 backup，并确认文件可以作为 JSON 打开。','把 backup 导入到空数据中，并检查所有部分。','开启离线模式并检查 cached/manual 汇率。','检查导入前的 rollback snapshot。']},
     {title:'界面和移动布局',items:['在窄屏上检查深色和浅色主题。','检查大金额不会被裁切。','检查弹窗、存款滑动和底部按钮。','检查所有语言中的按钮和空状态翻译。']},
     {title:'Paywall 和法律页面',items:['检查 30 天免费、$2.99/月 和 $24.99/年价格。','检查应用内 Privacy Policy 和 Terms & Disclaimer。','确认没有旧限制文本。','检查金融免责声明是否清楚。']},
-    {title:'发布',items:['检查图标、InveStory 名称、启动屏和版本。','在真实设备上检查 Android/iOS build。','准备截图、描述、privacy URL 和 support URL。','发布前备份最终测试数据。']}
+    {title:'发布',items:['检查图标、Ovanta 名称、启动屏和版本。','在真实设备上检查 Android/iOS build。','准备截图、描述、privacy URL 和 support URL。','发布前备份最终测试数据。']}
   ]}
 };
 function getTestChecklistData(){return TEST_CHECKLIST_I18N[currentLang]||TEST_CHECKLIST_I18N.en;}
@@ -12203,7 +12203,7 @@ function cancelPendingHistoryWrites(){
   if(typeof _sectionHourlyRecordTimer!=='undefined'&&_sectionHourlyRecordTimer){clearTimeout(_sectionHourlyRecordTimer);_sectionHourlyRecordTimer=null;}
 }
 // ── Переполнение хранилища ─────────────────────────────────────────────
-// У браузера на iPhone около 5 МБ на адрес, и mnacik1988.github.io делят InveStory,
+// У браузера на iPhone около 5 МБ на адрес, и mnacik1988.github.io делят Ovanta,
 // Mynado и NeedBuy. Когда место кончалось, запись истории графика бросала ошибку,
 // и вместе с ней падали экспорт, окно диагностики и облачная копия (19.10.2026).
 // Теперь запись не роняет приложение: сначала освобождаем место тем, что легче всего
@@ -12905,7 +12905,7 @@ function renderChart(){
 
 // ── PDF EXPORT ────────────────────────────────────────────
 const REPORT_I18N={
-  title:{uk:'InveStory — Фінансовий звіт',ru:'InveStory — Финансовый отчёт',en:'InveStory — Financial Report',de:'InveStory — Finanzbericht',zh:'InveStory — 财务报告'},
+  title:{uk:'Ovanta — Фінансовий звіт',ru:'Ovanta — Финансовый отчёт',en:'Ovanta — Financial Report',de:'Ovanta — Finanzbericht',zh:'Ovanta — 财务报告'},
   generated:{uk:'Згенеровано',ru:'Создано',en:'Generated',de:'Erstellt',zh:'生成于'},
   totalCapital:{uk:'Загальний капітал',ru:'Общий капитал',en:'Total capital',de:'Gesamtkapital',zh:'总资本'},
   deposits:{uk:'Депозитів',ru:'Депозитов',en:'Deposits',de:'Einlagen',zh:'存款'},
@@ -13021,7 +13021,7 @@ function exportPDF(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download='InveStory_'+getLocalDateKey()+'.html';
+  a.download='Ovanta_'+getLocalDateKey()+'.html';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -14631,7 +14631,7 @@ function renderPaywallBody(box){
   const planPrice=paywallPlan==='yearly'?pwTxt('perYearP').replace('{v}',pr.yearly):pwTxt('perMonthP').replace('{v}',pr.monthly);
   const head=banned
     ?'<div class="pw2-title">⛔ '+escHtml(pwTxt('banned'))+'</div>'
-    :'<img class="pw2-appicon" src="icons/icon-384.png" alt=""><div class="pw2-title">InveStory <b>Premium</b></div>';
+    :'<img class="pw2-appicon" src="icons/icon-384.png" alt=""><div class="pw2-title">Ovanta <b>Premium</b></div>';
   const reasonText=locked?(srv?serverAccessReason():paywallReason):'';
   const reason=reasonText?'<div class="pw2-reason">'+escHtml(reasonText)+'</div>':'';
   box.innerHTML=(locked&&!banned?'':'<button class="pw2-close" type="button" onclick="handlePaywallClose()" aria-label="Close">✕</button>')+
@@ -15661,7 +15661,7 @@ function backupExport(){
     const a=document.createElement('a');
     const stamp=new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
     a.href=url;
-    a.download='InveStory_backup_'+stamp+'.json';
+    a.download='Ovanta_backup_'+stamp+'.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

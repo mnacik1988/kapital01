@@ -1,6 +1,6 @@
 {
-  "name": "InveStory",
-  "short_name": "InveStory",
+  "name": "Ovanta",
+  "short_name": "Ovanta",
   "description": "Personal finance asset tracker for deposits, stocks, crypto, currencies, metals and liabilities.",
   "start_url": "./index.html",
   "scope": "./",
