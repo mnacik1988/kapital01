@@ -3529,7 +3529,7 @@ body:not(.nd) .nd-topups{display:none!important;}
         <span class="app-version-label" id="appVersionLabel">Версія застосунку</span>
         <span class="app-version-value" id="appVersionValue">v0.0.44-test</span>
       </div>
-      <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
+      <div class="settings-section" id="qaSection" style="display:none;border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
         <div class="settings-label" id="set_qa_label">QA / Release</div>
         <button class="settings-link-btn" id="testChecklistBtn" onclick="openTestChecklist()">
           <span>🧪 Тестовий чек-лист</span><span>›</span>
@@ -3710,8 +3710,8 @@ body:not(.nd) .nd-topups{display:none!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.31';
-const APP_BUILD_DATE = '2026-10-31';
+const APP_VERSION = 'v0.2.32';
+const APP_BUILD_DATE = '2026-11-02';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -13193,7 +13193,7 @@ function signOutGoogle(){
   ls.del('investory_access');
   ls.del('investory_bank_keys');ls.del('investory_bank_cache');
   try{bankUi.busy={};bankUi.errors={};bankUi.formOpen=false;renderBanks();}catch{}
-  try{const a=document.getElementById('adminSection');if(a)a.style.display='none';closeAdminPanel();}catch{}
+  try{const a=document.getElementById('adminSection');if(a)a.style.display='none';const q=document.getElementById('qaSection');if(q)q.style.display='none';closeAdminPanel();}catch{}
   try{exchangeUi.busy={};exchangeUi.errors={};exchangeUi.formOpen=false;renderExchanges();}catch{}
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();}catch{}
   try{if(window.InveStoryNative&&window.InveStoryNative.signOutNative)window.InveStoryNative.signOutNative();}catch{}
@@ -13712,7 +13712,10 @@ function applyServerAccess(){
   const state=refreshAccessState();
   updateAccessUI();
   const adminSec=document.getElementById('adminSection');
-  if(adminSec)adminSec.style.display=readServerAccess()?.isAdmin?'':'none';
+  const showAdmin=!!readServerAccess()?.isAdmin&&!(typeof isIosApp==='function'&&isIosApp());
+  if(adminSec)adminSec.style.display=showAdmin?'':'none';
+  const qaSec=document.getElementById('qaSection');
+  if(qaSec)qaSec.style.display=showAdmin?'':'none';
   scheduleTrialEndCheck();
   if(state===ACCESS_STATES.LOCKED)openPaywall(serverAccessReason(),'locked');
   else{
