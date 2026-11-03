@@ -2756,6 +2756,14 @@ body.nd.nd-anim.nd-anim-open .card.nd-open .nd-path i{animation:ndGrow .5s ease-
 body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 .nd-float{position:absolute;left:0;top:-12px;font:600 15px 'Manrope',sans-serif;letter-spacing:0;color:var(--nd-up);pointer-events:none;white-space:nowrap;animation:ndFloat 1.9s ease-out forwards;}
 }
+/* скелетоны: первая загрузка биржи/банка без сохранённых данных — переливающиеся плашки вместо «$0» */
+.nd-sk{display:inline-block;vertical-align:middle;border-radius:6px;background:linear-gradient(90deg,var(--nd-l1) 25%,var(--nd-l2) 50%,var(--nd-l1) 75%);background-size:200% 100%;}
+.nd-sk-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--nd-l0);}
+.nd-sk-col{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
+@media (prefers-reduced-motion:no-preference){
+@keyframes ndShimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+.nd-sk{animation:ndShimmer 1.3s linear infinite;}
+}
 /* ═══ ANIMATIONS END ═══ */
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
@@ -3776,7 +3784,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.38';
+const APP_VERSION = 'v0.2.39';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7919,6 +7927,7 @@ function renderExchanges(){
   ids.forEach(id=>{
     const c=cache[id]||{};
     const busy=!!exchangeUi.busy[id];
+    const sk=busy&&!c.updatedAt&&ndAnimOn();
     const err=exchangeUi.errors[id];
     const time=c.updatedAt?new Date(c.updatedAt).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'}):'';
     const upd=busy?exTxt('loading'):(time?exTxt('updated')+' '+time:'');
@@ -7931,7 +7940,7 @@ function renderExchanges(){
           (EXCHANGES[id].logo?'<img src="'+EXCHANGES[id].logo+'" alt="" onerror="this.parentNode.classList.remove(\'has-img\');this.remove()">':'')+'</div>'+
           '<div class="ex-id-text"><div class="ex-name">'+escHtml(EXCHANGES[id].name)+chev+'</div>'+
           (upd?'<div class="ex-upd">'+escHtml(upd)+'</div>':'')+'</div></div>'+
-        '<div class="ex-total">$'+fmtN(Math.round(totalUsd))+'<span class="ex-total-sub">≈ '+fmtN(toDisplayCurr(totalUsd*rate))+' '+sym+'</span></div>'+
+        (sk?ndSkTotal():'<div class="ex-total">$'+fmtN(Math.round(totalUsd))+'<span class="ex-total-sub">≈ '+fmtN(toDisplayCurr(totalUsd*rate))+' '+sym+'</span></div>')+
       '</div>'+
       (!busy&&c.partial?'<div class="ex-sub">'+escHtml(exTxt(c.partialKey||'partial'))+'</div>':'')+
       (err?'<div class="ex-sub err">'+escHtml(err)+'</div>':'');
@@ -7950,6 +7959,7 @@ function renderExchanges(){
       return;
     }
     html+='</div>';
+    if(sk)html+=ndSkRows(3);
     // USDT биржи — отдельной плашкой сверху, как ручной «Баланс USDT», чтобы
     // было видно, сколько на бирже в стейблах. Всегда первая, даже при нуле;
     // без кнопок: количество живёт на бирже. Тап — то же окно монеты.
@@ -8503,6 +8513,7 @@ function renderBanks(){
   ids.forEach(id=>{
     const c=cache[id]||{};
     const busy=!!bankUi.busy[id];
+    const sk=busy&&!c.updatedAt&&ndAnimOn();
     const err=bankUi.errors[id];
     const collapsed=isBankCollapsed(id);
     const withIdx=list=>(list||[]).map((x,i)=>({x,i})).sort((a,b)=>(bankAmountUah(b.x.balance,b.x.cur)||0)-(bankAmountUah(a.x.balance,a.x.cur)||0));
@@ -8515,13 +8526,14 @@ function renderBanks(){
     html+='<div class="ex-card bank-card'+(collapsed?' collapsed':'')+'"><div class="ex-top" onclick="toggleBankCollapse(\''+id+'\')"><div class="ex-head">'+
       '<div class="ex-id"><div class="ex-logo'+(B.logo?' has-img':'')+'">'+escHtml(B.mono)+(B.logo?'<img src="'+B.logo+'" alt="" onerror="this.parentNode.classList.remove(\'has-img\');this.remove()">':'')+'</div>'+
       '<div class="ex-id-text"><div class="ex-name">'+escHtml(B.name)+chev+'</div>'+(upd?'<div class="ex-upd">'+escHtml(upd)+'</div>':'')+'</div></div>'+
-      '<div class="ex-total" style="color:var(--blue2)">'+fmtN(toDisplayCurr(total))+' '+getCurrSym()+'<span class="ex-total-sub">'+escHtml(bankTxt('summary').replace('{c}',cards.length).replace('{j}',jars.length)+(offN?' · '+bankTxt('offN').replace('{n}',offN):''))+'</span></div></div>'+
+      (sk?ndSkTotal():'<div class="ex-total" style="color:var(--blue2)">'+fmtN(toDisplayCurr(total))+' '+getCurrSym()+'<span class="ex-total-sub">'+escHtml(bankTxt('summary').replace('{c}',cards.length).replace('{j}',jars.length)+(offN?' · '+bankTxt('offN').replace('{n}',offN):''))+'</span></div>')+'</div>'+
       (err?'<div class="ex-sub err">'+escHtml(err)+'</div>':'');
     if(collapsed){
       html+='<div class="ex-more">'+escHtml(bankTxt('showAll').replace('{n}',cards.length+jars.length))+chev+'</div></div></div>';
       return;
     }
     html+='</div>';
+    if(sk)html+=ndSkRows(2);
     if(cards.length)html+='<div class="bank-cards">'+cards.map(({x,i})=>bankPlasticHtml(x,id,i)).join('')+'</div>'+
       (cards.length>2?'<div class="bank-swipe">'+escHtml(bankTxt('swipe').replace('{n}',cards.length))+'</div>':'');
     if(jars.length)html+='<div class="bank-group">'+escHtml(bankTxt('jars'))+'</div><div class="bank-jars">'+jars.map(({x,i})=>bankJarHtml(x,id,i)).join('')+'</div>';
@@ -17895,6 +17907,13 @@ function ndPtrEnd(){
 }
 document.addEventListener('touchend',ndPtrEnd,{passive:true});
 document.addEventListener('touchcancel',ndPtrEnd,{passive:true});
+// Скелетоны — плашки-заглушки, пока биржа или банк грузятся впервые
+function ndSkTotal(){return '<div class="ex-total"><span class="nd-sk" style="width:86px;height:20px"></span><span class="ex-total-sub"><span class="nd-sk" style="width:58px;height:10px;margin-top:6px"></span></span></div>';}
+function ndSkRows(n){
+  let h='';
+  for(let i=0;i<n;i++)h+='<div class="nd-sk-row"><span class="nd-sk" style="width:36px;height:36px;border-radius:50%;flex:none"></span><span class="nd-sk-col"><span class="nd-sk" style="width:'+(62-i*8)+'%;height:12px"></span><span class="nd-sk" style="width:'+(34+i*6)+'%;height:10px"></span></span><span class="nd-sk" style="width:'+(72-i*10)+'px;height:14px;flex:none"></span></div>';
+  return h;
+}
 // ═══ АНИМАЦИИ END ═══
 function ndSecDayPct(sec){
   const stats=getStockSectionStats(sec);
