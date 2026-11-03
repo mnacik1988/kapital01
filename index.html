@@ -2704,6 +2704,42 @@ body.modern-mockup.nd #card-forex .balance-list-flag::after{content:attr(data-sy
 body.modern-mockup.nd .card.nd-open .card-icon,body.modern-mockup.nd .liab-card.nd-open .liab-card-icon{width:54px!important;height:54px!important;border-radius:16px!important;background:var(--nd-btn)!important;border:1px solid var(--nd-l2)!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0;}
 body.modern-mockup.nd .card.nd-open .card-icon img,body.modern-mockup.nd .liab-card.nd-open .liab-card-icon img{width:36px!important;height:36px!important;}
 body.modern-mockup.nd.theme-light .card.nd-open .card-icon,body.modern-mockup.nd.theme-light .liab-card.nd-open .liab-card-icon{background:#fff!important;box-shadow:0 2px 8px #4a392214!important;}
+/* ═══ ANIMATIONS (03.11) — только новый дизайн, выключаются в админке «✨ Анимации» и системным «Уменьшить движение».
+   Нижнюю панель не трогаем: на iOS анимации/трансформации внутри fixed-панели ломали иконки. ═══ */
+.nd-earn{display:none;}
+body.nd.nd-anim .nd-earn{display:flex;align-items:center;gap:8px;margin-top:10px;padding:2px 2px 0;font:500 11px 'DM Mono',monospace;color:var(--nd-muted);}
+.nd-earn b{color:var(--nd-up);font-weight:600;font-variant-numeric:tabular-nums;margin-left:auto;font-size:12px;}
+.nd-earn i{width:6px;height:6px;border-radius:50%;background:var(--nd-up);flex:none;}
+body.amounts-hidden .nd-earn{display:none!important;}
+@media (prefers-reduced-motion:no-preference){
+@keyframes ndPulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes ndFade{from{opacity:0}to{opacity:1}}
+@keyframes ndRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes ndFlashUp{0%{background-color:rgba(76,201,140,.32);box-shadow:0 0 0 4px rgba(76,201,140,.32)}100%{background-color:rgba(76,201,140,0);box-shadow:0 0 0 4px rgba(76,201,140,0)}}
+@keyframes ndFlashDown{0%{background-color:rgba(240,96,96,.32);box-shadow:0 0 0 4px rgba(240,96,96,.32)}100%{background-color:rgba(240,96,96,0);box-shadow:0 0 0 4px rgba(240,96,96,0)}}
+body.nd.nd-anim .nd-earn i{animation:ndPulse 2s ease-in-out infinite;}
+/* открытие раздела: экран проявляется, содержимое поднимается по очереди */
+body.nd.nd-anim.nd-anim-open .card.nd-open,body.nd.nd-anim.nd-anim-open .liab-card.nd-open{animation:ndFade .22s ease-out;}
+body.nd.nd-anim.nd-anim-open :is(.card,.liab-card).nd-open :is(.card-header,.liab-card-header){animation:ndRise .36s ease-out both;}
+body.nd.nd-anim.nd-anim-open :is(.card,.liab-card).nd-open :is(.card-inner,.liab-card-body)>*{animation:ndRise .4s ease-out both;animation-delay:.06s;}
+body.nd.nd-anim.nd-anim-open :is(.card,.liab-card).nd-open :is(.card-inner,.liab-card-body)>*:nth-child(2){animation-delay:.1s;}
+body.nd.nd-anim.nd-anim-open :is(.card,.liab-card).nd-open :is(.card-inner,.liab-card-body)>*:nth-child(3){animation-delay:.14s;}
+body.nd.nd-anim.nd-anim-open :is(.card,.liab-card).nd-open :is(.card-inner,.liab-card-body)>*:nth-child(4){animation-delay:.18s;}
+body.nd.nd-anim.nd-anim-open :is(.card,.liab-card).nd-open :is(.card-inner,.liab-card-body)>*:nth-child(n+5){animation-delay:.22s;}
+body.nd.nd-anim.nd-anim-open .card.nd-open .ticker-card{animation:ndRise .4s ease-out both;animation-delay:.16s;}
+body.nd.nd-anim.nd-anim-open .card.nd-open .ticker-card:nth-child(2){animation-delay:.2s;}
+body.nd.nd-anim.nd-anim-open .card.nd-open .ticker-card:nth-child(3){animation-delay:.24s;}
+body.nd.nd-anim.nd-anim-open .card.nd-open .ticker-card:nth-child(4){animation-delay:.28s;}
+body.nd.nd-anim.nd-anim-open .card.nd-open .ticker-card:nth-child(5){animation-delay:.32s;}
+body.nd.nd-anim.nd-anim-open .card.nd-open .ticker-card:nth-child(n+6){animation-delay:.36s;}
+/* вспышка цены после обновления: зелёная — выросла, красная — упала */
+body.nd.nd-anim .nd-flash-up{animation:ndFlashUp 1.4s ease-out;border-radius:6px;}
+body.nd.nd-anim .nd-flash-down{animation:ndFlashDown 1.4s ease-out;border-radius:6px;}
+/* отклик на нажатие — лёгкое «проседание» */
+body.nd.nd-anim :is(button,.settings-link-btn,.ticker-card,.card:not(.nd-open) .card-header,.liab-card:not(.nd-open) .liab-card-header):not(.bottom-nav *){transition:transform .14s ease;}
+body.nd.nd-anim :is(button,.settings-link-btn,.ticker-card,.card:not(.nd-open) .card-header,.liab-card:not(.nd-open) .liab-card-header):not(.bottom-nav *):active{transform:scale(.97);}
+}
+/* ═══ ANIMATIONS END ═══ */
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3554,6 +3590,9 @@ body.modern-mockup.nd.theme-light .card.nd-open .card-icon,body.modern-mockup.nd
         <button class="settings-link-btn" id="ndToggleBtn" onclick="toggleNewDesign()" style="margin-top:8px;">
           <span>🎨 Дизайн</span><span id="ndToggleState">новый</span>
         </button>
+        <button class="settings-link-btn" id="ndAnimBtn" onclick="toggleNdAnim()" style="margin-top:8px;">
+          <span>✨ Анимации</span><span id="ndAnimState">вкл</span>
+        </button>
       </div>
       <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
         <div class="settings-label" id="set_legal_label">Правові документи</div>
@@ -3720,7 +3759,7 @@ body.modern-mockup.nd.theme-light .card.nd-open .card-icon,body.modern-mockup.nd
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.35';
+const APP_VERSION = 'v0.2.36';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17112,6 +17151,7 @@ function applyNewDesign(){
     try{ndCleanCrypto();}catch(e){}
     try{renderLiabilities();}catch(e){}
   }
+  try{ndAnimApply();}catch(e){}
   const st=$('ndToggleState');
   if(st)st.textContent=on?trx({uk:'новий',ru:'новый',en:'new',de:'neu',zh:'新版'}):trx({uk:'старий (тест)',ru:'старый (тест)',en:'classic (test)',de:'alt (Test)',zh:'旧版（测试）'});
   try{updateAll();}catch(e){}
@@ -17165,6 +17205,7 @@ function renderNdExtras(){
   try{ndDecorateCrypto();}catch(e){}
   try{renderNdHero();}catch(e){}
   try{renderNdTable();}catch(e){}
+  ndFlashSoon();
   setText('ndBackLbl',trx({uk:'Назад',ru:'Назад',en:'Back',de:'Zurück',zh:'返回'}));
   ndReapplyOpen();
 }
@@ -17190,6 +17231,7 @@ function ndOpenSection(name){
   if(ndOpenId===name&&el.classList.contains('nd-open'))return;
   if(ndOpenId)ndCloseSection(true);
   ndOpenId=name;
+  ndAnimMarkOpen();
   el.classList.add('expanded','nd-open');
   el.scrollTop=0;
   document.body.classList.add('nd-section-open');
@@ -17629,8 +17671,99 @@ function renderNdHero(){
       '<div><div class="nd-k">'+escHtml(trx({uk:'За добу',ru:'За сутки',en:'24 hours',de:'24 Std.',zh:'24小时'}))+'</div><div class="v '+(d1ok?cls(d1.pct):'')+'">'+(d1ok?ndFmtPct(d1.pct,2):'—')+'</div></div>'+
       '<div><div class="nd-k">'+escHtml(pLbl)+'</div><div class="v '+(dP?cls(dP.pct):'')+'">'+(dP?ndFmtPct(dP.pct):'—')+'</div></div>'+
       '<div><div class="nd-k">'+escHtml(trx({uk:'Пасивно/міс',ru:'Пассивно/мес',en:'Passive/mo',de:'Passiv/Mon.',zh:'被动/月'}))+'</div><div class="v gold live-val">+'+fmtN(toDisplayCurr(ndPassiveMonthly()))+' '+sym+'</div></div>'+
-    '</div>';
+    '</div>'+
+    '<div class="nd-earn" id="ndEarn"><i></i>'+escHtml(trx({uk:'Сьогодні нараховано',ru:'Сегодня начислено',en:'Earned today',de:'Heute verdient',zh:'今日收益'}))+'<b></b></div>';
+  try{ndAnimHero(toDisplayCurr(total),sym);}catch(e){}
+  try{ndEarnTick();}catch(e){}
 }
+// ═══ АНИМАЦИИ (03.11) ═══
+// Всё движение нового дизайна собрано здесь. Выключатель — «✨ Анимации» в админке
+// (investory_anim='0'), системное «Уменьшить движение» выключает тоже.
+const ND_ANIM_LS='investory_anim';
+function ndAnimOn(){
+  if(!document.body.classList.contains('nd'))return false;
+  try{if(localStorage.getItem(ND_ANIM_LS)==='0')return false;}catch(e){}
+  try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return false;}catch(e){}
+  return true;
+}
+function ndAnimApply(){
+  let on=true;try{on=localStorage.getItem(ND_ANIM_LS)!=='0';}catch(e){}
+  document.body.classList.toggle('nd-anim',on);
+  const st=$('ndAnimState');
+  if(st)st.textContent=on?trx({uk:'увімк',ru:'вкл',en:'on',de:'an',zh:'开'}):trx({uk:'вимк',ru:'выкл',en:'off',de:'aus',zh:'关'});
+}
+function toggleNdAnim(){
+  let on=true;try{on=localStorage.getItem(ND_ANIM_LS)!=='0';localStorage.setItem(ND_ANIM_LS,on?'0':'1');}catch(e){}
+  ndAnimApply();
+  try{updateAll();}catch(e){}
+}
+let _ndOpenT=0;
+function ndAnimMarkOpen(){
+  document.body.classList.add('nd-anim-open');
+  clearTimeout(_ndOpenT);
+  _ndOpenT=setTimeout(()=>document.body.classList.remove('nd-anim-open'),900);
+}
+// Общий капитал «докручивается» от прежнего значения к новому
+let _ndHeroCur=0,_ndHeroSym='',_ndHeroRaf=0;
+function ndHeroSetText(v){
+  const amt=document.querySelector('#ndHero .nd-hero-amt');
+  if(amt&&amt.firstChild&&amt.firstChild.nodeType===3)amt.firstChild.nodeValue=fmtN(v)+' ';
+}
+function ndAnimHero(target,sym){
+  if(_ndHeroRaf){cancelAnimationFrame(_ndHeroRaf);_ndHeroRaf=0;}
+  const from=_ndHeroCur;
+  if(!ndAnimOn()||sym!==_ndHeroSym||!(target>0)||Math.abs(target-from)<1||document.hidden){
+    _ndHeroCur=target;_ndHeroSym=sym;return;
+  }
+  _ndHeroSym=sym;
+  const dur=from>0?700:1100,t0=performance.now();
+  ndHeroSetText(from);
+  const step=now=>{
+    const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);
+    _ndHeroCur=from+(target-from)*e;
+    ndHeroSetText(k<1?_ndHeroCur:target);
+    if(k<1)_ndHeroRaf=requestAnimationFrame(step);else{_ndHeroCur=target;_ndHeroRaf=0;}
+  };
+  _ndHeroRaf=requestAnimationFrame(step);
+}
+// «Сегодня начислено» — проценты вкладов с полуночи, растут каждую секунду
+function ndEarnTick(){
+  const el=$('ndEarn');
+  if(!el||document.hidden)return;
+  let daily=0;try{daily=toDisplayCurr(getPortfolioDepositIncome().daily||0);}catch(e){}
+  el.style.display=daily>0?'':'none';
+  if(!(daily>0)||!el.offsetParent)return;
+  const d=new Date(),sec=d.getHours()*3600+d.getMinutes()*60+d.getSeconds()+d.getMilliseconds()/1000;
+  const b=el.querySelector('b');
+  if(b)b.textContent='+'+(daily*sec/86400).toLocaleString('uk-UA',{minimumFractionDigits:4,maximumFractionDigits:4})+' '+getCurrSym();
+}
+setInterval(ndEarnTick,1000);
+// Вспышка цены у монет и акций, когда значение изменилось после обновления
+const _ndPrices={};
+function ndFlashScan(){
+  const on=ndAnimOn()&&!document.body.classList.contains('amounts-hidden');
+  const sym=getCurrSym();
+  document.querySelectorAll('.card-crypto .ticker-card,.card-stocks .ticker-card').forEach(tc=>{
+    const pr=tc.querySelector('.ticker-card-price'),nm=tc.querySelector('.ticker-card-name');
+    if(!pr||!nm)return;
+    const card=tc.closest('.card');
+    const key=(card&&card.id||'')+'|'+nm.textContent.trim()+'|'+sym;
+    const nums=(pr.textContent||'').replace(/[\s\u00a0\u202f]/g,'').match(/\d+(?:[.,]\d+)?/g);
+    if(!nums)return;
+    const v=parseFloat(nums[nums.length-1].replace(',','.'));
+    const old=_ndPrices[key];
+    _ndPrices[key]=v;
+    if(!on||old==null||old===v||!Number.isFinite(v))return;
+    const cls=v>old?'nd-flash-up':'nd-flash-down';
+    pr.classList.remove('nd-flash-up','nd-flash-down');
+    void pr.offsetWidth;
+    pr.classList.add(cls);
+    setTimeout(()=>pr.classList.remove(cls),1500);
+  });
+}
+let _ndFlashT=0;
+function ndFlashSoon(){clearTimeout(_ndFlashT);_ndFlashT=setTimeout(()=>{try{ndFlashScan();}catch(e){}},80);}
+// ═══ АНИМАЦИИ END ═══
 function ndSecDayPct(sec){
   const stats=getStockSectionStats(sec);
   const last={};
