@@ -2694,6 +2694,10 @@ body.modern-mockup.nd.theme-light .nd-day-btn{border-color:#c4962f!important;}
 .nd-topup .x{border:0;background:transparent;color:var(--nd-muted);font-size:17px;line-height:1;padding:2px 4px;cursor:pointer;}
 .nd-topup .x.arm{font-size:11px;font-weight:700;color:#fff;background:#d85a4a;border-radius:8px;padding:5px 8px;}
 body:not(.nd) .nd-topups{display:none!important;}
+/* Валютные накопления: в кружке — знак валюты золотом ($, €, £…), ровно по центру, вместо флага/глобуса */
+body.modern-mockup.nd #card-forex .balance-list-flag{font-size:0!important;line-height:1;}
+body.modern-mockup.nd #card-forex .balance-list-flag>*{display:none!important;}
+body.modern-mockup.nd #card-forex .balance-list-flag::after{content:attr(data-sym);font:800 19px/1 'Manrope',sans-serif;color:var(--nd-goldtx);}
 /* ═══ NEW DESIGN END (стили) ═══ */
 </style>
 </head>
@@ -3710,8 +3714,8 @@ body:not(.nd) .nd-topups{display:none!important;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.32';
-const APP_BUILD_DATE = '2026-11-02';
+const APP_VERSION = 'v0.2.33';
+const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
 const STORAGE_PREV_KEY = 'kapital_v6_prev';
@@ -8918,8 +8922,8 @@ function sellCrypto(coinKey){
 }
 
 // ── FOREX ─────────────────────────────────────
-const FFLAGS={EUR:'🇪🇺',GBP:'🇬🇧',PLN:'🇵🇱',CHF:'🇨🇭',CZK:'🇨🇿',RUB:'🇷🇺',KZT:'🇰🇿',OTHER:'🌐'};
-const FSYM  ={EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',OTHER:'?'};
+const FFLAGS={USD:'🇺🇸',EUR:'🇪🇺',GBP:'🇬🇧',PLN:'🇵🇱',CHF:'🇨🇭',CZK:'🇨🇿',RUB:'🇷🇺',KZT:'🇰🇿',OTHER:'🌐'};
+const FSYM  ={USD:'$',EUR:'€',GBP:'£',PLN:'zł',CHF:'Fr',CZK:'Kč',RUB:'₽',KZT:'₸',OTHER:'?'};
 // ── STOCK DETAIL MODAL ────────────────────────
 function stockDetailTxt(key){
   const dict={
@@ -9177,7 +9181,7 @@ function renderForex(){
     const isLive=(liveRates[cur]&&liveRates[cur]>0);
     return `<div class="balance-list-card">
       <div class="balance-list-head">
-        <span class="balance-list-flag">${FFLAGS[f.cur]||'🌐'}</span>
+        <span class="balance-list-flag" data-sym="${FSYM[cur]||cur.slice(0,1)}">${FFLAGS[cur]||'🌐'}</span>
         <span class="balance-list-code">${FSYM[f.cur]||''} ${cur}</span>
       </div>
       <div class="balance-list-amount">${fmtD(amount)} ${cur}</div>
