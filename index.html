@@ -3759,7 +3759,7 @@ body.nd.nd-anim :is(button,.settings-link-btn,.ticker-card,.card:not(.nd-open) .
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.36';
+const APP_VERSION = 'v0.2.37';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17703,7 +17703,8 @@ function ndAnimMarkOpen(){
   clearTimeout(_ndOpenT);
   _ndOpenT=setTimeout(()=>document.body.classList.remove('nd-anim-open'),900);
 }
-// Общий капитал «докручивается» от прежнего значения к новому
+// Общий капитал «докручивается» от прежнего значения к новому — только при обновлении,
+// при открытии приложения сумма сразу на месте (03.11 по просьбе Александра)
 let _ndHeroCur=0,_ndHeroSym='',_ndHeroRaf=0;
 function ndHeroSetText(v){
   const amt=document.querySelector('#ndHero .nd-hero-amt');
@@ -17712,11 +17713,11 @@ function ndHeroSetText(v){
 function ndAnimHero(target,sym){
   if(_ndHeroRaf){cancelAnimationFrame(_ndHeroRaf);_ndHeroRaf=0;}
   const from=_ndHeroCur;
-  if(!ndAnimOn()||sym!==_ndHeroSym||!(target>0)||Math.abs(target-from)<1||document.hidden){
+  if(!ndAnimOn()||!(from>0)||sym!==_ndHeroSym||!(target>0)||Math.abs(target-from)<1||document.hidden){
     _ndHeroCur=target;_ndHeroSym=sym;return;
   }
   _ndHeroSym=sym;
-  const dur=from>0?700:1100,t0=performance.now();
+  const dur=700,t0=performance.now();
   ndHeroSetText(from);
   const step=now=>{
     const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);
