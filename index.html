@@ -2704,6 +2704,27 @@ body.modern-mockup.nd #card-forex .balance-list-flag::after{content:attr(data-sy
 body.modern-mockup.nd .card.nd-open .card-icon,body.modern-mockup.nd .liab-card.nd-open .liab-card-icon{width:54px!important;height:54px!important;border-radius:16px!important;background:var(--nd-btn)!important;border:1px solid var(--nd-l2)!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0;}
 body.modern-mockup.nd .card.nd-open .card-icon img,body.modern-mockup.nd .liab-card.nd-open .liab-card-icon img{width:36px!important;height:36px!important;}
 body.modern-mockup.nd.theme-light .card.nd-open .card-icon,body.modern-mockup.nd.theme-light .liab-card.nd-open .liab-card-icon{background:#fff!important;box-shadow:0 2px 8px #4a392214!important;}
+/* 03.11: биржи и банки в новом дизайне — без фиолетового: суммы светлым Manrope, акценты золотом, полоска счетов в золотой гамме */
+body.modern-mockup.nd .ex-card .ex-total{font:500 22px 'Manrope',sans-serif!important;letter-spacing:-.02em!important;color:var(--nd-text-hi)!important;}
+body.modern-mockup.nd .ex-card .ex-total-sub{color:var(--nd-muted)!important;}
+body.modern-mockup.nd .ex-card .ex-upd{color:var(--nd-muted)!important;}
+body.modern-mockup.nd .ex-card .ex-chev{color:var(--nd-muted)!important;}
+body.modern-mockup.nd .ex-card .ex-more{border-top:1px solid var(--nd-l1)!important;font:500 11px 'DM Mono',monospace!important;color:var(--nd-goldtx)!important;}
+body.modern-mockup.nd .ex-card .ex-more .ex-chev{color:var(--nd-goldtx)!important;}
+body.modern-mockup.nd .ex-card .ex-bar{height:5px!important;gap:2px!important;}
+body.modern-mockup.nd .ex-card .ex-bar span:nth-child(1),body.modern-mockup.nd .ex-card .ex-lg:nth-child(1) i{background:#e9cd85!important;}
+body.modern-mockup.nd .ex-card .ex-bar span:nth-child(2),body.modern-mockup.nd .ex-card .ex-lg:nth-child(2) i{background:#a8874a!important;}
+body.modern-mockup.nd .ex-card .ex-bar span:nth-child(3),body.modern-mockup.nd .ex-card .ex-lg:nth-child(3) i{background:#7a6a4c!important;}
+body.modern-mockup.nd .ex-card .ex-bar span:nth-child(n+4),body.modern-mockup.nd .ex-card .ex-lg:nth-child(n+4) i{background:#5c574e!important;}
+body.modern-mockup.nd.theme-light .ex-card .ex-bar span:nth-child(1),body.modern-mockup.nd.theme-light .ex-card .ex-lg:nth-child(1) i{background:#c99a3f!important;}
+body.modern-mockup.nd.theme-light .ex-card .ex-bar span:nth-child(3),body.modern-mockup.nd.theme-light .ex-card .ex-lg:nth-child(3) i{background:#bfb3a0!important;}
+body.modern-mockup.nd.theme-light .ex-card .ex-bar span:nth-child(n+4),body.modern-mockup.nd.theme-light .ex-card .ex-lg:nth-child(n+4) i{background:#d9d1c3!important;}
+body.modern-mockup.nd .ex-card .ex-lg{color:var(--nd-muted)!important;}
+body.modern-mockup.nd .ex-card .ex-lg b{font-weight:600!important;color:var(--nd-text)!important;}
+body.modern-mockup.nd .ex-card .ex-btn{background:var(--nd-btn)!important;border:1px solid var(--nd-l2)!important;border-radius:12px!important;color:var(--nd-text)!important;}
+body.modern-mockup.nd .usdt-balance-title{color:var(--nd-goldtx)!important;font-weight:600!important;}
+body.modern-mockup.nd .usdt-balance-main{font-weight:500!important;color:var(--nd-text-hi)!important;}
+body.modern-mockup.nd .usdt-balance-equiv{color:var(--nd-muted)!important;font-weight:500!important;}
 /* ═══ ANIMATIONS (03.11) — только новый дизайн, выключаются в админке «✨ Анимации» и системным «Уменьшить движение».
    Нижнюю панель не трогаем: на iOS анимации/трансформации внутри fixed-панели ломали иконки. ═══ */
 .nd-earn{display:none;}
@@ -3784,7 +3805,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.40';
+const APP_VERSION = 'v0.2.41';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
