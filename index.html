@@ -3784,7 +3784,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.39';
+const APP_VERSION = 'v0.2.40';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17797,7 +17797,9 @@ function ndFlashScan(){
 let _ndFlashT=0;
 function ndFlashSoon(){clearTimeout(_ndFlashT);_ndFlashT=setTimeout(()=>{try{ndFlashScan();}catch(e){}},80);}
 // Графики «прочерчиваются»: один раз при первом показе (и линия капитала — при смене периода).
-// Перерисовка в течение секунды подхватывает анимацию с того же места.
+// Перерисовка в течение секунды подхватывает анимацию с того же места. Через element.animate,
+// а не CSS-класс: при запуске строки переставляются, и CSS-анимация от этого начиналась
+// заново — график рисовался дважды (03.11, замечено Александром).
 const _ndDraw={hero:{start:-1,want:true},spark:{start:-1,want:true}};
 function ndDrawMark(kind,svgs){
   const st=_ndDraw[kind];
@@ -17806,7 +17808,12 @@ function ndDrawMark(kind,svgs){
   const now=performance.now();
   if(st.want){st.want=false;st.start=now;}
   if(st.start<0||now-st.start>1000)return;
-  svgs.forEach(sv=>{if(sv.classList.contains('nd-draw'))return;sv.classList.add('nd-draw');sv.style.animationDelay=Math.round(st.start-now)+'ms';});
+  svgs.forEach(sv=>{
+    if(sv._ndDrawn||!sv.animate)return;
+    sv._ndDrawn=true;
+    try{sv.animate([{clipPath:'inset(0 100% 0 0)',webkitClipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0 0 0)',webkitClipPath:'inset(0 0 0 0)'}],
+      {duration:1000,delay:Math.round(st.start-now),easing:'cubic-bezier(.25,.7,.3,1)',fill:'backwards'});}catch(e){}
+  });
 }
 // После пополнения над счётчиком вклада всплывает и тает «+сумма»
 function ndTopupFloat(dep,amount){
@@ -17857,6 +17864,13 @@ function ndPtrRoot(){
   if(ndOpenId){const c=ndEl(ndOpenId);if(c&&c.classList.contains('nd-open'))return c;}
   return document.scrollingElement||document.documentElement;
 }
+// Страница прокручена хоть где-то выше пальца — жест не наш, это обычная прокрутка вверх.
+// Проверяем всех предков и само окно: на iPhone прокручивается не тот элемент, что в браузере (03.11).
+function ndPtrScrolled(t){
+  for(let n=t;n&&n.nodeType===1;n=n.parentNode)if(n.scrollTop>0)return true;
+  const se=document.scrollingElement;
+  return (window.scrollY||window.pageYOffset||0)>0||(se&&se.scrollTop>0)||document.body.scrollTop>0;
+}
 async function ndPtrRun(){
   _ptrBusy=true;
   const t0=performance.now();
@@ -17881,15 +17895,15 @@ document.addEventListener('touchstart',e=>{
   if(e.target.closest&&e.target.closest('input,textarea,select,.bottom-nav,.nd-menu,[class*="overlay"].open,[class*="modal"].open,.open[class*="sheet"]'))return;
   if(document.querySelector('[class*="overlay"].open,[class*="modal"].open'))return;
   const root=ndPtrRoot();
-  if(root.scrollTop>0)return;
-  _ptr={x:e.touches[0].clientX,y:e.touches[0].clientY,root,on:false,p:0};
+  if(root.scrollTop>0||ndPtrScrolled(e.target))return;
+  _ptr={x:e.touches[0].clientX,y:e.touches[0].clientY,root,on:false,p:0,t:e.target};
 },{passive:true});
 document.addEventListener('touchmove',e=>{
   if(!_ptr)return;
   if(typeof _activeTouchDrag!=='undefined'&&_activeTouchDrag){_ptr=null;ndPtrPos(0);return;}
   const dx=e.touches[0].clientX-_ptr.x,dy=e.touches[0].clientY-_ptr.y;
   if(!_ptr.on){
-    if(dy>8&&dy>Math.abs(dx)*1.5&&_ptr.root.scrollTop<=0){_ptr.on=true;_ptr.y+=8;}
+    if(dy>8&&dy>Math.abs(dx)*1.5&&_ptr.root.scrollTop<=0&&!ndPtrScrolled(_ptr.t)){_ptr.on=true;_ptr.y+=8;}
     else{if(dy<-4||Math.abs(dx)>10)_ptr=null;return;}
   }
   if(e.cancelable)e.preventDefault();
