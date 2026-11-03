@@ -3552,7 +3552,7 @@ body.modern-mockup.nd.theme-light .card.nd-open .card-icon,body.modern-mockup.nd
         </button>
         <!-- NEW DESIGN -->
         <button class="settings-link-btn" id="ndToggleBtn" onclick="toggleNewDesign()" style="margin-top:8px;">
-          <span>✨ Новый дизайн (тест)</span><span id="ndToggleState">выкл.</span>
+          <span>🎨 Дизайн</span><span id="ndToggleState">новый</span>
         </button>
       </div>
       <div class="settings-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;margin-bottom:0;">
@@ -3720,7 +3720,7 @@ body.modern-mockup.nd.theme-light .card.nd-open .card-icon,body.modern-mockup.nd
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.34';
+const APP_VERSION = 'v0.2.35';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17053,14 +17053,15 @@ function schedulePngIconCleanup(){
 //     #ndDepLive (в card-info) и #ndDepTabs (в card-inner); #ndTopLbl в шапке,
 //     #ndHero и #ndThead перед списком (#ndTfoot создаётся кодом);
 //  4) строку вызова renderNdExtras() в конце _updateAllNow.
-// Включается переключателем у админа в Настройках, хранится только на этом
+// С 03.11.2026 включён по умолчанию; прежний вид — переключателем у админа, выбор хранится только на этом
 // устройстве. Данные не трогает: меняет вид главного экрана, а разделы
 // открывает отдельным экраном — это та же карточка, растянутая поверх всего,
 // поэтому все кнопки и расчёты внутри работают как раньше.
 const ND_LS='investory_new_design';
 let ndOpenId=null;
 const _ndHome={};
-function ndEnabled(){try{return localStorage.getItem(ND_LS)==='1';}catch(e){return false;}}
+// С 03.11.2026 новый дизайн — основной: без сохранённого выбора включён, «0» — прежний вид для сравнения.
+function ndEnabled(){try{return localStorage.getItem(ND_LS)!=='0';}catch(e){return true;}}
 function toggleNewDesign(){
   try{localStorage.setItem(ND_LS,ndEnabled()?'0':'1');}catch(e){}
   applyNewDesign();
@@ -17112,7 +17113,7 @@ function applyNewDesign(){
     try{renderLiabilities();}catch(e){}
   }
   const st=$('ndToggleState');
-  if(st)st.textContent=on?trx({uk:'увімк.',ru:'вкл.',en:'on',de:'an',zh:'开'}):trx({uk:'вимк.',ru:'выкл.',en:'off',de:'aus',zh:'关'});
+  if(st)st.textContent=on?trx({uk:'новий',ru:'новый',en:'new',de:'neu',zh:'新版'}):trx({uk:'старий (тест)',ru:'старый (тест)',en:'classic (test)',de:'alt (Test)',zh:'旧版（测试）'});
   try{updateAll();}catch(e){}
 }
 const ND_CATS=[
