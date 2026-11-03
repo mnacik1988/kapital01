@@ -2771,8 +2771,6 @@ body.nd.theme-light .nd-ptr{box-shadow:0 4px 14px #4a392222;}
 @keyframes ndFloat{0%{opacity:0;top:6px}15%{opacity:1;top:-12px}70%{opacity:1;top:-22px}100%{opacity:0;top:-38px}}
 /* графики прочерчиваются слева направо */
 body.nd.nd-anim .nd-draw{animation:ndWipe 1s cubic-bezier(.25,.7,.3,1) both;}
-/* «Путь вклада»: столбики вырастают снизу по очереди при открытии раздела */
-body.nd.nd-anim.nd-anim-open .card.nd-open .nd-path i{animation:ndGrow .5s ease-out both;}
 /* «+сумма» над счётчиком вклада после пополнения */
 body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 .nd-float{position:absolute;left:0;top:-12px;font:600 15px 'Manrope',sans-serif;letter-spacing:0;color:var(--nd-up);pointer-events:none;white-space:nowrap;animation:ndFloat 1.9s ease-out forwards;}
@@ -3805,7 +3803,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.41';
+const APP_VERSION = 'v0.2.42';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17287,6 +17285,7 @@ function ndOpenSection(name){
   el.scrollTop=0;
   document.body.classList.add('nd-section-open');
   try{updateAll();}catch(e){}
+  setTimeout(()=>{try{ndAnimBars(el);}catch(e){}},0);
   if(name==='deposit'&&typeof syncDepositSliderHeight==='function')setTimeout(()=>{try{syncDepositSliderHeight();}catch(e){}},30);
   try{history.pushState({ndSection:name},'');}catch(e){}
 }
@@ -17511,7 +17510,7 @@ function ndRenderPath(d,slide){
   const cols=v.bars.map((b,i)=>{
     const cls=i<v.cur?'past':i===v.cur?'now':'future';
     const total=b.base+b.earned;
-    return '<i class="'+cls+'" title="'+escAttr(fmtDt(b.dt)+' · '+fmtN(total)+' '+sym+' (+'+fmtN(b.earned)+')')+'" style="height:'+Math.max(4,total/max*100).toFixed(1)+'%;animation-delay:'+Math.min(i*30,600)+'ms">'+
+    return '<i class="'+cls+'" title="'+escAttr(fmtDt(b.dt)+' · '+fmtN(total)+' '+sym+' (+'+fmtN(b.earned)+')')+'" style="height:'+Math.max(4,total/max*100).toFixed(1)+'%">'+
       '<u style="height:'+(total>0?(b.earned/total*100):0).toFixed(2)+'%"></u></i>';
   }).join('');
   const T=k=>trx(({
@@ -17835,6 +17834,16 @@ function ndDrawMark(kind,svgs){
     try{sv.animate([{clipPath:'inset(0 100% 0 0)',webkitClipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0 0 0)',webkitClipPath:'inset(0 0 0 0)'}],
       {duration:1000,delay:Math.round(st.start-now),easing:'cubic-bezier(.25,.7,.3,1)',fill:'backwards'});}catch(e){}
   });
+}
+// «Путь вклада»: столбики вырастают снизу по очереди при открытии раздела. Через element.animate:
+// на CSS-классе последние столбики не успевали до снятия метки и появлялись рывком (03.11).
+function ndAnimBars(card){
+  if(!card||!ndAnimOn())return;
+  const bars=[...card.querySelectorAll('.nd-path i')].filter(b=>b.offsetParent&&b.animate);
+  const n=bars.length;if(!n)return;
+  const step=Math.min(30,550/n);
+  bars.forEach((b,i)=>{try{b.animate([{clipPath:'inset(100% 0 0 0)',webkitClipPath:'inset(100% 0 0 0)'},{clipPath:'inset(0 0 0 0)',webkitClipPath:'inset(0 0 0 0)'}],
+    {duration:500,delay:Math.round(i*step),easing:'cubic-bezier(.25,.7,.3,1)',fill:'backwards'});}catch(e){}});
 }
 // После пополнения над счётчиком вклада всплывает и тает «+сумма»
 function ndTopupFloat(dep,amount){
