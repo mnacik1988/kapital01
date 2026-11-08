@@ -2725,6 +2725,21 @@ body.modern-mockup.nd .ex-card .ex-btn{background:var(--nd-btn)!important;border
 body.modern-mockup.nd .usdt-balance-title{color:var(--nd-goldtx)!important;font-weight:600!important;}
 body.modern-mockup.nd .usdt-balance-main{font-weight:500!important;color:var(--nd-text-hi)!important;}
 body.modern-mockup.nd .usdt-balance-equiv{color:var(--nd-muted)!important;font-weight:500!important;}
+/* окно монеты/бумаги (ручные и с биржи) — цвета и шрифты нового дизайна вместо фиолетового (08.11) */
+body.nd .stock-detail-box [style*="--purple"]{color:var(--nd-goldtx)!important;}
+body.nd .stock-detail-box :not(.add-btn)[style*="--green2"]{color:var(--nd-up)!important;}
+body.nd .stock-detail-box :not(.add-btn)[style*="var(--red)"]{color:var(--nd-dn)!important;}
+body.nd .stock-detail-box .stock-detail-stat-val{font-size:16px!important;font-weight:500!important;color:var(--nd-text-hi);}
+body.nd .stock-detail-box .stock-detail-stat-lbl{font-size:8.5px!important;letter-spacing:.08em!important;}
+body.nd .stock-detail-box .stock-detail-trade{border-color:var(--nd-l1)!important;}
+body.nd .stock-detail-box .stock-detail-trade [style*="DM Mono"]:not([style*="uppercase"]){font-family:'Manrope',sans-serif!important;letter-spacing:0!important;}
+body.nd .stock-detail-box .stock-detail-trade [style*="font-size:11px"]{font-size:14px!important;color:var(--nd-text);}
+body.nd .stock-detail-box .stock-detail-trade [style*="font-size:9px"]{font-size:12px!important;color:var(--nd-muted)!important;}
+body.nd .stock-detail-box [style*="uppercase"]{color:var(--nd-muted2)!important;letter-spacing:.1em!important;}
+body.nd .stock-detail-box .ex-hint{font-family:'Manrope',sans-serif!important;font-size:12px!important;line-height:1.5;color:var(--nd-muted)!important;}
+body.nd .stock-detail-box button[onclick^="closeStockDetail"]{background:var(--nd-btn)!important;border:1px solid var(--nd-l2)!important;border-radius:14px!important;padding:12px!important;font:600 14px 'Manrope',sans-serif!important;color:var(--nd-text2)!important;}
+body.nd .ticker-card.tc-coin{border-top-color:var(--nd-l1)!important;border-top-width:1px!important;}
+body.nd .ticker-card.tc-coin [style*="--purple"]{color:var(--nd-goldtx)!important;}
 /* ═══ ANIMATIONS (03.11) — только новый дизайн, выключаются в админке «✨ Анимации» и системным «Уменьшить движение».
    Нижнюю панель не трогаем: на iOS анимации/трансформации внутри fixed-панели ломали иконки. ═══ */
 .nd-earn{display:none;}
@@ -3803,7 +3818,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.42';
+const APP_VERSION = 'v0.2.43';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
