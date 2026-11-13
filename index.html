@@ -2741,6 +2741,7 @@ body.nd .stock-detail-box button[onclick^="closeStockDetail"]{background:var(--n
 body.nd .ticker-card.tc-coin{border-top-color:var(--nd-l1)!important;border-top-width:1px!important;}
 body.nd .ticker-card.tc-coin [style*="--purple"]{color:var(--nd-goldtx)!important;}
 /* выпадающие списки языка и валюты в настройках (13.11) */
+.cash-sub-btn{flex:none;cursor:pointer;padding:0 14px;border-radius:12px;border:1px solid var(--nd-l2,var(--border2));background:var(--nd-btn,transparent);color:var(--nd-dn,var(--red));font:700 13px 'Manrope',sans-serif;white-space:nowrap;}
 .dd-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .dd-row .settings-section{min-width:0;}
 .dd{position:relative;}
@@ -3128,6 +3129,10 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
             <option value="GBP">£ GBP</option>
             <option value="CNY">¥ CNY</option>
           </select>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <input class="field-input" type="text" id="cashSub" inputmode="decimal" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();cashSubtract();}">
+          <button type="button" class="cash-sub-btn" id="cashSubBtn" onclick="cashSubtract()"></button>
         </div>
       </div>
       <div class="field-group">
@@ -3833,7 +3838,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.45';
+const APP_VERSION = 'v0.2.46';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -4575,6 +4580,7 @@ function setLang(lang){
   saveData();
 }
 function applyTranslations(){
+  try{cashSubLabels();}catch(e){}
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key=el.getAttribute('data-i18n');
     el.textContent=t(key);
@@ -4640,6 +4646,22 @@ function numberOrFallback(v,fallback){
   if(v===''||v===null||v===undefined)return fallback;
   const n=parseInputNumber(v);
   return Number.isFinite(n)?n:fallback;
+}
+// Наличные: «− Списать» вычитает введённую сумму из текущей (не уходит ниже нуля)
+const CASH_SUB_TXT={uk:['Скільки витрачено','− Відняти'],ru:['Сколько потрачено','− Вычесть'],en:['Amount spent','− Subtract'],de:['Ausgegeben','− Abziehen'],zh:['支出金额','− 扣除']};
+function cashSubLabels(){
+  const t=CASH_SUB_TXT[currentLang]||CASH_SUB_TXT.ru;
+  const i=document.getElementById('cashSub'),b=document.getElementById('cashSubBtn');
+  if(i)i.placeholder=t[0];if(b)b.textContent=t[1];
+}
+function cashSubtract(){
+  const sub=parseInputNumber(document.getElementById('cashSub').value);
+  if(!(sub>0))return;
+  const cur=parseInputNumber(document.getElementById('cashAmount').value);
+  const next=Math.max(0,roundMoney(cur-sub));
+  document.getElementById('cashAmount').value=next?fmtMax2(next).replace(/ |\s/g,''):'';
+  document.getElementById('cashSub').value='';
+  updateAll();saveData();
 }
 function parseInputNumber(v){
   if(typeof v==='number')return Number.isFinite(v)?v:0;
