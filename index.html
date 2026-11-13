@@ -2741,13 +2741,16 @@ body.nd .stock-detail-box button[onclick^="closeStockDetail"]{background:var(--n
 body.nd .ticker-card.tc-coin{border-top-color:var(--nd-l1)!important;border-top-width:1px!important;}
 body.nd .ticker-card.tc-coin [style*="--purple"]{color:var(--nd-goldtx)!important;}
 /* выпадающие списки языка и валюты в настройках (13.11) */
-.dd-trig{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;cursor:pointer;font:600 14px 'Manrope',sans-serif;padding:12px 14px;border-radius:14px;border:1px solid var(--nd-l2,var(--border2));background:var(--nd-surface,transparent);color:var(--nd-text,var(--text));}
+.dd-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dd-row .settings-section{min-width:0;}
+.dd{position:relative;}
+.dd-trig{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;cursor:pointer;font:600 13px 'Manrope',sans-serif;padding:8px 12px;border-radius:12px;white-space:nowrap;border:1px solid var(--nd-l2,var(--border2));background:var(--nd-surface,transparent);color:var(--nd-text,var(--text));}
 .dd-trig::after{content:'';width:7px;height:7px;border-right:2px solid var(--nd-muted,var(--muted));border-bottom:2px solid var(--nd-muted,var(--muted));transform:rotate(45deg);margin:-3px 4px 0 0;transition:transform .2s;flex:none;}
 .dd.open .dd-trig{border-color:#d9b86666;}
 .dd.open .dd-trig::after{transform:rotate(-135deg);margin-top:3px;}
 .dd .dd-list{display:none!important;}
-.dd.open .dd-list{display:grid!important;grid-template-columns:1fr!important;gap:6px!important;margin-top:8px;}
-.dd .dd-list button{min-height:42px!important;font-size:14px!important;text-align:left!important;padding:10px 14px!important;white-space:nowrap;}
+.dd.open .dd-list{display:grid!important;grid-template-columns:1fr!important;gap:4px!important;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;padding:6px;border-radius:14px;background:var(--nd-panel,var(--bg2));border:1px solid var(--nd-l2,var(--border2));box-shadow:0 12px 30px #000a;}
+.dd .dd-list button{min-height:36px!important;font-size:13px!important;text-align:left!important;padding:7px 10px!important;white-space:nowrap;}
 /* ═══ ANIMATIONS (03.11) — только новый дизайн, выключаются в админке «✨ Анимации» и системным «Уменьшить движение».
    Нижнюю панель не трогаем: на iOS анимации/трансформации внутри fixed-панели ломали иконки. ═══ */
 .nd-earn{display:none;}
@@ -3582,6 +3585,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
       <span><img class="settings-png-icon" src="section-icons/section-settings.png?v=1" alt=""> <span id="settingsTitleText">Налаштування</span></span>
       <button class="settings-close" onclick="closeSettings()">✕</button>
     </div>
+    <div class="dd-row">
     <div class="settings-section">
       <div class="settings-label" id="set_lang_label">Мова / Language</div>
       <div class="dd" id="ddLang"><button class="dd-trig" type="button" id="ddLangTrig" onclick="toggleDd('ddLang')"></button>
@@ -3603,6 +3607,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
         <button class="settings-curr-btn" id="scurr-rub" onclick="setDisplayCurrency('rub')">₽ RUB</button>
         <button class="settings-curr-btn" id="scurr-cny" onclick="setDisplayCurrency('cny')">¥ CNY</button>
       </div></div>
+    </div>
     </div>
     <div class="settings-section">
       <div class="settings-label" id="set_theme_label">Тема</div>
@@ -3828,7 +3833,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.44';
+const APP_VERSION = 'v0.2.45';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
