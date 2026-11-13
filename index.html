@@ -3838,7 +3838,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.46';
+const APP_VERSION = 'v0.2.47';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -10071,6 +10071,7 @@ function applyHideAmounts(){
 function toggleHideAmounts(){
   try{localStorage.setItem(HIDE_AMOUNTS_LS,amountsHidden()?'0':'1');}catch(e){}
   applyHideAmounts();
+  try{renderNdHero();}catch(e){}
 }
 
 function bootstrapApp(){
@@ -17798,6 +17799,29 @@ function renderNdHero(){
   try{ndAnimHero(toDisplayCurr(total),sym);}catch(e){}
   try{ndEarnTick();}catch(e){}
   try{ndDrawMark('hero',[...box.querySelectorAll('.nd-line')]);}catch(e){}
+  try{ndWidgetPush(total,pts,d1ok?d1.pct:null);}catch(e){}
+}
+// Виджет на экране iPhone: после каждого пересчёта капитала отдаём в нативную часть готовую сумму,
+// процент за сутки и точки графика (только в приложении iOS; в вебе и на Android ничего не происходит).
+// Сумма скрыта кнопкой «глаз» — в виджет уходит флаг hidden, и он показывает «••••».
+let _ndWgT=0,_ndWgLast='';
+function ndWidgetPush(total,pts,pct){
+  if(!isIosApp())return;
+  const P=window.Capacitor&&(window.Capacitor.Plugins&&window.Capacitor.Plugins.OvantaWidget||window.Capacitor.registerPlugin&&window.Capacitor.registerPlugin('OvantaWidget'));
+  if(!P||!P.update)return;
+  clearTimeout(_ndWgT);
+  _ndWgT=setTimeout(()=>{
+    const arr=(pts||[]).filter(Number.isFinite).slice(-40);
+    const min=Math.min(...arr),max=Math.max(...arr),span=(max-min)||1;
+    const payload={amount:fmtN(toDisplayCurr(total)),sym:getCurrSym(),pct:Number.isFinite(pct)?Math.round(pct*100)/100:null,
+      pts:arr.length>1?arr.map(v=>Math.round((v-min)/span*1000)/1000):[],
+      hidden:document.body.classList.contains('amounts-hidden'),updated:Math.round(Date.now()/1000),
+      title:t('totalCapital')};
+    const json=JSON.stringify(payload);
+    if(json===_ndWgLast)return;
+    _ndWgLast=json;
+    P.update({json}).catch(()=>{});
+  },600);
 }
 // ═══ АНИМАЦИИ (03.11) ═══
 // Всё движение нового дизайна собрано здесь. Выключатель — «✨ Анимации» в админке
