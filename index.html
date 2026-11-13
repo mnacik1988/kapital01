@@ -2740,6 +2740,14 @@ body.nd .stock-detail-box .ex-hint{font-family:'Manrope',sans-serif!important;fo
 body.nd .stock-detail-box button[onclick^="closeStockDetail"]{background:var(--nd-btn)!important;border:1px solid var(--nd-l2)!important;border-radius:14px!important;padding:12px!important;font:600 14px 'Manrope',sans-serif!important;color:var(--nd-text2)!important;}
 body.nd .ticker-card.tc-coin{border-top-color:var(--nd-l1)!important;border-top-width:1px!important;}
 body.nd .ticker-card.tc-coin [style*="--purple"]{color:var(--nd-goldtx)!important;}
+/* выпадающие списки языка и валюты в настройках (13.11) */
+.dd-trig{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;cursor:pointer;font:600 14px 'Manrope',sans-serif;padding:12px 14px;border-radius:14px;border:1px solid var(--nd-l2,var(--border2));background:var(--nd-surface,transparent);color:var(--nd-text,var(--text));}
+.dd-trig::after{content:'';width:7px;height:7px;border-right:2px solid var(--nd-muted,var(--muted));border-bottom:2px solid var(--nd-muted,var(--muted));transform:rotate(45deg);margin:-3px 4px 0 0;transition:transform .2s;flex:none;}
+.dd.open .dd-trig{border-color:#d9b86666;}
+.dd.open .dd-trig::after{transform:rotate(-135deg);margin-top:3px;}
+.dd .dd-list{display:none!important;}
+.dd.open .dd-list{display:grid!important;grid-template-columns:1fr!important;gap:6px!important;margin-top:8px;}
+.dd .dd-list button{min-height:42px!important;font-size:14px!important;text-align:left!important;padding:10px 14px!important;white-space:nowrap;}
 /* ═══ ANIMATIONS (03.11) — только новый дизайн, выключаются в админке «✨ Анимации» и системным «Уменьшить движение».
    Нижнюю панель не трогаем: на iOS анимации/трансформации внутри fixed-панели ломали иконки. ═══ */
 .nd-earn{display:none;}
@@ -3576,23 +3584,25 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
     </div>
     <div class="settings-section">
       <div class="settings-label" id="set_lang_label">Мова / Language</div>
-      <div class="settings-langs">
+      <div class="dd" id="ddLang"><button class="dd-trig" type="button" id="ddLangTrig" onclick="toggleDd('ddLang')"></button>
+      <div class="settings-langs dd-list">
         <button class="settings-lang-btn" id="slang-en" onclick="setLangFromSettings('en')">🇬🇧 Eng</button>
         <button class="settings-lang-btn active" id="slang-uk" onclick="setLangFromSettings('uk')">🇺🇦 Укр</button>
         <button class="settings-lang-btn" id="slang-ru" onclick="setLangFromSettings('ru')">🇷🇺 Рус</button>
         <button class="settings-lang-btn" id="slang-de" onclick="setLangFromSettings('de')">🇩🇪 Deu</button>
         <button class="settings-lang-btn" id="slang-zh" onclick="setLangFromSettings('zh')">🇨🇳 中文</button>
-      </div>
+      </div></div>
     </div>
     <div class="settings-section">
       <div class="settings-label" id="set_curr_label">Відображення суми</div>
-      <div class="settings-currency-row">
+      <div class="dd" id="ddCurr"><button class="dd-trig" type="button" id="ddCurrTrig" onclick="toggleDd('ddCurr')"></button>
+      <div class="settings-currency-row dd-list">
         <button class="settings-curr-btn active" id="scurr-uah" onclick="setDisplayCurrency('uah')">₴ UAH</button>
         <button class="settings-curr-btn" id="scurr-usd" onclick="setDisplayCurrency('usd')">$ USD</button>
         <button class="settings-curr-btn" id="scurr-eur" onclick="setDisplayCurrency('eur')">€ EUR</button>
         <button class="settings-curr-btn" id="scurr-rub" onclick="setDisplayCurrency('rub')">₽ RUB</button>
         <button class="settings-curr-btn" id="scurr-cny" onclick="setDisplayCurrency('cny')">¥ CNY</button>
-      </div>
+      </div></div>
     </div>
     <div class="settings-section">
       <div class="settings-label" id="set_theme_label">Тема</div>
@@ -3818,7 +3828,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.43';
+const APP_VERSION = 'v0.2.44';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -10187,6 +10197,8 @@ function openSettings(){
   document.querySelectorAll('.settings-curr-btn').forEach(b=>{
     b.classList.toggle('active', b.id==='scurr-'+displayCurrency);
   });
+  document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open'));
+  ddSync();
   applyAppTheme(appTheme);
   const settingsOverlay=document.getElementById('settingsOverlay');
   if(settingsOverlay)settingsOverlay.classList.add('open');
@@ -10234,7 +10246,25 @@ function setLangFromSettings(lang){
   document.querySelectorAll('.settings-lang-btn').forEach(b=>{
     b.classList.toggle('active', b.id==='slang-'+lang);
   });
+  ddSync();
 }
+// Выпадающие списки языка и валюты: подпись = выбранная кнопка, список раскрывается по нажатию, выбор закрывает его
+function ddSync(){
+  [['ddLang','ddLangTrig','.settings-lang-btn'],['ddCurr','ddCurrTrig','.settings-curr-btn']].forEach(([id,tr,sel])=>{
+    const a=document.querySelector('#'+id+' '+sel+'.active'),t=document.getElementById(tr);
+    if(a&&t)t.textContent=a.textContent.trim();
+  });
+}
+function toggleDd(id){
+  const el=document.getElementById(id);if(!el)return;
+  const open=!el.classList.contains('open');
+  document.querySelectorAll('.dd.open').forEach(d=>d.classList.remove('open'));
+  if(open)el.classList.add('open');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('.dd-list button');
+  if(b){setTimeout(()=>{ddSync();const d=b.closest('.dd');if(d)d.classList.remove('open');},0);}
+});
 
 function getCurrSym(){return {'uah':'₴','usd':'$','eur':'€','rub':'₽','cny':'¥'}[displayCurrency]||'₴';}
 function getCurrRate(){
