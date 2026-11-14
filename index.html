@@ -3838,7 +3838,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.49';
+const APP_VERSION = 'v0.2.50';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17805,6 +17805,26 @@ function renderNdHero(){
 // процент за сутки и точки графика (только в приложениях iOS и Android; в обычном браузере ничего не происходит).
 // Сумма скрыта кнопкой «глаз» — в виджет уходит флаг hidden, и он показывает «••••».
 let _ndWgT=0,_ndWgLast='';
+// Позиции в крипте для виджета: он сам раз в 15–30 минут берёт цены у Binance и пересчитывает капитал.
+// Передаём количество и цену, по которой приложение оценило монету сейчас (p), — виджет прибавляет разницу.
+function ndWidgetCoins(){
+  const out=[];
+  if(hiddenCards['crypto'])return out;
+  try{
+    Object.values(getCryptoPortfolioStats().groups).forEach(g=>{
+      const q=Math.max(0,g.totalQty),p=Number(g.curPrice)||0;
+      if(q>0&&p>0&&!EXCHANGE_STABLES.has(g.name))out.push({s:g.name,q:+q.toPrecision(10),p});
+    });
+  }catch(e){}
+  try{
+    getExchangeHoldings().forEach(r=>{
+      if(!r||r.noPrice||EXCHANGE_STABLES.has(r.coin))return;
+      const q=Number(r.qty),p=Number(r.price)||(q>0?(Number(r.usd)||0)/q:0);
+      if(q>0&&p>0)out.push({s:String(r.coin),q:+q.toPrecision(10),p});
+    });
+  }catch(e){}
+  return out.slice(0,80);
+}
 function ndWidgetPush(total,pts,pct){
   const ios=isIosApp();
   const A=!ios&&window.InveStoryNative&&typeof window.InveStoryNative.updateWidget!=='undefined'?window.InveStoryNative:null;
@@ -17818,6 +17838,7 @@ function ndWidgetPush(total,pts,pct){
       pts:arr.length>1?arr.map(v=>Math.round((v-min)/span*1000)/1000):[],
       // num + rate: виджет сам «дотягивает» сумму за счёт начисления по вкладам, пока приложение закрыто
       num:Math.round(toDisplayCurrExact(total)*100)/100,rate:Math.max(0,(function(){try{return toDisplayCurrExact(getPortfolioDepositIncome().daily||0)/86400;}catch(e){return 0;}})()),
+      coins:ndWidgetCoins(),k:toDisplayCurrExact(getCryptoRate()),
       hidden:document.body.classList.contains('amounts-hidden'),updated:Math.round(Date.now()/1000),
       title:t('totalCapital')};
     const json=JSON.stringify(payload);
