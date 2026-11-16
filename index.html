@@ -2687,6 +2687,11 @@ body.modern-mockup.nd.theme-light .nd-day-btn{border-color:#c4962f!important;}
 .nd-topups{order:2;margin-top:16px;border:1px solid var(--nd-l1);border-radius:16px;padding:12px 14px;background:var(--nd-bg);}
 .nd-topups-head{display:flex;justify-content:space-between;align-items:baseline;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--nd-muted);margin-bottom:6px;}
 .nd-topups-head b{letter-spacing:0;font-size:12px;color:var(--nd-goldtx);}
+.nd-topups-head{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
+.nd-topups-head .chev{display:inline-block;margin-left:8px;font-size:13px;letter-spacing:0;transition:transform .2s;transform:rotate(90deg);}
+.nd-topups.closed .nd-topups-head{margin-bottom:0;}
+.nd-topups.closed .nd-topups-head .chev{transform:rotate(0deg);}
+.nd-topups.closed .nd-topup{display:none;}
 .nd-topup{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--nd-l1);font-size:13px;color:var(--nd-text);}
 .nd-topup:first-of-type{border-top:0;}
 .nd-topup .d{flex:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--nd-muted2);}
@@ -3838,7 +3843,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.50';
+const APP_VERSION = 'v0.2.51';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -17443,6 +17448,14 @@ function ndDepositBankLine(d){
     (pending>=0.5?' · '+escHtml(trx({uk:'набігло',ru:'набежало',en:'accrued',de:'aufgelaufen',zh:'已累计'}))+' <b class="up hide-amt">+'+fmtN(pending)+' '+sym+'</b>':'');
 }
 // Удаление пополнения в два нажатия: × → «Удалить?» → удаляем (confirm() в WebView не работает)
+// Список пополнений во вкладе сворачивается нажатием на заголовок; открытые вклады запоминаются
+const ndTopupsOpen=new Set((()=>{try{return JSON.parse(localStorage.getItem('ovanta_topups_open')||'[]');}catch(e){return [];}})());
+function ndToggleTopups(head){
+  const id=head.getAttribute('data-dep');const box=head.closest('.nd-topups');if(!box)return;
+  if(ndTopupsOpen.has(id))ndTopupsOpen.delete(id);else ndTopupsOpen.add(id);
+  box.classList.toggle('closed',!ndTopupsOpen.has(id));
+  try{localStorage.setItem('ovanta_topups_open',JSON.stringify([...ndTopupsOpen]));}catch(e){}
+}
 function ndDelTopup(depId,ti){
   const btn=window.event&&window.event.currentTarget;
   if(btn&&!btn.classList.contains('arm')){
@@ -17505,7 +17518,8 @@ function ndDecorateDeposits(){
     else{
       if(!tops){tops=document.createElement('div');tops.className='nd-topups';const db=slide.querySelector('.daily-section');if(db)db.after(tops);else slide.appendChild(tops);}
       const sym=getDepositCurrencySymbol(d);
-      tops.innerHTML='<div class="nd-topups-head"><span>'+escHtml(trx({uk:'Поповнення',ru:'Пополнения',en:'Top-ups',de:'Einzahlungen',zh:'追加'}))+' · '+tl.length+'</span><b class="hide-amt">+'+fmtN(tl.reduce((a,tp)=>a+(parseInputNumber(tp.amount)||0),0))+' '+sym+'</b></div>'+
+      tops.classList.toggle('closed',!ndTopupsOpen.has(String(d.id)));
+      tops.innerHTML='<div class="nd-topups-head" onclick="ndToggleTopups(this)" data-dep="'+escHtml(String(d.id))+'"><span>'+escHtml(trx({uk:'Поповнення',ru:'Пополнения',en:'Top-ups',de:'Einzahlungen',zh:'追加'}))+' · '+tl.length+'<i class="chev">›</i></span><b class="hide-amt">+'+fmtN(tl.reduce((a,tp)=>a+(parseInputNumber(tp.amount)||0),0))+' '+sym+'</b></div>'+
         tl.map((tp,ti)=>'<div class="nd-topup"><span class="d">'+escHtml(new Date(tp.date).toLocaleDateString(liabDateLocale(),{day:'numeric',month:'short',year:'numeric'}))+'</span><span class="a hide-amt">+'+fmtN(parseInputNumber(tp.amount))+' '+sym+'</span><button type="button" class="x" aria-label="×" onclick="ndDelTopup(\''+d.id+'\','+ti+')">×</button></div>').join('');
     }
     if(!slide.querySelector('.nd-dep-btns')){
