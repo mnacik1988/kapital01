@@ -31,6 +31,11 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 <style>
+/* Заставка при запуске: тот же логотип со столбиками, что при обновлении жестом вниз (18.11.2026) */
+.boot-splash{position:fixed;inset:0;z-index:2147483000;background:#0a0a0f;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .28s ease;}
+.boot-splash.out{opacity:0;pointer-events:none;}
+.boot-splash svg{width:104px;height:127px;display:block;}
+.boot-splash .bs-bg{fill:#2a2b31;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--card:#16161f;
@@ -2823,6 +2828,16 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 </style>
 </head>
 <body class="modern-mockup">
+<div class="boot-splash" id="bootSplash" aria-hidden="true"><svg viewBox="120 90 270 330"><defs><linearGradient id="bsG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d27a"/><stop offset="1" stop-color="#d9a441"/></linearGradient><clipPath id="bsC0"><rect x="100" width="320" y="408" height="1"><animate attributeName="y" dur="1.1s" repeatCount="indefinite" keyTimes="0;0.25;1" values="408;260;260"/><animate attributeName="height" dur="1.1s" repeatCount="indefinite" keyTimes="0;0.25;1" values="1;149;149"/></rect></clipPath><clipPath id="bsC1"><rect x="100" width="320" y="408" height="1"><animate attributeName="y" dur="1.1s" repeatCount="indefinite" keyTimes="0;0.25;0.5;1" values="408;408;182;182"/><animate attributeName="height" dur="1.1s" repeatCount="indefinite" keyTimes="0;0.25;0.5;1" values="1;1;227;227"/></rect></clipPath><clipPath id="bsC2"><rect x="100" width="320" y="388" height="1"><animate attributeName="y" dur="1.1s" repeatCount="indefinite" keyTimes="0;0.5;0.75;1" values="388;388;102;102"/><animate attributeName="height" dur="1.1s" repeatCount="indefinite" keyTimes="0;0.5;0.75;1" values="1;1;287;287"/></rect></clipPath></defs><polygon class="bs-bg" points="140,300 190,260 190,408 140,408"/><polygon class="bs-bg" points="220,218 278,182 278,408 220,408"/><polygon class="bs-bg" points="308,102 372,132 372,352 308,388"/><polygon fill="url(#bsG)" clip-path="url(#bsC0)" points="140,300 190,260 190,408 140,408"/><polygon fill="url(#bsG)" clip-path="url(#bsC1)" points="220,218 278,182 278,408 220,408"/><polygon fill="url(#bsG)" clip-path="url(#bsC2)" points="308,102 372,132 372,352 308,388"/></svg></div>
+<script>
+// Убирается, когда приложение собрано (bootstrapApp). Не раньше чем через ~0,9 с от начала загрузки, чтобы столбики успели вырасти,
+// и не позже чем через 8 с — на случай сбоя запуска.
+(function(){var s=document.getElementById("bootSplash"),gone=false;
+try{if(matchMedia("(prefers-reduced-motion: reduce)").matches||localStorage.getItem("investory_anim")==="0"){var v=s.querySelector("svg");if(v&&v.pauseAnimations){v.pauseAnimations();v.setCurrentTime(0.9);}}}catch(e){}
+window.bootSplashHide=function(){if(gone)return;gone=true;var w=Math.max(0,900-(window.performance&&performance.now?performance.now():900));
+setTimeout(function(){s.classList.add("out");setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},350);},w);};
+setTimeout(window.bootSplashHide,8000);})();
+</script>
 <div class="app">
 
 <!-- HEADER -->
@@ -3846,7 +3861,7 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.52';
+const APP_VERSION = 'v0.2.53';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -10140,6 +10155,7 @@ function bootstrapApp(){
     console.error('bootstrapApp failed',e);
     try{updateStorageHealthUI();}catch(_e){}
   }
+  try{if(window.bootSplashHide)window.bootSplashHide();}catch(e){}
 }
 
 const SETTINGS_I18N={
