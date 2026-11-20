@@ -3874,7 +3874,7 @@ setTimeout(window.bootSplashHide,8000);})();
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.55';
+const APP_VERSION = 'v0.2.56';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -5468,9 +5468,9 @@ function calcDeposit(depId){
 // ── LIVE TICKER// ── LIVE TICKER ──────────────────────────────
 function fmtLive(n,sym='₴'){
   const a=Math.abs(n);
-  if(a>=1e6)return (n/1e6).toFixed(4)+'M '+sym;
-  if(a>=1e3)return fmtD(n,2)+' '+sym;
-  return n.toFixed(2)+' '+sym;
+  // Одна запятая для всех сумм: раньше до 1000 шло «33.75», а от 1000 — «1 012,60» (20.11.2026)
+  if(a>=1e6)return fmtD(n/1e6,4)+'M '+sym;
+  return fmtD(n,2)+' '+sym;
 }
 function calcLive(depId){
   const dep=deposits.find(d=>d.id===depId);
@@ -5535,7 +5535,7 @@ function calcLive(depId){
   setText('liveInterest_'+depId,'+'+fmtLive(sim.totalGross,depSym)+' ('+sim.completedCaps+' '+uiText('accrualsShort')+')');
   setText('liveTaxLive_'+depId,'−'+fmtLive(sim.totalTax,depSym)+' ('+Math.round(tax*100)+'%)');
   setText('liveNet_'+depId,'+'+fmtLive(sim.totalNet,depSym));
-  setText('livePerSec_'+depId,'+'+perSec.toFixed(5)+' '+depSym+trx(UNIT_TXT.perSec));
+  setText('livePerSec_'+depId,'+'+fmtD(perSec,5)+' '+depSym+trx(UNIT_TXT.perSec));
   setText('livePerDay_'+depId,'+'+fmtLive(perDay,depSym));
   setText('livePerMonth_'+depId,'+'+fmtLive(perMonth,depSym));
   // Приписки «с завтра» больше нет: переключение действует сразу, и весь
@@ -17570,7 +17570,8 @@ function ndDecorateDeposits(){
     ru:n10===1&&n100!==11?'вклад':few?'вклада':'вкладов',
     en:n===1?'deposit':'deposits',de:n===1?'Einlage':'Einlagen',zh:'笔'}));
   const live=$('ndDepLive');
-  if(live)live.innerHTML='● <span class="live-val">+'+fmtD(toDisplayCurr(inc.daily))+' '+sym+'</span> '+escHtml(trx({uk:'сьогодні',ru:'сегодня',en:'today',de:'heute',zh:'今天'}))+' · <span class="live-val">'+(toDisplayCurr(inc.daily)/86400).toFixed(5)+' '+sym+'/'+trx({uk:'с',ru:'с',en:'s',de:'s',zh:'秒'})+'</span>';
+  // Без округления до целой гривны: было «+34,00 сегодня» при доходе 33,75 в карточке вклада (20.11.2026)
+  if(live)live.innerHTML='● <span class="live-val">+'+fmtD(toDisplayCurrExact(inc.daily))+' '+sym+'</span> '+escHtml(trx({uk:'сьогодні',ru:'сегодня',en:'today',de:'heute',zh:'今天'}))+' · <span class="live-val">'+fmtD(toDisplayCurrExact(inc.daily)/86400,5)+' '+sym+'/'+trx({uk:'с',ru:'с',en:'s',de:'s',zh:'秒'})+'</span>';
   if(typeof syncDepositSliderHeight==='function')syncDepositSliderHeight();
 }
 // Столбики берём из готового журнала по дням (его считает тот же движок, что и счётчик)
