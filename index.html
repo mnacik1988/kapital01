@@ -3874,7 +3874,7 @@ setTimeout(window.bootSplashHide,8000);})();
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.56';
+const APP_VERSION = 'v0.2.57';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -5606,10 +5606,13 @@ function renderDailyLog(depId,P,rAnn,tax,start,now,currentBalance,regDate,dep){
     shownNet+=dayNet;
     prev=next;
     const isCap=capStrs.includes(toStr(day));
-    rowList.push(`<div class="daily-row">
+    // Сегодняшний день ещё идёт: проценты за него банк начислит в полночь. Раньше строка выглядела уже начисленной
+    // («20 нояб. +33.75»), хотя «Чистая прибыль» честно показывала 0 (20.11.2026).
+    const isToday=toStr(day)===toStr(now);
+    rowList.push(`<div class="daily-row${isToday?' daily-today':''}">
       <span class="daily-date">${appShortDate(day,false)}${isCap?' 💰':''}</span>
-      <span class="daily-income" style="color:var(--green2)">+${dayNet.toFixed(2)} ${depSym}/${t('days')}</span>
-      <span class="daily-total" style="color:var(--muted);font-size:9px">${dayGross.toFixed(2)} − ${dayTax.toFixed(2)} ${uiText('taxShort')}</span>
+      <span class="daily-income" style="color:${isToday?'var(--muted)':'var(--green2)'}">${isToday?'≈':''}+${fmtD(dayNet)} ${depSym}/${t('days')}</span>
+      <span class="daily-total" style="color:var(--muted);font-size:9px">${isToday?escHtml(trx({uk:'нараховується, зарахують опівночі',ru:'начисляется, зачислят в полночь',en:'accruing, credited at midnight',de:'läuft, Gutschrift um Mitternacht',zh:'计息中，午夜入账'})):fmtD(dayGross)+' − '+fmtD(dayTax)+' '+uiText('taxShort')}</span>
     </div>`);
   }
   const rows=rowList.reverse().join('');
