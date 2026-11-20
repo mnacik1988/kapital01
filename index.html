@@ -2843,6 +2843,8 @@ body.nd.nd-anim [id^="liveAmount_"]{position:relative;}
 <script>
 // Убирается, когда приложение собрано (bootstrapApp). Не раньше чем через ~0,9 с от начала загрузки, чтобы столбики успели вырасти,
 // и не позже чем через 8 с — на случай сбоя запуска.
+// Новый дизайн включаем сразу, до загрузки основного кода: иначе iOS успевал на миг показать старый вид (20.11.2026).
+try{if(localStorage.getItem("investory_new_design")!=="0")document.body.classList.add("nd");}catch(e){document.body.classList.add("nd");}
 (function(){var s=document.getElementById("bootSplash"),gone=false;
 try{if(matchMedia("(prefers-reduced-motion: reduce)").matches||localStorage.getItem("investory_anim")==="0")s.classList.add("static");}catch(e){}
 window.bootSplashHide=function(){if(gone)return;gone=true;var w=Math.max(0,900-(window.performance&&performance.now?performance.now():900));
@@ -3872,7 +3874,7 @@ setTimeout(window.bootSplashHide,8000);})();
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.54';
+const APP_VERSION = 'v0.2.55';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
