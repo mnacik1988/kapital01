@@ -3874,7 +3874,7 @@ setTimeout(window.bootSplashHide,8000);})();
 
 
 // ── SUBSCRIPTION ACCESS STATE ─────────────────────────────
-const APP_VERSION = 'v0.2.57';
+const APP_VERSION = 'v0.2.58';
 const APP_BUILD_DATE = '2026-11-03';
 const STORAGE_SCHEMA_VERSION = 7;
 const STORAGE_KEY = 'kapital_v6';
@@ -7965,13 +7965,13 @@ function exUsdtCard(r,rate,sym,exId){
 // иногда меняются между версиями — поэтому даём и путь, и прямую ссылку.
 const CONNECT_GUIDES={
   bybit:{url:'https://www.bybit.com/app/user/api-management',
-    open:{uk:'Відкрити Bybit',ru:'Открыть Bybit',en:'Open Bybit',de:'Bybit öffnen',zh:'打开 Bybit'},
+    open:{uk:'Відкрити сайт Bybit',ru:'Открыть сайт Bybit',en:'Open Bybit website',de:'Bybit-Website öffnen',zh:'打开 Bybit 网站'},
     steps:{
-      uk:['Відкрийте застосунок Bybit → іконка профілю (ліворуч угорі) → «API».','«Створити новий ключ» → «Згенеровані системою».','Назва — Ovanta. Дозволи: лише «Тільки читання» (Read-Only). Торгівлю й виведення не вмикайте.','Підтвердіть кодом і скопіюйте API Key та API Secret.','Поверніться сюди й вставте обидва ключі кнопками «Вставити».'],
-      ru:['Откройте приложение Bybit → иконка профиля (слева вверху) → «API».','«Создать новый ключ» → «Сгенерированные системой».','Название — Ovanta. Права: только «Только чтение» (Read-Only). Торговлю и вывод не включайте.','Подтвердите кодом и скопируйте API Key и API Secret.','Вернитесь сюда и вставьте оба ключа кнопками «Вставить».'],
-      en:['Open the Bybit app → profile icon (top left) → “API”.','“Create new key” → “System-generated”.','Name it Ovanta. Permissions: “Read-Only” only. Do not enable trading or withdrawals.','Confirm with the code and copy the API Key and API Secret.','Come back here and paste both with the “Paste” buttons.'],
-      de:['Bybit-App öffnen → Profilsymbol (oben links) → „API“.','„Neuen Schlüssel erstellen“ → „Systemgeneriert“.','Name: Ovanta. Rechte: nur „Read-Only“. Handel und Auszahlung nicht aktivieren.','Mit Code bestätigen, API Key und API Secret kopieren.','Hierher zurückkehren und beide mit „Einfügen“ einfügen.'],
-      zh:['打开 Bybit 应用 → 左上角头像 → “API”。','“创建新密钥” → “系统生成”。','名称填 Ovanta。权限只选“只读”(Read-Only)，不要开启交易和提现。','用验证码确认，复制 API Key 和 API Secret。','回到这里，用“粘贴”按钮粘贴两个密钥。']},
+      uk:['Відкрийте сайт Bybit кнопкою нижче — у застосунку Bybit ключ створити не можна. Якщо відкрився застосунок, відкрийте посилання в браузері. Увійдіть → іконка профілю → «API».','«Створити новий ключ» → «Згенеровані системою».','Назва — Ovanta. Дозволи: лише «Тільки читання» (Read-Only). Торгівлю й виведення не вмикайте.','Підтвердіть кодом і скопіюйте API Key та API Secret.','Поверніться сюди й вставте обидва ключі кнопками «Вставити».'],
+      ru:['Откройте сайт Bybit кнопкой ниже — в приложении Bybit ключ создать нельзя. Если открылось приложение, откройте ссылку в браузере. Войдите → иконка профиля → «API».','«Создать новый ключ» → «Сгенерированные системой».','Название — Ovanta. Права: только «Только чтение» (Read-Only). Торговлю и вывод не включайте.','Подтвердите кодом и скопируйте API Key и API Secret.','Вернитесь сюда и вставьте оба ключа кнопками «Вставить».'],
+      en:['Open the Bybit website with the button below — keys can’t be created in the Bybit app. If the app opens instead, open the link in a browser. Sign in → profile icon → “API”.','“Create new key” → “System-generated”.','Name it Ovanta. Permissions: “Read-Only” only. Do not enable trading or withdrawals.','Confirm with the code and copy the API Key and API Secret.','Come back here and paste both with the “Paste” buttons.'],
+      de:['Bybit-Website mit dem Button unten öffnen — in der Bybit-App lassen sich keine Schlüssel erstellen. Öffnet sich die App, den Link im Browser öffnen. Anmelden → Profilsymbol → „API“.','„Neuen Schlüssel erstellen“ → „Systemgeneriert“.','Name: Ovanta. Rechte: nur „Read-Only“. Handel und Auszahlung nicht aktivieren.','Mit Code bestätigen, API Key und API Secret kopieren.','Hierher zurückkehren und beide mit „Einfügen“ einfügen.'],
+      zh:['用下方按钮打开 Bybit 网站——Bybit 应用内无法创建密钥。如果打开的是应用，请在浏览器中打开链接。登录 → 头像 → “API”。','“创建新密钥” → “系统生成”。','名称填 Ovanta。权限只选“只读”(Read-Only)，不要开启交易和提现。','用验证码确认，复制 API Key 和 API Secret。','回到这里，用“粘贴”按钮粘贴两个密钥。']},
     note:{uk:'Ключ без прив’язки до IP Bybit вимикає через 3 місяці — тоді створіть новий.',ru:'Ключ без привязки к IP Bybit отключает через 3 месяца — тогда создайте новый.',en:'Bybit disables keys without an IP binding after 3 months — then create a new one.',de:'Bybit deaktiviert Schlüssel ohne IP-Bindung nach 3 Monaten — dann neu erstellen.',zh:'未绑定 IP 的密钥 3 个月后会被 Bybit 停用，届时请重新创建。'}},
   binance:{url:'https://www.binance.com/my/settings/api-management',
     open:{uk:'Відкрити Binance',ru:'Открыть Binance',en:'Open Binance',de:'Binance öffnen',zh:'打开 Binance'},
@@ -13276,6 +13276,7 @@ window.refreshFromBottomNav=async function(event){
 // Подставить ID веб-клиента из своего проекта Google Cloud, и вход включится.
 const GOOGLE_CLIENT_ID='802898443875-ipii5n1uh9u2i4n9iu87r5ks51pjk6tl.apps.googleusercontent.com';
 const AUTH_BASE='https://plain-bread-df6d.mnacik1988.workers.dev';
+const KEYS_OWNER_LS='investory_keys_owner';
 const AK={jwt:'investory_g_jwt',jwtExp:'investory_g_jwt_exp',email:'investory_g_email',
   sub:'investory_g_sub',sess:'investory_sess',sessExp:'investory_sess_exp'};
 
@@ -13316,6 +13317,14 @@ function setGoogleToken(jwt){
     // Вход с Apple — отдельный аккаунт apple:<sub>, как его видит сервер (с Google не путается)
     const sub=p.sub?(p.iss==='https://appleid.apple.com'?'apple:'+p.sub:p.sub):'';
     ls.set(AK.email,p.email||'');ls.set(AK.sub,sub);
+    if(sub){
+      const owner=ls.get(KEYS_OWNER_LS);
+      if(owner&&owner!==sub){
+        ['investory_exchange_keys','investory_exchange_cache','investory_bank_keys','investory_bank_cache'].forEach(ls.del);
+        try{renderExchanges();}catch{}try{renderBanks();}catch{}
+      }
+      ls.set(KEYS_OWNER_LS,sub);
+    }
   }catch{}
 }
 async function exchangeForSessionToken(idToken){
@@ -13398,11 +13407,13 @@ function confirmSignOut(){
 }
 function signOutGoogle(){
   authGeneration++;
+  const prevSub=getGoogleSub();
   [AK.jwt,AK.jwtExp,AK.email,AK.sub,AK.sess,AK.sessExp].forEach(ls.del);
-  // Ключи бирж — чужие финансовые доступы; после выхода на устройстве им не место.
-  ls.del('investory_exchange_keys');ls.del('investory_exchange_cache');
+  // Ключи бирж и банков остаются на устройстве, как и сам портфель: раньше выход их стирал, и после
+  // повторного входа крипта и банк показывали 0 (21.11.2026). Помечаем, чьи они: войдёт ДРУГОЙ
+  // аккаунт — setGoogleToken удалит их, чтобы чужие доступы не достались.
+  if(prevSub)ls.set(KEYS_OWNER_LS,prevSub);
   ls.del('investory_access');
-  ls.del('investory_bank_keys');ls.del('investory_bank_cache');
   try{bankUi.busy={};bankUi.errors={};bankUi.formOpen=false;renderBanks();}catch{}
   try{const a=document.getElementById('adminSection');if(a)a.style.display='none';const q=document.getElementById('qaSection');if(q)q.style.display='none';closeAdminPanel();}catch{}
   try{exchangeUi.busy={};exchangeUi.errors={};exchangeUi.formOpen=false;renderExchanges();}catch{}

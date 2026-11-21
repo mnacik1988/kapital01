@@ -473,6 +473,12 @@ async function fetchCoinLogo(sym) {
   // Набор цветных иконок ~400 известных монет — с CDN, без лимитов.
   const pack = await fetchLogoImage('https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/' + encodeURIComponent(sym.toLowerCase()) + '.svg');
   if (pack) return pack;
+  // Иконки бирж по тикеру (21.11.2026): поиск CoinGecko часто отказывает серверам Cloudflare,
+  // и у IO, SOSO и других вместо логотипа оставались буквы. Binance и Gate отдают картинку прямо по тикеру.
+  for (const u of ['https://bin.bnbstatic.com/static/assets/logos/' + encodeURIComponent(sym) + '.png',
+                   'https://icon.gateimg.com/images/coin_icon/64/' + encodeURIComponent(sym.toLowerCase()) + '.png']) {
+    try { const img = await fetchLogoImage(u); if (img) return img; } catch { /* следующий источник */ }
+  }
   // Редкие монеты — картинка CoinGecko (самая крупная монета с таким тикером).
   const res = await fetch('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(sym), {
     headers: { Accept: 'application/json', 'User-Agent': 'InveStory-Worker/2.0' }, cf: { cacheEverything: true, cacheTtl: DAY_SEC } });
@@ -515,7 +521,8 @@ async function handleLogo(request, env) {
   const type = url.searchParams.get('t');
   const sym = String(url.searchParams.get('s') || '').trim().toUpperCase();
   if (!((type === 'coin' && COIN_RE.test(sym)) || (type === 'stock' && TICKER_RE.test(sym)))) return logoMiss(400, 0);
-  const key = 'logo:' + type + ':' + sym;
+  // logo2: новые источники иконок монет — старые записи «картинки нет» больше не читаем (21.11.2026)
+  const key = 'logo2:' + type + ':' + sym;
   if (env.AI_LIMITS) {
     try {
       const hit = await env.AI_LIMITS.getWithMetadata(key, 'arrayBuffer');
